@@ -105,11 +105,13 @@ module rs_one_entry(
 		USE_ADDER:
 			if (adder_available)
 				fu_ready = 1;
-else
+			else
 				fu_ready = 0;
 		USE_MEMORY:
 			if (memory_available)
 				fu_ready = 1;
+			else
+				fu_ready = 0;
 		default:
 				fu_ready = 0;
 		endcase

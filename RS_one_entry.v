@@ -122,7 +122,6 @@ module rs_one_entry(
 	begin 
     		if (reset) 
     		begin 
- 
             		OPa 	 <= `SD 0; 
             		OPb 	 <= `SD 0; 
             		OPaValid <= `SD 0; 
