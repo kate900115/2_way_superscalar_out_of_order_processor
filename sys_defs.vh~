@@ -285,7 +285,7 @@ typedef enum logic [1:0] {
 // JSR (1a.xx) opcodes
 
 
-
+// new system define
 
 
 `define JMP_INST  2'h0
@@ -299,7 +299,7 @@ typedef enum logic [1:0] {
 
 
 typedef enum logic [1:0] {
-  DEST_IS_REGC  = 2'h0,
-  DEST_IS_REGA  = 2'h1,
-  DEST_NONE     = 2'h2
-} DEST_REG_SEL;
+  USE_MULTIPLIER  = 2'h0,
+  USE_ADDER       = 2'h1,
+  USE_MEMORY      = 2'h2
+} FU_SELECT;

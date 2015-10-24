@@ -122,31 +122,31 @@ module rs_one_entry(
 	begin 
     		if (reset) 
     		begin 
-            		OPa 	 <= `SD 0; 
-            		OPb 	 <= `SD 0; 
-            		OPaValid <= `SD 0; 
-            		OPbValid <= `SD 0; 
-			OP_type  <= `SD 5'b0;
-            		InUse 	 <= `SD 1'b0; 
-           		DestTag  <= `SD 0;
-			Rob_idx	 <= `SD 0;
-			alu_func <= `SD 0;
-			fu_select_reg<=`SD 0;
+            		OPa 	 	<= `SD 0; 
+            		OPb 	 	<= `SD 0; 
+            		OPaValid 	<= `SD 0; 
+            		OPbValid 	<= `SD 0; 
+			OP_type  	<= `SD 5'b0;
+            		InUse 	 	<= `SD 1'b0; 
+           		DestTag  	<= `SD 0;
+			Rob_idx	 	<= `SD 0;
+			alu_func 	<= `SD 0;
+			fu_select_reg	<=`SD 0;
     		end 
     		else 
     		begin 
         		if (rs1_load_in) 
         		begin 
-           			OPa 	 <= `SD rs1_opa_in; 
-            			OPb 	 <= `SD rs1_opb_in; 
-            			OPaValid <= `SD rs1_opa_valid; 
-            			OPbValid <= `SD rs1_opb_valid; 
-				OP_type  <= `SD rs1_op_type_in;
-            			InUse 	 <= `SD 1'b1; 
-            			DestTag  <= `SD rs1_dest_in;
-				Rob_idx	 <= `SD rs1_rob_idx_in;
-				alu_func <= `SD rs1_alu_func; 
-				fu_select_reg<=`SD fu_select;
+           			OPa 	 	<= `SD rs1_opa_in; 
+            			OPb 	 	<= `SD rs1_opb_in; 
+            			OPaValid 	<= `SD rs1_opa_valid; 
+            			OPbValid 	<= `SD rs1_opb_valid; 
+				OP_type  	<= `SD rs1_op_type_in;
+            			InUse 	 	<= `SD 1'b1; 
+            			DestTag  	<= `SD rs1_dest_in;
+				Rob_idx	 	<= `SD rs1_rob_idx_in;
+				alu_func 	<= `SD rs1_alu_func; 
+				fu_select_reg	<= `SD fu_select;
         		end 
         		else 
         		begin
