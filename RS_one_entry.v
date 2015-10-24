@@ -30,7 +30,6 @@ module rs_one_entry(
 	input  	     				rs1_opa_valid,  	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs1_opb_valid,  	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			rs1_op_type_in,     	// 
-	input  ALU_FUNC				rs1_alu_func,
 
 	input  		        		rs1_load_in,    	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input   	        		rs1_use_enable, 	// Signal to send data to Func units AND to free this RS
@@ -41,6 +40,7 @@ module rs_one_entry(
 	input					mult_available,
 	input					adder_available,
 	input					memory_available,
+	input  FU_SELECT			fu_select;
   
  	//output
 	output logic        			rs1_ready_out,    	// This RS is in use and ready to go to EX 
@@ -62,7 +62,6 @@ module rs_one_entry(
 	logic  [$clog2(PRN_SIZE):0]  		DestTag;   		// Destination Tag bit 
 	logic  [$clog2(ROB_SIZE):0] 		Rob_idx;   		//
 	logic  [5:0]  				OP_type;  		//
-	logic  ALU_FUNC				alu_func;
  
 	logic  					LoadAFromCDB1;  	// signal to load from the CDB1 
 	logic  					LoadBFromCDB1;  	// signal to load from the CDB1
@@ -70,8 +69,9 @@ module rs_one_entry(
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
 
 	logic					fu_ready;
+	logic  FU_SELECT			fu_select_reg;
 
-	assign rs1_available_out = ~InUse;
+	assign rs1_available_out= ~InUse;
  
 	assign rs1_ready_out 	= InUse & OPaValid & OPbValid & fu_ready; 
  
@@ -93,29 +93,30 @@ module rs_one_entry(
 
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag[4:0] == OPb) && !OPbValid && InUse && rs1_cdb2_valid; 
 
-
-	always_comb begin
-		fu_ready = 1'b0;
-		if (mult_available) 
-			if 	(({OP_type[5:3],3'b0} == 6'h10) && (alu_func == `ALU_MULQ))
-				fu_ready = 1'b1;
-		else if (memory_available) 
-			if 	(({OP_type[5:3],3'b0} == 6'h08) || ({OP_type[5:3],3'b0} == 6'h20) || ({OP_type[5:3],3'b0} == 6'h28))
-				fu_ready = 1'b1;
-		else if (adder_available) 
-			if      ({OP_type[5:3],3'b0} == 6'h08) 
-				fu_ready = 1'b0;
-			else if ({OP_type[5:3],3'b0} == 6'h20) 
-				fu_ready = 1'b0;
-			else if ({OP_type[5:3],3'b0} == 6'h28)
-				fu_ready = 1'b0;
-			else if	(({OP_type[5:3],3'b0} == 6'h10) && (alu_func == `ALU_MULQ))
-				fu_ready = 1'b0;
+	
+	always_comb
+	begin	
+		case (fu_select_reg)
+		USE_MULTIPLIER:
+			if (mult_available)
+				fu_ready = 1;
 			else
-				fu_ready = 1'b1;	
-		else
-				fu_ready = 1'b0;
+				fu_ready = 0;
+		USE_ADDER:
+			if (adder_available)
+				fu_ready = 1;
+			else
+				fu_ready = 0;
+		USE_MEMORY:
+			if (memory_available)
+				fu_ready = 1;
+			else
+				fu_ready = 0;
+		default:
+				fu_ready = 0;
+		endcase
 	end
+	
 
 	always_ff @(posedge clock) 
 	begin 
@@ -131,6 +132,7 @@ module rs_one_entry(
            		DestTag  <= `SD 0;
 			Rob_idx	 <= `SD 0;
 			alu_func <= `SD 0;
+			fu_select_reg<=`SD 0;
     		end 
     		else 
     		begin 
@@ -145,6 +147,7 @@ module rs_one_entry(
             			DestTag  <= `SD rs1_dest_in;
 				Rob_idx	 <= `SD rs1_rob_idx_in;
 				alu_func <= `SD rs1_alu_func; 
+				fu_select_reg<=`SD fu_select;
         		end 
         		else 
         		begin

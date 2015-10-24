@@ -54,11 +54,11 @@ module rs(
 
 		  );
 	
-	//input
+	//input of one entry
 	logic [RS_SIZE-1:0] 			internal_rs_load_in;
 	logic [RS_SIZE-1:0] 			internal_rs_use_enable;
 	
-	//output
+	//output of one entry
 	logic [RS_SIZE-1:0]			internal_rs_ready_out;
 	logic [RS_SIZE-1:0]			internal_rs_available_out;	
 	logic [RS_SIZE-1:0][63:0]		internal_rs_opa_out;
@@ -66,6 +66,9 @@ module rs(
 	logic [RS_SIZE-1:0][5:0]		internal_rs_op_type_out;
 	logic [RS_SIZE-1:0][$clog2(PRN_SIZE):0]	internal_rs_dest_tag_out;
 	logic [RS_SIZE-1:0][$clog2(PRN_SIZE):0] internal_rs_rob_idx_out;
+
+	//internal registers
+	logic FU_SELECT				fu_select;
 
 
 
@@ -96,6 +99,7 @@ module rs(
 	.mult_available(mult_available),
 	.adder_available(adder_available),
 	.memory_available(memory_available),	
+	.fu_select(fu_select),
   
  	//output
 	.rs1_ready_out(internal_rs_ready_out),
@@ -108,7 +112,14 @@ module rs(
 
 		  );  
 
-	
+	always_comb begin
+		if 	(({OP_type[5:3],3'b0} == 6'h10) && (alu_func == `ALU_MULQ))
+			fu_select = USE_MULTIPLIER;
+		else if (({OP_type[5:3],3'b0} == 6'h08) || ({OP_type[5:3],3'b0} == 6'h20) || ({OP_type[5:3],3'b0} == 6'h28))
+			fu_select = USE_MEMORY; 
+		else 
+			fu_select = USE_ADDER;
+	end
 	
 
 

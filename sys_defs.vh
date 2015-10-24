@@ -283,6 +283,11 @@ typedef enum logic [1:0] {
 `define WH64_INST  16'hf800
 
 // JSR (1a.xx) opcodes
+
+
+// new system define
+
+
 `define JMP_INST  2'h0
 `define JSR_INST  2'h1
 `define RET_INST  2'h2
@@ -291,3 +296,10 @@ typedef enum logic [1:0] {
 `define RS_SIZE 	10
 `define PRN_SIZE 	48
 `define ROB_SIZE	16
+
+
+typedef enum logic [1:0] {
+  USE_MULTIPLIER  = 2'h0,
+  USE_ADDER       = 2'h1,
+  USE_MEMORY      = 2'h2
+} FU_SELECT;
