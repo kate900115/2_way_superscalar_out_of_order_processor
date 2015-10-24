@@ -284,14 +284,12 @@ typedef enum logic [1:0] {
 
 // JSR (1a.xx) opcodes
 
-
-// new system define
-
-
 `define JMP_INST  2'h0
 `define JSR_INST  2'h1
 `define RET_INST  2'h2
 `define JSR_CO_INST  2'h3
+
+// new system define
 
 `define RS_SIZE 	10
 `define PRN_SIZE 	48

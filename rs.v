@@ -30,7 +30,7 @@ module rs(
 	input  	     				rs_opa_valid,  // Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs_opb_valid,  // Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			rs_op_type_in,     	// 
-	input  ALU_FUNC				rs1_alu_func,
+	input  ALU_FUNC				rs_alu_func,
 
 	input  		        		rs_load_in,    // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input   	        		rs_use_enable, // Signal to send data to Func units AND to free this RS
@@ -43,16 +43,17 @@ module rs(
 	input					memory_available,
   
  	//output
-	output logic        			rs_ready,     		// This RS is in use and ready to go to EX 
 	output logic [63:0] 			rs_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs_opb_out,       	// This RS' opb 
 	output logic [$clog2(PRN_SIZE):0]	rs_dest_tag_out,  	// This RS' destination tag  
-	output logic        			rs_available_out, 
 	output logic [$clog2(ROB_SIZE):0]      	rs_rob_idx_out,   	// 
 	output logic [5:0]		      	rs_op_type_out,     	// 
 	output logic				rs_full			//
 
 		  );
+
+
+
 	
 	//input of one entry
 	logic [RS_SIZE-1:0] 			internal_rs_load_in;
@@ -74,7 +75,7 @@ module rs(
 
 	rs_one_entry rs1[RS_SIZE-1:0](
 	//input	
-	.reset(reset),					//internal signal
+	.reset(reset),						
 	.clock(clock),     
      	
 	.rs1_dest_in(rs_dest_in),    
@@ -112,8 +113,26 @@ module rs(
 
 		  );  
 
+
+	//the instruction to be dispatched use this priority selector to choose an available rs_one_entry
+	priority_selector ps1( 
+	.req(internal_rs_available_out),
+        .en(rs_load_in),
+        .gnt(internal_rs_load_in)
+			);
+
+	//this priority selector chooses which rs_one_entry to send its data to FU
+	priority_selector ps1( 
+	.req(internal_rs_ready_out),
+	//Yuxuan: I think en will always be 1'b1 because this is comb logic. You can change the input of en.
+        .en( 1'b1 ),		
+        .gnt(internal_rs_use_enable)
+			);
+
+	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
+
 	always_comb begin
-		if 	(({OP_type[5:3],3'b0} == 6'h10) && (alu_func == `ALU_MULQ))
+		if 	(({OP_type[5:3],3'b0} == 6'h10) && (rs_alu_func == `ALU_MULQ))
 			fu_select = USE_MULTIPLIER;
 		else if (({OP_type[5:3],3'b0} == 6'h08) || ({OP_type[5:3],3'b0} == 6'h20) || ({OP_type[5:3],3'b0} == 6'h28))
 			fu_select = USE_MEMORY; 
@@ -121,9 +140,28 @@ module rs(
 			fu_select = USE_ADDER;
 	end
 	
-	always_ff@(posedge clock)
+	always_comb begin
 	begin
-		
+		for(int i=0;i<RS_SIZE;i++)
+		begin
+			if(internal_rs_use_enable[i]==1'b1)
+			begin	
+				rs_opa_out      = internal_rs_opa_out[i];
+			 	rs_opb_out      = internal_rs_opb_out[i];
+				rs_dest_tag_out = internal_rs_dest_tag_out[i]; 
+				rs_rob_idx_out  = internal_rs_rob_idx_out[i];	 
+				rs_op_type_out  = internal_rs_op_type_out[i];
+				break;	 
+			end
+			else
+			begin
+				rs_opa_out      = 0;
+			 	rs_opb_out      = 0;
+				rs_dest_tag_out = 0; 
+				rs_rob_idx_out  = 0;	 
+				rs_op_type_out  = 0;
+			end
+		end
 	end
 
 );
