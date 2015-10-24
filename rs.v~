@@ -16,7 +16,7 @@ module rs(
 	input         				reset,          // reset signal 
 	input         				clock,          // the clock 
 
-	input  [$clog2(PRN_SIZE):0]  		rs_dest_in,    // The destination of this instruction
+	input  [$clog2(PRN_SIZE):0]  		rs_dest_in,     // The destination of this instruction
  
 	input  [63:0] 				rs_cdb1_in,     // CDB bus from functional units 
 	input  [$clog2(PRN_SIZE):0]  		rs_cdb1_tag,    // CDB tag bus from functional units 
@@ -25,17 +25,16 @@ module rs(
 	input  [$clog2(PRN_SIZE):0]  		rs_cdb2_tag,    // CDB tag bus from functional units 
 	input  	      				rs_cdb2_valid,  // The data on the CDB is valid 
 
-	input  [63:0] 				rs_opa_in,     // Operand a from Rename  
-	input  [63:0] 				rs_opb_in,     // Operand a from Rename 
-	input  	     				rs_opa_valid,  // Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				rs_opb_valid,  // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			rs_op_type_in,     	// 
+	input  [63:0] 				rs_opa_in,      // Operand a from Rename  
+	input  [63:0] 				rs_opb_in,      // Operand a from Rename 
+	input  	     				rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [5:0]      			rs_op_type_in,  // 
 	input  ALU_FUNC				rs_alu_func,
 
-	input  		        		rs_load_in,    // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input   	        		rs_use_enable, // Signal to send data to Func units AND to free this RS
+	input  		        		rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  [$clog2(ROB_SIZE):0]       	rs_rob_idx_in,   	// 
+	input  [$clog2(ROB_SIZE):0]       	rs_rob_idx_in,  // 
 
 
 	input					mult_available,

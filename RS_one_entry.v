@@ -131,7 +131,7 @@ module rs_one_entry(
            		DestTag  	<= `SD 0;
 			Rob_idx	 	<= `SD 0;
 			alu_func 	<= `SD 0;
-			fu_select_reg	<=`SD 0;
+			fu_select_reg	<= `SD 0;
     		end 
     		else 
     		begin 
