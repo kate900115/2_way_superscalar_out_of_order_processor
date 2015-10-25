@@ -175,7 +175,7 @@ module rs_one_entry(
             			// Clear InUse bit once the FU has data
             			if (rs1_use_enable)
             			begin
-                			InUse 	 <= `SD 0;
+                			InUse <= `SD 0;
             			end
         		end // else rs1_load_in 
     		end // else !reset 

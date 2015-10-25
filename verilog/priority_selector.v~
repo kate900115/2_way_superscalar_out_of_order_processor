@@ -50,10 +50,10 @@ module priority_selector (
         end
     endgenerate
     
-    assign sub_reqs[SIZE-1 : SIZE/2] = req;      // connect top-level requests to bottom layer selectors
+    assign sub_reqs[SIZE-1 : SIZE/2] = req;     // connect top-level requests to bottom layer selectors
     
-    assign sub_gnts[0][1] = en;           	 // connect enable to top layer selector
-    assign gnt = sub_gnts[SIZE-1 : SIZE/2];    	 // connect bottom layer selectors to top-level grants
+    assign sub_gnts[0][1] = en;           	// connect enable to top layer selector
+    assign gnt = sub_gnts[SIZE-1 : SIZE/2];    	// connect bottom layer selectors to top-level grants
     
 endmodule
 

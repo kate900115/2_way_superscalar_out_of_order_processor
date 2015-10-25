@@ -69,7 +69,7 @@ module rs(
 	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] 	internal_rs_rob_idx_out;
 
 	//internal registers
-	FU_SELECT					fu_select;
+	FU_SELECT				fu_select;
 
 
 
