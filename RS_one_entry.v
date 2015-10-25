@@ -18,20 +18,21 @@ module rs_one_entry(
 
 	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_dest_in,    	// The destination of this instruction
  
-	input  [63:0] 				rs1_cdb1_in,     	// CDB bus from functional units 
+	input  [63:0] 				rs1_cdb1_in,				// CDB bus from functional units 
 	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
-	input  	      				rs1_cdb1_valid,  	// The data on the CDB is valid 
-	input  [63:0] 				rs1_cdb2_in,     	// CDB bus from functional units 
+	input  	      				rs1_cdb1_valid,				// The data on the CDB is valid 
+	input  [63:0] 				rs1_cdb2_in,				// CDB bus from functional units 
 	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
-	input  	      				rs1_cdb2_valid,  	// The data on the CDB is valid 
+	input  	      				rs1_cdb2_valid,				// The data on the CDB is valid 
 
-	input  [63:0] 				rs1_opa_in,     	// Operand a from Rename  
-	input  [63:0] 				rs1_opb_in,     	// Operand a from Rename 
-	input  	     				rs1_opa_valid,  	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				rs1_opb_valid,  	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [63:0] 				rs1_opa_in,					// Operand a from Rename  
+	input  [63:0] 				rs1_opb_in,					// Operand a from Rename 
+	input  	     				rs1_opa_valid,				// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				rs1_opb_valid,				// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [5:0]				rs1_op_type_in,				// Instruction type of rs1
 
-	input  		        		rs1_load_in,    	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input   	        		rs1_use_enable, 	// Signal to send data to Func units AND to free this RS
+	input  		        		rs1_load_in,				// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input   	        		rs1_use_enable,				// Signal to send data to Func units AND to free this RS
 
 	input  [$clog2(`ROB_SIZE)-1:0]       	rs1_rob_idx_in,   	// 
 

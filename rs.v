@@ -90,7 +90,8 @@ module rs(
 	.rs1_opb_in(rs_opb_in),		
 	.rs1_opa_valid(rs_opa_valid),
 	.rs1_opb_valid(rs_opb_valid), 
- 		 
+ 	
+	.rs1_op_type_in(rs_op_type_in),
 	.rs1_load_in(internal_rs_load_in),   			//internal signal	
 	.rs1_use_enable(internal_rs_use_enable),		//internal signal	
 	.rs1_rob_idx_in(rs_rob_idx_in),   	
