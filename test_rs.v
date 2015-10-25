@@ -26,6 +26,34 @@ module testbench_rs;
 	logic [5:0]		rs_op_type_out,     	 
 	logic			rs_full			
 	//output signals
+	
+	rs(.reset(reset),
+	   .clock(clock),           
+	   .rs_dest_in(rs_dest_in),   
+	   .rs_cdb1_in(rs_cdb1_in),      
+	   .rs_cdb1_tag(rs_cdb1_tag),    
+	   .rs_cdb1_valid(rs_cdb1_valid),  
+	   .rs_cdb2_in(rs_cdb2_in),     
+	   .rs_cdb2_tag(rs_cdb2_tag),   
+	   .rs_cdb2_valid(rs_cdb2_valid),   
+	   .rs_opa_in(rs_opa_in),        
+	   .rs_opb_in(rs_opb_in),     
+	   .rs_opa_valid(rs_opa_valid),   
+	   .rs_opb_valid(rs_opb_valid),    
+	   .rs_op_type_in(rs_op_type_in),  
+	   .rs_alu_func(rs_alu_func),
+	   .rs_load_in(rs_load_in),    
+	   .rs_rob_idx_in(rs_rob_idx_in), 
+	   .mult_available(mult_available),
+	   .adder_available(adder_available),
+	   .memory_available(memory_available),
+  
+	   .rs_opa_out(rs_opa_out),       	// This RS' opa 
+	   .rs_opb_out(rs_opb_out),       	// This RS' opb 
+	   .rs_dest_tag_out(rs_dest_tag_out),  	// This RS' destination tag  
+	   .rs_rob_idx_out(rs_rob_idx_out),   	// 
+	   .rs_op_type_out(rs_op_type_out),     	// 
+	   .rs_full(rs_full));
 
 	always #5 clock = ~clock;
 	
