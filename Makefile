@@ -21,10 +21,10 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-		test_rs.v
-SIMFILES = 	rs.v		\
-		rs_one_entry.v 	\
-		priority_selector.v
+		test_bench/test_rs.v
+SIMFILES = 	verilog/rs.v		\
+		verilog/rs_one_entry.v 	\
+		verilog/priority_selector.v
 SYNFILES = rs.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
