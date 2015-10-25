@@ -47,7 +47,8 @@ module rs(
 	output logic [$clog2(`PRN_SIZE)-1:0]	rs_dest_tag_out,  	// This RS' destination tag  
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs_rob_idx_out,   	// 
 	output logic [5:0]		      	rs_op_type_out,     	// 
-	output logic				rs_full			//
+	output logic				rs_full,		//
+	output logic				rs_out_valid		// RS output is valid
 
 );
 
@@ -61,11 +62,11 @@ module rs(
 	//output of one entry
 	logic [`RS_SIZE-1:0]			internal_rs_ready_out;
 	logic [`RS_SIZE-1:0]			internal_rs_available_out;	
-	logic [`RS_SIZE*64-1:0]			internal_rs_opa_out;
-	logic [`RS_SIZE*64-1:0]			internal_rs_opb_out;
-	logic [`RS_SIZE*6-1:0]			internal_rs_op_type_out;
-	logic [`RS_SIZE*$clog2(`PRN_SIZE)-1:0]	internal_rs_dest_tag_out;
-	logic [`RS_SIZE*$clog2(`ROB_SIZE)-1:0] 	internal_rs_rob_idx_out;
+	logic [`RS_SIZE-1:0][63:0]		internal_rs_opa_out;
+	logic [`RS_SIZE-1:0][63:0]		internal_rs_opb_out;
+	logic [`RS_SIZE-1:0][5:0]		internal_rs_op_type_out;
+	logic [`RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0]	internal_rs_dest_tag_out;
+	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] 	internal_rs_rob_idx_out;
 
 	//internal registers
 	FU_SELECT				fu_select;
@@ -146,16 +147,18 @@ module rs(
 		for(int i=0;i<`RS_SIZE;i++)
 		begin
 			if(internal_rs_use_enable[i]==1'b1)
-			begin	
+			begin
+				rs_out_valid    = 1'b1;
 				rs_opa_out      = internal_rs_opa_out[i];
 			 	rs_opb_out      = internal_rs_opb_out[i];
-				rs_dest_tag_out = internal_rs_dest_tag_out[i]; 
-				rs_rob_idx_out  = internal_rs_rob_idx_out[i];	 
+				rs_dest_tag_out = internal_rs_dest_tag_out[i];
+				rs_rob_idx_out  = internal_rs_rob_idx_out[i];
 				rs_op_type_out  = internal_rs_op_type_out[i];
-				break;	 
+				break;
 			end
 			else
 			begin
+				rs_out_valid    = 0;
 				rs_opa_out      = 0;
 			 	rs_opb_out      = 0;
 				rs_dest_tag_out = 0; 

@@ -24,7 +24,8 @@ module testbench_rs;
 	logic [$clog2(`PRN_SIZE)-1:0] rs_dest_tag_out;  	// This RS' destination tag  
 	logic [$clog2(`ROB_SIZE)-1:0] rs_rob_idx_out;   	
 	logic [5:0]		rs_op_type_out;     	 
-	logic			rs_full;			
+	logic			rs_full;
+	logic			rs_out_valid;			
 	//output signals
 	
 	rs(.reset(reset),
@@ -52,8 +53,10 @@ module testbench_rs;
 	   .rs_opb_out(rs_opb_out),       	// This RS' opb 
 	   .rs_dest_tag_out(rs_dest_tag_out),  	// This RS' destination tag  
 	   .rs_rob_idx_out(rs_rob_idx_out),   	// 
-	   .rs_op_type_out(rs_op_type_out),     	// 
-	   .rs_full(rs_full));
+	   .rs_op_type_out(rs_op_type_out),     // 
+	   .rs_full(rs_full),
+	   .rs_out_valid(rs_out_valid)
+	);
 
 	always #5 clock = ~clock;
 	
@@ -64,12 +67,19 @@ module testbench_rs;
 			$finish;
 		end
 	endtask
-	
 	initial begin
-		$monitor("rs_dest_in: %h, rs_opa_valid: %b, rs_opb_valid: %b, rs_op_type_in: %h, rs_opa_in: %h, rs_opb_in: %h", rs_dest_in, rs_opa_valid, rs_opb_valid, rs_op_type_in, rs_opa_in, rs_opb_in );
-		rs_dest_in= 32'b1 << ($clog2(`PRN_SIZE)-1);
-		rs_opa_in=64'h4000_0000_0000_0000;
-		rs_opb_in=64'h0040_0000_0000_0000;
+		$monitor("time:%d, clk:%b, rs_dest_tag_out:%h, rs_rob_idx_out:%h, rs_op_type_out:%h, rs_opa_out:%h, rs_opb_out:%h, rs_out_valid:%b", $time, clock, rs_dest_tag_out, rs_rob_idx_out, rs_op_type_out, rs_opa_out, rs_opb_out, rs_out_valid);
+		clock = 0;
+		//***RESET**
+		reset = 1;
+		#5;
+		@(negedge clock);
+		reset = 0;
+		#5;
+		@(negedge clock);
+		rs_dest_in= {1'b1,{$clog2(`ROB_SIZE)-1{1'b0}}};
+		rs_opa_in= 64'h4000_0000_0000_0000;
+		rs_opb_in= 64'h0040_0000_0000_0000;
 		rs_opa_valid=1;
 		rs_opb_valid=1;
 		rs_cdb1_valid=0;
@@ -77,22 +87,19 @@ module testbench_rs;
 		rs_op_type_in=6'h13;
 		rs_alu_func=5'h0b;
 		rs_load_in=1;
-		rs_rob_idx_in=32'b1 << ($clog2(`ROB_SIZE)-1);
+		rs_rob_idx_in={1'b1,{$clog2(`ROB_SIZE)-1{1'b0}}};
 		mult_available=1;
 		adder_available=1;
 		memory_available=1;
-		
-		//***RESET**		
-		reset = 1;
+		#5;
 		@(negedge clock);
-		reset = 0;
+		while(!rs_out_valid);
 		assert(	rs_opa_out==64'h4000_0000_0000_0000 && 
 			rs_opb_out==64'h0040_0000_0000_0000 && 
-			rs_dest_tag_out == 32'b1 << ($clog2(`PRN_SIZE)-1) && 
-			rs_rob_idx_out == 32'b1 << ($clog2(`ROB_SIZE)-1) && 
-			rs_op_type_out == 6'h13 && !rs_full) 
-		else #1 exit_on_error;
-		
+			rs_dest_tag_out == {1'b1,{$clog2(`ROB_SIZE)-1{1'b0}}} && 
+			rs_rob_idx_out == {1'b1,{$clog2(`ROB_SIZE)-1{1'b0}}} && 
+			rs_op_type_out == 6'h13 && !rs_full && rs_out_valid)
+			else #1 exit_on_error;
 		$display("@@@Passed");
 		$finish;
 	end
