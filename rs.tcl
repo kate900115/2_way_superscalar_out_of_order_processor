@@ -121,12 +121,13 @@ if {  $dc_shell_status != [list] } {
   redirect -append $rep_file { report_timing -max_paths 2 -input_pins -nets -transition_time -nosplit }
   redirect -append $rep_file { report_constraint -max_delay -verbose -nosplit }
   remove_design -all
-  read_file -format verilog $netlist_file
+  analyze -format verilog $netlist_file
+  elaborate rs
   current_design $design_name
   redirect -append $rep_file { report_reference -nosplit }
   quit
 } else {
-   quit
+  quit
 }
 
 

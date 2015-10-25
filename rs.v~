@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-//   Modulename :  rs.v                                       		//
+//   Modulename :  rs.v                                       	        //
 //                                                                      //
-//   Description :        						//
-//                   							//
-//                 							// 
-//                  							//
-//                                    					// 
+//   Description :                                                      //
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      // 
 //                                                                      //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
@@ -29,8 +29,8 @@ module rs(
 	input  [63:0] 				rs_opb_in,      // Operand a from Rename 
 	input  	     				rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			rs_op_type_in,  // 
-	input  ALU_FUNC				rs_alu_func,
+	input  [5:0]      			rs_op_type_in,  // Instruction type from decoder
+	ALU_FUNC				rs_alu_func,	// ALU function type from decoder
 
 	input  		        		rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
@@ -49,26 +49,26 @@ module rs(
 	output logic [5:0]		      	rs_op_type_out,     	// 
 	output logic				rs_full			//
 
-		  );
+);
 
 
 
 	
 	//input of one entry
-	logic [RS_SIZE-1:0] 			internal_rs_load_in;
-	logic [RS_SIZE-1:0] 			internal_rs_use_enable;
+	logic [`RS_SIZE-1:0] 			internal_rs_load_in;
+	logic [`RS_SIZE-1:0] 			internal_rs_use_enable;
 	
 	//output of one entry
-	logic [RS_SIZE-1:0]			internal_rs_ready_out;
-	logic [RS_SIZE-1:0]			internal_rs_available_out;	
-	logic [RS_SIZE-1:0][63:0]		internal_rs_opa_out;
-	logic [RS_SIZE-1:0][63:0]		internal_rs_opb_out;
-	logic [RS_SIZE-1:0][5:0]		internal_rs_op_type_out;
-	logic [RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0] internal_rs_dest_tag_out;
-	logic [RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0] internal_rs_rob_idx_out;
+	logic [`RS_SIZE-1:0]			internal_rs_ready_out;
+	logic [`RS_SIZE-1:0]			internal_rs_available_out;	
+	logic [`RS_SIZE*64-1:0]			internal_rs_opa_out;
+	logic [`RS_SIZE*64-1:0]			internal_rs_opb_out;
+	logic [`RS_SIZE*6-1:0]			internal_rs_op_type_out;
+	logic [`RS_SIZE*$clog2(`PRN_SIZE)-1:0]	internal_rs_dest_tag_out;
+	logic [`RS_SIZE*$clog2(`PRN_SIZE)-1:0] 	internal_rs_rob_idx_out;
 
 	//internal registers
-	logic FU_SELECT				fu_select;
+	FU_SELECT				fu_select;
 
 
 
@@ -87,14 +87,15 @@ module rs(
 	.rs1_cdb2_valid(rs_cdb2_valid),
  
 	.rs1_opa_in(rs_opa_in),
-	.rs1_opb_in(rs_opb_in),     		
-	.rs1_opa_valid(rs_opa_valid),  		
+	.rs1_opb_in(rs_opb_in),		
+	.rs1_opa_valid(rs_opa_valid),
 	.rs1_opb_valid(rs_opb_valid), 
- 		 
+ 	
+	.rs1_op_type_in(rs_op_type_in),
+	.rs1_alu_func(rs_alu_func),
 	.rs1_load_in(internal_rs_load_in),   			//internal signal	
 	.rs1_use_enable(internal_rs_use_enable),		//internal signal	
 	.rs1_rob_idx_in(rs_rob_idx_in),   	
-	.rs1_op_type_in(rs_op_type_in),     
 
 	.mult_available(mult_available),
 	.adder_available(adder_available),
@@ -114,42 +115,34 @@ module rs(
 
 
 	//the instruction to be dispatched use this priority selector to choose an available rs_one_entry
-	priority_selector ps1( 
-	.req(internal_rs_available_out),
-        .en(rs_load_in),
-        .gnt(internal_rs_load_in)
-			);
+	priority_selector #(.SIZE(`RS_SIZE)) rs_psl1( 
+		.req(internal_rs_available_out),
+	        .en(rs_load_in),
+        	.gnt(internal_rs_load_in)
+	);
 
 	//this priority selector chooses which rs_one_entry to send its data to FU
-	priority_selector ps2( 
-	.req(internal_rs_ready_out),
-	//Yuxuan: I think en will always be 1'b1 because this is comb logic. You can change the input of en.
-        .en( 1'b1 ),		
-        .gnt(internal_rs_use_enable)
-			);
+	//Yuxuan: I think en will always be 1'b1 because this is comb logic. You can change the input of en.	
+	priority_selector #(.SIZE(`RS_SIZE)) rs_psl2( 
+		.req(internal_rs_ready_out),
+        	.en(1'b1),		
+        	.gnt(internal_rs_use_enable)
+	);
 
 	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
 
-	/*always_comb begin
-		if 	(({OP_type[5:3],3'b0} == 6'h10) && (rs_alu_func == `ALU_MULQ))
-			fu_select = `USE_MULTIPLIER;
-		else if (({OP_type[5:3],3'b0} == 6'h08) || ({OP_type[5:3],3'b0} == 6'h20) || ({OP_type[5:3],3'b0} == 6'h28))
-			fu_select = `USE_MEMORY; 
-		else 
-			fu_select = `USE_ADDER;
-	end*/
-
 	always_comb begin
-		if 	(({rs_op_type_in[5:3],3'b0} == 6'h10) && (rs_alu_func == `ALU_MULQ))
-			fu_select = `USE_MULTIPLIER;
-		else if (({rs_op_type_in[5:3],3'b0} == 6'h08) || ({rs_op_type_in[5:3],3'b0} == 6'h20) || ({rs_op_type_in[5:3],3'b0} == 6'h28))
-			fu_select = `USE_MEMORY; 
+		if 	({rs_op_type_in[5:3],3'b0} == 6'h10 && rs_alu_func == ALU_MULQ)
+			fu_select = USE_MULTIPLIER;
+		else if (	({rs_op_type_in[5:3],3'b0} == 6'h08) || 
+				({rs_op_type_in[5:3],3'b0} == 6'h20) || 
+				({rs_op_type_in[5:3],3'b0} == 6'h28))
+			fu_select = USE_MEMORY; 
 		else 
-			fu_select = `USE_ADDER;
+			fu_select = USE_ADDER;
 	end
 	
 	always_comb begin
-	begin
 		for(int i=0;i<`RS_SIZE;i++)
 		begin
 			if(internal_rs_use_enable[i]==1'b1)
@@ -171,5 +164,4 @@ module rs(
 			end
 		end
 	end
-
-);
+endmodule

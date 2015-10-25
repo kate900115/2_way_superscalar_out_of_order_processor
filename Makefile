@@ -20,7 +20,7 @@ all:    simv
 # Modify starting here
 #####
 
-TESTBENCH = 	sys_defs.vh	\ 
+TESTBENCH = 	sys_defs.vh	\
 		test_rs.v
 SIMFILES = 	rs.v		\
 		rs_one_entry.v 	\

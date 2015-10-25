@@ -70,7 +70,7 @@ module rs_one_entry(
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
 
 	logic					fu_ready;
-	ALU_FUNC				alu_func;
+	ALU_FUNC				alu_func
 	FU_SELECT				fu_select_reg;
 
 	assign rs1_available_out= ~InUse;
