@@ -16,13 +16,13 @@ module rs(
 	input         				reset,          // reset signal 
 	input         				clock,          // the clock 
 
-	input  [$clog2(PRN_SIZE):0]  		rs_dest_in,     // The destination of this instruction
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs_dest_in,     // The destination of this instruction
  
 	input  [63:0] 				rs_cdb1_in,     // CDB bus from functional units 
-	input  [$clog2(PRN_SIZE):0]  		rs_cdb1_tag,    // CDB tag bus from functional units 
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs_cdb1_tag,    // CDB tag bus from functional units 
 	input  	      				rs_cdb1_valid,  // The data on the CDB is valid 
 	input  [63:0] 				rs_cdb2_in,     // CDB bus from functional units 
-	input  [$clog2(PRN_SIZE):0]  		rs_cdb2_tag,    // CDB tag bus from functional units 
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs_cdb2_tag,    // CDB tag bus from functional units 
 	input  	      				rs_cdb2_valid,  // The data on the CDB is valid 
 
 	input  [63:0] 				rs_opa_in,      // Operand a from Rename  
@@ -34,7 +34,7 @@ module rs(
 
 	input  		        		rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  [$clog2(ROB_SIZE):0]       	rs_rob_idx_in,  // 
+	input  [$clog2(`ROB_SIZE)-1:0]       	rs_rob_idx_in,  // 
 
 
 	input					mult_available,
@@ -44,8 +44,8 @@ module rs(
  	//output
 	output logic [63:0] 			rs_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(PRN_SIZE):0]	rs_dest_tag_out,  	// This RS' destination tag  
-	output logic [$clog2(ROB_SIZE):0]      	rs_rob_idx_out,   	// 
+	output logic [$clog2(`PRN_SIZE)-1:0]	rs_dest_tag_out,  	// This RS' destination tag  
+	output logic [$clog2(`ROB_SIZE)-1:0]    rs_rob_idx_out,   	// 
 	output logic [5:0]		      	rs_op_type_out,     	// 
 	output logic				rs_full			//
 
@@ -64,15 +64,15 @@ module rs(
 	logic [RS_SIZE-1:0][63:0]		internal_rs_opa_out;
 	logic [RS_SIZE-1:0][63:0]		internal_rs_opb_out;
 	logic [RS_SIZE-1:0][5:0]		internal_rs_op_type_out;
-	logic [RS_SIZE-1:0][$clog2(PRN_SIZE):0]	internal_rs_dest_tag_out;
-	logic [RS_SIZE-1:0][$clog2(PRN_SIZE):0] internal_rs_rob_idx_out;
+	logic [RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0] internal_rs_dest_tag_out;
+	logic [RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0] internal_rs_rob_idx_out;
 
 	//internal registers
 	logic FU_SELECT				fu_select;
 
 
 
-	rs_one_entry rs1[RS_SIZE-1:0](
+	rs_one_entry rs1[`RS_SIZE-1:0](
 	//input	
 	.reset(reset),						
 	.clock(clock),     
@@ -121,7 +121,7 @@ module rs(
 			);
 
 	//this priority selector chooses which rs_one_entry to send its data to FU
-	priority_selector ps1( 
+	priority_selector ps2( 
 	.req(internal_rs_ready_out),
 	//Yuxuan: I think en will always be 1'b1 because this is comb logic. You can change the input of en.
         .en( 1'b1 ),		
@@ -130,18 +130,27 @@ module rs(
 
 	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
 
-	always_comb begin
+	/*always_comb begin
 		if 	(({OP_type[5:3],3'b0} == 6'h10) && (rs_alu_func == `ALU_MULQ))
-			fu_select = USE_MULTIPLIER;
+			fu_select = `USE_MULTIPLIER;
 		else if (({OP_type[5:3],3'b0} == 6'h08) || ({OP_type[5:3],3'b0} == 6'h20) || ({OP_type[5:3],3'b0} == 6'h28))
-			fu_select = USE_MEMORY; 
+			fu_select = `USE_MEMORY; 
 		else 
-			fu_select = USE_ADDER;
+			fu_select = `USE_ADDER;
+	end*/
+
+	always_comb begin
+		if 	(({rs_op_type_in[5:3],3'b0} == 6'h10) && (rs_alu_func == `ALU_MULQ))
+			fu_select = `USE_MULTIPLIER;
+		else if (({rs_op_type_in[5:3],3'b0} == 6'h08) || ({rs_op_type_in[5:3],3'b0} == 6'h20) || ({rs_op_type_in[5:3],3'b0} == 6'h28))
+			fu_select = `USE_MEMORY; 
+		else 
+			fu_select = `USE_ADDER;
 	end
 	
 	always_comb begin
 	begin
-		for(int i=0;i<RS_SIZE;i++)
+		for(int i=0;i<`RS_SIZE;i++)
 		begin
 			if(internal_rs_use_enable[i]==1'b1)
 			begin	

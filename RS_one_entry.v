@@ -16,13 +16,13 @@ module rs_one_entry(
 	input         				reset,          	// reset signal 
 	input         				clock,          	// the clock 
 
-	input  [$clog2(`PRN_SIZE)-1:0]  		rs1_dest_in,    	// The destination of this instruction
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_dest_in,    	// The destination of this instruction
  
 	input  [63:0] 				rs1_cdb1_in,     	// CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  		rs1_cdb1_tag,    	// CDB tag bus from functional units 
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
 	input  	      				rs1_cdb1_valid,  	// The data on the CDB is valid 
 	input  [63:0] 				rs1_cdb2_in,     	// CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  		rs1_cdb2_tag,    	// CDB tag bus from functional units 
+	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
 	input  	      				rs1_cdb2_valid,  	// The data on the CDB is valid 
 
 	input  [63:0] 				rs1_opa_in,     	// Operand a from Rename  
@@ -48,7 +48,7 @@ module rs_one_entry(
 	output logic [63:0] 			rs1_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRN_SIZE)-1:0]	rs1_dest_tag_out,  	// This RS' destination tag   
 	output logic        			rs1_available_out, 
-	output logic [$clog2(`ROB_SIZE)-1:0]      	rs1_rob_idx_out,   	// 
+	output logic [$clog2(`ROB_SIZE)-1:0]    rs1_rob_idx_out,   	// 
 	output logic [5:0]		      	rs1_op_type_out     	// 
 
 		  );  
