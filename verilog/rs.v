@@ -45,9 +45,9 @@ module rs(
 	output logic [63:0] 			rs_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRN_SIZE)-1:0]	rs_dest_tag_out,  	// This RS' destination tag  
-	output logic [$clog2(`ROB_SIZE)-1:0]    rs_rob_idx_out,   	// 
-	output logic [5:0]		      	rs_op_type_out,     	// 
-	output logic				rs_full,		//
+	output logic [$clog2(`ROB_SIZE)-1:0]    rs_rob_idx_out,   	// This RS' corresponding ROB index
+	output logic [5:0]		      	rs_op_type_out,     	// This RS' operation type
+	output logic				rs_full,		// RS is full now
 	output logic				rs_out_valid		// RS output is valid
 
 );
