@@ -2,11 +2,11 @@
 //                                                                      //
 //   Modulename :  rs_one_entry.v                                       //
 //                                                                      //
-//   Description :        						//
-//                   							//
-//                 							// 
-//                  							//
-//                                    					// 
+//   Description :                                                      //
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      // 
 //                                                                      //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,6 @@ module rs_one_entry(
 	input  [63:0] 				rs1_opb_in,     	// Operand a from Rename 
 	input  	     				rs1_opa_valid,  	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs1_opb_valid,  	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			rs1_op_type_in,     	// 
 
 	input  		        		rs1_load_in,    	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input   	        		rs1_use_enable, 	// Signal to send data to Func units AND to free this RS

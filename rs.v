@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////
 //                                                                      //
-//   Modulename :  rs.v                                       		//
+//   Modulename :  rs.v                                       	        //
 //                                                                      //
-//   Description :        						//
-//                   							//
-//                 							// 
-//                  							//
-//                                    					// 
+//   Description :        		                                        //
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      // 
 //                                                                      //
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
@@ -29,8 +29,8 @@ module rs(
 	input  [63:0] 				rs_opb_in,      // Operand a from Rename 
 	input  	     				rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			rs_op_type_in,  // 
-	input  ALU_FUNC				rs_alu_func,
+	input  [5:0]      			rs_op_type_in,  // Instruction type from decoder
+	input  ALU_FUNC				rs_alu_func,	// ALU function type from decoder
 
 	input  		        		rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
@@ -87,14 +87,13 @@ module rs(
 	.rs1_cdb2_valid(rs_cdb2_valid),
  
 	.rs1_opa_in(rs_opa_in),
-	.rs1_opb_in(rs_opb_in),     		
-	.rs1_opa_valid(rs_opa_valid),  		
+	.rs1_opb_in(rs_opb_in),		
+	.rs1_opa_valid(rs_opa_valid),
 	.rs1_opb_valid(rs_opb_valid), 
  		 
 	.rs1_load_in(internal_rs_load_in),   			//internal signal	
 	.rs1_use_enable(internal_rs_use_enable),		//internal signal	
 	.rs1_rob_idx_in(rs_rob_idx_in),   	
-	.rs1_op_type_in(rs_op_type_in),     
 
 	.mult_available(mult_available),
 	.adder_available(adder_available),
