@@ -16,13 +16,13 @@ module rs_one_entry(
 	input         				reset,          	// reset signal 
 	input         				clock,          	// the clock 
 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_dest_in,    	// The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_dest_in,    	// The destination of this instruction
  
 	input  [63:0] 				rs1_cdb1_in,		// CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
 	input  	      				rs1_cdb1_valid,		// The data on the CDB is valid 
 	input  [63:0] 				rs1_cdb2_in,		// CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
 	input  	      				rs1_cdb2_valid,		// The data on the CDB is valid 
 
 	input  [63:0] 				rs1_opa_in,		// Operand a from Rename  
@@ -47,7 +47,7 @@ module rs_one_entry(
 	output logic        			rs1_ready_out,    	// This RS is in use and ready to go to EX 
 	output logic [63:0] 			rs1_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs1_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRN_SIZE)-1:0]	rs1_dest_tag_out,  	// This RS' destination tag   
+	output logic [$clog2(`PRF_SIZE)-1:0]	rs1_dest_tag_out,  	// This RS' destination tag   
 	output logic        			rs1_available_out, 
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs1_rob_idx_out,   	// 
 	output logic [5:0]		      	rs1_op_type_out     	// 
@@ -60,7 +60,7 @@ module rs_one_entry(
 	logic  					OPaValid;         	// Operand a Tag/Value 
 	logic  					OPbValid;         	// Operand B Tag/Value 
 	logic  					InUse;            	// InUse bit 
-	logic  [$clog2(`PRN_SIZE)-1:0]  	DestTag;   		// Destination Tag bit 
+	logic  [$clog2(`PRF_SIZE)-1:0]  	DestTag;   		// Destination Tag bit 
 	logic  [$clog2(`ROB_SIZE)-1:0] 		Rob_idx;   		//
 	logic  [5:0]  				OP_type;  		//
  
@@ -87,13 +87,13 @@ module rs_one_entry(
 
 	assign rs1_op_type_out	= rs1_use_enable ? OP_type : 6'b0;
 
-	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa[$clog2(`PRN_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb1_valid; 
+	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb1_valid; 
 
-	assign LoadBFromCDB1 	= (rs1_cdb1_tag == OPb[$clog2(`PRN_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb1_valid; 
+	assign LoadBFromCDB1 	= (rs1_cdb1_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb1_valid; 
 
-	assign LoadAFromCDB2 	= (rs1_cdb2_tag == OPa[$clog2(`PRN_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb2_valid; 
+	assign LoadAFromCDB2 	= (rs1_cdb2_tag == OPa[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb2_valid; 
 
-	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRN_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
+	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
 
 	
 	always_comb
