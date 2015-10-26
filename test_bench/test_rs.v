@@ -1,11 +1,11 @@
 module testbench_rs;
 	logic clock,reset;
-	logic [$clog2(`PRN_SIZE)-1:0]  	rs_dest_in;
+	logic [$clog2(`PRF_SIZE)-1:0]  	rs_dest_in;
  	logic [63:0] 			rs_cdb1_in;     // CDB bus from functional units 
-	logic [$clog2(`PRN_SIZE)-1:0]  	rs_cdb1_tag;    // CDB tag bus from functional units 
+	logic [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag;    // CDB tag bus from functional units 
 	logic  	      			rs_cdb1_valid;  // The data on the CDB is valid 
 	logic [63:0] 			rs_cdb2_in;     // CDB bus from functional units 
-	logic [$clog2(`PRN_SIZE)-1:0]  	rs_cdb2_tag;    // CDB tag bus from functional units 
+	logic [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag;    // CDB tag bus from functional units 
 	logic  	      			rs_cdb2_valid;  // The data on the CDB is valid 
 	logic  [63:0] 			rs_opa_in;      // Operand a from Rename  
 	logic  [63:0] 			rs_opb_in;      // Operand a from Rename 
@@ -21,7 +21,7 @@ module testbench_rs;
 	//input signals
 	logic [63:0] 		rs_opa_out;       	// This RS' opa 
 	logic [63:0] 		rs_opb_out;       	// This RS' opb 
-	logic [$clog2(`PRN_SIZE)-1:0] rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`PRF_SIZE)-1:0] rs_dest_tag_out;  	// This RS' destination tag  
 	logic [$clog2(`ROB_SIZE)-1:0] rs_rob_idx_out;   	
 	logic [5:0]		rs_op_type_out;     	 
 	logic			rs_full;
@@ -77,7 +77,7 @@ module testbench_rs;
 		reset = 0;
 		#5;
 		@(negedge clock);
-		rs_dest_in= {{$clog2(`PRN_SIZE)-1{1'b0}},1'b1};
+		rs_dest_in= {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
 		rs_opa_in= 32;
 		rs_opb_in= 26;
 		rs_opa_valid=1;
@@ -96,13 +96,13 @@ module testbench_rs;
 		while(!rs_out_valid);
 		assert(	rs_opa_out==32 && 
 			rs_opb_out==26 && 
-			rs_dest_tag_out == {{$clog2(`PRN_SIZE)-1{1'b0}},1'b1} && 
+			rs_dest_tag_out == {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE){1'b0}}} && 
 			rs_op_type_out == 6'h13 && !rs_full && rs_out_valid)  $display("@@@mulq issue Passed");
 			else #1 exit_on_error;
 		
-		rs_dest_in= {3'b111,{$clog2(`PRN_SIZE)-3{1'b0}}};
-		rs_opa_in= {{64-$clog2(`PRN_SIZE){1'b0}},{$clog2(`PRN_SIZE)-1{1'b0}},1'b1};
+		rs_dest_in= {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}};
+		rs_opa_in= {{64-$clog2(`PRF_SIZE){1'b0}},{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
 		rs_opb_in= 46;
 		rs_opa_valid=0;
 		rs_opb_valid=1;
@@ -120,18 +120,18 @@ module testbench_rs;
 		while(rs_out_valid);
 		assert(	rs_opa_out==64'h0 && 
 			rs_opb_out==64'h0 && 
-			rs_dest_tag_out == {$clog2(`PRN_SIZE){1'b0}} && 
+			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
 			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
 			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@addq wait Passed");
 			else #1 exit_on_error;
 
-		rs_dest_in= {3'b100,{$clog2(`PRN_SIZE)-3{1'b0}}};
+		rs_dest_in= {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}};
 		rs_opa_in= 64'h0000_0000_0003_0000;
 		rs_opb_in= 64'h0000_0000_0000_4000;
 		rs_opa_valid=1;
 		rs_opb_valid=1;
 		rs_cdb1_valid=1;
-		rs_cdb1_tag={{$clog2(`PRN_SIZE)-1{1'b0}},1'b1};
+		rs_cdb1_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
 		rs_cdb1_in=832;
 		rs_cdb2_valid=0;
 		rs_op_type_in=6'h28;    //instruction is LDQ
@@ -146,13 +146,13 @@ module testbench_rs;
 		while(!rs_out_valid);
 		assert(	rs_opa_out==832 && 
 			rs_opb_out==46 && 
-			rs_dest_tag_out == {3'b111,{$clog2(`PRN_SIZE)-3{1'b0}}} && 
+			rs_dest_tag_out == {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-1{1'b0}},1'b1} && 
 			rs_op_type_out == 6'h10 && !rs_full && rs_out_valid)  $display("@@@addq issue Passed");
 			else #1 exit_on_error;  
 			
 		
-		rs_dest_in= {3'b010,{$clog2(`PRN_SIZE)-3{1'b0}}};
+		rs_dest_in= {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}};
 		rs_opa_in= 64'h0000_0000_0045_0000;
 		rs_opb_in= 64'h0000_0000_0000_2400;
 		rs_opa_valid=1;
@@ -171,7 +171,7 @@ module testbench_rs;
 		/*while(!rs_out_valid);
 		assert(	rs_opa_out==64'h0000_0000_0003_0000 && 
 			rs_opb_out==64'h0000_0000_0000_4000 && 
-			rs_dest_tag_out == {3'b100,{$clog2(`PRN_SIZE)-3{1'b0}}} && 
+			rs_dest_tag_out == {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b10} && 
 			rs_op_type_out == 6'h28 && !rs_full && rs_out_valid)  $display("@@@ldq issue Passed");
 			else #1 exit_on_error;*/
