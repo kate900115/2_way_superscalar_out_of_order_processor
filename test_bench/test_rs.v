@@ -122,7 +122,7 @@ module testbench_rs;
 			rs_opb_out==64'h0 && 
 			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
 			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
-			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@addq wait Passed");
+			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@addq wait to issue Passed");
 			else #1 exit_on_error;
 
 		rs_dest_in= {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}};
@@ -168,13 +168,13 @@ module testbench_rs;
 		memory_available=1;
 		#5;
 		@(negedge clock);
-		/*while(!rs_out_valid);
-		assert(	rs_opa_out==64'h0000_0000_0003_0000 && 
-			rs_opb_out==64'h0000_0000_0000_4000 && 
-			rs_dest_tag_out == {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
-			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b10} && 
-			rs_op_type_out == 6'h28 && !rs_full && rs_out_valid)  $display("@@@ldq issue Passed");
-			else #1 exit_on_error;*/
+		while(rs_out_valid);
+		assert(	rs_opa_out==64'h0 && 
+			rs_opb_out==64'h0 && 
+			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
+			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
+			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@ldq wait to issue Passed");
+			else #1 exit_on_error;
 		$display("@@@Passed");
 		$finish;
 	end
