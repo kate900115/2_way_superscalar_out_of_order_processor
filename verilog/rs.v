@@ -16,13 +16,13 @@ module rs(
 	input         				reset,          // reset signal 
 	input         				clock,          // the clock 
 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs_dest_in,     // The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs_dest_in,     // The destination of this instruction
  
 	input  [63:0] 				rs_cdb1_in,     // CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs_cdb1_tag,    // CDB tag bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag,    // CDB tag bus from functional units 
 	input  	      				rs_cdb1_valid,  // The data on the CDB is valid 
 	input  [63:0] 				rs_cdb2_in,     // CDB bus from functional units 
-	input  [$clog2(`PRN_SIZE)-1:0]  	rs_cdb2_tag,    // CDB tag bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag,    // CDB tag bus from functional units 
 	input  	      				rs_cdb2_valid,  // The data on the CDB is valid 
 
 	input  [63:0] 				rs_opa_in,      // Operand a from Rename  
@@ -44,7 +44,7 @@ module rs(
  	//output
 	output logic [63:0] 			rs_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRN_SIZE)-1:0]	rs_dest_tag_out,  	// This RS' destination tag  
+	output logic [$clog2(`PRF_SIZE)-1:0]	rs_dest_tag_out,  	// This RS' destination tag  
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs_rob_idx_out,   	// This RS' corresponding ROB index
 	output logic [5:0]		      	rs_op_type_out,     	// This RS' operation type
 	output logic				rs_full,		// RS is full now
@@ -65,7 +65,7 @@ module rs(
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opa_out;
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opb_out;
 	logic [`RS_SIZE-1:0][5:0]			internal_rs_op_type_out;
-	logic [`RS_SIZE-1:0][$clog2(`PRN_SIZE)-1:0]	internal_rs_dest_tag_out;
+	logic [`RS_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	internal_rs_dest_tag_out;
 	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] 	internal_rs_rob_idx_out;
 
 	//internal registers
