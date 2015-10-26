@@ -10,7 +10,8 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-read_file -f sverilog [list "rs.v" "rs_one_entry.v" "priority_selector.v" "sys_defs.vh"]
+analyze -f sverilog [list "sys_defs.vh" "./verilog/rs_one_entry.v" "./verilog/rs.v" "./verilog/priority_selector.v"]
+elaborate rs
 set design_name rs
 set clock_name clock
 set reset_name reset
@@ -86,7 +87,7 @@ set dc_shell_status [ set chk_file [format "%s%s"  [format "%s%s"  $SYN_DIR $des
 
 #/* if we didnt find errors at this point, run */
 if {  $dc_shell_status != [list] } {
-   current_design $design_name
+  current_design $design_name
   link
   set_wire_load_model -name $WIRE_LOAD -lib $LOGICLIB $design_name
   set_wire_load_mode top
@@ -121,8 +122,7 @@ if {  $dc_shell_status != [list] } {
   redirect -append $rep_file { report_timing -max_paths 2 -input_pins -nets -transition_time -nosplit }
   redirect -append $rep_file { report_constraint -max_delay -verbose -nosplit }
   remove_design -all
-  analyze -format verilog $netlist_file
-  elaborate rs
+  read_file -format verilog $netlist_file
   current_design $design_name
   redirect -append $rep_file { report_reference -nosplit }
   quit

@@ -11,7 +11,7 @@
 # similar to the information in those scripts but that seems hard to avoid.
 #
 
-VCS = SW_VCS=2015.09 vcs -sverilog +vc -Mupdate -line -full64 +define+TEST_SIZE=$(CAM_SIZE)
+VCS = SW_VCS=2015.09 vcs -sverilog +vc -Mupdate -line -full64 +define+
 
 all:    simv
 	./simv | tee program.out

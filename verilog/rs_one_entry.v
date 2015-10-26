@@ -70,7 +70,7 @@ module rs_one_entry(
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
 
 	logic					fu_ready;
-	ALU_FUNC				alu_func;
+	ALU_FUNC				alu_func_reg;
 	FU_SELECT				fu_select_reg;
 
 	assign rs1_available_out= ~InUse;
@@ -132,8 +132,8 @@ module rs_one_entry(
             		InUse 	 	<= `SD 1'b0; 
            		DestTag  	<= `SD 0;
 			Rob_idx	 	<= `SD 0;
-			alu_func 	<= `SD 0;
-			fu_select_reg	<= `SD 0;
+			alu_func_reg 	<= `SD ALU_DEFAULT;
+			fu_select_reg	<= `SD FU_DEFAULT;
     		end 
     		else 
     		begin 
@@ -147,7 +147,7 @@ module rs_one_entry(
             			InUse 	 	<= `SD 1'b1; 
             			DestTag  	<= `SD rs1_dest_in;
 				Rob_idx	 	<= `SD rs1_rob_idx_in;
-				alu_func 	<= `SD rs1_alu_func; 
+				alu_func_reg 	<= `SD rs1_alu_func; 
 				fu_select_reg	<= `SD fu_select;
         		end 
         		else 

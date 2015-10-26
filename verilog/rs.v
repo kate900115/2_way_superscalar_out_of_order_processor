@@ -144,6 +144,12 @@ module rs(
 	end
 	
 	always_comb begin
+		rs_out_valid    = 0;
+		rs_opa_out      = 0;
+		rs_opb_out      = 0;
+		rs_dest_tag_out = 0; 
+		rs_rob_idx_out  = 0;	 
+		rs_op_type_out  = 0;
 		for(int i=0;i<`RS_SIZE;i++)
 		begin
 			if(internal_rs_use_enable[i]==1'b1)
@@ -155,15 +161,6 @@ module rs(
 				rs_rob_idx_out  = internal_rs_rob_idx_out[i];
 				rs_op_type_out  = internal_rs_op_type_out[i];
 				break;
-			end
-			else
-			begin
-				rs_out_valid    = 0;
-				rs_opa_out      = 0;
-			 	rs_opb_out      = 0;
-				rs_dest_tag_out = 0; 
-				rs_rob_idx_out  = 0;	 
-				rs_op_type_out  = 0;
 			end
 		end
 	end

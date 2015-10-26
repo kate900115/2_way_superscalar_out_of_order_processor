@@ -95,7 +95,8 @@ typedef enum logic [4:0] {
   ALU_CMPLT     = 5'h0d,
   ALU_CMPLE     = 5'h0e,
   ALU_CMPULT    = 5'h0f,
-  ALU_CMPULE    = 5'h10
+  ALU_CMPULE    = 5'h10,
+  ALU_DEFAULT	= 5'h1f
 } ALU_FUNC;
 
 //////////////////////////////////////////////
@@ -299,5 +300,6 @@ typedef enum logic [1:0] {
 typedef enum logic [1:0] {
   USE_MULTIPLIER  = 2'h0,
   USE_ADDER       = 2'h1,
-  USE_MEMORY      = 2'h2
+  USE_MEMORY      = 2'h2,
+  FU_DEFAULT	  = 2'h3
 } FU_SELECT;
