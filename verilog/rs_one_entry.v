@@ -87,13 +87,13 @@ module rs_one_entry(
 
 	assign rs1_op_type_out	= rs1_use_enable ? OP_type : 6'b0;
 
-	assign LoadAFromCDB1 	= (rs1_cdb1_tag[4:0] == OPa) && !OPaValid && InUse && rs1_cdb1_valid; 
+	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa[$clog2(`PRN_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb1_valid; 
 
-	assign LoadBFromCDB1 	= (rs1_cdb1_tag[4:0] == OPb) && !OPbValid && InUse && rs1_cdb1_valid; 
+	assign LoadBFromCDB1 	= (rs1_cdb1_tag == OPb[$clog2(`PRN_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb1_valid; 
 
-	assign LoadAFromCDB2 	= (rs1_cdb2_tag[4:0] == OPa) && !OPaValid && InUse && rs1_cdb2_valid; 
+	assign LoadAFromCDB2 	= (rs1_cdb2_tag == OPa[$clog2(`PRN_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb2_valid; 
 
-	assign LoadBFromCDB2 	= (rs1_cdb2_tag[4:0] == OPb) && !OPbValid && InUse && rs1_cdb2_valid; 
+	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRN_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
 
 	
 	always_comb
