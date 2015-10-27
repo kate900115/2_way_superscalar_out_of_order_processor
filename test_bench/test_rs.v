@@ -75,6 +75,7 @@ module testbench_rs;
 		#5;
 		@(negedge clock);
 		reset = 0;
+		rs_load_in=0;
 		#5;
 		@(negedge clock);
 		rs_dest_in= {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
@@ -100,7 +101,6 @@ module testbench_rs;
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE){1'b0}}} && 
 			rs_op_type_out == 6'h13 && !rs_full && rs_out_valid)  $display("@@@mulq issue Passed");
 			else #1 exit_on_error;
-		
 		rs_dest_in= {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}};
 		rs_opa_in= {{64-$clog2(`PRF_SIZE){1'b0}},{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
 		rs_opb_in= 46;
@@ -124,16 +124,19 @@ module testbench_rs;
 			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
 			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@addq wait to issue Passed");
 			else #1 exit_on_error;
-
 		rs_dest_in= {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}};
 		rs_opa_in= 64'h0000_0000_0003_0000;
 		rs_opb_in= 64'h0000_0000_0000_4000;
-		rs_opa_valid=1;
-		rs_opb_valid=1;
+		rs_opa_valid=0;
+		rs_opb_valid=0;
+		#5;
+		@(negedge clock);
 		rs_cdb1_valid=1;
 		rs_cdb1_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
 		rs_cdb1_in=832;
-		rs_cdb2_valid=0;
+		rs_cdb2_valid=1;
+		rs_cdb2_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
+		rs_cdb2_in=46;
 		rs_op_type_in=6'h28;    //instruction is LDQ
 		rs_alu_func=ALU_DEFAULT;
 		rs_load_in=1;
@@ -149,9 +152,7 @@ module testbench_rs;
 			rs_dest_tag_out == {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-1{1'b0}},1'b1} && 
 			rs_op_type_out == 6'h10 && !rs_full && rs_out_valid)  $display("@@@addq issue Passed");
-			else #1 exit_on_error;  
-			
-		
+			else #1 exit_on_error;
 		rs_dest_in= {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}};
 		rs_opa_in= 64'h0000_0000_0045_0000;
 		rs_opb_in= 64'h0000_0000_0000_2400;

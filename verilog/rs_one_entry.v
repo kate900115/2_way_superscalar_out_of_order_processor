@@ -30,7 +30,7 @@ module rs_one_entry(
 	input  	     				rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]				rs1_op_type_in,		// Instruction type of rs1
-	ALU_FUNC				rs1_alu_func,
+	input  ALU_FUNC				rs1_alu_func,
 
 	input  		        		rs1_load_in,		// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input   	        		rs1_use_enable,		// Signal to send data to Func units AND to free this RS
@@ -41,7 +41,7 @@ module rs_one_entry(
 	input					mult_available,
 	input					adder_available,
 	input					memory_available,
-	FU_SELECT				fu_select,
+	input  FU_SELECT			fu_select,
   
  	//output
 	output logic        			rs1_ready_out,    	// This RS is in use and ready to go to EX 
@@ -51,8 +51,7 @@ module rs_one_entry(
 	output logic        			rs1_available_out, 
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs1_rob_idx_out,   	// 
 	output logic [5:0]		      	rs1_op_type_out     	// 
-
-		  );  
+);  
 
 
 	logic  [63:0] 				OPa;              	// Operand A 
@@ -70,14 +69,14 @@ module rs_one_entry(
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
 
 	logic					fu_ready;
-	ALU_FUNC				alu_func_reg;
+	ALU_FUNC				Alu_func_reg;
 	FU_SELECT				fu_select_reg;
 
 	assign rs1_available_out= ~InUse;
  
-	assign rs1_ready_out 	= InUse & OPaValid & OPbValid & fu_ready; 
+	assign rs1_ready_out 	= InUse && OPaValid && OPbValid && fu_ready; 
  
-	assign rs1_opa_out 	= rs1_use_enable ? OPa : 64'b0; 
+	assign rs1_opa_out 	= rs1_use_enable ? OPa : 64'b0;
  
 	assign rs1_opb_out 	= rs1_use_enable ? OPb : 64'b0; 
  
@@ -124,30 +123,30 @@ module rs_one_entry(
 	begin 
     		if (reset) 
     		begin 
-            		OPa 	 	<= `SD 0; 
-            		OPb 	 	<= `SD 0; 
-            		OPaValid 	<= `SD 0; 
-            		OPbValid 	<= `SD 0; 
+            		OPa 	 	<= `SD 0;
+            		OPb 	 	<= `SD 0;
+            		OPaValid 	<= `SD 0;
+            		OPbValid 	<= `SD 0;
 			OP_type  	<= `SD 5'b0;
             		InUse 	 	<= `SD 1'b0; 
            		DestTag  	<= `SD 0;
 			Rob_idx	 	<= `SD 0;
-			alu_func_reg 	<= `SD ALU_DEFAULT;
+			Alu_func_reg 	<= `SD ALU_DEFAULT;
 			fu_select_reg	<= `SD FU_DEFAULT;
-    		end 
-    		else 
-    		begin 
+    		end
+    		else
+    		begin
         		if (rs1_load_in) 
-        		begin 
-           			OPa 	 	<= `SD rs1_opa_in; 
-            			OPb 	 	<= `SD rs1_opb_in; 
-            			OPaValid 	<= `SD rs1_opa_valid; 
-            			OPbValid 	<= `SD rs1_opb_valid; 
+        		begin
+           			OPa 	 	<= `SD rs1_opa_in;
+            			OPb 	 	<= `SD rs1_opb_in;
+            			OPaValid 	<= `SD rs1_opa_valid;
+            			OPbValid 	<= `SD rs1_opb_valid;
 				OP_type  	<= `SD rs1_op_type_in;
-            			InUse 	 	<= `SD 1'b1; 
+            			InUse 	 	<= `SD 1'b1;
             			DestTag  	<= `SD rs1_dest_in;
 				Rob_idx	 	<= `SD rs1_rob_idx_in;
-				alu_func_reg 	<= `SD rs1_alu_func; 
+				Alu_func_reg 	<= `SD rs1_alu_func;
 				fu_select_reg	<= `SD fu_select;
         		end 
         		else 
