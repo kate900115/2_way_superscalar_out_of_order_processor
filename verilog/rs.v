@@ -111,8 +111,7 @@ module rs(
 	.rs1_available_out(internal_rs_available_out), 
 	.rs1_rob_idx_out(internal_rs_rob_idx_out),   	
 	.rs1_op_type_out(internal_rs_op_type_out)
-
-		  );  
+);
 
 
 	//the instruction to be dispatched use this priority selector to choose an available rs_one_entry
