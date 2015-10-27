@@ -63,14 +63,14 @@ module rs_one_entry(
 
   
  	//output
-	output logic        			rs1_ready_out,    	// This RS is in use and ready to go to EX 
-	output logic [63:0] 			rs1_opa_out,       	// This RS' opa 
-	output logic [63:0] 			rs1_opb_out,       	// This RS' opb 
+	output logic							rs1_ready_out,    	// This RS is in use and ready to go to EX 
+	output logic [63:0]						rs1_opa_out,       	// This RS' opa 
+	output logic [63:0]						rs1_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRF_SIZE)-1:0]	rs1_dest_tag_out,  	// This RS' destination tag   
-	output logic        			rs1_available_out, 
+	output logic							rs1_available_out, 
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs1_rob_idx_out,   	// 
-	output logic [5:0]		      	rs1_op_type_out     	// 
-	output FU_SELECT			fu_select_reg_out
+	output logic [5:0]					  	rs1_op_type_out,     	// 
+	output FU_SELECT						fu_select_reg_out
 );  
 
 
@@ -92,9 +92,9 @@ module rs_one_entry(
 	ALU_FUNC				Alu_func_reg;
 	FU_SELECT				fu_select_reg;
 
-	wire rs1_use_enable;
+	logic rs1_use_enable;
 
-	assign rs1_use_enable=fu1_rs1_use_enable||fu2_rs1_use_enable    //if we want to output this entry to fu1 or fu2
+	assign rs1_use_enable=fu1_rs1_use_enable||fu2_rs1_use_enable;    //if we want to output this entry to fu1 or fu2
 
 	assign rs1_available_out= ~InUse;
  

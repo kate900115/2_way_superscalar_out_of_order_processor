@@ -19,12 +19,12 @@ module rs(
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in,     // The destination of this instruction
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in,     // The destination of this instruction
  
-	input  [63:0] 				rs_cdb1_in,     // CDB bus from functional units 
+	input  [63:0]						rs_cdb1_in,     // CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag,    // CDB tag bus from functional units 
-	input  	      				rs_cdb1_valid,  // The data on the CDB is valid 
-	input  [63:0] 				rs_cdb2_in,     // CDB bus from functional units 
+	input								rs_cdb1_valid,  // The data on the CDB is valid 
+	input  [63:0]						rs_cdb2_in,     // CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag,    // CDB tag bus from functional units 
-	input  	      				rs_cdb2_valid,  // The data on the CDB is valid 
+	input								rs_cdb2_valid,  // The data on the CDB is valid 
 
 /*
 	input  [63:0] 				rs_opa_in,      // Operand a from Rename  
@@ -67,24 +67,21 @@ module rs(
 	input					fu2_memory_available,
   
  	//output
-	output logic [63:0] 			fu1_rs_opa_out,       	// This RS' opa 
-	output logic [63:0] 			fu1_rs_opb_out,       	// This RS' opb 
+	output logic [63:0]						fu1_rs_opa_out,       	// This RS' opa 
+	output logic [63:0]						fu1_rs_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRF_SIZE)-1:0]	fu1_rs_dest_tag_out,  	// This RS' destination tag  
 	output logic [$clog2(`ROB_SIZE)-1:0]    fu1_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]		      	fu1_rs_op_type_out,     	// This RS' operation type
-	output logic				fu1_rs_out_valid		// RS output is valid
+	output logic [5:0]						fu1_rs_op_type_out,     // This RS' operation type
+	output logic							fu1_rs_out_valid,		// RS output is valid
 
-	output logic [63:0] 			fu2_rs_opa_out,       	// This RS' opa 
-	output logic [63:0] 			fu2_rs_opb_out,       	// This RS' opb 
+	output logic [63:0]						fu2_rs_opa_out,       	// This RS' opa 
+	output logic [63:0]						fu2_rs_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRF_SIZE)-1:0]	fu2_rs_dest_tag_out,  	// This RS' destination tag  
 	output logic [$clog2(`ROB_SIZE)-1:0]    fu2_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]		      	fu2_rs_op_type_out,     	// This RS' operation type
-	output logic				fu2_rs_out_valid		// RS output is valid
+	output logic [5:0]					  	fu2_rs_op_type_out,     // This RS' operation type
+	output logic							fu2_rs_out_valid,		// RS output is valid
 
-	output logic				rs_full,		// RS is full now
-
-
-
+	output logic							rs_full					// RS is full now
 
 );
 
@@ -198,7 +195,7 @@ module rs(
 	two_stage_priority_selector	#(.p_SIZE(`RS_SIZE))	tsps1(                                  //****newly updated
 		.available(internal_rs_available_out),                                                 //when dispatching, two instruction comes in , this selector can help us to find two available entries in rs, then make the load of the two entries to be 1
 		.enable1(inst1_rs_load_in),
-		.enable2(inst2_rs_load_in)
+		.enable2(inst2_rs_load_in),
 		.output1(inst1_internal_rs_load_in),
 		.output2(inst2_internal_rs_load_in),
 		.load(internal_rs_load_in)
@@ -258,22 +255,22 @@ module rs(
 	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
 
 	always_comb begin
-		if 	({rs_op_type_in[5:3],3'b0} == 6'h10 && rs_alu_func == ALU_MULQ)
+		if 	({inst1_rs_op_type_in[5:3],3'b0} == 6'h10 && inst1_rs_alu_func == ALU_MULQ)
 			inst1_fu_select = USE_MULTIPLIER;
-		else if (	({rs_op_type_in[5:3],3'b0} == 6'h08) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h20) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h28))
+		else if (	({inst1_rs_op_type_in[5:3],3'b0} == 6'h08) || 
+				({inst1_rs_op_type_in[5:3],3'b0} == 6'h20) || 
+				({inst1_rs_op_type_in[5:3],3'b0} == 6'h28))
 			inst1_fu_select = USE_MEMORY; 
 		else 
 			inst1_fu_select = USE_ADDER;
 	end
 
 	always_comb begin
-		if 	({rs_op_type_in[5:3],3'b0} == 6'h10 && rs_alu_func == ALU_MULQ)
+		if 	({inst2_rs_op_type_in[5:3],3'b0} == 6'h10 && inst2_rs_alu_func == ALU_MULQ)
 			inst2_fu_select = USE_MULTIPLIER;
-		else if (	({rs_op_type_in[5:3],3'b0} == 6'h08) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h20) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h28))
+		else if (	({inst2_rs_op_type_in[5:3],3'b0} == 6'h08) || 
+				({inst2_rs_op_type_in[5:3],3'b0} == 6'h20) || 
+				({inst2_rs_op_type_in[5:3],3'b0} == 6'h28))
 			inst2_fu_select = USE_MEMORY; 
 		else 
 			inst2_fu_select = USE_ADDER;
