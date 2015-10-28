@@ -10,7 +10,7 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-analyze -f sverilog [list "sys_defs.vh" "./verilog/rs_one_entry.v" "./verilog/rs.v" "./verilog/priority_selector.v"]
+analyze -f sverilog [list "sys_defs.vh" "./verilog/rs_one_entry.v" "./verilog/rs.v" "./verilog/priority_selector.v" "./verilog/two_stage_priority_selector.v"]
 elaborate rs
 set design_name rs
 set clock_name clock

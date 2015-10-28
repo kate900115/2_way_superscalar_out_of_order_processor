@@ -1,7 +1,7 @@
 // this is for selecting two signals from available list using two priority selectors, output each one selected then output the "+" of two output
 
 
-module two_stage_priority_selector(available,enable,output1,output2,load);
+module two_stage_priority_selector(available,enable1,enable2,output1,output2,load);
 
 parameter p_SIZE=8;
                                         
