@@ -69,6 +69,7 @@ module rs(
 	logic [`RS_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	internal_rs_dest_tag_out;
 	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] 	internal_rs_rob_idx_out;
 	ALU_FUNC [`RS_SIZE-1:0]                         internal_rs_alu_func_out;
+	logic [`RS_SIZE-1:0]				internal_rs_free;
 
 	//internal registers
 	FU_SELECT					fu_select;
@@ -105,6 +106,7 @@ module rs(
 	.adder_available(adder_available),
 	.memory_available(memory_available),	
 	.fu_select(fu_select),
+	.rs1_free_in(internal_rs_free),
   
  	//output
 	.rs1_ready_out(internal_rs_ready_out),
@@ -155,6 +157,7 @@ module rs(
 		rs_alu_func_out = ALU_DEFAULT;
 		for(int i=0;i<`RS_SIZE;i++)
 		begin
+		internal_rs_free[i]=1'b0;
 			if(internal_rs_use_enable[i]==1'b1)
 			begin
 				rs_out_valid       = 1'b1;
@@ -164,6 +167,7 @@ module rs(
 				rs_rob_idx_out     = internal_rs_rob_idx_out[i];
 				rs_op_type_out     = internal_rs_op_type_out[i];
 				rs_alu_func_out    = internal_rs_alu_func_out[i];
+				internal_rs_free[i]= 1'b1;
 				break;
 			end
 		end

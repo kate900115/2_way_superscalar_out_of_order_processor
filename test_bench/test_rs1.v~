@@ -18,6 +18,7 @@ module testbench_rs;
 	logic							mult_available;
 	logic							adder_available;
 	logic							memory_available;
+	logic                                                   stall;
 	//input signals
 	logic [63:0] 						rs_opa_out;       	// This RS' opa 
 	logic [63:0] 						rs_opb_out;       	// This RS' opb 
@@ -49,6 +50,7 @@ module testbench_rs;
 	   .mult_available(mult_available),
 	   .adder_available(adder_available),
 	   .memory_available(memory_available),
+	   .stall(stall),
   
 	   .rs_opa_out(rs_opa_out),       	// This RS' opa 
 	   .rs_opb_out(rs_opb_out),       	// This RS' opb 
@@ -78,6 +80,7 @@ module testbench_rs;
 		@(negedge clock);
 		reset = 0;
 		rs_load_in=0;
+		stall=0;
 		rs_cdb2_valid=0;
 		//#5;
 		@(negedge clock);
@@ -176,18 +179,9 @@ module testbench_rs;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE)-2{1'b0}},2'b11};
 		mult_available=0;
 		adder_available=1;
-		//adder_available=0;
-		//memory_available=1;
 		memory_available=0;
 		#5;
 		@(negedge clock);
-		/*while(rs_out_valid);
-		assert(	rs_opa_out==64'h0 && 
-			rs_opb_out==64'h0 && 
-			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
-			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
-			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@ldq wait to issue Passed");
-			else #1 exit_on_error;*/
 		while(!rs_out_valid);
 		assert(	rs_opa_out==64'h0000_0000_0045_0000 && 
 			rs_opb_out==64'h0000_0000_0000_2400 && 
@@ -350,7 +344,7 @@ module testbench_rs;
 			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
 			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
 			rs_op_type_out == 6'h00 && rs_alu_func_out== ALU_DEFAULT && !rs_full && !rs_out_valid)  $display("@@@nothing can be issued Passed");
-			else #1 exit_on_error;*/
+			else #1 exit_on_error;
 		/*while(!rs_out_valid);
 		assert(	rs_opa_out==64'h0000_3234_0000_0000 && 
 			rs_opb_out==64'h0000_0000_2000_8300 && 
