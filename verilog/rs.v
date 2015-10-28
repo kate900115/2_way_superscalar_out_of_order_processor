@@ -83,7 +83,7 @@ module rs(
 	output ALU_FUNC                         fu1_alu_func_out,
 	output ALU_FUNC                         fu2_alu_func_out,
 
-	output logic				rs_full			// RS is full now
+	output RS_FULL				rs_full			// RS is full now
 
 );
 
@@ -288,7 +288,7 @@ module rs(
 
 
 //*********************************************************************************************
-/*
+
 	always_comb begin
 		if(internal_rs_available_out == 0)
 			rs_full = RS_NO_ENTRY_EMPTY;
@@ -314,8 +314,8 @@ module rs(
 			end
 		end 
 	end
-*/
-	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
+
+	//assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
 
 	always_comb begin
 		if 	({inst1_rs_op_type_in[5:3],3'b0} == 6'h10 && inst1_rs_alu_func == ALU_MULQ)
