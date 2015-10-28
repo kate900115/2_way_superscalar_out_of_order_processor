@@ -95,7 +95,7 @@ module rs_one_entry(
 
 	logic rs1_use_enable;
 
-	assign rs1_use_enable   = fu1_rs1_use_enable||fu2_rs1_use_enable;    //if we want to output this entry to fu1 or fu2
+	assign rs1_use_enable   = fu1_rs1_use_enable || fu2_rs1_use_enable;    //if we want to output this entry to fu1 or fu2
 
 	assign rs1_available_out= ~InUse;
  
@@ -128,17 +128,17 @@ module rs_one_entry(
 	begin	
 		case (fu_select_reg)
 		USE_MULTIPLIER:
-			if (fu1_mult_available||fu2_mult_available)
+			if (fu1_mult_available || fu2_mult_available)
 				fu_ready = 1;
 			else
 				fu_ready = 0;
 		USE_ADDER:
-			if (fu1_adder_available||fu2_adder_available)
+			if (fu1_adder_available || fu2_adder_available)
 				fu_ready = 1;
 			else
 				fu_ready = 0;
 		USE_MEMORY:
-			if (fu1_memory_available||fu1_memory_available)
+			if (fu1_memory_available || fu1_memory_available)
 				fu_ready = 1;
 			else
 				fu_ready = 0;
@@ -191,7 +191,6 @@ module rs_one_entry(
 				Alu_func_reg 	<= `SD inst2_rs1_alu_func;
 				fu_select_reg	<= `SD inst2_fu_select;
 			end
-			
         		else 
         		begin
             			if (LoadAFromCDB1)

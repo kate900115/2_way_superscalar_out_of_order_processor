@@ -13,49 +13,40 @@
 
 module rs(
 
-	input         				reset,          // reset signal 
-	input         				clock,          // the clock 
+	input         				reset,          	// reset signal 
+	input         				clock,          	// the clock 
 
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in,     // The destination of this instruction
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in,     // The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in,     	// The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in,     	// The destination of this instruction
  
-	input  [63:0]				rs_cdb1_in,     // CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag,    // CDB tag bus from functional units 
-	input					rs_cdb1_valid,  // The data on the CDB is valid 
-	input  [63:0]				rs_cdb2_in,     // CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag,    // CDB tag bus from functional units 
-	input					rs_cdb2_valid,  // The data on the CDB is valid 
+	input  [63:0]				rs_cdb1_in,     	// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag,    	// CDB tag bus from functional units 
+	input					rs_cdb1_valid,  	// The data on the CDB is valid 
+	input  [63:0]				rs_cdb2_in,     	// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag,    	// CDB tag bus from functional units 
+	input					rs_cdb2_valid,  	// The data on the CDB is valid 
 
-	/*
-	input  [63:0] 				rs_opa_in,      // Operand a from Rename  
-	input  [63:0] 				rs_opb_in,      // Operand a from Rename 
-	input  	     				rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			rs_op_type_in,  // Instruction type from decoder
-	ALU_FUNC				rs_alu_func,	// ALU function type from decoder
-	*/
-
-        //*** for instruction1
-	input  [63:0] 				inst1_rs_opa_in,      // Operand a from Rename  
-	input  [63:0] 				inst1_rs_opb_in,      // Operand a from Rename 
-	input  	     				inst1_rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst1_rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst1_rs_op_type_in,  // Instruction type from decoder
-	ALU_FUNC				inst1_rs_alu_func,	// ALU function type from decoder
+        //for instruction1
+	input  [63:0] 				inst1_rs_opa_in,      	// Operand a from Rename  
+	input  [63:0] 				inst1_rs_opb_in,      	// Operand a from Rename 
+	input  	     				inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
+	ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
         
-        //*** for instruction2
-	input  [63:0] 				inst2_rs_opa_in,      // Operand a from Rename  
-	input  [63:0] 				inst2_rs_opb_in,      // Operand a from Rename 
-	input  	     				inst2_rs_opa_valid,   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst2_rs_opb_valid,   // Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst2_rs_op_type_in,  // Instruction type from decoder
-	ALU_FUNC				inst2_rs_alu_func,	// ALU function type from decoder
+        //for instruction2
+	input  [63:0] 				inst2_rs_opa_in,      	// Operand a from Rename  
+	input  [63:0] 				inst2_rs_opb_in,      	// Operand a from Rename 
+	input  	     				inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
+	ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
 
-	input  		        		inst1_rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  		        		inst2_rs_load_in,     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  // 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  //
+	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
+	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 
 
 	input					fu1_mult_available,
@@ -87,8 +78,6 @@ module rs(
 
 );
 
-
-
 	
 	//input of one entry
 	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;                                //instruction1 go to the entries according to this,
@@ -97,8 +86,7 @@ module rs(
 				
 	logic [`RS_SIZE-1:0] 				fu1_internal_rs_use_enable;                               //tell rs which entry we want to send to FU1
 	logic [`RS_SIZE-1:0] 				fu2_internal_rs_use_enable;				  //tell rs which entry we want to send to FU2
-	//logic [`RS_SIZE-1:0] 				internal_rs_use_enable;					  //no use
-	//logic [`RS_SIZE-1:0] 				internal_rs_load_in;					  //no use
+
 	
 	//output of one entry
 	logic [`RS_SIZE-1:0]				internal_rs_ready_out;
@@ -116,9 +104,9 @@ module rs(
 	FU_SELECT					inst1_fu_select;
 	FU_SELECT        				inst2_fu_select;
 
-	logic	[`RS_SIZE-1:0]	available2;
+	logic	[`RS_SIZE-1:0]	ready_out_for_second_rs;
 	logic	[`RS_SIZE-1:0]	second_rs_use_available;
-
+	logic	[`RS_SIZE-1:0]  temp_internal_rs_available_out;
 
 
 	rs_one_entry rs1[`RS_SIZE-1:0](
@@ -126,7 +114,6 @@ module rs(
 	.reset(reset),					                    
 	.clock(clock),     
      	
-	//.rs1_dest_in(rs_dest_in),
 	.inst1_rs1_dest_in(inst1_rs_dest_in),
 	.inst2_rs1_dest_in(inst2_rs_dest_in),   
 		
@@ -181,48 +168,22 @@ module rs(
 
 		  );  
 
-
-	//the instruction to be dispatched use this priority selector to choose an available rs_one_entry
-	/*
-	priority_selector #(.SIZE(`RS_SIZE)) rs_psl1( 
-		.req(internal_rs_available_out),
-	        .en(rs_load_in),
-        	.gnt(internal_rs_load_in)
-	);
-
-	//this priority selector chooses which rs_one_entry to send its data to FU
-	//Yuxuan: I think en will always be 1'b1 because this is comb logic. You can change the input of en.	
-	priority_selector #(.SIZE(`RS_SIZE)) rs_psl2( 
-		.req(internal_rs_ready_out),
-        	.en(1'b1),		
-        	.gnt(internal_rs_use_enable)
-	); 
-	*/
-	
-
+	//when dispatching, two instruction comes in, 
+	//this selector can help us to find two available entries in rs, 
+	//then make the load of the two entries to be 1
 	two_stage_priority_selector	#(.p_SIZE(`RS_SIZE))	tsps1(                                  
-		.available(internal_rs_available_out),                                                 //when dispatching, two instruction comes in , 
-		.enable1(inst1_rs_load_in),							       //this selector can help us to find two available entries in rs, then make the load of the two entries to be 1
+		.available(internal_rs_available_out),                                                 
+		.enable1(inst1_rs_load_in),							       
 		.enable2(inst2_rs_load_in),
 		.output1(inst1_internal_rs_load_in),
 		.output2(inst2_internal_rs_load_in)
 	);
 
-	/*two_stage_priority_selector	#(.p_SIZE(`RS_SIZE))	tsps1(                                  
-		.available(internal_rs_ready_out),                                                 
-		.enable1(1'b1),
-		.enable2(1'b1)
-		.output1(fu1_internal_rs_use_enable),
-		.output2(fu2_internal_rs_use_enable),
-		.load(internal_rs_use_enable)
-	);
-	*/
-
-
 
 	//during the wake-up rs entries , we want to select two to the two FU. 
 	//but for example: only one adder is available, 
-	//we want to make sure that only one instruction using adder is sent to FU, so the logic is quite complicated. 
+	//we want to make sure that only one instruction using adder is sent to FU, 
+	//so the logic is quite complicated. 
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
        priority_selector #(.SIZE(`RS_SIZE)) rs_psl1( 
@@ -231,30 +192,9 @@ module rs(
         	.gnt(fu1_internal_rs_use_enable)
 	);
 
-	/*assign available2 = (fu1_internal_rs_use_enable) & internal_rs_ready_out; 
+	
 
-	always_comb begin
-		for(int i=0;i<`RS_SIZE;i++)
-		begin
-			if((fu1_mult_available^fu2_mult_available)
-			  &&(fu1_internal_rs_use_enable[i])
-			  &&(internal_fu_select_reg_out[i]==USE_MULTIPLIER))
-				available3[i]=0;
-			else if((fu1_adder_available^fu2_adder_available)
-			      &&(fu1_internal_rs_use_enable[i])
-                              &&(internal_fu_select_reg_out[i]==USE_ADDER ))
-				available3[i]=0;
-			else if((fu1_memory_available^fu2_memory_available)
-			      &&(fu1_internal_rs_use_enable[i])
-			      &&(internal_fu_select_reg_out[i]==USE_MEMORY )  )
-				available3[i]=0;
-			else
-				available3[i]=available2[i];
-		end
-	end */
-
-
-	assign available2 = (~fu1_internal_rs_use_enable) & internal_rs_ready_out; 
+	assign ready_out_for_second_rs = (~fu1_internal_rs_use_enable) & internal_rs_ready_out; 
 
 	always_comb begin
 		for(int i=0;i<`RS_SIZE;i++)
@@ -274,7 +214,7 @@ module rs(
 			      &&(internal_fu_select_reg_out[i]==USE_MEMORY))
 				second_rs_use_available[i]=0;
 			else
-				second_rs_use_available[i]=available2[i];
+				second_rs_use_available[i]=ready_out_for_second_rs[i];
 		end
 	end
 
@@ -287,8 +227,10 @@ module rs(
 	);
 
 
-//*********************************************************************************************
-
+	//to test how many RS_one_entry(s) are available
+	//if there isn't any entry availble, rs_full = RS_NO_ENTRY_EMPTY
+	//if there is one entry available, rs_full = RS_ONE_ENTRY_EMPTY
+	//if there is two or more entry available, rs_full = RS_TWO_OR_MORE_ENTRY_EMPTY
 	always_comb begin
 		if(internal_rs_available_out == 0)
 			rs_full = RS_NO_ENTRY_EMPTY;
@@ -298,9 +240,9 @@ module rs(
 			begin
 				if(internal_rs_available_out[i]==1)
 				begin
-					temp    = internal_rs_available_out;
-					temp[i] = ~internal_rs_available_out[i];
-					if ( | temp==0)
+					temp_internal_rs_available_out    = internal_rs_available_out;
+					temp_internal_rs_available_out[i] = ~internal_rs_available_out[i];
+					if (temp_internal_rs_available_out == 0)
 					begin
 						rs_full = RS_ONE_ENTRY_EMPTY;
 						break;
@@ -315,7 +257,7 @@ module rs(
 		end 
 	end
 
-	//assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
+	
 
 	always_comb begin
 		if 	({inst1_rs_op_type_in[5:3],3'b0} == 6'h10 && inst1_rs_alu_func == ALU_MULQ)
@@ -339,30 +281,6 @@ module rs(
 			inst2_fu_select = USE_ADDER;
 	end
 
-
-	/*
-	always_comb begin
-		rs_out_valid    = 0;
-		rs_opa_out      = 0;
-		rs_opb_out      = 0;
-		rs_dest_tag_out = 0; 
-		rs_rob_idx_out  = 0;	 
-		rs_op_type_out  = 0;
-		for(int i=0;i<`RS_SIZE;i++)
-		begin
-			if(internal_rs_use_enable[i]==1'b1)
-			begin
-				rs_out_valid    = 1'b1;
-				rs_opa_out      = internal_rs_opa_out[i];
-			 	rs_opb_out      = internal_rs_opb_out[i];
-				rs_dest_tag_out = internal_rs_dest_tag_out[i];
-				rs_rob_idx_out  = internal_rs_rob_idx_out[i];
-				rs_op_type_out  = internal_rs_op_type_out[i];
-				break;
-			end
-		end
-	end
-	*/
 
 	always_comb begin                                                                                      // output need to change so that we can dispatch different contents of entries to different FU
 		fu1_rs_out_valid    = 0;
@@ -406,3 +324,30 @@ module rs(
 		end
 	end
 endmodule
+
+
+
+
+//assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
+
+/*assign available2 = (fu1_internal_rs_use_enable) & internal_rs_ready_out; 
+
+	always_comb begin
+		for(int i=0;i<`RS_SIZE;i++)
+		begin
+			if((fu1_mult_available^fu2_mult_available)
+			  &&(fu1_internal_rs_use_enable[i])
+			  &&(internal_fu_select_reg_out[i]==USE_MULTIPLIER))
+				available3[i]=0;
+			else if((fu1_adder_available^fu2_adder_available)
+			      &&(fu1_internal_rs_use_enable[i])
+                              &&(internal_fu_select_reg_out[i]==USE_ADDER ))
+				available3[i]=0;
+			else if((fu1_memory_available^fu2_memory_available)
+			      &&(fu1_internal_rs_use_enable[i])
+			      &&(internal_fu_select_reg_out[i]==USE_MEMORY )  )
+				available3[i]=0;
+			else
+				available3[i]=available2[i];
+		end
+	end */
