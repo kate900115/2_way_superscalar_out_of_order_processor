@@ -87,8 +87,8 @@ module testbench_rs;
 		rs_opa_valid=1;
 		rs_opb_valid=1;
 		rs_cdb1_valid=0;
-		rs_op_type_in=6'h13;    //instruction is mulq
-		rs_alu_func=5'h0b;
+		rs_op_type_in=`INTM_GRP;    //instruction is mulq
+		rs_alu_func=ALU_MULQ;
 		rs_load_in=1;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE){1'b0}}};
 		mult_available=1;
@@ -101,7 +101,7 @@ module testbench_rs;
 			rs_opb_out==26 && 
 			rs_dest_tag_out == {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE){1'b0}}} && 
-			rs_op_type_out == 6'h13 && rs_alu_func_out==5'h0b && !rs_full && rs_out_valid)  $display("@@@mulq issue Passed");
+			rs_op_type_out == `INTM_GRP && rs_alu_func_out==ALU_MULQ && !rs_full && rs_out_valid)  $display("@@@mulq issue Passed");
 			else #1 exit_on_error;
 
 		rs_dest_in= {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}};
@@ -110,8 +110,8 @@ module testbench_rs;
 		rs_opa_valid=0;
 		rs_opb_valid=1;
 		rs_cdb1_valid=0;
-		rs_op_type_in=6'h10;   //instruction is addq,dependent on mulq
-		rs_alu_func=5'h00;
+		rs_op_type_in=`INTA_GRP;   //instruction is addq,dependent on mulq
+		rs_alu_func=ALU_ADDQ;
 		rs_load_in=1;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE)-1{1'b0}},1'b1};
 		mult_available=0;
@@ -133,31 +133,21 @@ module testbench_rs;
 		rs_opa_valid=1;
 		rs_opb_valid=1;
 		rs_cdb1_valid=0;
-		//rs_cdb1_valid=1;
-		//rs_cdb1_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
-		//rs_cdb1_in=832;
-		rs_op_type_in=6'h28;    //instruction is LDQ,independent on previous instrs
-		rs_alu_func=5'h00;
+		rs_op_type_in=`LDQ_INST;    //instruction is LDQ,independent on previous instrs
+		rs_alu_func=ALU_ADDQ;
 		rs_load_in=1;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE)-2{1'b0}},2'b10};
-		//mult_available=1;
 		mult_available=0;
 		adder_available=1;
 		memory_available=1;
 		#5;
 		@(negedge clock);
 		while(!rs_out_valid);
-		/*assert(	rs_opa_out==832 && 
-			rs_opb_out==46 && 
-			rs_dest_tag_out == {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
-			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-1{1'b0}},1'b1} && 
-			rs_op_type_out == 6'h10 && !rs_full && rs_out_valid)  $display("@@@addq issue Passed");
-			else #1 exit_on_error;*/ 
 		assert(	rs_opa_out==64'h0000_0000_0003_0000 && 
 			rs_opb_out==64'h0000_0000_0000_4000 && 
 			rs_dest_tag_out == {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b10} && 
-			rs_op_type_out == 6'h28 && rs_alu_func_out==5'h00 && !rs_full && rs_out_valid)  $display("@@@ldq issue Passed");
+			rs_op_type_out == `LDQ_INST && rs_alu_func_out==ALU_ADDQ && !rs_full && rs_out_valid)  $display("@@@ldq issue Passed");
 			else #1 exit_on_error;
 	
 		
@@ -167,33 +157,21 @@ module testbench_rs;
 		rs_opa_valid=1;
 		rs_opb_valid=1;
 		rs_cdb1_valid=0;
-		/*rs_cdb1_valid=1;
-		rs_cdb1_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};//multq execution completed,CDB broadcast
-		rs_cdb1_in=832;*/
-		rs_op_type_in=6'h10;    //instruction is addq,independent on previous instrs
-		rs_alu_func=5'h00;
+		rs_op_type_in=`INTA_GRP;    //instruction is addq,independent on previous instrs
+		rs_alu_func=ALU_ADDQ;
 		rs_load_in=1;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE)-2{1'b0}},2'b11};
 		mult_available=0;
 		adder_available=1;
-		//adder_available=0;
-		//memory_available=1;
 		memory_available=0;
 		#5;
 		@(negedge clock);
-		/*while(rs_out_valid);
-		assert(	rs_opa_out==64'h0 && 
-			rs_opb_out==64'h0 && 
-			rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
-			rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
-			rs_op_type_out == 6'h00 && !rs_full && !rs_out_valid)  $display("@@@ldq wait to issue Passed");
-			else #1 exit_on_error;*/
 		while(!rs_out_valid);
 		assert(	rs_opa_out==64'h0000_0000_0045_0000 && 
 			rs_opb_out==64'h0000_0000_0000_2400 && 
 			rs_dest_tag_out == {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b11} && 
-			rs_op_type_out == 6'h10 && rs_alu_func_out==5'h00 && !rs_full && rs_out_valid)  $display("@@@current independent addq issue Passed");
+			rs_op_type_out == `INTA_GRP && rs_alu_func_out==ALU_ADDQ && !rs_full && rs_out_valid)  $display("@@@current independent addq issue Passed");
 			else #1 exit_on_error;
 
 		rs_dest_in= {3'b101,{$clog2(`PRF_SIZE)-3{1'b0}}};
@@ -204,8 +182,8 @@ module testbench_rs;
 		rs_cdb1_valid=1;
 		rs_cdb1_tag={{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};//multq execution completed,CDB broadcast,dependent addq operand available
 		rs_cdb1_in=832;
-		rs_op_type_in=6'h13;    //instruction is independent mulq on preceding addq
-		rs_alu_func=5'h0b;
+		rs_op_type_in=`INTM_GRP;    //instruction is independent mulq on preceding addq
+		rs_alu_func=ALU_MULQ;
 		rs_load_in=1;
 		rs_rob_idx_in={{$clog2(`ROB_SIZE)-3{1'b0}},3'b100};
 		mult_available=1;
@@ -218,7 +196,7 @@ module testbench_rs;
 			rs_opb_out==255 && 
 			rs_dest_tag_out == {3'b101,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			rs_rob_idx_out == {{$clog2(`ROB_SIZE)-3{1'b0}},3'b100} && 
-			rs_op_type_out == 6'h13 && rs_alu_func_out==5'h0b && !rs_full && rs_out_valid)  $display("@@@independent mulq issue Passed");
+			rs_op_type_out == `INTM_GRP && rs_alu_func_out==ALU_MULQ && !rs_full && rs_out_valid)  $display("@@@independent mulq issue Passed");
 			else #1 exit_on_error;
 
 
