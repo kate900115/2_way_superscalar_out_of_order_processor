@@ -201,36 +201,37 @@ module rs(
 		begin
 			if (fu1_internal_rs_use_enable[i]==1)
 			begin
-				if(internal_fu_select_reg_out[i]==USE_MULTIPLIER)
+				inst1_use_mult=1'b0;
+				inst1_use_adder=1'b0;
+				inst1_use_memory=1'b0;
+				unique if(internal_fu_select_reg_out[i]==USE_MULTIPLIER)
 				begin
 					inst1_use_mult=1'b1;
-					inst1_use_adder=1'b0;
-					inst1_use_memory=1'b0;
+					break;
 				end
 				else if(internal_fu_select_reg_out[i]==USE_ADDER)
 				begin
-					inst1_use_mult=1'b0;
 					inst1_use_adder=1'b1;
-					inst1_use_memory=1'b0;
+					break;
 				end
 				else if(internal_fu_select_reg_out[i]==USE_MEMORY)
 				begin
-					inst1_use_mult=1'b0;
-					inst1_use_adder=1'b0;
 					inst1_use_memory=1'b1;
+					break;
 				end
 				else
 				begin
 					inst1_use_mult=1'b0;
 					inst1_use_adder=1'b0;
 					inst1_use_memory=1'b0;
+					break;
 				end
 			end
 			else
 			begin
-					inst1_use_mult=1'b0;
-					inst1_use_adder=1'b0;
-					inst1_use_memory=1'b0;
+				inst1_use_mult=1'b0;
+				inst1_use_adder=1'b0;
+				inst1_use_memory=1'b0;	
 			end
 		end
 	end
