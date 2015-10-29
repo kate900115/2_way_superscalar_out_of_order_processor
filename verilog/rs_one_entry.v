@@ -121,35 +121,31 @@ module rs_one_entry(
 
 	assign LoadAFromCDB2 	= (rs1_cdb2_tag == OPa[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb2_valid; 
 
-	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
-
+	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid;
 	
-	always_comb
-	begin	
+
+	always_ff @(posedge clock)
+	begin
 		case (fu_select_reg)
-		USE_MULTIPLIER:
-			if (fu1_mult_available || fu2_mult_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		USE_ADDER:
-			if (fu1_adder_available || fu2_adder_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		USE_MEMORY:
-			if (fu1_memory_available || fu1_memory_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		default:
-				fu_ready = 0;
+			USE_MULTIPLIER:
+				if (fu1_mult_available || fu2_mult_available)
+					fu_ready <= `SD 1;
+				else
+					fu_ready <= `SD 0;
+			USE_ADDER:
+				if (fu1_adder_available || fu2_adder_available)
+					fu_ready <= `SD 1;
+				else
+					fu_ready <= `SD 0;
+			USE_MEMORY:
+				if (fu1_memory_available || fu1_memory_available)
+					fu_ready <= `SD 1;
+				else
+					fu_ready <= `SD 0;
+			default:
+					fu_ready <= `SD 0;
 		endcase
-	end
 	
-
-	always_ff @(posedge clock) 
-	begin 
     		if (reset) 
     		begin 
             		OPa 	 	<= `SD 0;
