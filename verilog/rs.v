@@ -82,6 +82,7 @@ module rs(
 	//input of one entry
 	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;                                //instruction1 go to the entries according to this,
 														  //when dispatching two instructions it tell us the address of entries to load each instructions
+
 	logic [`RS_SIZE-1:0] 				inst2_internal_rs_load_in;                                //instruction2 go to the entries according to this
 				
 	logic [`RS_SIZE-1:0] 				fu1_internal_rs_use_enable;                               //tell rs which entry we want to send to FU1
@@ -234,6 +235,7 @@ module rs(
 				inst1_use_memory=1'b0;	
 			end
 		end
+
 	end
 
 	assign ready_out_for_second_rs = (~fu1_internal_rs_use_enable) & internal_rs_ready_out; 
@@ -367,6 +369,8 @@ module rs(
 				break;
 			end
 		end
+
+        $display("fu1_rs_opa_out:%b", fu1_rs_opa_out);
 	end
 endmodule
 

@@ -131,7 +131,7 @@ module testbench_rs;
 		$monitor("time:%d, clk:%b, fu1_rs_dest_tag_out:%h, fu1_rs_rob_idx_out:%h, fu1_rs_op_type_out:%h, fu1_alu_func_out:%h, fu1_rs_opa_out:%h, fu1_rs_opb_out:%h, fu1_rs_out_valid:%b, \
 					   fu2_rs_dest_tag_out:%h, fu2_rs_rob_idx_out:%h, fu2_rs_op_type_out:%h, fu2_alu_func_out:%h, fu2_rs_opa_out:%h, fu2_rs_opb_out:%h, fu2_rs_out_valid:%b,",
 				$time, clock, fu1_rs_dest_tag_out, fu1_rs_rob_idx_out, fu1_rs_op_type_out, fu1_alu_func_out, fu1_rs_opa_out, fu1_rs_opb_out, fu1_rs_out_valid, 
-					      fu1_rs_dest_tag_out, fu1_rs_rob_idx_out, fu1_rs_op_type_out, fu1_alu_func_out, fu1_rs_opa_out, fu1_rs_opb_out, fu1_rs_out_valid);
+					      fu2_rs_dest_tag_out, fu2_rs_rob_idx_out, fu2_rs_op_type_out, fu2_alu_func_out, fu2_rs_opa_out, fu2_rs_opb_out, fu2_rs_out_valid);
 		clock = 0;
 		//***RESET**
 		reset = 1;
@@ -214,18 +214,22 @@ module testbench_rs;
 		fu2_memory_available=1;
 		#5;
 		@(negedge clock);
-		while((!fu1_rs_out_valid) || (!fu2_rs_out_valid));
-		assert(	fu1_rs_opa_out==64'h0000_0000_0003_0000 && 
-			fu1_rs_opb_out==64'h0000_0000_0000_4000 && 
-			fu1_rs_dest_tag_out == {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
-			fu1_rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b10} && 
-			fu1_rs_op_type_out == `INTM_GRP && fu1_alu_func_out == ALU_MULQ && fu1_rs_out_valid
+		while(!fu1_rs_out_valid && !fu2_rs_out_valid);
+		$display("%b", fu2_rs_dest_tag_out == {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}});
+		$display("%b", fu2_rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b11});
+		$display("%b", fu2_rs_op_type_out == `INTA_GRP && fu2_alu_func_out == ALU_ADDQ);
+		$display("enter");
+		assert( fu1_rs_opa_out==64'h0 && 
+			fu1_rs_opb_out==64'h0 && 
+			fu1_rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
+			fu1_rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
+			fu1_rs_op_type_out == 6'h00 && fu1_alu_func_out == ALU_DEFAULT && !fu1_rs_out_valid
 			&& !rs_full &&
 			fu2_rs_opa_out==64'h0000_0000_0045_0000 && 
 			fu2_rs_opb_out==64'h0000_0000_0000_2400 && 
 			fu2_rs_dest_tag_out == {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
 			fu2_rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b11} && 
-			fu2_rs_op_type_out == `INTA_GRP && fu2_alu_func_out == ALU_DEFAULT && fu2_rs_out_valid)  $display("@@@ldq and independent addq issue Passed");
+			fu2_rs_op_type_out == `INTA_GRP && fu2_alu_func_out == ALU_ADDQ && fu2_rs_out_valid)  $display("@@@ldq and independent addq issue Passed");
 			else #1 exit_on_error;
 		$display("@@@Passed");
 		$finish;
