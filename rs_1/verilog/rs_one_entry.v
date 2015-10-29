@@ -16,8 +16,7 @@ module rs_one_entry(
 	input         				reset,          	// reset signal 
 	input         				clock,          	// the clock 
 
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs1_dest_in,    	// The destination of this instruction
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs1_dest_in,    	// The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_dest_in,    	// The destination of this instruction
  
 	input  [63:0] 				rs1_cdb1_in,		// CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
@@ -26,44 +25,25 @@ module rs_one_entry(
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
 	input  	      				rs1_cdb2_valid,		// The data on the CDB is valid 
 
-	input  [63:0] 				inst1_rs1_opa_in,		// Operand a from Rename  
-	input  [63:0] 				inst1_rs1_opb_in,		// Operand a from Rename 
-	input  	     				inst1_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst1_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]				inst1_rs1_op_type_in,		// Instruction type of rs1
-	input  ALU_FUNC				inst1_rs1_alu_func,
-	input  FU_SELECT			inst1_fu_select,
+	input  [63:0] 				rs1_opa_in,		// Operand a from Rename  
+	input  [63:0] 				rs1_opb_in,		// Operand a from Rename 
+	input  	     				rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [5:0]				rs1_op_type_in,		// Instruction type of rs1
+	input  ALU_FUNC				rs1_alu_func,
 
-	input  [63:0] 				inst2_rs1_opa_in,		// Operand a from Rename  
-	input  [63:0] 				inst2_rs1_opb_in,		// Operand a from Rename 
-	input  	     				inst2_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst2_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]				inst2_rs1_op_type_in,		// Instruction type of rs1
-	input  ALU_FUNC				inst2_rs1_alu_func,
-	input  FU_SELECT			inst2_fu_select,
+	input  		        		rs1_load_in,		// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input   	        		rs1_use_enable,		// Signal to send data to Func units AND to free this RS
 
-	input  		        		inst1_rs1_load_in,		// *****rs1 need two loads for each      Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  		        		inst2_rs1_load_in,
-
-	input   	        		fu1_rs1_use_enable,		// Signal to send data to Func units AND to free this RS
-	input   	        		fu2_rs1_use_enable,		// Signal to send data to Func units AND to free this RS
-
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs1_rob_idx_in,   	// 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs1_rob_idx_in,   	// 
+	input  [$clog2(`ROB_SIZE)-1:0]       	rs1_rob_idx_in,   	// 
 
 
-	input					fu1_mult_available,
-	input					fu1_adder_available,
-	input					fu1_memory_available,
-
-	input					fu2_mult_available,
-	input					fu2_adder_available,
-	input					fu2_memory_available,
-
-
+	input					mult_available,
+	input					adder_available,
+	input					memory_available,
+	input  FU_SELECT			fu_select,
   
  	//output
-<<<<<<< HEAD
 	output logic        			rs1_ready_out,    	// This RS is in use and ready to go to EX 
 	output logic [63:0] 			rs1_opa_out,       	// This RS' opa 
 	output logic [63:0] 			rs1_opb_out,       	// This RS' opb 
@@ -72,17 +52,6 @@ module rs_one_entry(
 	output logic [$clog2(`ROB_SIZE)-1:0]    rs1_rob_idx_out,   	// 
 	output logic [5:0]		      	rs1_op_type_out,     	//
 	output ALU_FUNC                         rs1_alu_func_out 
-=======
-	output logic							rs1_ready_out,    	// This RS is in use and ready to go to EX 
-	output logic [63:0]						rs1_opa_out,       	// This RS' opa 
-	output logic [63:0]						rs1_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]				rs1_dest_tag_out,  	// This RS' destination tag   
-	output logic							rs1_available_out, 	// This RS' is available
-	output logic [$clog2(`ROB_SIZE)-1:0]    			rs1_rob_idx_out,   	// 
-	output logic [5:0]					  	rs1_op_type_out,     	// 
-	output FU_SELECT						fu_select_reg_out,
-	output ALU_FUNC                         			rs1_alu_func_out 
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
 );  
 
 
@@ -104,17 +73,11 @@ module rs_one_entry(
 	ALU_FUNC				Alu_func_reg;
 	FU_SELECT				fu_select_reg;
 
-	logic rs1_use_enable;
-
-	assign rs1_use_enable   = fu1_rs1_use_enable || fu2_rs1_use_enable;    //if we want to output this entry to fu1 or fu2
-
 	assign rs1_available_out= ~InUse;
  
 	assign rs1_ready_out 	= InUse && OPaValid && OPbValid && fu_ready; 
  
 	assign rs1_opa_out 	= rs1_use_enable ? OPa : 64'b0;
-
-	assign fu_select_reg_out= rs1_use_enable ? fu_select_reg : FU_DEFAULT; 
  
 	assign rs1_opb_out 	= rs1_use_enable ? OPb : 64'b0; 
  
@@ -123,8 +86,6 @@ module rs_one_entry(
 	assign rs1_rob_idx_out	= rs1_use_enable ? Rob_idx : 0;
 
 	assign rs1_op_type_out	= rs1_use_enable ? OP_type : 6'b0;
-	
-	assign rs1_alu_func_out = rs1_use_enable ? Alu_func_reg : ALU_DEFAULT;
 
 	assign rs1_alu_func_out = rs1_use_enable ? Alu_func_reg : ALU_DEFAULT;
 
@@ -134,7 +95,6 @@ module rs_one_entry(
 
 	assign LoadAFromCDB2 	= (rs1_cdb2_tag == OPa[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && InUse && rs1_cdb2_valid; 
 
-<<<<<<< HEAD
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
 
 	always_ff @(posedge clock) 
@@ -158,33 +118,6 @@ module rs_one_entry(
 		default:
 				fu_ready <= `SD 0;
 		endcase
-=======
-	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid;
-	
-
-	always_ff @(posedge clock)
-	begin
-		case (fu_select_reg)
-			USE_MULTIPLIER:
-				if (fu1_mult_available || fu2_mult_available)
-					fu_ready <= `SD 1;
-				else
-					fu_ready <= `SD 0;
-			USE_ADDER:
-				if (fu1_adder_available || fu2_adder_available)
-					fu_ready <= `SD 1;
-				else
-					fu_ready <= `SD 0;
-			USE_MEMORY:
-				if (fu1_memory_available || fu1_memory_available)
-					fu_ready <= `SD 1;
-				else
-					fu_ready <= `SD 0;
-			default:
-					fu_ready <= `SD 0;
-		endcase
-	
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
     		if (reset) 
     		begin 
             		OPa 	 	<= `SD 0;
@@ -200,32 +133,19 @@ module rs_one_entry(
     		end
     		else
     		begin
-        		if (inst1_rs1_load_in) 
+        		if (rs1_load_in) 
         		begin
-           			OPa 	 	<= `SD inst1_rs1_opa_in;
-            			OPb 	 	<= `SD inst1_rs1_opb_in;
-            			OPaValid 	<= `SD inst1_rs1_opa_valid;
-            			OPbValid 	<= `SD inst1_rs1_opb_valid;
-				OP_type  	<= `SD inst1_rs1_op_type_in;
+           			OPa 	 	<= `SD rs1_opa_in;
+            			OPb 	 	<= `SD rs1_opb_in;
+            			OPaValid 	<= `SD rs1_opa_valid;
+            			OPbValid 	<= `SD rs1_opb_valid;
+				OP_type  	<= `SD rs1_op_type_in;
             			InUse 	 	<= `SD 1'b1;
-            			DestTag  	<= `SD inst1_rs1_dest_in;
-				Rob_idx	 	<= `SD inst1_rs1_rob_idx_in;
-				Alu_func_reg 	<= `SD inst1_rs1_alu_func;
-				fu_select_reg	<= `SD inst1_fu_select;
+            			DestTag  	<= `SD rs1_dest_in;
+				Rob_idx	 	<= `SD rs1_rob_idx_in;
+				Alu_func_reg 	<= `SD rs1_alu_func;
+				fu_select_reg	<= `SD fu_select;
         		end 
-			else if(inst2_rs1_load_in)
-			begin
-				OPa 	 	<= `SD inst2_rs1_opa_in;
-            			OPb 	 	<= `SD inst2_rs1_opb_in;
-            			OPaValid 	<= `SD inst2_rs1_opa_valid;
-            			OPbValid 	<= `SD inst2_rs1_opb_valid;
-				OP_type  	<= `SD inst2_rs1_op_type_in;
-            			InUse 	 	<= `SD 1'b1;
-            			DestTag  	<= `SD inst2_rs1_dest_in;
-				Rob_idx	 	<= `SD inst2_rs1_rob_idx_in;
-				Alu_func_reg 	<= `SD inst2_rs1_alu_func;
-				fu_select_reg	<= `SD inst2_fu_select;
-			end
         		else 
         		begin
             			if (LoadAFromCDB1)

@@ -97,7 +97,6 @@ module rs_one_entry(
 
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && InUse && rs1_cdb2_valid; 
 
-<<<<<<< HEAD
 	always_ff @(posedge clock) 
 	begin
 		case (fu_select_reg)
@@ -119,34 +118,6 @@ module rs_one_entry(
 		default:
 				fu_ready <= `SD 0;
 		endcase
-=======
-	always_comb
-	begin	
-		case (fu_select_reg)
-		USE_MULTIPLIER:
-			if (mult_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		USE_ADDER:
-			if (adder_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		USE_MEMORY:
-			if (memory_available)
-				fu_ready = 1;
-			else
-				fu_ready = 0;
-		default:
-				fu_ready = 0;
-		endcase
-	end
-	
-
-	always_ff @(posedge clock) 
-	begin 
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
     		if (reset) 
     		begin 
             		OPa 	 	<= `SD 0;
@@ -174,10 +145,6 @@ module rs_one_entry(
 				Rob_idx	 	<= `SD rs1_rob_idx_in;
 				Alu_func_reg 	<= `SD rs1_alu_func;
 				fu_select_reg	<= `SD fu_select;
-<<<<<<< HEAD
-=======
-				
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
         		end 
         		else 
         		begin
@@ -185,54 +152,28 @@ module rs_one_entry(
             			begin
                 			OPa 	 <= `SD rs1_cdb1_in;
                 			OPaValid <= `SD 1'b1;
-<<<<<<< HEAD
-=======
-					
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
             			end
             			if (LoadBFromCDB1)
             			begin
                 			OPb 	 <= `SD rs1_cdb1_in;
                 			OPbValid <= `SD 1'b1;
-<<<<<<< HEAD
-=======
-					
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
             			end
 				if (LoadAFromCDB2)
             			begin
                 			OPa 	 <= `SD rs1_cdb2_in;
                 			OPaValid <= `SD 1'b1;
-<<<<<<< HEAD
-=======
-					
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
             			end
             			if (LoadBFromCDB2)
             			begin
                 			OPb 	 <= `SD rs1_cdb2_in;
                 			OPbValid <= `SD 1'b1;
-<<<<<<< HEAD
             			end
-=======
-					
-            			end
-				
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
             			// Clear InUse bit once the FU has data
             			if (rs1_use_enable)
             			begin
                 			InUse 	 <= `SD 0;
             			end
-<<<<<<< HEAD
         		end // else rs1_load_in 
     		end // else !reset 
 	end // always @ 
 endmodule  
-=======
-			end
-    		end // else !reset 
-	end // always @ 
-endmodule  
-
->>>>>>> 8e8466fccbfda37c925e4d1f07d77da4f9912f91
