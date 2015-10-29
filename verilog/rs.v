@@ -32,7 +32,7 @@ module rs(
 	input  	     				inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
-	ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
+	input  ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
         
         //for instruction2
 	input  [63:0] 				inst2_rs_opa_in,      	// Operand a from Rename  
@@ -40,7 +40,7 @@ module rs(
 	input  	     				inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
-	ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
+	input  ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
 
 	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
@@ -104,9 +104,13 @@ module rs(
 	FU_SELECT					inst1_fu_select;
 	FU_SELECT        				inst2_fu_select;
 
-	logic	[`RS_SIZE-1:0]	ready_out_for_second_rs;
-	logic	[`RS_SIZE-1:0]	second_rs_use_available;
-	logic	[`RS_SIZE-1:0]  temp_internal_rs_available_out;
+	logic	[`RS_SIZE-1:0]				ready_out_for_second_rs;
+	logic	[`RS_SIZE-1:0]				second_rs_use_available;
+	logic	[`RS_SIZE-1:0]  			temp_internal_rs_available_out;
+
+	logic 						inst1_use_mult;
+	logic						inst1_use_adder;
+	logic						inst1_use_memory;
 
 
 	rs_one_entry rs1[`RS_SIZE-1:0](
@@ -192,7 +196,44 @@ module rs(
         	.gnt(fu1_internal_rs_use_enable)
 	);
 
-	
+	always_comb begin
+		for(int i=0;i<`RS_SIZE;i++)
+		begin
+			if (fu1_internal_rs_use_enable[i]==1)
+			begin
+				if(internal_fu_select_reg_out[i]==USE_MULTIPLIER)
+				begin
+					inst1_use_mult=1'b1;
+					inst1_use_adder=1'b0;
+					inst1_use_memory=1'b0;
+				end
+				else if(internal_fu_select_reg_out[i]==USE_ADDER)
+				begin
+					inst1_use_mult=1'b0;
+					inst1_use_adder=1'b1;
+					inst1_use_memory=1'b0;
+				end
+				else if(internal_fu_select_reg_out[i]==USE_MEMORY)
+				begin
+					inst1_use_mult=1'b0;
+					inst1_use_adder=1'b0;
+					inst1_use_memory=1'b1;
+				end
+				else
+				begin
+					inst1_use_mult=1'b0;
+					inst1_use_adder=1'b0;
+					inst1_use_memory=1'b0;
+				end
+			end
+			else
+			begin
+					inst1_use_mult=1'b0;
+					inst1_use_adder=1'b0;
+					inst1_use_memory=1'b0;
+			end
+		end
+	end
 
 	assign ready_out_for_second_rs = (~fu1_internal_rs_use_enable) & internal_rs_ready_out; 
 
@@ -201,17 +242,20 @@ module rs(
 		begin
 			if((fu1_mult_available^fu2_mult_available)
 			  &&(internal_rs_ready_out[i])
-			  &&(internal_fu_select_reg_out[i]==USE_MULTIPLIER))
+			  &&(internal_fu_select_reg_out[i]==USE_MULTIPLIER)
+			  &&inst1_use_mult)
 				second_rs_use_available[i]=0;
 
 			else if((fu1_adder_available^fu2_adder_available)
 			      &&(internal_rs_ready_out[i])
-                              &&(internal_fu_select_reg_out[i]==USE_ADDER))
+                              &&(internal_fu_select_reg_out[i]==USE_ADDER)
+			      &&inst1_use_adder)
 				second_rs_use_available[i]=0;
 
 			else if((fu1_memory_available^fu2_memory_available)
 			      &&(internal_rs_ready_out[i])
-			      &&(internal_fu_select_reg_out[i]==USE_MEMORY))
+			      &&(internal_fu_select_reg_out[i]==USE_MEMORY)
+			      &&inst1_use_memory)
 				second_rs_use_available[i]=0;
 			else
 				second_rs_use_available[i]=ready_out_for_second_rs[i];
@@ -236,11 +280,11 @@ module rs(
 			rs_full = RS_NO_ENTRY_EMPTY;
 		else
 		begin
+			temp_internal_rs_available_out = internal_rs_available_out;
 			for(int i=0;i<`RS_SIZE;i++)
 			begin
 				if(internal_rs_available_out[i]==1)
 				begin
-					temp_internal_rs_available_out    = internal_rs_available_out;
 					temp_internal_rs_available_out[i] = ~internal_rs_available_out[i];
 					if (temp_internal_rs_available_out == 0)
 					begin
