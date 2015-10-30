@@ -99,7 +99,7 @@ module rs_one_entry(
 
 	always_ff @(posedge clock) 
 	begin
-		case (fu_select)
+		/*case (fu_select)
 		USE_MULTIPLIER:
 			if (mult_available)
 				fu_ready <= `SD 1;
@@ -117,7 +117,7 @@ module rs_one_entry(
 				fu_ready <= `SD 0;
 		default:
 				fu_ready <= `SD 0;
-		endcase
+		endcase*/
     		if (reset) 
     		begin 
             		OPa 	 	<= `SD 0;
@@ -145,6 +145,26 @@ module rs_one_entry(
 				Rob_idx	 	<= `SD rs1_rob_idx_in;
 				Alu_func_reg 	<= `SD rs1_alu_func;
 				fu_select_reg	<= `SD fu_select;
+
+				case (fu_select)
+				USE_MULTIPLIER:
+					if (mult_available)
+						fu_ready <= `SD 1;
+					else
+						fu_ready <= `SD 0;
+				USE_ADDER:
+					if (adder_available)
+						fu_ready <= `SD 1;
+					else
+						fu_ready <= `SD 0;
+				USE_MEMORY:
+					if (memory_available)
+						fu_ready <= `SD 1;
+					else
+						fu_ready <= `SD 0;
+				default:
+						fu_ready <= `SD 0;
+				endcase
         		end 
         		else 
         		begin
@@ -168,6 +188,26 @@ module rs_one_entry(
                 			OPb 	 <= `SD rs1_cdb2_in;
                 			OPbValid <= `SD 1'b1;
             			end
+				if(fu_select_reg==fu_select)
+					case (fu_select)
+					USE_MULTIPLIER:
+						if (mult_available)
+							fu_ready <= `SD 1;
+						else
+							fu_ready <= `SD 0;
+					USE_ADDER:
+						if (adder_available)
+							fu_ready <= `SD 1;
+						else
+							fu_ready <= `SD 0;
+					USE_MEMORY:
+						if (memory_available)
+							fu_ready <= `SD 1;
+						else
+							fu_ready <= `SD 0;
+					default:
+							fu_ready <= `SD 0;
+					endcase
             			// Clear InUse bit once the FU has data
             			if (rs1_use_enable)
             			begin
