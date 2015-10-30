@@ -135,14 +135,18 @@ module rs(
 	assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
 
 	always_comb begin
-		if 	({rs_op_type_in[5:3],3'b0} == 6'h10 && rs_alu_func == ALU_MULQ)
-			fu_select = USE_MULTIPLIER;
-		else if (	({rs_op_type_in[5:3],3'b0} == 6'h08) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h20) || 
-				({rs_op_type_in[5:3],3'b0} == 6'h28))
-			fu_select = USE_MEMORY; 
-		else 
-			fu_select = USE_ADDER;
+		if(rs_load_in) begin
+			if 	({rs_op_type_in[5:3],3'b0} == 6'h10 && rs_alu_func == ALU_MULQ)
+				fu_select = USE_MULTIPLIER;
+			else if (	({rs_op_type_in[5:3],3'b0} == 6'h08) || 
+					({rs_op_type_in[5:3],3'b0} == 6'h20) || 
+					({rs_op_type_in[5:3],3'b0} == 6'h28))
+				fu_select = USE_MEMORY; 
+			else 
+				fu_select = USE_ADDER;
+		end
+		else
+			fu_select = USE_DEFAULT;
 	end
 	
 	always_comb begin

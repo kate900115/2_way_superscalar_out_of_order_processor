@@ -110,17 +110,45 @@ module rs_one_entry(
            		DestTag  	<= `SD 0;
 			Rob_idx	 	<= `SD 0;
 			Alu_func_reg 	<= `SD ALU_DEFAULT;
-			fu_select_reg	<= `SD FU_DEFAULT;
+			fu_select_reg	<= `SD USE_DEFAULT;
 			fu_ready        <= `SD 0;
     		end
     		else
     		begin
         		if (rs1_load_in) 
         		begin
-           			OPa 	 	<= `SD rs1_opa_in;
-            			OPb 	 	<= `SD rs1_opb_in;
-            			OPaValid 	<= `SD rs1_opa_valid;
-            			OPbValid 	<= `SD rs1_opb_valid;
+           			if ((rs1_cdb1_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && rs1_cdb1_valid)
+				begin
+		        		OPa	 <= `SD rs1_cdb1_in;
+		    			OPaValid <= `SD 1'b1;
+				end        		
+				else if ((rs1_cdb2_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && rs1_cdb2_valid)
+				begin
+		        		OPa	 <= `SD rs1_cdb1_in;
+		    			OPaValid <= `SD 1'b1;
+				end 
+				else
+				begin
+					OPa 	 <= `SD rs1_opa_in;
+					OPaValid <= `SD rs1_opa_valid;
+				end 
+
+				if ((rs1_cdb1_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && rs1_cdb1_valid)
+				begin
+		        		OPb 	 <= `SD rs1_cdb1_in;
+		        		OPbValid <= `SD 1'b1;
+				end         		
+				else if ((rs1_cdb2_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && rs1_cdb2_valid)
+				begin
+		        		OPb 	 <= `SD rs1_cdb1_in;
+		        		OPbValid <= `SD 1'b1;
+				end  
+				else 
+				begin
+					OPb 	 <= `SD rs1_opb_in;
+		    			OPbValid <= `SD rs1_opb_valid;
+				end  
+
 				OP_type  	<= `SD rs1_op_type_in;
             			InUse 	 	<= `SD 1'b1;
             			DestTag  	<= `SD rs1_dest_in;
@@ -170,8 +198,7 @@ module rs_one_entry(
                 			OPb 	 <= `SD rs1_cdb2_in;
                 			OPbValid <= `SD 1'b1;
             			end
-				if(fu_select_reg==fu_select) begin
-					case (fu_select)
+				case (fu_select_reg)
 					USE_MULTIPLIER:
 						if (mult_available)
 							fu_ready <= `SD 1;
@@ -187,10 +214,10 @@ module rs_one_entry(
 							fu_ready <= `SD 1;
 						else
 							fu_ready <= `SD 0;
-					default:
+				        default:
 							fu_ready <= `SD 0;
-					endcase
-				end
+							
+				endcase
             			// Clear InUse bit once the FU has data
             			if (rs1_use_enable)
             			begin
