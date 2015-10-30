@@ -117,14 +117,14 @@ module rs_one_entry(
     		begin
         		if (rs1_load_in) 
         		begin
-           			if ((rs1_cdb1_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && rs1_cdb1_valid)
+           			if ((rs1_cdb1_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !rs1_opa_valid && rs1_cdb1_valid)
 				begin
 		        		OPa	 <= `SD rs1_cdb1_in;
 		    			OPaValid <= `SD 1'b1;
 				end        		
-				else if ((rs1_cdb2_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !OPaValid && rs1_cdb2_valid)
+				else if ((rs1_cdb2_tag == rs1_opa_in[$clog2(`PRF_SIZE)-1:0]) && !rs1_opa_valid && rs1_cdb2_valid)
 				begin
-		        		OPa	 <= `SD rs1_cdb1_in;
+		        		OPa	 <= `SD rs1_cdb2_in;
 		    			OPaValid <= `SD 1'b1;
 				end 
 				else
@@ -133,14 +133,14 @@ module rs_one_entry(
 					OPaValid <= `SD rs1_opa_valid;
 				end 
 
-				if ((rs1_cdb1_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && rs1_cdb1_valid)
+				if ((rs1_cdb1_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !rs1_opb_valid && rs1_cdb1_valid)
 				begin
 		        		OPb 	 <= `SD rs1_cdb1_in;
 		        		OPbValid <= `SD 1'b1;
 				end         		
-				else if ((rs1_cdb2_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !OPbValid && rs1_cdb2_valid)
+				else if ((rs1_cdb2_tag == rs1_opb_in[$clog2(`PRF_SIZE)-1:0]) && !rs1_opb_valid && rs1_cdb2_valid)
 				begin
-		        		OPb 	 <= `SD rs1_cdb1_in;
+		        		OPb 	 <= `SD rs1_cdb2_in;
 		        		OPbValid <= `SD 1'b1;
 				end  
 				else 
