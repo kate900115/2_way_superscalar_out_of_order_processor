@@ -21,16 +21,16 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-		test_bench/test_prf.v
-SIMFILES = 	verilog/prf.v		\
-		verilog/prf_one_entry.v 	\
+		test_bench/test_rs.v
+SIMFILES = 	verilog/rs.v		\
+		verilog/rs_one_entry.v 	\
 		verilog/priority_selector.v  \
-
-SYNFILES = prf.vg 
+		verilog/two_stage_priority_selector.v
+SYNFILES = rs.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-prf.vg:	$(SIMFILES) prf.tcl 
-	dc_shell-t -f prf.tcl | tee synth.out
+rs.vg:	$(SIMFILES) rs.tcl 
+	dc_shell-t -f rs.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
