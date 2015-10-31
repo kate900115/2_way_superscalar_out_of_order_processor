@@ -71,7 +71,7 @@ module prf(
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
 	//other registers to store value
-
+	//logic	[`PRF_SIZE-1:0]			internal_free_this_entry;
 
 
 	prf_one_entry prf1[`PRF_SIZE-1:0](
@@ -97,8 +97,6 @@ module prf(
         	.gnt(internal_assign_a_free_reg1)
 	);
 
-	
-
 
 	always_comb
 	begin
@@ -108,7 +106,6 @@ module prf(
 			begin
 				rat1_prf_rename_valid_out = 1'b1;
 				rat1_prf_rename_idx_out   = i;
-				break;
 			end
 			else
 			begin
@@ -126,7 +123,7 @@ module prf(
 	        .en(rat2_allocate_new_prf),
         	.gnt(internal_assign_a_free_reg2)
 	);
-
+	
 	always_comb
 	begin
 		for(int i=0;i<`PRF_SIZE;i++)
@@ -135,7 +132,6 @@ module prf(
 			begin
 				rat2_prf_rename_valid_out = 1'b1;
 				rat2_prf_rename_idx_out   = i;
-				break;
 			end
 			else
 			begin
@@ -177,7 +173,7 @@ module prf(
 	begin
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
-			if ((inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available))
+			if ((inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst1_opa_prf_value = internal_data_out[i];
 				inst1_opa_valid	    = 1'b1;
@@ -188,7 +184,7 @@ module prf(
 				inst1_opa_valid	    = 1'b0;
 			end
 
-			if ((inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available))
+			if ((inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst1_opb_prf_value = internal_data_out[i];
 				inst1_opb_valid	    = 1'b1;
@@ -199,7 +195,7 @@ module prf(
 				inst1_opb_valid	    = 1'b0;
 			end
 			
-			if ((inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available))
+			if ((inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst2_opa_prf_value = internal_data_out[i];
 				inst2_opa_valid	    = 1'b1;
@@ -210,7 +206,7 @@ module prf(
 				inst2_opa_valid	    = 1'b0;
 			end
 
-			if ((inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available))
+			if ((inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst2_opb_prf_value = internal_data_out[i];
 				inst2_opb_valid	    = 1'b1;
