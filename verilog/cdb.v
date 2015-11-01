@@ -17,21 +17,23 @@ module cdb(adder_result_ready,
 	input  				memory_result_ready;
 	input  [63:0]			memory_result_in;
 	input  [$clog2(`PRF_SIZE)-1:0]	dest_reg_idx;
+	
 	output 				cdb_valid;
 	output [$clog2(`PRF_SIZE)-1:0]	cdb_tag;
 	output [63:0]			cdb_out;	
 
+	logic  [p_SIZE-1:0]		instruction_select_result;			
 	
 
 	priority_selector #(.SIZE(p_SIZE)) cdb_psl1( 
 		.req({memory_result_ready,mult_result_ready,adder_result_ready}),
 	        .en(1'b1),
-        	.gnt(output1)
+        	.gnt(instruction_select_result)
 	);
 
 	always_comb
 	begin
-		case (output1)
+		case (instruction_select_result)
 		3'b001:		
 			begin
 				cdb_valid = 1'b1;				
@@ -57,12 +59,4 @@ module cdb(adder_result_ready,
 				cdb_out   = 0;
 			end
 	end
-
-
-
-
-
-
-
-
 endmodule

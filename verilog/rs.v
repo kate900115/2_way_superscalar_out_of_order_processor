@@ -45,7 +45,7 @@ module rs(
 	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
+	input  instruction_select_result       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 
 
@@ -374,29 +374,3 @@ module rs(
 	end
 endmodule
 
-
-
-
-//assign rs_full = (internal_rs_available_out == 0)? 1'b1 : 1'b0;
-
-/*assign available2 = (fu1_internal_rs_use_enable) & internal_rs_ready_out; 
-
-	always_comb begin
-		for(int i=0;i<`RS_SIZE;i++)
-		begin
-			if((fu1_mult_available^fu2_mult_available)
-			  &&(fu1_internal_rs_use_enable[i])
-			  &&(internal_fu_select_reg_out[i]==USE_MULTIPLIER))
-				available3[i]=0;
-			else if((fu1_adder_available^fu2_adder_available)
-			      &&(fu1_internal_rs_use_enable[i])
-                              &&(internal_fu_select_reg_out[i]==USE_ADDER ))
-				available3[i]=0;
-			else if((fu1_memory_available^fu2_memory_available)
-			      &&(fu1_internal_rs_use_enable[i])
-			      &&(internal_fu_select_reg_out[i]==USE_MEMORY )  )
-				available3[i]=0;
-			else
-				available3[i]=available2[i];
-		end
-	end */
