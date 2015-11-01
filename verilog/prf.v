@@ -55,7 +55,11 @@ module prf(
 	output  logic				inst1_opa_valid,			//whether opa load from prf of instruction1 is valid
 	output	logic				inst1_opb_valid,			//whether opb load from prf of instruction1 is valid
 	output  logic				inst2_opa_valid,			//whether opa load from prf of instruction2 is valid
-	output	logic				inst2_opb_valid				//whether opa load from prf of instruction2 is valid
+	output	logic				inst2_opb_valid,				//whether opa load from prf of instruction2 is valid
+
+	//for debug
+	output logic	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1,
+	output logic	[`PRF_SIZE-1:0]         internal_prf_available
 
 );
 	//internal signal for input
@@ -71,7 +75,7 @@ module prf(
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
 	//other registers to store value
-	//logic	[`PRF_SIZE-1:0]			internal_free_this_entry;
+
 
 
 	prf_one_entry prf1[`PRF_SIZE-1:0](
@@ -100,17 +104,15 @@ module prf(
 
 	always_comb
 	begin
+		rat1_prf_rename_valid_out = 1'b0;
+		rat1_prf_rename_idx_out   = 0;
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
 			if (internal_assign_a_free_reg1[i]==1'b1)
 			begin
 				rat1_prf_rename_valid_out = 1'b1;
 				rat1_prf_rename_idx_out   = i;
-			end
-			else
-			begin
-				rat1_prf_rename_valid_out = 1'b0;
-				rat1_prf_rename_idx_out   = 0;
+				break;
 			end
 		end
 	end
@@ -132,6 +134,7 @@ module prf(
 			begin
 				rat2_prf_rename_valid_out = 1'b1;
 				rat2_prf_rename_idx_out   = i;
+				break;
 			end
 			else
 			begin
@@ -173,43 +176,56 @@ module prf(
 	begin
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
-			if ((inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+			if (inst1_opa_prf_idx==i)
 			begin
 				inst1_opa_prf_value = internal_data_out[i];
-				inst1_opa_valid	    = 1'b1;
+				inst1_opa_valid	    = internal_prf_ready[i] && (!internal_prf_available[i]);
+				break;
 			end
 			else
 			begin
 				inst1_opa_prf_value = 0;
 				inst1_opa_valid	    = 1'b0;
 			end
+		end
 
+		for(int i=0;i<`PRF_SIZE;i++)
+		begin
 			if ((inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst1_opb_prf_value = internal_data_out[i];
 				inst1_opb_valid	    = 1'b1;
+				break;
 			end
 			else
 			begin
 				inst1_opb_prf_value = 0;
 				inst1_opb_valid	    = 1'b0;
 			end
-			
+		end
+
+		for(int i=0;i<`PRF_SIZE;i++)
+		begin			
 			if ((inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst2_opa_prf_value = internal_data_out[i];
 				inst2_opa_valid	    = 1'b1;
+				break;
 			end
 			else
 			begin
 				inst2_opa_prf_value = 0;
 				inst2_opa_valid	    = 1'b0;
 			end
-
+		end
+		
+		for(int i=0;i<`PRF_SIZE;i++)
+		begin
 			if ((inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
 			begin
 				inst2_opb_prf_value = internal_data_out[i];
 				inst2_opb_valid	    = 1'b1;
+				break;
 			end
 			else
 			begin

@@ -44,6 +44,9 @@ module test_prf;
 	logic   [63:0]			inst2_opa_prf_value;			//opa prf value of instruction2
 	logic	[63:0]			inst2_opb_prf_value;			//opb prf value of instruction2
 
+	//for debug
+	logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1;
+	logic 	[`PRF_SIZE-1:0]		internal_prf_available;
 
 	prf prf1(
 		//input
@@ -90,7 +93,11 @@ module test_prf;
 		.inst1_opa_prf_value(inst1_opa_prf_value),			
 		.inst1_opb_prf_value(inst1_opb_prf_value),			
 		.inst2_opa_prf_value(inst2_opa_prf_value),			
-		.inst2_opb_prf_value(inst2_opb_prf_value)			
+		.inst2_opb_prf_value(inst2_opb_prf_value),
+		
+		//for debug
+		.internal_assign_a_free_reg1(internal_assign_a_free_reg1),
+		.internal_prf_available(internal_prf_available)		
 
 );
 
@@ -107,9 +114,10 @@ module test_prf;
 
 	initial begin
 		$monitor("time:%d, clk:%b, inst1_opa_prf_value:%h, inst1_opb_prf_value:%h, inst2_opa_prf_value:%h, inst2_opb_prf_value:%h,\n\
-					   rat1_prf_rename_idx_out:%b, rat1_prf_rename_valid_out:%b,rat2_prf_rename_idx_out :%b, rat2_prf_rename_valid_out:%b",
+					   rat1_prf_rename_idx_out:%b, rat1_prf_rename_valid_out:%b,rat2_prf_rename_idx_out :%b, rat2_prf_rename_valid_out:%b\n\
+						internal_assign_a_free_reg1=%b,\ninternal_prf_available=%b",//for debug
 				$time, clock, inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value, inst2_opb_prf_value,  
-					      rat1_prf_rename_idx_out, rat1_prf_rename_valid_out, rat2_prf_rename_idx_out, rat2_prf_rename_valid_out);
+					      rat1_prf_rename_idx_out, rat1_prf_rename_valid_out, rat2_prf_rename_idx_out, rat2_prf_rename_valid_out,internal_assign_a_free_reg1,internal_prf_available);
 
 	
 
@@ -149,32 +157,6 @@ module test_prf;
 		rrat1_prf_free_idx		 = 0;
 		rrat2_prf_free_idx		 = 0;
 		
-		@(negedge clock); 
-		cdb1_valid			 = 0;
-		cdb1_tag			 = 0;
-		cdb1_out			 = 0;
-		cdb2_valid			 = 0;
-		cdb2_tag			 = 0;
-		cdb2_out			 = 0;
-		inst1_opa_prf_idx		 = 0;				
-		inst1_opb_prf_idx		 = 0;				
-		inst2_opa_prf_idx		 = 0;			
-		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
-
-		rrat1_prf_free_list		 = 0;			
-		rrat2_prf_free_list		 = 0;			
-		rat1_prf_free_list		 = 0;			
-		rat2_prf_free_list		 = 0;
-		rrat1_branch_mistaken_free_valid = 0;	
-		rrat2_branch_mistaken_free_valid = 0;	
-
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
-		
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -187,32 +169,6 @@ module test_prf;
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
 		rat1_allocate_new_prf		 = 1;			
-		rat2_allocate_new_prf		 = 0;			
-
-		rrat1_prf_free_list		 = 0;			
-		rrat2_prf_free_list		 = 0;			
-		rat1_prf_free_list		 = 0;			
-		rat2_prf_free_list		 = 0;
-		rrat1_branch_mistaken_free_valid = 0;	
-		rrat2_branch_mistaken_free_valid = 0;	
-
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
-		
-		@(negedge clock); 
-		cdb1_valid			 = 0;
-		cdb1_tag			 = 0;
-		cdb1_out			 = 0;
-		cdb2_valid			 = 0;
-		cdb2_tag			 = 0;
-		cdb2_out			 = 0;
-		inst1_opa_prf_idx		 = 0;				
-		inst1_opb_prf_idx		 = 0;				
-		inst2_opa_prf_idx		 = 0;			
-		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
 		rat2_allocate_new_prf		 = 0;			
 
 		rrat1_prf_free_list		 = 0;			
@@ -252,15 +208,17 @@ module test_prf;
 		rrat2_prf_free_valid		 = 0;	
 		rrat1_prf_free_idx		 = 0;
 		rrat2_prf_free_idx		 = 0;
-		
-
-		@(negedge clock); 
+	
+		//at this time, we allocate 3 PRF entries (011111,011110,011101)
+		//after this, we want to store data from CDB.
+		//from CDB2, we store 5 into #reg 011110.
+		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
-		cdb2_valid			 = 0;
-		cdb2_tag			 = 0;
-		cdb2_out			 = 0;
+		cdb2_valid			 = 1;
+		cdb2_tag			 = 6'b011110;
+		cdb2_out			 = 5;
 		inst1_opa_prf_idx		 = 0;				
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
@@ -280,27 +238,69 @@ module test_prf;
 		rrat1_prf_free_idx		 = 0;
 		rrat2_prf_free_idx		 = 0;
 		@(negedge clock);
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;  
+		@(negedge clock); 
+		//then we want to load data from #reg 011110;
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 6'b011110;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		
+		@(negedge clock);
+
+
+		@(negedge clock);  
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 1;			
+		rat2_allocate_new_prf		 = 0;			
+
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+
+		@(negedge clock);
+		@(negedge clock);
+
 		$finish;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	end
 
