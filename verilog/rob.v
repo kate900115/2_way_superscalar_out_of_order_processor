@@ -126,8 +126,8 @@ module rob(
 */
 
 //instantiate the decoder, so we can output the number of rob assigned.
- 	decoder #(.SIZE(`RS_SIZE)) decoder1(.load(internal_inst1_rob_load_in),.idx(inst1_rs_rob_idx_in) );
-	decoder #(.SIZE(`RS_SIZE)) decoder2(.load(internal_inst2_rob_load_in),.idx(inst2_rs_rob_idx_in) );
+ 	//decoder #(.SIZE(`RS_SIZE)) decoder1(.load(internal_inst1_rob_load_in),.idx(inst1_rs_rob_idx_in) );
+	//decoder #(.SIZE(`RS_SIZE)) decoder2(.load(internal_inst2_rob_load_in),.idx(inst2_rs_rob_idx_in) );
 	
 
 
