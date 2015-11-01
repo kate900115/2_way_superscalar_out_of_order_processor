@@ -30,7 +30,7 @@ module testbench_rs;
 	ALU_FUNC				inst2_rs_alu_func;	// ALU function type from decoder
 
 	logic  		        		inst1_rs_load_in;     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	logic  		        		inst2_rs_load_in;     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	logic 		        		inst2_rs_load_in;     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
 	logic  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in;  // 
 	logic  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in;  //
@@ -45,20 +45,52 @@ module testbench_rs;
  	//outputs
 	logic [63:0]						fu1_rs_opa_out;       	// This RS' opa 
 	logic [63:0]						fu1_rs_opb_out;       	// This RS' opb 
-	logic [$clog2(`PRF_SIZE)-1:0]	fu1_rs_dest_tag_out;  	// This RS' destination tag  
-	logic [$clog2(`ROB_SIZE)-1:0]    fu1_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [$clog2(`PRF_SIZE)-1:0]				fu1_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu1_rs_rob_idx_out;   	// This RS' corresponding ROB index
 	logic [5:0]						fu1_rs_op_type_out;     // This RS' operation type
 	logic							fu1_rs_out_valid;		// RS output is valid
 	ALU_FUNC                                                fu1_alu_func_out;
 
 	logic [63:0]						fu2_rs_opa_out;       	// This RS' opa 
 	logic [63:0]						fu2_rs_opb_out;       	// This RS' opb 
-	logic [$clog2(`PRF_SIZE)-1:0]	fu2_rs_dest_tag_out;  	// This RS' destination tag  
-	logic [$clog2(`ROB_SIZE)-1:0]    fu2_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [$clog2(`PRF_SIZE)-1:0]				fu2_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu2_rs_rob_idx_out;   	// This RS' corresponding ROB index
 	logic [5:0]					  	fu2_rs_op_type_out;    // This RS' operation type
 	logic							fu2_rs_out_valid;		// RS output is valid
 	ALU_FUNC                                                fu2_alu_func_out;
-	logic							rs_full;				// RS is full now		
+	logic [1:0]						rs_full;				// RS is full now
+
+	logic [63:0]						fu3_rs_opa_out;       	// This RS' opa 
+	logic [63:0]						fu3_rs_opb_out;       	// This RS' opb 
+	logic [$clog2(`PRF_SIZE)-1:0]				fu3_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu3_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [5:0]						fu3_rs_op_type_out;     // This RS' operation type
+	logic							fu3_rs_out_valid;		// RS output is valid
+	ALU_FUNC                                                fu3_alu_func_out;
+
+	logic [63:0]						fu4_rs_opa_out;       	// This RS' opa 
+	logic [63:0]						fu4_rs_opb_out;       	// This RS' opb 
+	logic [$clog2(`PRF_SIZE)-1:0]				fu4_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu4_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [5:0]						fu4_rs_op_type_out;     // This RS' operation type
+	logic							fu4_rs_out_valid;		// RS output is valid
+	ALU_FUNC                                                fu4_alu_func_out;
+
+	logic [63:0]						fu5_rs_opa_out;       	// This RS' opa 
+	logic [63:0]						fu5_rs_opb_out;       	// This RS' opb 
+	logic [$clog2(`PRF_SIZE)-1:0]				fu5_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu5_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [5:0]						fu5_rs_op_type_out;     // This RS' operation type
+	logic							fu5_rs_out_valid;		// RS output is valid
+	ALU_FUNC                                                fu5_alu_func_out;
+
+	logic [63:0]						fu6_rs_opa_out;       	// This RS' opa 
+	logic [63:0]						fu6_rs_opb_out;       	// This RS' opb 
+	logic [$clog2(`PRF_SIZE)-1:0]				fu6_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [$clog2(`ROB_SIZE)-1:0]    			fu6_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [5:0]						fu6_rs_op_type_out;     // This RS' operation type
+	logic							fu6_rs_out_valid;		// RS output is valid
+	ALU_FUNC                                                fu6_alu_func_out;
 	
 	rs DUT(.reset(reset),
 	   .clock(clock),           
@@ -113,6 +145,34 @@ module testbench_rs;
 	   .fu2_rs_op_type_out(fu2_rs_op_type_out),     //
 	   .fu2_rs_out_valid(fu2_rs_out_valid),
 	   .fu2_alu_func_out(fu2_alu_func_out),
+	   .fu3_rs_opa_out(fu3_rs_opa_out),       	// This RS' opa 
+	   .fu3_rs_opb_out(fu3_rs_opb_out),       	// This RS' opb 
+	   .fu3_rs_dest_tag_out(fu3_rs_dest_tag_out),  	// This RS' destination tag  
+	   .fu3_rs_rob_idx_out(fu3_rs_rob_idx_out),   	// 
+	   .fu3_rs_op_type_out(fu3_rs_op_type_out),     //
+	   .fu3_rs_out_valid(fu3_rs_out_valid),
+	   .fu3_alu_func_out(fu3_alu_func_out),
+	   .fu4_rs_opa_out(fu4_rs_opa_out),       	// This RS' opa 
+	   .fu4_rs_opb_out(fu4_rs_opb_out),       	// This RS' opb 
+	   .fu4_rs_dest_tag_out(fu4_rs_dest_tag_out),  	// This RS' destination tag  
+	   .fu4_rs_rob_idx_out(fu4_rs_rob_idx_out),   	// 
+	   .fu4_rs_op_type_out(fu4_rs_op_type_out),     //
+	   .fu4_rs_out_valid(fu4_rs_out_valid),
+	   .fu4_alu_func_out(fu4_alu_func_out),
+	   .fu5_rs_opa_out(fu5_rs_opa_out),       	// This RS' opa 
+	   .fu5_rs_opb_out(fu5_rs_opb_out),       	// This RS' opb 
+	   .fu5_rs_dest_tag_out(fu5_rs_dest_tag_out),  	// This RS' destination tag  
+	   .fu5_rs_rob_idx_out(fu5_rs_rob_idx_out),   	// 
+	   .fu5_rs_op_type_out(fu5_rs_op_type_out),     //
+	   .fu5_rs_out_valid(fu5_rs_out_valid),
+	   .fu5_alu_func_out(fu5_alu_func_out),
+	   .fu6_rs_opa_out(fu6_rs_opa_out),       	// This RS' opa 
+	   .fu6_rs_opb_out(fu6_rs_opb_out),       	// This RS' opb 
+	   .fu6_rs_dest_tag_out(fu6_rs_dest_tag_out),  	// This RS' destination tag  
+	   .fu6_rs_rob_idx_out(fu6_rs_rob_idx_out),   	// 
+	   .fu6_rs_op_type_out(fu6_rs_op_type_out),     //
+	   .fu6_rs_out_valid(fu6_rs_out_valid),
+	   .fu6_alu_func_out(fu6_alu_func_out),
 
 	   .rs_full(rs_full)
 	);
@@ -128,109 +188,120 @@ module testbench_rs;
 	endtask
 
 	initial begin
-		$monitor("time:%d, clk:%b, fu1_rs_dest_tag_out:%h, fu1_rs_rob_idx_out:%h, fu1_rs_op_type_out:%h, fu1_alu_func_out:%h, fu1_rs_opa_out:%h, fu1_rs_opb_out:%h, fu1_rs_out_valid:%b, \
-					   fu2_rs_dest_tag_out:%h, fu2_rs_rob_idx_out:%h, fu2_rs_op_type_out:%h, fu2_alu_func_out:%h, fu2_rs_opa_out:%h, fu2_rs_opb_out:%h, fu2_rs_out_valid:%b,",
+		$monitor("time:%.0f, clk:%b, fu1_rs_dest_tag_out:%d, fu1_rs_rob_idx_out:%d, fu1_rs_op_type_out:%d, fu1_alu_func_out:%d, fu1_rs_opa_out:%d, fu1_rs_opb_out:%d, fu1_rs_out_valid:%b,\n \
+	        fu2_rs_dest_tag_out:%d, fu2_rs_rob_idx_out:%d, fu2_rs_op_type_out:%d, fu2_alu_func_out:%d, fu2_rs_opa_out:%d, fu2_rs_opb_out:%d, fu2_rs_out_valid:%b, \n \
+	        fu3_rs_dest_tag_out:%d, fu3_rs_rob_idx_out:%d, fu3_rs_op_type_out:%d, fu3_alu_func_out:%d, fu3_rs_opa_out:%d, fu3_rs_opb_out:%d, fu3_rs_out_valid:%b, \n \
+	        fu4_rs_dest_tag_out:%d, fu4_rs_rob_idx_out:%d, fu4_rs_op_type_out:%d, fu4_alu_func_out:%d, fu4_rs_opa_out:%d, fu4_rs_opb_out:%d, fu4_rs_out_valid:%b, \n \
+	        fu5_rs_dest_tag_out:%d, fu5_rs_rob_idx_out:%d, fu5_rs_op_type_out:%d, fu5_alu_func_out:%d, fu5_rs_opa_out:%d, fu5_rs_opb_out:%d, fu5_rs_out_valid:%b, \n \
+	        fu6_rs_dest_tag_out:%d, fu6_rs_rob_idx_out:%d, fu6_rs_op_type_out:%d, fu6_alu_func_out:%d, fu6_rs_opa_out:%d, fu6_rs_opb_out:%d, fu6_rs_out_valid:%b, rs_full: %b",
 				$time, clock, fu1_rs_dest_tag_out, fu1_rs_rob_idx_out, fu1_rs_op_type_out, fu1_alu_func_out, fu1_rs_opa_out, fu1_rs_opb_out, fu1_rs_out_valid, 
-					      fu2_rs_dest_tag_out, fu2_rs_rob_idx_out, fu2_rs_op_type_out, fu2_alu_func_out, fu2_rs_opa_out, fu2_rs_opb_out, fu2_rs_out_valid);
+					      fu2_rs_dest_tag_out, fu2_rs_rob_idx_out, fu2_rs_op_type_out, fu2_alu_func_out, fu2_rs_opa_out, fu2_rs_opb_out, fu2_rs_out_valid, 
+					      fu3_rs_dest_tag_out, fu3_rs_rob_idx_out, fu3_rs_op_type_out, fu3_alu_func_out, fu3_rs_opa_out, fu3_rs_opb_out, fu3_rs_out_valid,
+					      fu4_rs_dest_tag_out, fu4_rs_rob_idx_out, fu4_rs_op_type_out, fu4_alu_func_out, fu4_rs_opa_out, fu4_rs_opb_out, fu4_rs_out_valid,
+					      fu5_rs_dest_tag_out, fu5_rs_rob_idx_out, fu5_rs_op_type_out, fu5_alu_func_out, fu5_rs_opa_out, fu5_rs_opb_out, fu5_rs_out_valid,
+					      fu6_rs_dest_tag_out, fu6_rs_rob_idx_out, fu6_rs_op_type_out, fu6_alu_func_out, fu6_rs_opa_out, fu6_rs_opb_out, fu6_rs_out_valid,rs_full);
 		clock = 0;
 		//***RESET**
 		reset = 1;
 		#5;
 		@(negedge clock);
 		reset = 0;
-		inst1_rs_load_in=0;
-		inst2_rs_load_in=0;
-		#5;
-		@(negedge clock);
-		inst1_rs_dest_in= {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
-		inst1_rs_opa_in= 32;
-		inst1_rs_opb_in= 26;
-		inst1_rs_opa_valid=1;
-		inst1_rs_opb_valid=1;
-		rs_cdb1_valid=0;
-		rs_cdb2_valid=0;
-		inst1_rs_op_type_in=`INTM_GRP;    //instruction is mulq
-		inst1_rs_alu_func=ALU_MULQ;
-		inst1_rs_load_in=1;
-		inst1_rs_rob_idx_in={{$clog2(`ROB_SIZE){1'b0}}};
-		fu1_mult_available=1;
-		fu1_adder_available=1;
-		fu1_memory_available=1;
+		inst1_rs_dest_in	= 1;
+		inst1_rs_opa_in		= 0;
+		inst1_rs_opb_in		= 8;
+		inst1_rs_opa_valid	= 1;
+		inst1_rs_opb_valid	= 0;
+		inst1_rs_op_type_in	= `LDA_INST;
+		inst1_rs_alu_func	= ALU_ADDQ;
+		inst1_rs_load_in	= 1;
+		inst1_rs_rob_idx_in	= 1;
+		fu1_mult_available	= 1;
+		fu1_adder_available	= 1;
+		fu1_memory_available	= 1;
 		
-		inst2_rs_dest_in= {3'b111,{$clog2(`PRF_SIZE)-3{1'b0}}};
-		inst2_rs_opa_in= {{64-$clog2(`PRF_SIZE){1'b0}},{$clog2(`PRF_SIZE)-1{1'b0}},1'b1};
-		inst2_rs_opb_in= 46;
-		inst2_rs_opa_valid=0;
-		inst2_rs_opb_valid=1;
-		inst2_rs_op_type_in=`INTA_GRP;   //instruction is addq
-		inst2_rs_alu_func=ALU_ADDQ;
-		inst2_rs_load_in=1;
-		inst2_rs_rob_idx_in={{$clog2(`ROB_SIZE)-1{1'b0}},1'b1};
-		fu2_mult_available=1;
-		fu2_adder_available=1;
-		fu2_memory_available=1;
-		#5;
-		@(negedge clock);
-		while((!fu1_rs_out_valid) || fu2_rs_out_valid);
-		assert(	fu1_rs_opa_out==32 && 
-			fu1_rs_opb_out==26 && 
-			fu1_rs_dest_tag_out == {{$clog2(`PRF_SIZE)-1{1'b0}},1'b1} && 
-			fu1_rs_rob_idx_out == {{$clog2(`ROB_SIZE){1'b0}}} && 
-			fu1_rs_op_type_out == `INTM_GRP && fu1_alu_func_out == ALU_MULQ && fu1_rs_out_valid
-  			&& !rs_full &&
-			fu2_rs_opa_out==64'h0 && 
-			fu2_rs_opb_out==64'h0 && 
-			fu2_rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
-			fu2_rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
-			fu2_rs_op_type_out == 6'h00 && fu2_alu_func_out == ALU_DEFAULT && !fu2_rs_out_valid)  $display("@@@addq wait to issue and mulq issue Passed");
-			else #1 exit_on_error;
+		inst2_rs_dest_in	= 2;
+		inst2_rs_opa_in		= 0;
+		inst2_rs_opb_in		= 64'h27bb;
+		inst2_rs_opa_valid	= 1;
+		inst2_rs_opb_valid	= 1;
+		inst2_rs_op_type_in	= `LDA_INST;
+		inst2_rs_alu_func	= ALU_ADDQ;
+		inst2_rs_load_in	= 1;
+		inst2_rs_rob_idx_in	= 2;
+		fu2_mult_available	= 1;
+		fu2_adder_available	= 1;
+		fu2_memory_available	= 1;
 
-		inst1_rs_dest_in= {3'b100,{$clog2(`PRF_SIZE)-3{1'b0}}};
-		inst1_rs_opa_in= 64'h0000_0000_0003_0000;
-		inst1_rs_opb_in= 64'h0000_0000_0000_4000;
-		inst1_rs_opa_valid=1;
-		inst1_rs_opb_valid=1;
+		rs_cdb1_valid	= 0;
+		rs_cdb2_valid	= 1;
+		rs_cdb2_in	= 9;
+		rs_cdb2_tag	= 8;
+		
+		#5
+
+		@(negedge clock);
+		inst1_rs_dest_in	= 3;
+		inst1_rs_opa_in		= 2;
+		inst1_rs_opb_in		= 16;
+		inst1_rs_opa_valid	= 0;
+		inst1_rs_opb_valid	= 1;
+		inst1_rs_op_type_in	= `SLL_INST;
+		inst1_rs_alu_func	= ALU_SLL;
+		inst1_rs_load_in	= 1;
+		inst1_rs_rob_idx_in	= 3;
+		fu1_mult_available	= 1;
+		fu1_adder_available	= 1;
+		fu1_memory_available	= 1;
+		
+		inst2_rs_dest_in	= 4;
+		inst2_rs_opa_in		= 0;
+		inst2_rs_opb_in		= 64'h2ee6;
+		inst2_rs_opa_valid	= 1;
+		inst2_rs_opb_valid	= 1;
+		inst2_rs_op_type_in	= `LDA_INST;
+		inst2_rs_alu_func	= ALU_ADDQ;
+		inst2_rs_load_in	= 1;
+		inst2_rs_rob_idx_in	= 1;
+		fu2_mult_available	= 1;
+		fu2_adder_available	= 1;
+		fu2_memory_available	= 1;
+
+		rs_cdb1_valid	= 0;
+		rs_cdb2_valid	= 0;
+		rs_cdb2_in	= 9;
+		rs_cdb2_tag	= 8;
+		#5
+
+		@(negedge clock);
+		inst1_rs_dest_in	= 5;
+		inst1_rs_opa_in		= 4;
+		inst1_rs_opb_in		= 3;
+		inst1_rs_opa_valid	= 0;
+		inst1_rs_opb_valid	= 0;
+		inst1_rs_op_type_in	= `BIS_INST;
+		inst1_rs_alu_func	= ALU_BIS;
+		inst1_rs_load_in	= 1;
+		inst1_rs_rob_idx_in	= 3;
+		fu1_mult_available	= 1;
+		fu1_adder_available	= 1;
+		fu1_memory_available	= 1;
+		
+		inst2_rs_dest_in	= 6;
+		inst2_rs_opa_in		= 0;
+		inst2_rs_opb_in		= 64'h876;
+		inst2_rs_opa_valid	= 1;
+		inst2_rs_opb_valid	= 1;
+		inst2_rs_op_type_in	= `LDA_INST;
+		inst2_rs_alu_func	= ALU_ADDQ;
+		inst2_rs_load_in	= 1;
+		inst2_rs_rob_idx_in	= 1;
+		fu2_mult_available	= 1;
+		fu2_adder_available	= 1;
+		fu2_memory_available	= 1;
+
 		rs_cdb1_valid=0;
 		rs_cdb2_valid=0;
-		inst1_rs_op_type_in=`LDQ_INST;    //instruction is LDQ
-		inst1_rs_alu_func=ALU_ADDQ;
-		inst1_rs_load_in=1;
-		inst1_rs_rob_idx_in={{$clog2(`ROB_SIZE)-2{1'b0}},2'b10};
-		fu1_mult_available=0;
-		fu1_adder_available=1;
-		fu1_memory_available=1;
-		
-		inst2_rs_dest_in= {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}};
-		inst2_rs_opa_in= 64'h0000_0000_0045_0000;
-		inst2_rs_opb_in= 64'h0000_0000_0000_2400;
-		inst2_rs_opa_valid=1;
-		inst2_rs_opb_valid=1;
-		inst2_rs_op_type_in=`INTA_GRP;    //instruction is independent addq
-		inst2_rs_alu_func=ALU_ADDQ;
-		inst2_rs_load_in=1;
-		inst2_rs_rob_idx_in={{$clog2(`ROB_SIZE)-2{1'b0}},2'b11};
-		fu2_mult_available=1;
-		fu2_adder_available=1;
-		fu2_memory_available=1;
-		#5;
-		@(negedge clock);
-		while(!fu1_rs_out_valid && !fu2_rs_out_valid);
-		$display("%b", fu2_rs_dest_tag_out == {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}});
-		$display("%b", fu2_rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b11});
-		$display("%b", fu2_rs_op_type_out == `INTA_GRP && fu2_alu_func_out == ALU_ADDQ);
-		$display("enter");
-		assert( fu1_rs_opa_out==64'h0 && 
-			fu1_rs_opb_out==64'h0 && 
-			fu1_rs_dest_tag_out == {$clog2(`PRF_SIZE){1'b0}} && 
-			fu1_rs_rob_idx_out == {$clog2(`ROB_SIZE){1'b0}} && 
-			fu1_rs_op_type_out == 6'h00 && fu1_alu_func_out == ALU_DEFAULT && !fu1_rs_out_valid
-			&& !rs_full &&
-			fu2_rs_opa_out==64'h0000_0000_0045_0000 && 
-			fu2_rs_opb_out==64'h0000_0000_0000_2400 && 
-			fu2_rs_dest_tag_out == {3'b010,{$clog2(`PRF_SIZE)-3{1'b0}}} && 
-			fu2_rs_rob_idx_out == {{$clog2(`ROB_SIZE)-2{1'b0}},2'b11} && 
-			fu2_rs_op_type_out == `INTA_GRP && fu2_alu_func_out == ALU_ADDQ && fu2_rs_out_valid)  $display("@@@ldq and independent addq issue Passed");
-			else #1 exit_on_error;
+		#5
 		$display("@@@Passed");
 		$finish;
 	end

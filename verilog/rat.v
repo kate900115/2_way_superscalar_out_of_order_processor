@@ -101,39 +101,3 @@ module rat(
 	  end //else
 
 	end  //always_ff
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
