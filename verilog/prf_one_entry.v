@@ -28,8 +28,8 @@ module prf_one_entry(
 	logic   [63:0]       	     value;
 
 	logic                	     prf_in_use_next;
-	logic                	     prf_is_valid_next;
-	logic   [63:0]       	     value_next;
+	logic               	     prf_is_valid_next;
+	logic  [63:0]       	     value_next;
 
 /*	always_ff@(posedge clock)
 	begin
@@ -83,7 +83,7 @@ endmodule
 */
 	assign	prf_available = ~prf_in_use;
 	assign	prf_ready     = prf_is_valid;
-	assign	data_out      = value;
+	assign	data_out      = prf_is_valid ? value : 64'b0;
 
 	always_ff@(posedge clock)
 	begin
@@ -104,14 +104,16 @@ endmodule
 
 	always_comb
 	begin
-
-		if(free_this_entry)
+		prf_in_use_next      	= prf_in_use;
+               	prf_is_valid_next    	= prf_is_valid;
+               	value_next           	= value;
+		/*if(free_this_entry)
 		begin
 			prf_in_use_next		= 1'b0;
             		prf_is_valid_next    	= 1'b0;
 			value_next		= 0;
 		end
-		else if(assign_a_free_reg)   
+		else */if(assign_a_free_reg)   
             	begin
                 	prf_in_use_next      	= 1'b1;
                 	prf_is_valid_next    	= 1'b0;
@@ -123,12 +125,6 @@ endmodule
                 	prf_is_valid_next    	= 1'b1;
                 	value_next           	= data_in;
             	end
-		else
-		begin
-			prf_in_use_next      	= prf_in_use;
-                	prf_is_valid_next    	= prf_is_valid;
-                	value_next           	= value;
-		end
 	end
 endmodule
 

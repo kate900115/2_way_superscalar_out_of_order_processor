@@ -66,11 +66,11 @@ module prf(
 	logic	[`PRF_SIZE-1:0]			internal_free_this_entry;
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_in;
 	logic	[`PRF_SIZE-1:0]			internal_write_prf_enable;
-	logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
+	//logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
 	logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
 
 	//internal signal for output	
-	logic   [`PRF_SIZE-1:0]			internal_prf_available;
+	//logic   [`PRF_SIZE-1:0]			internal_prf_available;
 	logic   [`PRF_SIZE-1:0]			internal_prf_ready;
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
@@ -82,7 +82,7 @@ module prf(
 		//input
 		.clock(clock),
 		.reset(reset),
-		.free_this_entry(free_this_entry),
+		.free_this_entry(internal_free_this_entry),
     		.data_in(internal_data_in),
 		.write_prf_enable(internal_write_prf_enable),
 		.assign_a_free_reg(internal_assign_a_free_reg1),
@@ -95,9 +95,9 @@ module prf(
 
 	//this priority selector choose a register from free lists for RAT1
 	//and return the index of this newly allocated register
-	priority_selector #(.SIZE(`PRF_SIZE)) prf_psl1( 
+	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl1( 
 		.req(internal_prf_available),
-	        .en(rat1_allocate_new_prf),
+	        .en((~reset)&rat1_allocate_new_prf),
         	.gnt(internal_assign_a_free_reg1)
 	);
 
@@ -120,7 +120,7 @@ module prf(
 	//this priority selector choose a second register from free lists for RAT2
 	//and return the index of this newly allocated register
 
-	priority_selector #(.SIZE(`PRF_SIZE)) prf_psl2( 
+	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl2( 
 		.req((~internal_assign_a_free_reg1)&internal_prf_available),
 	        .en(rat2_allocate_new_prf),
         	.gnt(internal_assign_a_free_reg2)

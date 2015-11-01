@@ -127,11 +127,9 @@ module test_prf;
 		reset = 1;
 		#5;
 		@(negedge clock);
-		reset = 0;		
-
 		//A new request from RAT1 to allocate a new PRF 
 		//and return the index of this PRF entry.
-		@(negedge clock);
+		reset = 0;		
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
