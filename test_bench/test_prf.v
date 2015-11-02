@@ -118,13 +118,6 @@ module test_prf;
 		end
 	endtask
 
-	/*initial begin
-		$monitor("time:%d, clk:%b, inst1_opa_prf_value:%h, inst1_opb_prf_value:%h, inst2_opa_prf_value:%h, inst2_opb_prf_value:%h,\n\
-					   rat1_prf_rename_idx_out:%b, rat1_prf_rename_valid_out:%b,rat2_prf_rename_idx_out :%b, rat2_prf_rename_valid_out:%b\n\
-						internal_assign_a_free_reg1=%b,\ninternal_prf_available=%b\n,internal_assign_a_free_reg2=%b,\ninternal_prf_available2=%b",//for debug
-				$time, clock, inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value, inst2_opb_prf_value,  
-					      rat1_prf_rename_idx_out, rat1_prf_rename_valid_out, rat2_prf_rename_idx_out, rat2_prf_rename_valid_out,internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2);*/
-
 	initial begin
 		$monitor(" @@@  time:%d, clk:%b, \n\
 						inst1_opa_prf_value:%h, \n\
@@ -778,24 +771,6 @@ module test_prf;
 		$finish;
 
 	end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 endmodule

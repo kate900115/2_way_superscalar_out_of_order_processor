@@ -62,7 +62,6 @@ module prf(
 	output logic	[`PRF_SIZE-1:0]         internal_prf_available,
 	output logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2,
 	output logic 	[`PRF_SIZE-1:0]		internal_prf_available2,
-
 	output logic 	[`PRF_SIZE-1:0]		internal_free_this_entry
 			
 
