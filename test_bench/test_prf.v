@@ -49,6 +49,7 @@ module test_prf;
 	logic 	[`PRF_SIZE-1:0]		internal_prf_available;
 	logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2;
 	logic 	[`PRF_SIZE-1:0]		internal_prf_available2;
+	logic 	[`PRF_SIZE-1:0]		internal_free_this_entry;
 
 	prf prf1(
 		//input
@@ -101,7 +102,8 @@ module test_prf;
 		.internal_assign_a_free_reg1(internal_assign_a_free_reg1),
 		.internal_prf_available(internal_prf_available),
 		.internal_assign_a_free_reg2(internal_assign_a_free_reg2),
-		.internal_prf_available2(internal_prf_available2)		
+		.internal_prf_available2(internal_prf_available2),	
+		.internal_free_this_entry(internal_free_this_entry)	
 
 );
 
@@ -140,12 +142,14 @@ module test_prf;
 						internal_assign_a_free_reg1=%b,\n\
 						internal_prf_available=%b\n\
 						internal_assign_a_free_reg2=%b\n\
-						internal_prf_available2=%b",//for debug
+						internal_prf_available2=%b\n\
+						internal_free_this_entry=%b",//for debug
 				$time, clock, 
 				inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value,inst2_opb_prf_value,
 				inst1_opa_valid,     inst1_opb_valid,     inst2_opa_valid,    inst2_opb_valid,
 				rat1_prf_rename_idx_out, rat1_prf_rename_valid_out, rat2_prf_rename_idx_out,rat2_prf_rename_valid_out,
-				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2);
+				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2,
+				internal_free_this_entry);
 
 
 		clock = 0;
@@ -154,6 +158,9 @@ module test_prf;
 		reset = 1;
 		#5;
 		@(negedge clock);
+		$display("@@@ stop reset!!");
+
+
 		//A new request from RAT1 to allocate a new PRF 
 		//and return the index of this PRF entry.
 		$display("@@@ RAT1 allocate a new register!!");
@@ -445,7 +452,329 @@ module test_prf;
 		rrat1_prf_free_idx		 = 0;
 		rrat2_prf_free_idx		 = 0;
 		
-		@(negedge clock);		
+		@(negedge clock);
+		$display("@@@ RRAT wants to free reg#101101!!");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 1;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 6'b101101;
+		rrat2_prf_free_idx		 = 0;		
+		
+		@(negedge clock);
+		$display("@@@ RAT1 and RAT2 want to allocate new entries!!");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 1;			
+		rat2_allocate_new_prf		 = 1;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+
+		@(negedge clock);
+		$display("@@@ Store data from CDB2!!");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 1;
+		cdb2_tag			 = 6'b101010;
+		cdb2_out			 = 17;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+
+		@(negedge clock);
+		$display("@@@ RRAT1 send the freelist in");
+		$display("@@@ RRAT1 because of the freelist!!");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 48'b001100100000000000000000000000000000000000000000;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 48'b011101000000000000000111100000001111000000010111;
+		rrat1_branch_mistaken_free_valid = 1;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+
+		@(negedge clock);
+		$display("@@@ RRAT1 send the freelist in");
+		$display("@@@ RRAT1 because of the freelist!!");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 48'b001100100000000000000000000000000000000000000000;			
+		rrat2_prf_free_list		 = 48'b000000100000000000000000000000000000000000000000;			
+		rat1_prf_free_list		 = 48'b010101100000000000000111100000001111000000010111;			
+		rat2_prf_free_list		 = 48'b000101100000000000000111100000001111000000010111;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 1;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		
+		@(negedge clock);
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+
+
+		@(negedge clock);
+		$display("@@@ this time we want to (1)free one entry");
+		$display("@@@ (2)store a value from CDB (3)load inst1 opb");
+		cdb1_valid			 = 1;
+		cdb1_tag			 = 6'b101110;
+		cdb1_out			 = 19;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 6'b101111;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 1;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 6'b101011;
+		@(negedge clock);
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
+
+		$display("@@@ this time we want to (1)allocate a new entry");
+		$display("@@@ (2)load value from Reg#6'b101110");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 6'b101110;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 1;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
+
+
+		$display("@@@ store a value to a register which is not allocated");
+		cdb1_valid			 = 1;
+		cdb1_tag			 = 6'b000001;
+		cdb1_out			 = 11;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
+		$display("@@@ load value from this wrong register");
+		cdb1_valid			 = 0;
+		cdb1_tag			 = 0;
+		cdb1_out			 = 0;
+		cdb2_valid			 = 0;
+		cdb2_tag			 = 0;
+		cdb2_out			 = 0;
+		inst1_opa_prf_idx		 = 6'b000001;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf		 = 0;			
+		rat2_allocate_new_prf		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf_free_valid		 = 0;	
+		rrat2_prf_free_valid		 = 0;	
+		rrat1_prf_free_idx		 = 0;
+		rrat2_prf_free_idx		 = 0;
+		@(negedge clock);
 		$finish;
 
 	end

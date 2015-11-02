@@ -61,19 +61,21 @@ module prf(
 	output logic	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1,
 	output logic	[`PRF_SIZE-1:0]         internal_prf_available,
 	output logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2,
-	output logic 	[`PRF_SIZE-1:0]		internal_prf_available2
+	output logic 	[`PRF_SIZE-1:0]		internal_prf_available2,
+
+	output logic 	[`PRF_SIZE-1:0]		internal_free_this_entry
 			
 
 );
 	//internal signal for input
-	logic	[`PRF_SIZE-1:0]			internal_free_this_entry;
+	//logic	[`PRF_SIZE-1:0]			internal_free_this_entry;
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_in;
 	logic	[`PRF_SIZE-1:0]			internal_write_prf_enable;
 	//logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
 	//logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
 
 	//internal signal for output	
-	//logic   [`PRF_SIZE-1:0]			internal_prf_available;
+	//logic   [`PRF_SIZE-1:0]		internal_prf_available;
 	logic   [`PRF_SIZE-1:0]			internal_prf_ready;
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
@@ -259,17 +261,14 @@ module prf(
 	//free prf
 	always_comb
 	begin
-	
+		internal_free_this_entry = 0;
 		//free one entry of PRF 
 		//this happens when RoB retires an intruction
 		//RRAT will give out the physical register index to tell which entry of PRF should be free
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
-			if 	((rrat1_prf_free_idx==i)&&(rrat1_prf_free_valid))
-			begin
-				internal_free_this_entry[i] = 1'b1;
-			end
-			else if ((rrat2_prf_free_idx==i)&&(rrat2_prf_free_valid))
+			if 	(((rrat1_prf_free_idx==i)&&(rrat1_prf_free_valid))||
+				 ((rrat2_prf_free_idx==i)&&(rrat2_prf_free_valid)))
 			begin
 				internal_free_this_entry[i] = 1'b1;
 			end
@@ -298,7 +297,7 @@ module prf(
 				end
 			end
 		end
-		else if (rrat2_branch_mistaken_free_valid)
+		if (rrat2_branch_mistaken_free_valid)
 		begin
 			for(int i=0;i<`PRF_SIZE;i++)
 			begin
@@ -311,10 +310,6 @@ module prf(
 					internal_free_this_entry[i] = 1'b0;
 				end
 			end
-		end
-		else
-		begin
-			internal_free_this_entry = 0;
-		end		
+		end			
 	end
 endmodule

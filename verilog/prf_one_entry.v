@@ -67,13 +67,28 @@ module prf_one_entry(
                 	prf_in_use_next      	= 1'b1;
                 	prf_is_valid_next    	= 1'b0;
 			value_next		= 0;
-            	end       
-            	else if(write_prf_enable)
+            	end   
+		else if(write_prf_enable)
            	begin
-			prf_in_use_next      	= 1'b1;
-                	prf_is_valid_next    	= 1'b1;
-                	value_next           	= data_in;
+			if (prf_in_use)
+			begin
+				prf_in_use_next      	= 1'b1;
+                		prf_is_valid_next    	= 1'b1;
+                		value_next           	= data_in;
+			end
+			else
+			begin
+				prf_in_use_next      		= prf_in_use;
+               			prf_is_valid_next    		= prf_is_valid;
+               			value_next           		= value;
+			end
             	end
+		else
+		begin
+			prf_in_use_next      		= prf_in_use;
+               		prf_is_valid_next    		= prf_is_valid;
+               		value_next           		= value;
+		end
 	end
 endmodule
 
