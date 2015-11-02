@@ -55,11 +55,14 @@ module prf(
 	output  logic				inst1_opa_valid,			//whether opa load from prf of instruction1 is valid
 	output	logic				inst1_opb_valid,			//whether opb load from prf of instruction1 is valid
 	output  logic				inst2_opa_valid,			//whether opa load from prf of instruction2 is valid
-	output	logic				inst2_opb_valid,				//whether opa load from prf of instruction2 is valid
+	output	logic				inst2_opb_valid,			//whether opa load from prf of instruction2 is valid
 
 	//for debug
 	output logic	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1,
-	output logic	[`PRF_SIZE-1:0]         internal_prf_available
+	output logic	[`PRF_SIZE-1:0]         internal_prf_available,
+	output logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2,
+	output logic 	[`PRF_SIZE-1:0]		internal_prf_available2
+			
 
 );
 	//internal signal for input
@@ -67,7 +70,7 @@ module prf(
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_in;
 	logic	[`PRF_SIZE-1:0]			internal_write_prf_enable;
 	//logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
-	logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
+	//logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
 
 	//internal signal for output	
 	//logic   [`PRF_SIZE-1:0]			internal_prf_available;
@@ -75,7 +78,22 @@ module prf(
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
 	//other registers to store value
+	logic					priority_selector1_en;
+	logic					priority_selector2_en;
 
+	always_ff@(posedge clock)
+	begin
+		if(reset)
+		begin
+			priority_selector1_en <=`SD 1'b0;
+			priority_selector2_en <=`SD 1'b0;
+		end
+		else
+		begin
+			priority_selector1_en <=`SD rat1_allocate_new_prf;
+			priority_selector2_en <=`SD rat2_allocate_new_prf;
+		end
+	end
 
 
 	prf_one_entry prf1[`PRF_SIZE-1:0](
@@ -85,7 +103,7 @@ module prf(
 		.free_this_entry(internal_free_this_entry),
     		.data_in(internal_data_in),
 		.write_prf_enable(internal_write_prf_enable),
-		.assign_a_free_reg(internal_assign_a_free_reg1),
+		.assign_a_free_reg(internal_assign_a_free_reg1|internal_assign_a_free_reg2),
 
 		//output
 		.prf_available(internal_prf_available),
@@ -97,7 +115,7 @@ module prf(
 	//and return the index of this newly allocated register
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl1( 
 		.req(internal_prf_available),
-	        .en((~reset)&rat1_allocate_new_prf),
+	        .en(priority_selector1_en),
         	.gnt(internal_assign_a_free_reg1)
 	);
 
@@ -119,12 +137,18 @@ module prf(
 
 	//this priority selector choose a second register from free lists for RAT2
 	//and return the index of this newly allocated register
+	
+	//#######ATTENTION########
+	//internal_assign_a_free_reg1 and internal_assign_a_free_reg2 the highest bit might be X when 
+	//so RAT and RRAT should not give out signals like "xxx". 
 
+	assign internal_prf_available2 = (~internal_assign_a_free_reg1)&internal_prf_available;//for debug
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl2( 
-		.req((~internal_assign_a_free_reg1)&internal_prf_available),
-	        .en(rat2_allocate_new_prf),
+		.req(internal_prf_available2),
+	        .en(priority_selector2_en),
         	.gnt(internal_assign_a_free_reg2)
 	);
+
 	
 	always_comb
 	begin
@@ -149,25 +173,21 @@ module prf(
 	begin
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
-			if      ((cdb1_tag == i) && (cdb1_valid) && 
-				 (!internal_prf_available[i]) && 
-				 (!internal_prf_ready))
+				internal_data_in[i] 	     = 0;
+				internal_write_prf_enable[i] = 1'b0;
+
+			if      ((cdb1_tag == i) && (cdb1_valid))
+
 			begin
 				internal_data_in[i] 	     = cdb1_out;
 				internal_write_prf_enable[i] = 1'b1;
 			end
-			else if ((cdb2_tag == i) && (cdb2_valid) && 
-				 (!internal_prf_available[i]) && 
-				 (!internal_prf_ready))
+			if 	((cdb2_tag == i) && (cdb2_valid)) 
 			begin
 				internal_data_in[i] 	     = cdb2_out;
 				internal_write_prf_enable[i] = 1'b1;
 			end
-			else
-			begin
-				internal_data_in[i] 	     = 0;
-				internal_write_prf_enable[i] = 1'b0;
-			end
+
 		end
 	end
 

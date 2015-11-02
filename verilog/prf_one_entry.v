@@ -25,62 +25,12 @@ module prf_one_entry(
 
 	logic                	     prf_in_use;
 	logic                	     prf_is_valid;
-	logic   [63:0]       	     value;
+	logic   	[63:0]       value;
 
 	logic                	     prf_in_use_next;
 	logic               	     prf_is_valid_next;
-	logic  [63:0]       	     value_next;
+	logic  		[63:0]       value_next;
 
-/*	always_ff@(posedge clock)
-	begin
-		if(reset)
-        	begin
-            		prf_in_use     		<= `SD 1'b0;
-            		prf_is_valid    	<= `SD 1'b0;
-            		value         		<= `SD 64'b0;
-        	end   
-        	else
-        	begin
-			if(free_this_entry)
-			begin
-				prf_in_use     	<= `SD 1'b0;
-            			prf_is_valid    <= `SD 1'b0;
-				value         	<= `SD 64'b0;
-			end
-			else if(assign_a_free_reg &&(!prf_in_use))   
-            		begin
-                		prf_in_use      <= `SD 1'b1;
-                		prf_is_valid    <= `SD 1'b0;
-				value         	<= `SD 64'b0;
-            		end       
-            		else if(write_prf_enable && prf_in_use)
-           		begin
-				prf_in_use      <= `SD 1'b1;
-                		prf_is_valid    <= `SD 1'b1;
-                		value           <= `SD data_in;
-            		end
-
-        	end
-    	end
-
-
-    	always_comb
-    	begin
-		prf_available    = ~prf_in_use;
-        	prf_ready 	= prf_is_valid;
-        	if (prf_in_use && prf_is_valid)
-        	begin       
-            		data_out = value;
-        	end
-        	else
-        	begin
-            		data_out = 64'b0;
-        	end
-    	end
-
-
-endmodule
-*/
 	assign	prf_available = ~prf_in_use;
 	assign	prf_ready     = prf_is_valid;
 	assign	data_out      = prf_is_valid ? value : 64'b0;
@@ -101,19 +51,18 @@ endmodule
         	end
     	end
 
-
 	always_comb
 	begin
-		prf_in_use_next      	= prf_in_use;
-               	prf_is_valid_next    	= prf_is_valid;
-               	value_next           	= value;
-		/*if(free_this_entry)
+		prf_in_use_next      		= prf_in_use;
+               	prf_is_valid_next    		= prf_is_valid;
+               	value_next           		= value;
+		if(free_this_entry)
 		begin
 			prf_in_use_next		= 1'b0;
             		prf_is_valid_next    	= 1'b0;
 			value_next		= 0;
 		end
-		else */if(assign_a_free_reg)   
+		else if(assign_a_free_reg)   
             	begin
                 	prf_in_use_next      	= 1'b1;
                 	prf_is_valid_next    	= 1'b0;
