@@ -1,19 +1,19 @@
 module cdb(
-	input  					adder_result_ready;
-	input  	[63:0]				adder_result_in;
-	input	[$clog2(`PRF_SIZE)-1:0]		adder_dest_reg_idx;
-	input  					mult_result_ready;
-	input  	[63:0]				mult_result_in;
-	input	[$clog2(`PRF_SIZE)-1:0]		mult_dest_reg_idx;
-	input  					memory_result_ready;
-	input  	[63:0]				memory_result_in;
-	input	[$clog2(`PRF_SIZE)-1:0]		memory_dest_reg_idx;
+	input  					adder_result_ready,
+	input  	[63:0]				adder_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		adder_dest_reg_idx,
+	input  					mult_result_ready,
+	input  	[63:0]				mult_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		mult_dest_reg_idx,
+	input  					memory_result_ready,
+	input  	[63:0]				memory_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		memory_dest_reg_idx,
 	
-	output 					cdb_valid;
-	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag;
-	output 	logic [63:0]			cdb_out;
-	output	logic				mult_result_send_in_fail;
-	output	logic				adder_result_send_in_fail;	
+	output 	logic				cdb_valid,
+	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag,
+	output 	logic [63:0]			cdb_out,
+	output	logic				mult_result_send_in_fail,
+	output	logic				adder_result_send_in_fail	
 );
 
 	
@@ -72,7 +72,7 @@ module cdb(
 		3'b111:
 			begin
 				cdb_valid 		   = 1'b1;				
-				cdb_tag   		   = memroy_dest_reg_idx;
+				cdb_tag   		   = memory_dest_reg_idx;
 				cdb_out   		   = memory_result_in;
 				mult_result_send_in_fail   = 1;
 				adder_result_send_in_fail  = 1;
@@ -85,5 +85,6 @@ module cdb(
 				mult_result_send_in_fail   = 0;
 				adder_result_send_in_fail  = 0;
 			end
+		endcase
 	end
 endmodule
