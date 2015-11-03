@@ -33,6 +33,8 @@ module rs(
 	input         				inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
 	input  ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
+	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
+	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
         
         //for instruction2
 	input  [63:0] 				inst2_rs_opa_in,      	// Operand a from Rename  
@@ -41,12 +43,11 @@ module rs(
 	input         				inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
 	input  ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
-
-	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  instruction_select_result       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
+
+
 
 
 	input					fu1_mult_available,
@@ -112,12 +113,11 @@ module rs(
 
 	
 	//input of one entry
-	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;                                //instruction1 go to the entries according to this,
-														  //when dispatching two instructions it tell us the address of entries to load each instructions
-
-	logic [`RS_SIZE-1:0] 				inst2_internal_rs_load_in;                                //instruction2 go to the entries according to this
+	logic [2*`RS_SIZE-1:0]				internal_rs_load_in;			//instruction1 go to the entries according to this,
+	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;		//when dispatching two instructions it tell us the address of entries to load each instructions
+	logic [`RS_SIZE-1:0] 				inst2_internal_rs_load_in;		//instruction2 go to the entries according to this
 				
-	logic [`RS_SIZE-1:0]	 			fu_internal_rs_free;                               //tell rs which entry we want to send to FU1
+	logic [`RS_SIZE-1:0]	 			fu_internal_rs_free;			//tell rs which entry we want to send to FU1
 	
 	//output of one entry
 	logic [`RS_SIZE-1:0]				internal_rs_ready_out;
@@ -264,12 +264,10 @@ module rs(
 	//when dispatching, two instruction comes in, 
 	//this selector can help us to find two available entries in rs, 
 	//then make the load of the two entries to be 1
-	two_stage_priority_selector #(.p_SIZE(`RS_SIZE)) tsps1(                                  
-		.available(internal_rs_available_out),                                                 
-		.enable1(inst1_rs_load_in),							       
-		.enable2(inst2_rs_load_in),
-		.output1(inst1_internal_rs_load_in),
-		.output2(inst2_internal_rs_load_in)
+	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) tsps1(                                  
+		.req(internal_rs_available_out),                                                 
+		.en(inst1_rs_load_in | inst2_rs_load_in),							       
+		.gnt_bus({inst1_internal_rs_load_in, inst2_internal_rs_load_in})
 	);
 
 	//during the wake-up rs entries , we want to select two to the two FU. 
@@ -430,13 +428,13 @@ module rs(
 	//if there isn't any entry availble, rs_full = RS_NO_ENTRY_EMPTY
 	//if there is one entry available, rs_full = RS_ONE_ENTRY_EMPTY
 	//if there is two or more entry available, rs_full = RS_TWO_OR_MORE_ENTRY_EMPTY
-	two_stage_priority_selector	#(.p_SIZE(`RS_SIZE))	rs_is_full(                                  
-		.available(internal_rs_available_out),                                                 
-		.enable1(1'b1),							       
-		.enable2(1'b1),
-		.output1(is_full1),
-		.output2(is_full2)
+
+	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) rs_is_full(                                  
+		.req(internal_rs_available_out),
+		.en(1'b1),
+		.gnt_bus({is_full1, is_full2})
 	);
+
 	always_comb begin
 		if (is_full2) 		rs_full = RS_TWO_OR_MORE_ENTRY_EMPTY;
 		else if (is_full1) 	rs_full = RS_ONE_ENTRY_EMPTY;
@@ -462,7 +460,4 @@ module rs(
 			inst2_fu_select = USE_ADDER;
 	end
 endmodule
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/only_two_way_rs
