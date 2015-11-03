@@ -1,90 +1,127 @@
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//   Modulename :  cdb.v                                       	        //
+//                                                                      //
+//   Description :                                                      //
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
 module cdb(
-	input  					adder_result_ready,
-	input  	[63:0]				adder_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		adder_dest_reg_idx,
-	input  					mult_result_ready,
-	input  	[63:0]				mult_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		mult_dest_reg_idx,
-	input  					memory_result_ready,
-	input  	[63:0]				memory_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		memory_dest_reg_idx,
+	input  					adder1_result_ready,
+	input  	[63:0]				adder1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		adder1_dest_reg_idx,
+	input  					mult1_result_ready,
+	input  	[63:0]				mult1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		mult1_dest_reg_idx,
+	input  					memory1_result_ready,
+	input  	[63:0]				memory1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		memory1_dest_reg_idx,
+	input  					adder2_result_ready,
+	input  	[63:0]				adder2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		adder2_dest_reg_idx,
+	input  					mult2_result_ready,
+	input  	[63:0]				mult2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		mult2_dest_reg_idx,
+	input  					memory2_result_ready,
+	input  	[63:0]				memory2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		memory2_dest_reg_idx,
 	
-	output 	logic				cdb_valid,
-	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag,
-	output 	logic [63:0]			cdb_out,
-	output	logic				mult_result_send_in_fail,
-	output	logic				adder_result_send_in_fail	
+	output 	logic				cdb1_valid,
+	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb1_tag,
+	output 	logic [63:0]			cdb1_out,
+	output 	logic				cdb2_valid,
+	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb2_tag,
+	output 	logic [63:0]			cdb2_out,
+	output 	logic				adder1_send_in_fail,
+	output 	logic				adder2_send_in_fail,
+	output 	logic				mult1_send_in_fail,
+	output 	logic				mult2_send_in_fail,
+	output 	logic				memory1_send_in_fail,
+	output 	logic				memory2_send_in_fail
 );
 
-	
+	logic	[5:0]				fu_result_ready;
+	logic	[5:0]				fu_send_in_fail;
+	logic   [5:0]				fu_result_ready2;
+	logic   [5:0]				fu_select1;
+	logic   [5:0]				fu_select2;
 
-	always_comb
-	begin
-		case ({memory_result_ready, mult_result_ready, adder_result_ready})
-		3'b001:		
-			begin
-				cdb_valid		   = 1'b1;				
-				cdb_tag  		   = adder_dest_reg_idx;
-				cdb_out  		   = adder_result_in;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 0;
-			end
-		3'b010:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag   		   = mult_dest_reg_idx;
-				cdb_out   		   = mult_result_in;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 0;
-			end
-		3'b011:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag   		   = mult_dest_reg_idx;
-				cdb_out   		   = mult_result_in;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 1;
-			end
-		3'b100:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag   		   = memory_dest_reg_idx;
-				cdb_out   	     	   = memory_result_in;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 0;
-			end
-		3'b101:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag         	   = memory_dest_reg_idx;
-				cdb_out   		   = memory_result_in;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 1;
-			end
-		3'b110:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag   	   	   = memory_dest_reg_idx;
-				cdb_out   		   = memory_result_in;
-				mult_result_send_in_fail   = 1;
-				adder_result_send_in_fail  = 0;
-			end
-		3'b111:
-			begin
-				cdb_valid 		   = 1'b1;				
-				cdb_tag   		   = memory_dest_reg_idx;
-				cdb_out   		   = memory_result_in;
-				mult_result_send_in_fail   = 1;
-				adder_result_send_in_fail  = 1;
-			end
-		default:
-			begin
-				cdb_valid 		   = 1'b0;				
-				cdb_tag   		   = 0;
-				cdb_out   		   = 0;
-				mult_result_send_in_fail   = 0;
-				adder_result_send_in_fail  = 0;
-			end
-		endcase
-	end
+
+	assign  memory1_send_in_fail = fu_send_in_fail[5];
+	assign  memory2_send_in_fail = fu_send_in_fail[4];
+	assign  mult1_send_in_fail   = fu_send_in_fail[3]; 
+	assign  mult2_send_in_fail   = fu_send_in_fail[2];
+	assign  adder1_send_in_fail  = fu_send_in_fail[1];
+	assign  adder2_send_in_fail  = fu_send_in_fail[0];
+
+	assign  fu_result_ready      = {memory1_result_ready, memory2_result_ready, mult1_result_ready,
+				        mult2_result_ready, adder1_result_ready, adder2_result_ready};
+
+	assign  fu_result_ready2     = (~fu_select1) & fu_result_ready;	
+	
+	assign  fu_send_in_fail      = (~(fu_select1 | fu_select2) )& fu_result_ready;
+
+	cdb_one_entry cdb1(
+		//input
+		.fu_select(fu_select1),
+		.adder1_result_in(adder1_result_in),
+		.adder1_dest_reg_idx(adder1_dest_reg_idx),
+		.mult1_result_in(mult1_result_in),
+		.mult1_dest_reg_idx(mult1_dest_reg_idx),
+		.memory1_result_in(memory1_result_in),
+		.memory1_dest_reg_idx(memory1_dest_reg_idx),
+		.adder2_result_in(adder2_result_in),
+		.adder2_dest_reg_idx(adder2_dest_reg_idx),
+		.mult2_result_in(mult2_result_in),
+		.mult2_dest_reg_idx(mult2_dest_reg_idx),
+		.memory2_result_in(memory2_result_in),
+		.memory2_dest_reg_idx(memory2_dest_reg_idx),
+	
+		//output
+		.cdb_valid(cdb1_valid),
+		.cdb_tag(cdb1_tag),
+		.cdb_out(cdb1_out)	
+	);
+
+	cdb_one_entry cdb2(
+		//input
+		.fu_select(fu_select2),
+		.adder1_result_in(adder1_result_in),
+		.adder1_dest_reg_idx(adder1_dest_reg_idx),
+		.mult1_result_in(mult1_result_in),
+		.mult1_dest_reg_idx(mult1_dest_reg_idx),
+		.memory1_result_in(memory1_result_in),
+		.memory1_dest_reg_idx(memory1_dest_reg_idx),
+		.adder2_result_in(adder2_result_in),
+		.adder2_dest_reg_idx(adder2_dest_reg_idx),
+		.mult2_result_in(mult2_result_in),
+		.mult2_dest_reg_idx(mult2_dest_reg_idx),
+		.memory2_result_in(memory2_result_in),
+		.memory2_dest_reg_idx(memory2_dest_reg_idx),
+		
+		//output
+		.cdb_valid(cdb2_valid),
+		.cdb_tag(cdb2_tag),
+		.cdb_out(cdb2_out)	
+	);
+
+	priority_selector #(.WIDTH(6)) cdb_psl1( 
+		.req(fu_result_ready),
+	        .en(1'b1),
+        	.gnt(fu_select1)
+	);
+
+	priority_selector #(.WIDTH(6)) cdb_psl2( 
+		.req(fu_result_ready2),
+	        .en(1'b1),
+        	.gnt(fu_select2)
+	);
+
+
+
 endmodule

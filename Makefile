@@ -23,6 +23,8 @@ all:    simv
 TESTBENCH = 	sys_defs.vh	\
 		test_bench/test_cdb.v
 SIMFILES = 	verilog/cdb.v		\
+		verilog/cdb_one_entry.v 	\
+		verilog/priority_selector.v  \
 
 SYNFILES = cdb.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
