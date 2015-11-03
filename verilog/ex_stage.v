@@ -41,8 +41,8 @@ module alu(
 
   always_comb begin
     case (func)
-      ALU_ADDQ:      result = opa + opb;
-      ALU_SUBQ:      result = opa - opb;
+      ALU_ADDQ:     result = opa + opb;
+      ALU_SUBQ:     result = opa - opb;
       ALU_AND:      result = opa & opb;
       ALU_BIC:      result = opa & ~opb;
       ALU_BIS:      result = opa | opb;
@@ -53,9 +53,9 @@ module alu(
       ALU_SLL:      result = opa << opb[5:0];
       ALU_SRA:      result = (opa >> opb[5:0]) | ({64{opa[63]}} << (64 -
                               opb[5:0])); // arithmetic from logical shift
-      ALU_CMPULT:    result = { 63'd0, (opa < opb) };
+      ALU_CMPULT:   result = { 63'd0, (opa < opb) };
       ALU_CMPEQ:    result = { 63'd0, (opa == opb) };
-      ALU_CMPULE:    result = { 63'd0, (opa <= opb) };
+      ALU_CMPULE:   result = { 63'd0, (opa <= opb) };
       ALU_CMPLT:    result = { 63'd0, signed_lt(opa, opb) };
       ALU_CMPLE:    result = { 63'd0, (signed_lt(opa, opb) || (opa == opb)) };
       default:      result = 64'xxxx_xxxx_xxxx_xxxx;  // here only to force
@@ -100,29 +100,13 @@ module ex_stage(
     input          			clock,			// system clock
     input          			reset,			// system reset
 
-    input  [63:0]			fu1_rs_opa_in,		// register A value from reg file
-    input  [63:0]			fu1_rs_opb_in,		// register B value from reg file
-    input  [$clog2(`PRF_SIZE)-1:0]	fu1_rs_dest_tag_in,
-    input  [$clog2(`ROB_SIZE)-1:0]	fu1_rs_rob_idx_in,
-    input  [5:0]  			fu1_rs_op_type_in,	// incoming instruction
-    input				fu1_rs_valid_in,
-    ALU_FUNC       			fu1_alu_func_in,	// ALU function select from decoder
-
-    input  [63:0]			fu2_rs_opa_in,		// register A value from reg file
-    input  [63:0]			fu2_rs_opb_in,		// register B value from reg file
-    input  [$clog2(`PRF_SIZE)-1:0]	fu2_rs_dest_tag_in,
-    input  [$clog2(`ROB_SIZE)-1:0]	fu2_rs_rob_idx_in,
-    input  [5:0]  			fu2_rs_op_type_in,	// incoming instruction
-    input				fu2_rs_valid_in,
-    ALU_FUNC       			fu2_alu_func_in,	// ALU function select from decoder
-
-    input  [63:0]			fu3_rs_opa_in,		// register A value from reg file
-    input  [63:0]			fu3_rs_opb_in,		// register B value from reg file
-    input  [$clog2(`PRF_SIZE)-1:0]	fu3_rs_dest_tag_in,
-    input  [$clog2(`ROB_SIZE)-1:0]	fu3_rs_rob_idx_in,
-    input  [5:0]  			fu3_rs_op_type_in,	// incoming instruction
-    input				fu3_rs_valid_in,
-    ALU_FUNC       			fu3_alu_func_in,	// ALU function select from decoder
+    input  [5:0][63:0]			fu_rs_opa_in,		// register A value from reg file
+    input  [5:0][63:0]			fu_rs_opb_in,		// register B value from reg file
+    input  [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
+    input  [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
+    input  [5:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
+    input  [5:0]			fu_rs_valid_in,
+    ALU_FUNC [5:0]     			fu_alu_func_in,	// ALU function select from decoder
 
     input          id_ex_cond_branch,   // is this a cond br? from decoder
     input          id_ex_uncond_branch, // is this an uncond br? from decoder
@@ -130,19 +114,21 @@ module ex_stage(
     output [63:0]	ex_result_out,   // ALU result
     output		ex_take_branch_out,  // is this a taken branch?
 
-    output logic [$clog2(`PRF_SIZE)-1:0]	fu1_rs_dest_tag_out,
-    output logic [$clog2(`ROB_SIZE)-1:0]	fu1_rs_rob_idx_out,
-    output logic [5:0]  			fu1_rs_op_type_out,	// incoming instruction
-    output ALU_FUNC				fu1_alu_func_out,	// ALU function select from decoder
-    output logic [63:0]				fu1_result;
-    output					fu1_result_is_valid,
+    output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out1,
+    output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out1,
+    output logic [5:0]  			fu_rs_op_type_out1,	// incoming instruction
+    output ALU_FUNC				fu_alu_func_out1,	// ALU function select from decoder
+    output logic [63:0]				fu_result1,
+    output logic				fu_is_valid1,
 
-    output logic [$clog2(`PRF_SIZE)-1:0]	fu2_rs_dest_tag_out,
-    output logic [$clog2(`ROB_SIZE)-1:0]	fu2_rs_rob_idx_out,
-    output logic [5:0]  			fu2_rs_op_type_out,	// incoming instruction
-    output ALU_FUNC				fu2_alu_func_out,	// ALU function select from decoder
-    output logic [63:0]				fu2_result;
-    output					fu2_result_is_valid,
+    output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out2,
+    output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out2,
+    output logic [5:0]  			fu_rs_op_type_out2,	// incoming instruction
+    output ALU_FUNC				fu_alu_func_out2,	// ALU function select from decoder
+    output logic [63:0]				fu_result2,
+    output logic				fu_is_valid2,
+
+    output logic [5:0]				fu_result_is_valid
 /*
     output logic [$clog2(`PRF_SIZE)-1:0]	fu3_rs_dest_tag_out,
     output logic [$clog2(`ROB_SIZE)-1:0]	fu3_rs_rob_idx_out,
@@ -157,14 +143,22 @@ module ex_stage(
 	logic		mult_done;
 	logic  [63:0]	alu_result;
 	assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
+	logic  [5:0]	internal_fu_value_select1;
+	logic  [5:0]	internal_fu_value_select2;
+
+	logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag;
+	logic [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx;
+	logic [5:0][5:0]  			fu_rs_op_type;	// incoming instruction
+	ALU_FUNC [5:0]				fu_alu_func;	// ALU function select from decoder
+	logic [5:0][63:0]			fu_result;
 
    // fu1: multipler
-	mult #(3) (// Inputs
+	mult #(4) (// Inputs
 		.clock(clock),
 		.reset(reset),
-		.mcand(fu1_rs_opa_in),
-		.mplier(fu1_rs_opb_in),
-		.start(fu1_rs_valid_in),
+		.mcand(fu_rs_opa_in[0]),
+		.mplier(fu_rs_opb_in[0]),
+		.start(fu_rs_valid_in[0]),
 	// Outputs
 		.product(mult_result),
 		.done(mult_done)
@@ -172,9 +166,9 @@ module ex_stage(
 
     // fu2: ALU
 	alu alu_0 (// Inputs
-		.opa(fu2_rs_opa_in),
-		.opb(fu2_rs_opb_in),
-		.func(fu2_alu_func_in),
+		.opa(fu_rs_opa_in[1]),
+		.opb(fu_rs_opb_in[1]),
+		.func(fu_alu_func_in[1]),
     // Output
 		.result(alu_result)
 	);
@@ -193,26 +187,28 @@ module ex_stage(
    //    unconditional, or conditional and the condition is true
 	always_ff @(posedge clock)
 	begin
-		if (fu1_rs_valid_in)
+		if (fu_rs_valid_in[0])
 		begin
-			fu1_rs_dest_tag_out	<= `SD fu1_rs_dest_tag_in;
-			fu1_rs_rob_idx_out	<= `SD fu1_rs_rob_idx_in;
-			fu1_rs_op_type_out	<= `SD fu1_rs_op_type_in;
-			fu1_alu_func_out	<= `SD fu1_alu_func_in;
+			fu_rs_dest_tag[0]	<= `SD fu_rs_dest_tag_in[0];
+			fu_rs_rob_idx[0]	<= `SD fu_rs_rob_idx_in[0];
+			fu_rs_op_type[0]	<= `SD fu_rs_op_type_in[0];
+			fu_alu_func[0]		<= `SD fu_alu_func_in[0];
+			fu_result_is_valid[0]	<= `SD 1'b0;
 		end
 		if (mult_done) begin
-			fu1_result		<= `SD mult_result;
-			fu1_result_is_valid	<= `SD 1'b1;
+			fu_result[0]		<= `SD mult_result;
+			fu_result_is_valid[0]	<= `SD 1'b1;
 		end
 			
-		if (fu2_rs_valid_in)
+		if (fu_rs_valid_in[1])
 		begin
-			fu2_rs_dest_tag_out	<= `SD fu2_rs_dest_tag_in;
-			fu2_rs_rob_idx_out	<= `SD fu2_rs_rob_idx_in;
-			fu2_rs_op_type_out	<= `SD fu2_rs_op_type_in;
-			fu2_alu_func_out	<= `SD fu2_alu_func_in;
-			fu2_result		<= `SD alu_result;
-			fu2_result_is_valid	<= `SD 1'b1;
+			fu_rs_dest_tag[1]	<= `SD fu_rs_dest_tag_in[1];
+			fu_rs_rob_idx[1]	<= `SD fu_rs_rob_idx_in[1];
+			fu_rs_op_type[1]	<= `SD fu_rs_op_type_in[1];
+			fu_alu_func[1]		<= `SD fu_alu_func_in[1];
+			fu_result_is_valid[1]	<= `SD 1'b0;
+			fu_result[1]		<= `SD mult_result;
+			fu_result_is_valid[1]	<= `SD 1'b1;
 		end
 /*
 		if (fu3_rs_valid_in)
@@ -223,5 +219,54 @@ module ex_stage(
 			fu3_alu_func_out	<= `SD fu3_alu_func_in;
 		end
 */
+	end
+
+	priority_selector #(2,6) ps1(
+		.req({fu_result_is_valid}),
+		.en(1'b1),
+		// Outputs
+		.gnt_bus(internal_fu_value_select),
+	);
+
+	always_comb
+	begin
+		fu_rs_dest_tag_out1 = 0;
+		fu_rs_rob_idx_out1 = 0;
+		fu_rs_op_type_out1 = 0;
+		fu_alu_func_out1 = 0;
+		fu_result1 = 64'b0;
+		fu_is_valid1 = 1'b0;
+
+		fu_rs_dest_tag_out2 = 0;
+		fu_rs_rob_idx_out2 = 0;
+		fu_rs_op_type_out2 = 0;
+		fu_alu_func_out2 = 0;
+		fu_result2 = 64'b0;
+		fu_is_valid2 = 1'b0;
+
+		for (int i = 0; i < 6; i++)
+		begin
+			if (internal_fu_value_select1[i])
+			begin
+				fu_rs_dest_tag_out1	= fu_rs_dest_tag[i];
+				fu_rs_rob_idx_out1	= fu_rs_rob_idx[i];
+				fu_rs_op_type_out1	= fu_rs_op_type[i];
+				fu_alu_func_out1	= fu_alu_func[i];
+				fu_result1		= fu_result[i];
+				fu_is_valid1		= 1'b1;
+				break;
+			end
+
+			if (internal_fu_value_select2[i])
+			begin
+				fu_rs_dest_tag_out2	= fu_rs_dest_tag[i];
+				fu_rs_rob_idx_out2	= fu_rs_rob_idx[i];
+				fu_rs_op_type_out2	= fu_rs_op_type[i];
+				fu_alu_func_out2	= fu_alu_func[i];
+				fu_result2		= fu_result[i];
+				fu_is_valid2		= 1'b1;
+				break;
+			end
+		end
 	end
 endmodule // module ex_stage

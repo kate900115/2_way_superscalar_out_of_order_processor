@@ -59,53 +59,13 @@ module rs(
 	input					fu2_memory_available,
   
  	//output
-	output logic [63:0]			fu1_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu1_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu1_rs_dest_tag_out,  	// This RS' destination tag  
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu1_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu1_rs_op_type_out,     // This RS' operation type
-	output logic				fu1_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu1_alu_func_out,
-
-	output logic [63:0]			fu2_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu2_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu2_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu2_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu2_rs_op_type_out,     // This RS' operation type
-	output logic				fu2_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu2_alu_func_out,
-
-	output logic [63:0]			fu3_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu3_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu3_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu3_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu3_rs_op_type_out,     // This RS' operation type
-	output logic				fu3_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu3_alu_func_out,
-
-	output logic [63:0]			fu4_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu4_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu4_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu4_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu4_rs_op_type_out,     // This RS' operation type
-	output logic				fu4_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu4_alu_func_out,
-
-	output logic [63:0]			fu5_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu5_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu5_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu5_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu5_rs_op_type_out,     // This RS' operation type
-	output logic				fu5_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu5_alu_func_out,
-
-	output logic [63:0]			fu6_rs_opa_out,       	// This RS' opa 
-	output logic [63:0]			fu6_rs_opb_out,       	// This RS' opb 
-	output logic [$clog2(`PRF_SIZE)-1:0]	fu6_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [$clog2(`ROB_SIZE)-1:0]    fu6_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0]			fu6_rs_op_type_out,     // This RS' operation type
-	output logic				fu6_rs_out_valid,	// RS output is valid
-	output ALU_FUNC                         fu6_alu_func_out,
+	output logic [5:0][63:0]		fu_rs_opa_out,       	// This RS' opa 
+	output logic [5:0][63:0]		fu_rs_opb_out,       	// This RS' opb 
+	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag  
+	output logic [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
+	output logic [5:0][5:0]			fu_rs_op_type_out,     // This RS' operation type
+	output logic [5:0]			fu_rs_out_valid,	// RS output is valid
+	output ALU_FUNC [5:0]			fu_alu_func_out,
 
 	output RS_FULL				rs_full			// RS is full now
 
@@ -277,146 +237,119 @@ module rs(
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
 	always_comb begin
-		fu1_rs_out_valid    = 0;
-		fu1_rs_opa_out      = 0;
-		fu1_rs_opb_out      = 0;
-		fu1_rs_dest_tag_out = 0; 
-		fu1_rs_rob_idx_out  = 0;
-		fu1_rs_op_type_out  = 0;
-		fu1_alu_func_out    = ALU_DEFAULT;
-		fu_internal_rs_free = 0;
+
+		for (int i = 0; i < 6; i++) begin
+			fu_rs_out_valid[i]	= 0;
+			fu_rs_opa_out[i]	= 0;
+			fu_rs_opb_out[i]	= 0;
+			fu_rs_dest_tag_out[i]	= 0; 
+			fu_rs_rob_idx_out[i]	= 0;
+			fu_rs_op_type_out[i]	= 0;
+			fu_alu_func_out[i]	= ALU_DEFAULT;
+			fu_internal_rs_free[i]	= 0;
+		end
 		if (fu1_mult_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i] = 1;
-						fu1_rs_opa_out		= internal_rs_opa_out[i];
-						fu1_rs_opb_out		= internal_rs_opb_out[i];
-						fu1_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu1_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu1_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu1_rs_out_valid	= 1'b1;
-						fu1_alu_func_out	= internal_rs_alu_func_out[i];
+						fu_rs_opa_out[0]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[0]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[0]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[0]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[0]	= 1'b1;
+						fu_alu_func_out[0]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
 			end
 		end
-		fu2_rs_out_valid    = 0;
-		fu2_rs_opa_out      = 0;
-		fu2_rs_opb_out      = 0;
-		fu2_rs_dest_tag_out = 0; 
-		fu2_rs_rob_idx_out  = 0;	 
-		fu2_rs_op_type_out  = 0;
-		fu2_alu_func_out    = ALU_DEFAULT;
+
 		if (fu1_adder_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i]	= 1;
-						fu2_rs_opa_out		= internal_rs_opa_out[i];
-						fu2_rs_opb_out		= internal_rs_opb_out[i];
-						fu2_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu2_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu2_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu2_rs_out_valid	= 1'b1;
-						fu2_alu_func_out	= internal_rs_alu_func_out[i];
+						fu_rs_opa_out[1]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[1]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[1]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[1]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[1]	= 1'b1;
+						fu_alu_func_out[1]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
 			end
 		end
-		fu3_rs_out_valid    = 0;
-		fu3_rs_opa_out      = 0;
-		fu3_rs_opb_out      = 0;
-		fu3_rs_dest_tag_out = 0; 
-		fu3_rs_rob_idx_out  = 0;	 
-		fu3_rs_op_type_out  = 0;
-		fu3_alu_func_out    = ALU_DEFAULT;
+
 		if (fu1_memory_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i]	= 1;
-						fu3_rs_opa_out		= internal_rs_opa_out[i];
-						fu3_rs_opb_out		= internal_rs_opb_out[i];
-						fu3_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu3_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu3_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu3_rs_out_valid	= 1'b1;
-						fu3_alu_func_out	= internal_rs_alu_func_out[i];
+						fu3_rs_opa_out[2]	= internal_rs_opa_out[i];
+						fu3_rs_opb_out[2]	= internal_rs_opb_out[i];
+						fu3_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
+						fu3_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
+						fu3_rs_op_type_out[2]	= internal_rs_op_type_out[i];
+						fu3_rs_out_valid[2]	= 1'b1;
+						fu3_alu_func_out[2]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
 			end
 		end
-		fu4_rs_out_valid    = 0;
-		fu4_rs_opa_out      = 0;
-		fu4_rs_opb_out      = 0;
-		fu4_rs_dest_tag_out = 0;
-		fu4_rs_rob_idx_out  = 0; 
-		fu4_rs_op_type_out  = 0;
-		fu4_alu_func_out    = ALU_DEFAULT;
+
 		if (fu2_mult_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i]	= 1;
-						fu4_rs_opa_out		= internal_rs_opa_out[i];
-						fu4_rs_opb_out		= internal_rs_opb_out[i];
-						fu4_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu4_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu4_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu4_rs_out_valid	= 1'b1;
-						fu4_alu_func_out	= internal_rs_alu_func_out[i];
+						fu4_rs_opa_out[3]	= internal_rs_opa_out[i];
+						fu4_rs_opb_out[3]	= internal_rs_opb_out[i];
+						fu4_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
+						fu4_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
+						fu4_rs_op_type_out[3]	= internal_rs_op_type_out[i];
+						fu4_rs_out_valid[3]	= 1'b1;
+						fu4_alu_func_out[3]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
 			end
 		end
-		fu5_rs_out_valid    = 0;
-		fu5_rs_opa_out      = 0;
-		fu5_rs_opb_out      = 0;
-		fu5_rs_dest_tag_out = 0;
-		fu5_rs_rob_idx_out  = 0; 
-		fu5_rs_op_type_out  = 0;
-		fu5_alu_func_out    = ALU_DEFAULT;
+
 		if (fu2_adder_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i]	= 1;
-						fu5_rs_opa_out		= internal_rs_opa_out[i];
-						fu5_rs_opb_out		= internal_rs_opb_out[i];
-						fu5_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu5_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu5_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu5_rs_out_valid	= 1'b1;
-						fu5_alu_func_out	= internal_rs_alu_func_out[i];
+						fu5_rs_opa_out[4]	= internal_rs_opa_out[i];
+						fu5_rs_opb_out[4]	= internal_rs_opb_out[i];
+						fu5_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
+						fu5_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
+						fu5_rs_op_type_out[4]	= internal_rs_op_type_out[i];
+						fu5_rs_out_valid[4]	= 1'b1;
+						fu5_alu_func_out[4]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
 			end
 		end
-		fu6_rs_out_valid    = 0;
-		fu6_rs_opa_out      = 0;
-		fu6_rs_opb_out      = 0;
-		fu6_rs_dest_tag_out = 0; 
-		fu6_rs_rob_idx_out  = 0;	 
-		fu6_rs_op_type_out  = 0;
-		fu6_alu_func_out    = ALU_DEFAULT;
+
 		if (fu2_memory_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
 					if (!fu_internal_rs_free[i]) begin
 						fu_internal_rs_free[i]	= 1;
-						fu6_rs_opa_out		= internal_rs_opa_out[i];
-						fu6_rs_opb_out		= internal_rs_opb_out[i];
-						fu6_rs_dest_tag_out	= internal_rs_dest_tag_out[i];
-						fu6_rs_rob_idx_out	= internal_rs_rob_idx_out[i];
-						fu6_rs_op_type_out	= internal_rs_op_type_out[i];
-						fu6_rs_out_valid	= 1'b1;
-						fu6_alu_func_out	= internal_rs_alu_func_out[i];
+						fu6_rs_opa_out[5]	= internal_rs_opa_out[i];
+						fu6_rs_opb_out[5]	= internal_rs_opb_out[i];
+						fu6_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
+						fu6_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
+						fu6_rs_op_type_out[5]	= internal_rs_op_type_out[i];
+						fu6_rs_out_valid[5]	= 1'b1;
+						fu6_alu_func_out[5]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
