@@ -37,34 +37,34 @@ module cdb(
 	output 	logic				cdb2_valid,
 	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb2_tag,
 	output 	logic [63:0]			cdb2_out,
-	output 	logic				adder1_send_in_fail,
-	output 	logic				adder2_send_in_fail,
-	output 	logic				mult1_send_in_fail,
-	output 	logic				mult2_send_in_fail,
-	output 	logic				memory1_send_in_fail,
-	output 	logic				memory2_send_in_fail
+	output 	logic				adder1_send_in_success,
+	output 	logic				adder2_send_in_success,
+	output 	logic				mult1_send_in_success,
+	output 	logic				mult2_send_in_success,
+	output 	logic				memory1_send_in_success,
+	output 	logic				memory2_send_in_success
 );
 
 	logic	[5:0]				fu_result_ready;
-	logic	[5:0]				fu_send_in_fail;
+	logic	[5:0]				fu_send_in_success;
 	logic   [5:0]				fu_result_ready2;
 	logic   [5:0]				fu_select1;
 	logic   [5:0]				fu_select2;
 
 
-	assign  memory1_send_in_fail = fu_send_in_fail[5];
-	assign  memory2_send_in_fail = fu_send_in_fail[4];
-	assign  mult1_send_in_fail   = fu_send_in_fail[3]; 
-	assign  mult2_send_in_fail   = fu_send_in_fail[2];
-	assign  adder1_send_in_fail  = fu_send_in_fail[1];
-	assign  adder2_send_in_fail  = fu_send_in_fail[0];
+	assign  memory1_send_in_success = fu_send_in_success[5];
+	assign  memory2_send_in_success = fu_send_in_success[4];
+	assign  mult1_send_in_success   = fu_send_in_success[3]; 
+	assign  mult2_send_in_success   = fu_send_in_success[2];
+	assign  adder1_send_in_success  = fu_send_in_success[1];
+	assign  adder2_send_in_success  = fu_send_in_success[0];
 
 	assign  fu_result_ready      = {memory1_result_ready, memory2_result_ready, mult1_result_ready,
 				        mult2_result_ready, adder1_result_ready, adder2_result_ready};
 
 	assign  fu_result_ready2     = (~fu_select1) & fu_result_ready;	
 	
-	assign  fu_send_in_fail      = (~(fu_select1 | fu_select2) )& fu_result_ready;
+	assign  fu_send_in_success   = fu_select1 | fu_select2;
 
 	cdb_one_entry cdb1(
 		//input

@@ -26,12 +26,12 @@ module test_cdb;
 	logic					cdb2_valid;
 	logic 	[$clog2(`PRF_SIZE)-1:0]		cdb2_tag;
 	logic 	[63:0]				cdb2_out;
-	logic					adder1_send_in_fail;
-	logic					adder2_send_in_fail;
-	logic					mult1_send_in_fail;
-	logic					mult2_send_in_fail;
-	logic					memory1_send_in_fail;
-	logic					memory2_send_in_fail;
+	logic					adder1_send_in_success;
+	logic					adder2_send_in_success;
+	logic					mult1_send_in_success;
+	logic					mult2_send_in_success;
+	logic					memory1_send_in_success;
+	logic					memory2_send_in_success;
 
 	cdb cdb34(
 		//input
@@ -61,12 +61,12 @@ module test_cdb;
 		.cdb2_valid(cdb2_valid),
 		.cdb2_tag(cdb2_tag),
 		.cdb2_out(cdb2_out),
-		.adder1_send_in_fail(adder1_send_in_fail),
-		.adder2_send_in_fail(adder2_send_in_fail),
-		.mult1_send_in_fail(mult1_send_in_fail),
-		.mult2_send_in_fail(mult2_send_in_fail),
-		.memory1_send_in_fail(memory1_send_in_fail),
-		.memory2_send_in_fail(memory2_send_in_fail)
+		.adder1_send_in_success(adder1_send_in_success),
+		.adder2_send_in_success(adder2_send_in_success),
+		.mult1_send_in_success(mult1_send_in_success),
+		.mult2_send_in_success(mult2_send_in_success),
+		.memory1_send_in_success(memory1_send_in_success),
+		.memory2_send_in_success(memory2_send_in_success)
 );
 	
 	task exit_on_error;
@@ -85,15 +85,15 @@ module test_cdb;
 						cdb2_valid:%b, \n\
 						cdb2_tag:%b, \n\
 						cdb2_out:%d, \n\
-						adder1_send_in_fail:%b,\n\
-						adder2_send_in_fail:%b,\n\
-						mult1_send_in_fail:%b,\n\
-						mult2_send_in_fail:%b,\n\
-						memory1_send_in_fail:%b,\n\
-						memory2_send_in_fail:%b",
+						adder1_send_in_success:%b,\n\
+						adder2_send_in_success:%b,\n\
+						mult1_send_in_success:%b,\n\
+						mult2_send_in_success:%b,\n\
+						memory1_send_in_success:%b,\n\
+						memory2_send_in_success:%b",
 				$time, cdb1_valid, cdb1_tag, cdb1_out, cdb2_valid, cdb2_tag, cdb2_out,
-				adder1_send_in_fail,adder2_send_in_fail,mult1_send_in_fail,
-				mult2_send_in_fail,memory1_send_in_fail,memory2_send_in_fail);
+				adder1_send_in_success,adder2_send_in_success,mult1_send_in_success,
+				mult2_send_in_success,memory1_send_in_success,memory2_send_in_success);
 
 	#10;
 	$display("@@@ adder1 and mult2 are ready!!");
