@@ -100,77 +100,93 @@ module ex_stage(
     input          			clock,			// system clock
     input          			reset,			// system reset
 
-    input  [5:0][63:0]			fu_rs_opa_in,		// register A value from reg file
-    input  [5:0][63:0]			fu_rs_opb_in,		// register B value from reg file
-    input  [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
-    input  [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
-    input  [5:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
-    input  [5:0]			fu_rs_valid_in,
+    input  [3:0][63:0]			fu_rs_opa_in,		// register A value from reg file
+    input  [3:0][63:0]			fu_rs_opb_in,		// register B value from reg file
+    input  [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
+    input  [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
+    input  [3:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
+    input  [3:0]			fu_rs_valid_in,
     ALU_FUNC [5:0]     			fu_alu_func_in,	// ALU function select from decoder
 
-    input          id_ex_cond_branch,   // is this a cond br? from decoder
-    input          id_ex_uncond_branch, // is this an uncond br? from decoder
+    //input          id_ex_cond_branch,   // is this a cond br? from decoder
+    //input          id_ex_uncond_branch, // is this an uncond br? from decoder
 
-    output [63:0]	ex_result_out,   // ALU result
-    output		ex_take_branch_out,  // is this a taken branch?
+    input	adder1_send_in_fail,
+    input	adder2_send_in_fail,
+    input	mult1_send_in_fail,
+    input	mult2_send_in_fail,
 
+    //output	ex_take_branch_out,  // is this a taken branch?
+
+    output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,
+    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out,
+    output logic [3:0][5:0]  			fu_rs_op_type_out,	// incoming instruction
+    output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
+    output logic [3:0][63:0]			fu_result_out,
+    output logic [3:0]				fu_result_is_valid,
+    output logic [3:0]				fu_is_busy
+/*
     output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out1,
     output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out1,
     output logic [5:0]  			fu_rs_op_type_out1,	// incoming instruction
     output ALU_FUNC				fu_alu_func_out1,	// ALU function select from decoder
     output logic [63:0]				fu_result1,
     output logic				fu_is_valid1,
-
-    output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out2,
-    output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out2,
-    output logic [5:0]  			fu_rs_op_type_out2,	// incoming instruction
-    output ALU_FUNC				fu_alu_func_out2,	// ALU function select from decoder
-    output logic [63:0]				fu_result2,
-    output logic				fu_is_valid2,
-
-    output logic [5:0]				fu_result_is_valid
-/*
-    output logic [$clog2(`PRF_SIZE)-1:0]	fu3_rs_dest_tag_out,
-    output logic [$clog2(`ROB_SIZE)-1:0]	fu3_rs_rob_idx_out,
-    output logic [5:0]  			fu3_rs_op_type_out,	// incoming instruction
-    output ALU_FUNC				fu3_alu_func_out,	// ALU function select from decoder
-    output					fu3_result_is_valid
 */
   );
 
 	logic		brcond_result;
-	logic  [63:0]	mult_result;
-	logic		mult_done;
-	logic  [63:0]	alu_result;
-	assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
+	logic  [63:0]	mult_result1;
+	logic  [63:0]	mult_result2;
+	logic		mult_done1;
+	logic		mult_done2;
+	logic  [63:0]	alu_result1;
+	logic  [63:0]	alu_result2;
 	logic  [5:0]	internal_fu_value_select1;
 	logic  [5:0]	internal_fu_value_select2;
 
-	logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag;
-	logic [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx;
-	logic [5:0][5:0]  			fu_rs_op_type;	// incoming instruction
-	ALU_FUNC [5:0]				fu_alu_func;	// ALU function select from decoder
-	logic [5:0][63:0]			fu_result;
+	//assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
 
-   // fu1: multipler
-	mult #(4) (// Inputs
+   // fu1: multipler1
+	mult #(4) mult1(// Inputs
 		.clock(clock),
 		.reset(reset),
 		.mcand(fu_rs_opa_in[0]),
 		.mplier(fu_rs_opb_in[0]),
 		.start(fu_rs_valid_in[0]),
 	// Outputs
-		.product(mult_result),
-		.done(mult_done)
+		.product(mult_result1),
+		.done(mult_done1)
 	);
 
-    // fu2: ALU
-	alu alu_0 (// Inputs
+    // fu2: ALU1
+	alu alu1 (// Inputs
 		.opa(fu_rs_opa_in[1]),
 		.opb(fu_rs_opb_in[1]),
 		.func(fu_alu_func_in[1]),
     // Output
-		.result(alu_result)
+		.result(alu_result1)
+	);
+
+   // fu3: multipler2
+	mult #(4) mult1(// Inputs
+		.clock(clock),
+		.reset(reset),
+		.mcand(fu_rs_opa_in[2]),
+		.mplier(fu_rs_opb_in[2]),
+		.start(fu_rs_valid_in[2]),
+	// Outputs
+		.product(mult_result2),
+		.done(mult_done2)
+	);
+
+    // fu4: ALU2
+	alu alu2 (// Inputs
+		.opa(fu_rs_opa_in[3]),
+		.opb(fu_rs_opb_in[3]),
+		.func(fu_alu_func_in[3]),
+    // Output
+		.result(alu_result2)
 	);
 
    //
@@ -185,88 +201,86 @@ module ex_stage(
 
    // ultimate "take branch" signal:
    //    unconditional, or conditional and the condition is true
+	
 	always_ff @(posedge clock)
 	begin
-		if (fu_rs_valid_in[0])
+		if (reset) 
 		begin
-			fu_rs_dest_tag[0]	<= `SD fu_rs_dest_tag_in[0];
-			fu_rs_rob_idx[0]	<= `SD fu_rs_rob_idx_in[0];
-			fu_rs_op_type[0]	<= `SD fu_rs_op_type_in[0];
-			fu_alu_func[0]		<= `SD fu_alu_func_in[0];
+			fu_rs_dest_tag_out[0]	<= `SD 0;
+			fu_rs_rob_idx_out[0]	<= `SD 0;
+			fu_rs_op_type_out[0]	<= `SD 0;
+			fu_alu_func_out[0]	<= `SD ALU_DEFAULT;
 			fu_result_is_valid[0]	<= `SD 1'b0;
-		end
-		if (mult_done) begin
-			fu_result[0]		<= `SD mult_result;
-			fu_result_is_valid[0]	<= `SD 1'b1;
-		end
+			fu_result_out[0]	<= `SD 0;
 			
-		if (fu_rs_valid_in[1])
-		begin
-			fu_rs_dest_tag[1]	<= `SD fu_rs_dest_tag_in[1];
-			fu_rs_rob_idx[1]	<= `SD fu_rs_rob_idx_in[1];
-			fu_rs_op_type[1]	<= `SD fu_rs_op_type_in[1];
-			fu_alu_func[1]		<= `SD fu_alu_func_in[1];
+			fu_rs_dest_tag_out[1]	<= `SD 0;
+			fu_rs_rob_idx_out[1]	<= `SD 0;
+			fu_rs_op_type_out[1]	<= `SD 0;
+			fu_alu_func_out[1]	<= `SD ALU_DEFAULT;
+			fu_result_out[1]	<= `SD 0;
 			fu_result_is_valid[1]	<= `SD 1'b0;
-			fu_result[1]		<= `SD mult_result;
-			fu_result_is_valid[1]	<= `SD 1'b1;
+
+			fu_rs_dest_tag_out[2]	<= `SD 0;
+			fu_rs_rob_idx_out[2]	<= `SD 0;
+			fu_rs_op_type_out[2]	<= `SD 0;
+			fu_alu_func_out[2]	<= `SD ALU_DEFAULT;
+			fu_result_is_valid[2]	<= `SD 1'b0;
+			fu_result_out[0]	<= `SD 0;
+
+			fu_rs_dest_tag_out[3]	<= `SD 0;
+			fu_rs_rob_idx_out[3]	<= `SD 0;
+			fu_rs_op_type_out[3]	<= `SD 0;
+			fu_alu_func_out[3]	<= `SD ALU_DEFAULT;
+			fu_result_out[3]	<= `SD 0;
+			fu_result_is_valid[3]	<= `SD 1'b0;
 		end
-/*
-		if (fu3_rs_valid_in)
-		begin
-			fu3_rs_dest_tag_out	<= `SD fu3_rs_dest_tag_in;
-			fu3_rs_rob_idx_out	<= `SD fu3_rs_rob_idx_in;
-			fu3_rs_op_type_out	<= `SD fu3_rs_op_type_in;
-			fu3_alu_func_out	<= `SD fu3_alu_func_in;
-		end
-*/
-	end
-
-	priority_selector #(2,6) ps1(
-		.req({fu_result_is_valid}),
-		.en(1'b1),
-		// Outputs
-		.gnt_bus(internal_fu_value_select),
-	);
-
-	always_comb
-	begin
-		fu_rs_dest_tag_out1 = 0;
-		fu_rs_rob_idx_out1 = 0;
-		fu_rs_op_type_out1 = 0;
-		fu_alu_func_out1 = 0;
-		fu_result1 = 64'b0;
-		fu_is_valid1 = 1'b0;
-
-		fu_rs_dest_tag_out2 = 0;
-		fu_rs_rob_idx_out2 = 0;
-		fu_rs_op_type_out2 = 0;
-		fu_alu_func_out2 = 0;
-		fu_result2 = 64'b0;
-		fu_is_valid2 = 1'b0;
-
-		for (int i = 0; i < 6; i++)
-		begin
-			if (internal_fu_value_select1[i])
+		else begin
+			if (fu_rs_valid_in[0])
 			begin
-				fu_rs_dest_tag_out1	= fu_rs_dest_tag[i];
-				fu_rs_rob_idx_out1	= fu_rs_rob_idx[i];
-				fu_rs_op_type_out1	= fu_rs_op_type[i];
-				fu_alu_func_out1	= fu_alu_func[i];
-				fu_result1		= fu_result[i];
-				fu_is_valid1		= 1'b1;
-				break;
+				fu_rs_dest_tag_out[0]	<= `SD fu_rs_dest_tag_in[0];
+				fu_rs_rob_idx_out[0]	<= `SD fu_rs_rob_idx_in[0];
+				fu_rs_op_type_out[0]	<= `SD fu_rs_op_type_in[0];
+				fu_alu_func_out[0]	<= `SD fu_alu_func_in[0];
+				fu_result_is_valid[0]	<= `SD 1'b0;
+			end
+			if (mult_done1) begin
+				fu_result_out[0]	<= `SD mult_result1;
+				fu_result_is_valid[0]	<= `SD 1'b1;
+			end
+			
+			if (fu_rs_valid_in[1])
+			begin
+				fu_rs_dest_tag_out[1]	<= `SD fu_rs_dest_tag_in[1];
+				fu_rs_rob_idx_out[1]	<= `SD fu_rs_rob_idx_in[1];
+				fu_rs_op_type_out[1]	<= `SD fu_rs_op_type_in[1];
+				fu_alu_func_out[1]	<= `SD fu_alu_func_in[1];
+				fu_result_out[1]	<= `SD alu_result1;
+				fu_result_is_valid[1]	<= `SD 1'b1;
 			end
 
-			if (internal_fu_value_select2[i])
+			if (fu_rs_valid_in[2])
 			begin
-				fu_rs_dest_tag_out2	= fu_rs_dest_tag[i];
-				fu_rs_rob_idx_out2	= fu_rs_rob_idx[i];
-				fu_rs_op_type_out2	= fu_rs_op_type[i];
-				fu_alu_func_out2	= fu_alu_func[i];
-				fu_result2		= fu_result[i];
-				fu_is_valid2		= 1'b1;
-				break;
+				fu_rs_dest_tag_out[2]	<= `SD fu_rs_dest_tag_in[2];
+				fu_rs_rob_idx_out[2]	<= `SD fu_rs_rob_idx_in[2];
+				fu_rs_op_type_out[2]	<= `SD fu_rs_op_type_in[2];
+				fu_alu_func_out[2]	<= `SD fu_alu_func_in[2];
+				fu_result_is_valid[2]	<= `SD 1'b0;
+			end
+			if (mult_done2) begin
+				fu_result_out[0]	<= `SD mult_result2;
+				fu_result_is_valid[0]	<= `SD 1'b1;
+			end
+			
+			if (fu_rs_valid_in[3])
+			begin
+				fu_rs_dest_tag_out[3]	<= `SD fu_rs_dest_tag_in[3];
+				fu_rs_rob_idx_out[3]	<= `SD fu_rs_rob_idx_in[3];
+				fu_rs_op_type_out[3]	<= `SD fu_rs_op_type_in[3];
+				fu_alu_func_out[3]	<= `SD fu_alu_func_in[3];
+				fu_result_out[3]	<= `SD alu_result2;
+				fu_result_is_valid[3]	<= `SD 1'b1;
 			end
 		end
 	end
+
 endmodule // module ex_stage
