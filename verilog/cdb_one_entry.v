@@ -1,0 +1,90 @@
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//   Modulename :  cdb_one_entry.v                                      //
+//                                                                      //
+//   Description :                                                      //
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      // 
+//                                                                      //
+//                                                                      //
+//////////////////////////////////////////////////////////////////////////
+
+
+module cdb_one_entry(
+	//fu_select signal will give out the result from which function unit
+	//is selected. the priority is: mem1 > mem2 > mult1 > mult2 > adder1 > adder2.
+
+	input  	[5:0]				fu_select,		
+
+	input  	[63:0]				memory1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		memory1_dest_reg_idx,
+	input  	[63:0]				memory2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		memory2_dest_reg_idx,
+	input  	[63:0]				mult1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		mult1_dest_reg_idx,
+	input  	[63:0]				mult2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		mult2_dest_reg_idx,
+	input  	[63:0]				adder1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		adder1_dest_reg_idx,
+	input  	[63:0]				adder2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]		adder2_dest_reg_idx,
+
+	
+	output 	logic				cdb_valid,
+	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag,
+	output 	logic [63:0]			cdb_out	
+);
+
+	
+
+	always_comb
+	begin
+		case (fu_select)
+		6'b100000:		
+			begin
+				cdb_valid 		   = 1'b1;				
+				cdb_tag   		   = memory1_dest_reg_idx;
+				cdb_out   		   = memory1_result_in;
+			end
+		6'b010000:
+			begin
+				cdb_valid 		   = 1'b1;				
+				cdb_tag   		   = memory2_dest_reg_idx;
+				cdb_out   		   = memory2_result_in;
+			end
+		6'b001000:
+			begin
+				cdb_valid 		   = 1'b1;				
+				cdb_tag   		   = mult1_dest_reg_idx;
+				cdb_out   		   = mult1_result_in;
+			end
+		6'b000100:
+			begin
+				cdb_valid 		   = 1'b1;				
+				cdb_tag   		   = mult2_dest_reg_idx;
+				cdb_out   		   = mult2_result_in;
+			end
+		6'b000010:
+			begin
+				cdb_valid		   = 1'b1;				
+				cdb_tag  		   = adder1_dest_reg_idx;
+				cdb_out  		   = adder1_result_in;
+				
+			end
+		6'b000001:
+			begin
+				cdb_valid 		   = 1'b1;				
+				cdb_tag   		   = adder2_dest_reg_idx;
+				cdb_out   		   = adder2_result_in;
+			end
+		default:
+			begin
+				cdb_valid 		   = 1'b0;				
+				cdb_tag   		   = 0;
+				cdb_out   		   = 0;
+			end
+		endcase
+	end
+endmodule
