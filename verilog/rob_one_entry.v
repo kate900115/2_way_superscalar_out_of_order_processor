@@ -26,12 +26,14 @@ module rob_one_entry(
 	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,                              //the prf number assigned to the destination of this instruction
 	input				inst1_is_branch_in,                             //if this instruction is a branch
 	input 				inst1_rob_load_in				//tell this entry if we want to load this instruction
+	input				inst1_if_thread1				//the it is for thread1, else it is for thread2
 
 	input	[31:0]			inst2_pc_in,                                    //pc in
 	input	[4:0]			inst2_arn_dest_in,                              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,                              //the prf number assigned to the destination of this instruction
 	input				inst2_is_branch_in,                             //if this instruction is a branch
 	input 				inst2_rob_load_in				//tell this entry if we want to load this instruction
+	input				inst2_if_thread1				//the it is for thread1, else it is for thread2
 
 
 
@@ -43,6 +45,7 @@ module rob_one_entry(
 
 //output:
 //is this entry is about to be commmited, the output takes effect
+	output				is_ex_out
 	output				is_branch_out,				       	//if this instruction is a branch
 	output				available_out,				       	//if this rob entry is available
 	output				mispredict_out,				       	//if this instrucion is mispredicted
@@ -67,6 +70,7 @@ module rob_one_entry(
 	assign arn_dest_out = if_committed ? arn_dest : 0;
 	assign prn_dest_out = if_committed ? prn_dest : 0;
 	assign rename_out = if_committed;                                      		//if this entry is committed the output information is important
+	assign is_ex_out = is_executed;
 
 	assign available_out = ~inuse;                                         		//if this entry is not in use, it is available
 
