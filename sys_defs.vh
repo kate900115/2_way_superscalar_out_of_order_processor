@@ -318,19 +318,19 @@ typedef enum logic [1:0] {
 } THREAD_NUMBER;
 
 typedef enum logic [2:0] {
-  TWO_ZERO  = 2'h0,
-  ONE_ONE  = 2'h1,			
-  ONE_ZERO  = 2'h2,
-  ZERO_TWO = 2'h3,
-  ZERO_ONE = 2'h4,
-  ZERO_ZERO = 2'h5			
+  TWO_ZERO	= 3'h0,
+  ONE_ONE	= 3'h1,			
+  ONE_ZERO	= 3'h2,
+  ZERO_TWO	= 3'h3,
+  ZERO_ONE	= 3'h4,
+  ZERO_ZERO	= 3'h5	
 } COMMIT_STATUS;
 
 typedef enum logic [1:0] {
-  ZERO_EXECUTED  = 2'h0,
+  ZERO_EXECUTED = 2'h0,
   ONE_EXECUTED  = 2'h1,			//if inst1 is thread1 , and inst2 is thread2
   TWE_EXECUTED  = 2'h2			//if inst2 is thread1,  and inst2 is thread1
-} EXECUTION_STATUS_FOR_HEAD
+} EXECUTION_STATUS_FOR_HEAD;
 
 
 
