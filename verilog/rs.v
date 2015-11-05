@@ -77,7 +77,7 @@ module rs(
 	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;		//when dispatching two instructions it tell us the address of entries to load each instructions
 	logic [`RS_SIZE-1:0] 				inst2_internal_rs_load_in;		//instruction2 go to the entries according to this
 				
-	logic [`RS_SIZE-1:0]	 			fu_internal_rs_free;			//tell rs which entry we want to send to FU1
+	logic [`RS_SIZE-1:0]	 			internal_rs_free;			//tell rs which entry we want to send to FU1
 	
 	//output of one entry
 	logic [`RS_SIZE-1:0]				internal_rs_ready_out;
@@ -206,7 +206,7 @@ module rs(
 	.inst1_rs1_rob_idx_in(inst1_rs_rob_idx_in),   
 	.inst2_rs1_rob_idx_in(inst2_rs_rob_idx_in),   	
 
-	.rs1_free(fu_internal_rs_free),
+	.rs1_free(internal_rs_free),
   
  	//output
 	.rs1_ready_out(internal_rs_ready_out),
@@ -246,13 +246,13 @@ module rs(
 			fu_rs_rob_idx_out[i]	= 0;
 			fu_rs_op_type_out[i]	= 0;
 			fu_alu_func_out[i]	= ALU_DEFAULT;
-			fu_internal_rs_free[i]	= 0;
+			internal_rs_free[i]	= 0;
 		end
 		if (fu1_mult_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i] = 1;
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i] = 1;
 						fu_rs_opa_out[0]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[0]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
@@ -269,8 +269,8 @@ module rs(
 		if (fu1_adder_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i]	= 1;
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i]	= 1;
 						fu_rs_opa_out[1]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[1]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
@@ -287,15 +287,15 @@ module rs(
 		if (fu1_memory_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i]	= 1;
-						fu3_rs_opa_out[2]	= internal_rs_opa_out[i];
-						fu3_rs_opb_out[2]	= internal_rs_opb_out[i];
-						fu3_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
-						fu3_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
-						fu3_rs_op_type_out[2]	= internal_rs_op_type_out[i];
-						fu3_rs_out_valid[2]	= 1'b1;
-						fu3_alu_func_out[2]	= internal_rs_alu_func_out[i];
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i]	= 1;
+						fu_rs_opa_out[2]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[2]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[2]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[2]	= 1'b1;
+						fu_alu_func_out[2]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -305,15 +305,15 @@ module rs(
 		if (fu2_mult_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i]	= 1;
-						fu4_rs_opa_out[3]	= internal_rs_opa_out[i];
-						fu4_rs_opb_out[3]	= internal_rs_opb_out[i];
-						fu4_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
-						fu4_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
-						fu4_rs_op_type_out[3]	= internal_rs_op_type_out[i];
-						fu4_rs_out_valid[3]	= 1'b1;
-						fu4_alu_func_out[3]	= internal_rs_alu_func_out[i];
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i]	= 1;
+						fu_rs_opa_out[3]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[3]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[3]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[3]	= 1'b1;
+						fu_alu_func_out[3]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -323,15 +323,15 @@ module rs(
 		if (fu2_adder_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i]	= 1;
-						fu5_rs_opa_out[4]	= internal_rs_opa_out[i];
-						fu5_rs_opb_out[4]	= internal_rs_opb_out[i];
-						fu5_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
-						fu5_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
-						fu5_rs_op_type_out[4]	= internal_rs_op_type_out[i];
-						fu5_rs_out_valid[4]	= 1'b1;
-						fu5_alu_func_out[4]	= internal_rs_alu_func_out[i];
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i]	= 1;
+						fu_rs_opa_out[4]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[4]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[4]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[4]	= 1'b1;
+						fu_alu_func_out[4]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -341,15 +341,15 @@ module rs(
 		if (fu2_memory_available) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
-					if (!fu_internal_rs_free[i]) begin
-						fu_internal_rs_free[i]	= 1;
-						fu6_rs_opa_out[5]	= internal_rs_opa_out[i];
-						fu6_rs_opb_out[5]	= internal_rs_opb_out[i];
-						fu6_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
-						fu6_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
-						fu6_rs_op_type_out[5]	= internal_rs_op_type_out[i];
-						fu6_rs_out_valid[5]	= 1'b1;
-						fu6_alu_func_out[5]	= internal_rs_alu_func_out[i];
+					if (!internal_rs_free[i]) begin
+						internal_rs_free[i]	= 1;
+						fu_rs_opa_out[5]	= internal_rs_opa_out[i];
+						fu_rs_opb_out[5]	= internal_rs_opb_out[i];
+						fu_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
+						fu_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
+						fu_rs_op_type_out[5]	= internal_rs_op_type_out[i];
+						fu_rs_out_valid[5]	= 1'b1;
+						fu_alu_func_out[5]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
