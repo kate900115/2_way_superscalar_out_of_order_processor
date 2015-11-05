@@ -79,10 +79,10 @@ module prf(
 	logic   [`PRF_SIZE-1:0][63:0]		internal_data_out;
 
 	//other registers to store value
-	logic					priority_selector1_en;
-	logic					priority_selector2_en;
+	//logic					priority_selector1_en;
+	//logic					priority_selector2_en;
 
-	always_ff@(posedge clock)
+	/*always_ff@(posedge clock)
 	begin
 		if(reset)
 		begin
@@ -94,7 +94,7 @@ module prf(
 			priority_selector1_en <=`SD rat1_allocate_new_prf;
 			priority_selector2_en <=`SD rat2_allocate_new_prf;
 		end
-	end
+	end*/
 
 
 	prf_one_entry prf1[`PRF_SIZE-1:0](
@@ -116,7 +116,7 @@ module prf(
 	//and return the index of this newly allocated register
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl1( 
 		.req(internal_prf_available),
-	        .en(priority_selector1_en),
+	        .en( rat1_allocate_new_prf/*priority_selector1_en*/),
         	.gnt(internal_assign_a_free_reg1)
 	);
 
@@ -146,7 +146,7 @@ module prf(
 	assign internal_prf_available2 = (~internal_assign_a_free_reg1)&internal_prf_available;//for debug
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl2( 
 		.req(internal_prf_available2),
-	        .en(priority_selector2_en),
+	        .en(rat2_allocate_new_prf/*priority_selector2_en*/),
         	.gnt(internal_assign_a_free_reg2)
 	);
 
