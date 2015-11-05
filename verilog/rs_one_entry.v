@@ -137,6 +137,7 @@ module rs_one_entry(
        			OPb		= OPb_reg;
        			OPbValid	= OPbValid_reg;
 			fu_select	= fu_select_reg;
+			next_InUse	= InUse;
     			if (LoadAFromCDB1)
     			begin
         			OPa	 = rs1_cdb1_in;

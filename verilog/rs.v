@@ -46,10 +46,6 @@ module rs(
 	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-
-
-
-
 	input					fu1_mult_available,
 	input					fu1_adder_available,
 	input					fu1_memory_available,
@@ -237,8 +233,7 @@ module rs(
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
 	always_comb begin
-
-		for (int i = 0; i < 6; i++) begin
+		for (int i = 0; i < `RS_SIZE; i++) begin
 			fu_rs_out_valid[i]	= 0;
 			fu_rs_opa_out[i]	= 0;
 			fu_rs_opb_out[i]	= 0;
