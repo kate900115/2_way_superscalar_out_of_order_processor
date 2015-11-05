@@ -57,28 +57,3 @@ always_comb begin
 		n_rrat_reg[RoB_ARF_idx] = rrat_reg[RoB_ARF_idx];
 	  
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
