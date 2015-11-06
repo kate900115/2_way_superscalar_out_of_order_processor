@@ -67,23 +67,27 @@ endtask
 
 initial begin
 	correct = 1;
-	$monitor (" @@@ time:%d, \n\
-					opa_PRF_idx:%b, \n\
-					opb_PRF_idx:%b, \n\
-					request:%b, \n\
-					PRF_free_sig:%b, \n\
-					PRF_free_list:%b, \n\
-					RAT_allo_halt:%b, \n\
-					opa_valid_out:%b, \n\
-					opb_valid_out:%b",
-			$time, opa_PRF_idx, opb_PRF_idx, request, PRF_free_sig, PRF_free_list, RAT_allo_halt, opa_valid_out, opb_valid_out);
+	$monitor (" @@@ time:%d, \
+		        clock:%b,\
+			opa_PRF_idx:%b, \
+			opb_PRF_idx:%b, \
+			request:%b, \
+			PRF_free_sig:%b, \
+			PRF_free_list:%b, \
+			RAT_allo_halt:%b, \
+			opa_valid_out:%b, \
+			opb_valid_out:%b",
+			$time, clock, opa_PRF_idx, opb_PRF_idx, request, PRF_free_sig, PRF_free_list, RAT_allo_halt, opa_valid_out, opb_valid_out);
 
 	clock = 0;
 	//***RESET**
 	reset = 1;
-
+	#5;
+	@(negedge clock);
+	reset = 0;
 	//HERE we initial the reg
-	#5
+	//#5
+	@(negedge clock);
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -95,6 +99,7 @@ initial begin
 	mispredict_sig 		= 0;
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 12;
+	@(negedge clock);
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
@@ -104,9 +109,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 1 &&
 				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed1");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -119,6 +125,7 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 3;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 1 &&
@@ -127,9 +134,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 1 &&
 				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed2");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -142,6 +150,7 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 9;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 1 &&
@@ -150,9 +159,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 1 &&
 				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed3");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -165,6 +175,7 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 10;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 1 &&
@@ -173,9 +184,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 1 &&
 				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed4");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -188,6 +200,7 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 5;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 1 &&
@@ -196,9 +209,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 1 &&
 				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed5");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -211,6 +225,7 @@ initial begin
 	PRF_rename_valid	= 0;
 	PRF_rename_idx 		= 0;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 0 &&
@@ -219,9 +234,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 0 &&
 				opb_valid_out == 0;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed6");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -234,6 +250,7 @@ initial begin
 	PRF_rename_valid	= 0;
 	PRF_rename_idx 		= 0;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 0 &&
@@ -242,9 +259,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 0 &&
 				opb_valid_out == 0;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed7");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
@@ -261,21 +279,23 @@ initial begin
 	PRF_rename_valid= 1;
 	PRF_rename_idx 	= 5;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 0 &&
 				PRF_free_sig == {{`ARF_SIZE-5{1'b0}},{5'b01001}} &&
-				PRF_free_list[0] == 8 &&
+				PRF_free_list[0] == 12 &&
 				PRF_free_list[1] == 0 &&
 				PRF_free_list[2] == 0 &&
-				PRF_free_list[3] == 6 &&
+				PRF_free_list[3] == 10 &&
 				PRF_free_list[4] == 0 &&
 				RAT_allo_halt == 0 &&
-				opa_valid_out == 1 &&
-				opb_valid_out == 1;
-	if(!correct) exit_on_error;
+				opa_valid_out == 0 &&
+				opb_valid_out == 0;
+	assert(correct) $display("@@@passed8");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 1;
 	opb_ARF_idx 		= 4;
@@ -288,6 +308,7 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 0;
 
+	@(negedge clock);
 	correct = 	opa_PRF_idx == 3 &&
 				opb_PRF_idx == 5 &&
 				request == 1 &&
@@ -296,9 +317,10 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 0 &&
 				opb_valid_out == 0;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed9");
+		else #1 exit_on_error;
 
-	#5
+	//#5
 	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 2;
@@ -311,7 +333,8 @@ initial begin
 	PRF_rename_valid	= 1;
 	PRF_rename_idx 		= 1;
 
-	correct = 	opa_PRF_idx == 12 &&
+	@(negedge clock);
+	correct = 		opa_PRF_idx == 8 &&
 				opb_PRF_idx == 0 &&
 				request == 1 &&
 				PRF_free_sig == 0 &&
@@ -319,7 +342,9 @@ initial begin
 				RAT_allo_halt == 0 &&
 				opa_valid_out == 0 &&
 				opb_valid_out == 0;
-	if(!correct) exit_on_error;
+	assert(correct) $display("@@@passed10");
+		else #1 exit_on_error;
+	$finish;
 end
 
 endmodule

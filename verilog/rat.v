@@ -40,54 +40,73 @@ module rat(
 	);
 
 	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] rat_reg, n_rat_reg;
+	logic	[`ARF_SIZE-1:0]	n_PRF_free_sig;
+	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] n_PRF_free_list;
+	logic	[$clog2(`PRF_SIZE)-1:0]	n_opa_PRF_idx;
+	logic	[$clog2(`PRF_SIZE)-1:0]	n_opb_PRF_idx;
+	logic	n_opa_valid_out;	//if high opa_valid is immediate
+	logic	n_opb_valid_out;
 	//logic	[$clog2(`ARF_SIZE)-1:0]	i;
 
 
 	always_ff @(posedge clock) begin
 	if(reset) begin
-		rat_reg 		<= #1 0; 
+		rat_reg 		<= #1 0;
+		PRF_free_sig            <= #1 0;
+		PRF_free_list           <= #1 0;
+		opa_valid_out           <= #1 0;
+		opb_valid_out           <= #1 0;
+		opa_PRF_idx             <= #1 0;
+		opb_PRF_idx             <= #1 0;
 	  	end
 	else begin
 		rat_reg 		<= #1 n_rat_reg;
+		PRF_free_sig            <= #1 n_PRF_free_sig;
+		PRF_free_list           <= #1 n_PRF_free_list;
+		opa_valid_out           <= #1 n_opa_valid_out;
+		opb_valid_out           <= #1 n_opb_valid_out;
+		opa_PRF_idx             <= #1 n_opa_PRF_idx;
+		opb_PRF_idx             <= #1 n_opb_PRF_idx;
 		end
 	end //always_ff
 
 	always_comb begin
-	  unique if(reset) begin
-	  	PRF_free_sig 		= 0;
-	  	PRF_free_list 		= 0;
-	  	opa_PRF_idx 		= 0;
-	  	opb_PRF_idx 		= 0;
+	  if(reset) begin
+	  	n_PRF_free_sig 		= 0;
+	  	n_PRF_free_list 	= 0;
+	  	n_opa_PRF_idx 		= 0;
+	  	n_opb_PRF_idx 		= 0;
 	  	request 		= 0;
 	  	RAT_allo_halt 		= 0;  
-	  	opa_valid_out 		= 0;
-	   	opb_valid_out 		= 0;
+	  	n_opa_valid_out 	= 0;
+	   	n_opb_valid_out 	= 0;
 	  end
 	  else if(mispredict_sig) begin
-	    	PRF_free_sig 		= 0;
-	    	PRF_free_list 		= 0;
+	    	n_PRF_free_sig 		= 0;
+	    	n_PRF_free_list 	= 0;
 	  	for(int i=0; i<`ARF_SIZE; i++) begin
-	  		PRF_free_sig[i] = ~(rat_reg[i] == mispredict_up_idx[i]);	//indicate RAT_idx of i has been overwrite
-	  		PRF_free_list[i]= (rat_reg[i] == mispredict_up_idx[i])? 0:rat_reg[i];  //indicate the PRF_idx to be free
+	  		n_PRF_free_sig[i] = !(rat_reg[i] == mispredict_up_idx[i]);	//indicate RAT_idx of i has been overwrite
+	  		n_PRF_free_list[i]= (rat_reg[i] == mispredict_up_idx[i])? 0:rat_reg[i];  //indicate the PRF_idx to be free
 	  		n_rat_reg[i] 	= mispredict_up_idx[i];  //copy from rrat
 	  	end //for
 	  	request 		= 0;
 	  	RAT_allo_halt 		= 0;
-	  	opa_PRF_idx 		= 0;
-	  	opb_PRF_idx 		= 0;
-	  	opa_valid_out 		= 0;
-	    opb_valid_out 		= 0;
+	  	n_opa_PRF_idx 		= 0;
+	  	n_opb_PRF_idx 		= 0;
+	  	n_opa_valid_out 	= 0;
+	    	n_opb_valid_out 	= 0;
+
 	  end //else
 	  else if((~PRF_rename_valid && dest_rename_sig) | ~dest_rename_sig) begin
-	  	PRF_free_sig 	= 0;
-	  	PRF_free_list 	= 0;
-	    	opa_PRF_idx 	= 0;
-	  	opb_PRF_idx 	= 0;
+	  	n_PRF_free_sig 	= 0;
+	  	n_PRF_free_list = 0;
+	    	n_opa_PRF_idx 	= 0;
+	  	n_opb_PRF_idx 	= 0;
 	  	request 	= 0;
 	  	RAT_allo_halt 	= ~PRF_rename_valid && dest_rename_sig;  //if don't need rename, halt=0;
 	  	n_rat_reg 	= rat_reg;
-	  	opa_valid_out 	= 0;
-	   	opb_valid_out 	= 0;
+	  	n_opa_valid_out = 0;
+	   	n_opb_valid_out = 0;
 	  end //else
 	  else	begin //we can allocate PRF
 		for(int i=0; i<`ARF_SIZE; i++) begin
@@ -99,14 +118,16 @@ module rat(
 				n_rat_reg[i]	= rat_reg[i];
 			end //else
 		end  //for
-	  opa_PRF_idx 		= (opa_valid_in) ? 0:rat_reg[opa_ARF_idx];  //opa request prf
-	  opb_PRF_idx 		= (opb_valid_in) ? 0:rat_reg[opa_ARF_idx];
-	  opa_valid_out 	= opa_valid_in;
-	  opb_valid_out		= opb_valid_in;
+	  n_opa_PRF_idx 	= (opa_valid_in) ? 0:rat_reg[opa_ARF_idx];  //opa request prf
+	  n_opb_PRF_idx 	= (opb_valid_in) ? 0:rat_reg[opb_ARF_idx];
+	  n_opa_valid_out 	= opa_valid_in;
+	  n_opb_valid_out	= opb_valid_in;
 	  request 		= 1;
-	  PRF_free_sig 		= 0;
-	  PRF_free_list 	= 0;
+	  n_PRF_free_sig 	= 0;
+	  n_PRF_free_list 	= 0;
 	  RAT_allo_halt 	= 0;
+	  $display("n_rat_reg[0]:%b", n_rat_reg[0]);
+	  $display("rat_reg[0]:%b", rat_reg[0]);
 	  end //else
 
 	end  //always_comb

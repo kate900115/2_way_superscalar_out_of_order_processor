@@ -295,6 +295,7 @@ typedef enum logic [1:0] {
 `define RS_SIZE 	10
 `define PRF_SIZE 	48
 `define ROB_SIZE	16
+`define ARF_SIZE        32
 
 
 typedef enum logic [1:0] {
