@@ -11,7 +11,7 @@ module test_rat;
 	logic	opa_valid_in;	//if high opa_valid is immediate
 	logic	opb_valid_in;
 
-	logic	[`ARF_SIZE-1:0]	[clog2(`PRF_SIZE)-1:0]	mispredict_up_idx;	//if mispredict happens; need to copy from rrat
+	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0]	mispredict_up_idx;	//if mispredict happens; need to copy from rrat
 	logic	mispredict_sig;	//indicate weather mispredict happened
 
 	logic	PRF_rename_valid;	//we get valid signal from prf if the dest address has been request
@@ -29,8 +29,7 @@ module test_rat;
 
 	logic correct;
 
-rat rat1(
-
+	rat rat1(
 	//input
 	.reset(reset),
 	.clock(clock),
@@ -60,9 +59,9 @@ always #5 clock = ~clock;
 	
 task exit_on_error;
 	begin
-			#1;
-			$display("@@@Failed at time %f", $time);
-			$finish;
+		#1;
+		$display("@@@Failed at time %f", $time);
+		$finish;
 	end
 endtask
 
@@ -76,7 +75,7 @@ initial begin
 					PRF_free_list:%b, \n\
 					RAT_allo_halt:%b, \n\
 					opa_valid_out:%b, \n\
-					opb_valid_out:%b", \n\
+					opb_valid_out:%b",
 			$time, opa_PRF_idx, opb_PRF_idx, request, PRF_free_sig, PRF_free_list, RAT_allo_halt, opa_valid_out, opb_valid_out);
 
 	clock = 0;
@@ -85,7 +84,7 @@ initial begin
 
 	//HERE we initial the reg
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -99,7 +98,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -108,7 +107,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 1;
@@ -122,7 +121,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -131,7 +130,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 2;
@@ -145,7 +144,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -154,7 +153,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 3;
@@ -168,7 +167,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -177,7 +176,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 4;
@@ -191,7 +190,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -200,7 +199,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -214,7 +213,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
+				request == 0 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -223,7 +222,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -237,7 +236,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
+				request == 0 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -246,7 +245,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 4;
@@ -258,14 +257,14 @@ initial begin
 	mispredict_up_idx[2]= 9;
 	mispredict_up_idx[3]= 6;
 	mispredict_up_idx[4]= 5;
-	mispredict_sig 		= 1;
-	PRF_rename_valid	= 1;
-	PRF_rename_idx 		= 5;
+	mispredict_sig 	= 1;
+	PRF_rename_valid= 1;
+	PRF_rename_idx 	= 5;
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
-				PRF_free_sig == 2'b01001 &&
+				request == 0 &&
+				PRF_free_sig == {{`ARF_SIZE-5{1'b0}},{5'b01001}} &&
 				PRF_free_list[0] == 8 &&
 				PRF_free_list[1] == 0 &&
 				PRF_free_list[2] == 0 &&
@@ -277,7 +276,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 1;
 	opb_ARF_idx 		= 4;
 	dest_ARF_idx 		= 2;
@@ -291,7 +290,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 3 &&
 				opb_PRF_idx == 5 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -300,7 +299,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 2;
 	dest_ARF_idx 		= 0;
@@ -314,7 +313,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 12 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -323,4 +322,4 @@ initial begin
 	if(!correct) exit_on_error;
 end
 
-endmodules
+endmodule
