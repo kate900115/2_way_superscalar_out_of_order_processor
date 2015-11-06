@@ -11,8 +11,6 @@
 //                                                                      //
 //////////////////////////////////////////////////////////////////////////
 
-`timescale 1ns/100ps
-
 //
 // The ALU
 //
@@ -58,7 +56,7 @@ module alu(
       ALU_CMPULE:   result = { 63'd0, (opa <= opb) };
       ALU_CMPLT:    result = { 63'd0, signed_lt(opa, opb) };
       ALU_CMPLE:    result = { 63'd0, (signed_lt(opa, opb) || (opa == opb)) };
-      default:      result = 64'xxxx_xxxx_xxxx_xxxx;  // here only to force
+      default:      result = 64'hXXXX_XXXX_XXXX_XXXX;  // here only to force
                               // a combinational solution
                               // a casex would be better
     endcase
@@ -124,7 +122,7 @@ module ex_stage(
     output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
     output logic [3:0][63:0]			fu_result_out,
     output logic [3:0]				fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
-    output logic [3:0]				fu_is_available,
+    output logic [3:0]				fu_is_available
 /*
     output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out1,
     output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out1,
@@ -149,7 +147,7 @@ module ex_stage(
 	//assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
 
    // fu1: multipler1
-	mult #(4) mult1(// Inputs
+	mult #(.stage(4)) mult1(// Inputs
 		.clock(clock),
 		.reset(reset),
 		.mcand(fu_rs_opa_in[0]),
@@ -170,7 +168,7 @@ module ex_stage(
 	);
 
    // fu3: multipler2
-	mult #(4) mult1(// Inputs
+	mult #(.stage(4)) mult2(// Inputs
 		.clock(clock),
 		.reset(reset),
 		.mcand(fu_rs_opa_in[2]),
