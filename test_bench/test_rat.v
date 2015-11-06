@@ -60,9 +60,9 @@ always #5 clock = ~clock;
 	
 task exit_on_error;
 	begin
-			#1;
-			$display("@@@Failed at time %f", $time);
-			$finish;
+		#1;
+		$display("@@@Failed at time %f", $time);
+		$finish;
 	end
 endtask
 
@@ -85,7 +85,7 @@ initial begin
 
 	//HERE we initial the reg
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -99,7 +99,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -108,7 +108,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 1;
@@ -122,7 +122,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -131,7 +131,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 2;
@@ -145,7 +145,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -154,7 +154,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 3;
@@ -168,7 +168,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -177,7 +177,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 4;
@@ -191,7 +191,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -200,7 +200,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -214,7 +214,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
+				request == 0 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -223,7 +223,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 0;
@@ -237,7 +237,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
+				request == 0 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -246,7 +246,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 0;
 	dest_ARF_idx 		= 4;
@@ -258,13 +258,13 @@ initial begin
 	mispredict_up_idx[2]= 9;
 	mispredict_up_idx[3]= 6;
 	mispredict_up_idx[4]= 5;
-	mispredict_sig 		= 1;
-	PRF_rename_valid	= 1;
-	PRF_rename_idx 		= 5;
+	mispredict_sig 	= 1;
+	PRF_rename_valid= 1;
+	PRF_rename_idx 	= 5;
 
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
-				request 	== 0 &&
+				request == 0 &&
 				PRF_free_sig == 2'b01001 &&
 				PRF_free_list[0] == 8 &&
 				PRF_free_list[1] == 0 &&
@@ -277,7 +277,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 1;
 	opb_ARF_idx 		= 4;
 	dest_ARF_idx 		= 2;
@@ -291,7 +291,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 3 &&
 				opb_PRF_idx == 5 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
@@ -300,7 +300,7 @@ initial begin
 	if(!correct) exit_on_error;
 
 	#5
-	reset 				= 0;
+	reset 			= 0;
 	opa_ARF_idx 		= 0;
 	opb_ARF_idx 		= 2;
 	dest_ARF_idx 		= 0;
@@ -314,7 +314,7 @@ initial begin
 
 	correct = 	opa_PRF_idx == 12 &&
 				opb_PRF_idx == 0 &&
-				request 	== 1 &&
+				request == 1 &&
 				PRF_free_sig == 0 &&
 				PRF_free_list == 0 &&
 				RAT_allo_halt == 0 &&
