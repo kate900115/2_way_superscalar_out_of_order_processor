@@ -60,7 +60,7 @@ module rat(
 	  	PRF_free_list 		= 0;
 	  	opa_PRF_idx 		= 0;
 	  	opb_PRF_idx 		= 0;
-	  	request 			= 0;
+	  	request 		= 0;
 	  	RAT_allo_halt 		= 0;  
 	  	opa_valid_out 		= 0;
 	   	opb_valid_out 		= 0;
@@ -69,23 +69,23 @@ module rat(
 	    	PRF_free_sig 		= 0;
 	    	PRF_free_list 		= 0;
 	  	for(i=0; i<`ARF_SIZE; i++) begin
-	  		PRF_free_sig[i] 	= rat_reg[i] ~= mispredict_up_idx[i];	//indicate RAT_idx of i has been overwrite
-	  		PRF_free_list[i]	= (rat_reg[i] ~= mispredict_up_idx[i])? rat_reg[i]:0;  //indicate the PRF_idx to be free
-	  		n_rat_reg[i] 		= mispredict_up_idx[i];  //copy from rrat
+	  		PRF_free_sig[i] = rat_reg[i] ~= mispredict_up_idx[i];	//indicate RAT_idx of i has been overwrite
+	  		PRF_free_list[i]= (rat_reg[i] ~= mispredict_up_idx[i])? rat_reg[i]:0;  //indicate the PRF_idx to be free
+	  		n_rat_reg[i] 	= mispredict_up_idx[i];  //copy from rrat
 	  	end //for
-	  	request 				= 0;
-	  	RAT_allo_halt 			= 0;
-	  	opa_PRF_idx 			= 0;
-	  	opb_PRF_idx 			= 0;
-	  	opa_valid_out 			= 0;
-	    opb_valid_out 			= 0;
+	  	request 		= 0;
+	  	RAT_allo_halt 		= 0;
+	  	opa_PRF_idx 		= 0;
+	  	opb_PRF_idx 		= 0;
+	  	opa_valid_out 		= 0;
+	    opb_valid_out 		= 0;
 	  end //else
 	  else if((~PRF_rename_valid && dest_rename_sig) | ~dest_rename_sig) begin
 	  	PRF_free_sig 	= 0;
 	  	PRF_free_list 	= 0;
 	    opa_PRF_idx 	= 0;
 	  	opb_PRF_idx 	= 0;
-	  	request 		= 0;
+	  	request 	= 0;
 	  	RAT_allo_halt 	= ~PRF_rename_valid && dest_rename_sig;  //if don't need rename, halt=0;
 	  	n_rat_reg 		= rat_reg;
 	  	opa_valid_out 	= 0;
@@ -101,14 +101,14 @@ module rat(
 				n_rat_reg[i]	= rat_reg[i];
 			end //else
 		end  //for
-	    opa_PRF_idx 		= (opa_valid_in) ? 0:rat_reg[opa_ARF_idx];  //opa request prf
-	    opb_PRF_idx 		= (opb_valid_in) ? 0:rat_reg[opa_ARF_idx];
-	   	opa_valid_out 		= opa_valid_in;
-	    opb_valid_out		= opb_valid_in;
-	    request 			= 1;
-	    PRF_free_sig 		= 0;
-	  	PRF_free_list 		= 0;
-	  	RAT_allo_halt 		= 0;
+	  opa_PRF_idx 		= (opa_valid_in) ? 0:rat_reg[opa_ARF_idx];  //opa request prf
+	  opb_PRF_idx 		= (opb_valid_in) ? 0:rat_reg[opa_ARF_idx];
+	  opa_valid_out 	= opa_valid_in;
+	  opb_valid_out		= opb_valid_in;
+	  request 		= 1;
+	  PRF_free_sig 		= 0;
+	  PRF_free_list 	= 0;
+	  RAT_allo_halt 	= 0;
 	  end //else
 
 	end  //always_comb
