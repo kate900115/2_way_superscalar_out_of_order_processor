@@ -11,7 +11,7 @@ module test_rat;
 	logic	opa_valid_in;	//if high opa_valid is immediate
 	logic	opb_valid_in;
 
-	logic	[`ARF_SIZE-1:0]	[clog2(`PRF_SIZE)-1:0]	mispredict_up_idx;	//if mispredict happens; need to copy from rrat
+	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0]	mispredict_up_idx;	//if mispredict happens; need to copy from rrat
 	logic	mispredict_sig;	//indicate weather mispredict happened
 
 	logic	PRF_rename_valid;	//we get valid signal from prf if the dest address has been request
@@ -29,8 +29,7 @@ module test_rat;
 
 	logic correct;
 
-rat rat1(
-
+	rat rat1(
 	//input
 	.reset(reset),
 	.clock(clock),
@@ -76,7 +75,7 @@ initial begin
 					PRF_free_list:%b, \n\
 					RAT_allo_halt:%b, \n\
 					opa_valid_out:%b, \n\
-					opb_valid_out:%b", \n\
+					opb_valid_out:%b",
 			$time, opa_PRF_idx, opb_PRF_idx, request, PRF_free_sig, PRF_free_list, RAT_allo_halt, opa_valid_out, opb_valid_out);
 
 	clock = 0;
@@ -265,7 +264,7 @@ initial begin
 	correct = 	opa_PRF_idx == 0 &&
 				opb_PRF_idx == 0 &&
 				request == 0 &&
-				PRF_free_sig == 2'b01001 &&
+				PRF_free_sig == {{`ARF_SIZE-5{1'b0}},{5'b01001}} &&
 				PRF_free_list[0] == 8 &&
 				PRF_free_list[1] == 0 &&
 				PRF_free_list[2] == 0 &&
@@ -323,4 +322,4 @@ initial begin
 	if(!correct) exit_on_error;
 end
 
-endmodules
+endmodule
