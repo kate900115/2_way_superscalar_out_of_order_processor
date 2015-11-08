@@ -21,16 +21,16 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-		test_bench/test_cdb.v
-SIMFILES = 	verilog/cdb.v		\
-		verilog/cdb_one_entry.v 	\
+		test_bench/test_prf.v
+SIMFILES = 	verilog/prf.v		\
+		verilog/prf_one_entry.v 	\
 		verilog/priority_selector.v  \
 
-SYNFILES = cdb.vg 
+SYNFILES = prf.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-cdb.vg:	$(SIMFILES) cdb.tcl 
-	dc_shell-t -f cdb.tcl | tee synth.out
+prf.vg:	$(SIMFILES) prf.tcl 
+	dc_shell-t -f prf.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here

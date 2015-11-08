@@ -14,8 +14,10 @@ module test_prf;
 	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opa_prf_idx;			//opa prf index of instruction2
 	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opb_prf_idx;			//opb prf index of instruction2
 
-	logic				rat1_allocate_new_prf;			//the request from rat1 for allocating a new prf entry
-	logic				rat2_allocate_new_prf;			//the request from rat2 for allocating a new prf entry
+	logic				rat1_allocate_new_prf1;			//the request from rat1 for allocating a new prf entry
+	logic				rat1_allocate_new_prf2;			//the request from rat2 for allocating a new prf entry
+	logic				rat2_allocate_new_prf1;			//the request from rat1 for allocating a new prf entry
+	logic				rat2_allocate_new_prf2;			//the request from rat2 for allocating a new prf entry
 
 	logic	[`PRF_SIZE-1:0]		rrat1_prf_free_list;			//when a branch is mispredict, RRAT1 gives a freelist to PRF
 	logic	[`PRF_SIZE-1:0]		rrat2_prf_free_list;			//when a branch is mispredict, RRAT2 gives a freelist to PRF
@@ -32,12 +34,17 @@ module test_prf;
 	logic				inst1_opa_valid;			//whether opa load from prf of instruction1 is valid
 	logic				inst1_opb_valid;			//whether opb load from prf of instruction1 is valid
 	logic				inst2_opa_valid;			//whether opa load from prf of instruction2 is valid
-	logic				inst2_opb_valid;
+	logic				inst2_opb_valid;			//whether opa load from prf of instruction2 is valid
 
-	logic				rat1_prf_rename_valid_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	logic				rat2_prf_rename_valid_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf_rename_idx_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf_rename_idx_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic				rat1_prf1_rename_valid_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic				rat1_prf2_rename_valid_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic				rat2_prf1_rename_valid_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic				rat2_prf2_rename_valid_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf1_rename_idx_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf2_rename_idx_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf1_rename_idx_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf2_rename_idx_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
 
 	logic   [63:0]			inst1_opa_prf_value;			//opa prf value of instruction1
 	logic	[63:0]			inst1_opb_prf_value;			//opb prf value of instruction1
@@ -67,8 +74,10 @@ module test_prf;
 		.inst2_opa_prf_idx(inst2_opa_prf_idx),				
 		.inst2_opb_prf_idx(inst2_opb_prf_idx),				
 
-		.rat1_allocate_new_prf(rat1_allocate_new_prf),			
-		.rat2_allocate_new_prf(rat2_allocate_new_prf),			
+		.rat1_allocate_new_prf1(rat1_allocate_new_prf1),			
+		.rat1_allocate_new_prf2(rat1_allocate_new_prf2),
+		.rat2_allocate_new_prf1(rat2_allocate_new_prf1),			
+		.rat2_allocate_new_prf2(rat2_allocate_new_prf2),			
 
 		.rrat1_prf_free_list(rrat1_prf_free_list),			
 		.rrat2_prf_free_list(rrat2_prf_free_list),			
@@ -83,10 +92,14 @@ module test_prf;
 		.rrat2_prf_free_idx(rrat2_prf_free_idx),			
 		
 		//output
-		.rat1_prf_rename_valid_out(rat1_prf_rename_valid_out),		
-		.rat2_prf_rename_valid_out(rat2_prf_rename_valid_out),		
-		.rat1_prf_rename_idx_out(rat1_prf_rename_idx_out),		
-		.rat2_prf_rename_idx_out(rat2_prf_rename_idx_out),
+		.rat1_prf1_rename_valid_out(rat1_prf1_rename_valid_out),		
+		.rat1_prf2_rename_valid_out(rat1_prf2_rename_valid_out),	
+		.rat2_prf1_rename_valid_out(rat2_prf1_rename_valid_out),		
+		.rat2_prf2_rename_valid_out(rat2_prf2_rename_valid_out),		
+		.rat1_prf1_rename_idx_out(rat1_prf1_rename_idx_out),		
+		.rat1_prf2_rename_idx_out(rat1_prf2_rename_idx_out),
+		.rat2_prf1_rename_idx_out(rat2_prf1_rename_idx_out),		
+		.rat2_prf2_rename_idx_out(rat2_prf2_rename_idx_out),
 
 		.inst1_opa_valid(inst1_opa_valid),			
 		.inst1_opb_valid(inst1_opb_valid),			
@@ -128,10 +141,14 @@ module test_prf;
 						inst1_opb_valid:%h,\n\
 						inst2_opa_valid:%h,\n\
 						inst2_opb_valid:%h,\n\
-						rat1_prf_rename_idx_out:%b, \n\
-						rat1_prf_rename_valid_out:%b\n\
-						rat2_prf_rename_idx_out :%b,\n\
-						rat2_prf_rename_valid_out:%b\n\
+						rat1_prf1_rename_idx_out:%b, \n\
+						rat1_prf1_rename_valid_out:%b\n\
+						rat1_prf2_rename_idx_out :%b,\n\
+						rat1_prf2_rename_valid_out:%b\n\
+						rat2_prf1_rename_idx_out:%b, \n\
+						rat2_prf1_rename_valid_out:%b\n\
+						rat2_prf2_rename_idx_out :%b,\n\
+						rat2_prf2_rename_valid_out:%b\n\
 						internal_assign_a_free_reg1=%b,\n\
 						internal_prf_available=%b\n\
 						internal_assign_a_free_reg2=%b\n\
@@ -140,7 +157,8 @@ module test_prf;
 				$time, clock, 
 				inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value,inst2_opb_prf_value,
 				inst1_opa_valid,     inst1_opb_valid,     inst2_opa_valid,    inst2_opb_valid,
-				rat1_prf_rename_idx_out, rat1_prf_rename_valid_out, rat2_prf_rename_idx_out,rat2_prf_rename_valid_out,
+				rat1_prf1_rename_idx_out, rat1_prf1_rename_valid_out, rat1_prf2_rename_idx_out,rat1_prf2_rename_valid_out,
+				rat2_prf1_rename_idx_out, rat2_prf1_rename_valid_out, rat2_prf2_rename_idx_out,rat2_prf2_rename_valid_out,
 				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2,
 				internal_free_this_entry);
 
@@ -157,7 +175,7 @@ module test_prf;
 
 		//A new request from RAT1 to allocate a new PRF 
 		//and return the index of this PRF entry.
-		$display("@@@ RAT1 allocate a new register!!");
+		$display("@@@ RAT1 allocate prf1 and RAT2 allocate prf2!!");
 		reset = 0;	
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -169,8 +187,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 1;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 1;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -183,7 +203,7 @@ module test_prf;
 		rrat2_prf_free_idx		 = 0;
 
 		@(posedge clock);
-		$display("@@@ RAT1 stop sending allocate_a_new_register_signal!!");
+		$display("@@@ RAT1 and RAT2 stop sending allocate_a_new_register_signal!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
@@ -194,8 +214,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -208,7 +230,7 @@ module test_prf;
 		rrat2_prf_free_idx		 = 0;
 		
 		@(negedge clock);
-		$display("@@@ RAT1 allocate a new register!!");
+		$display("@@@ RAT1 allocate two new registers!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
@@ -219,8 +241,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 1;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 1;			
+		rat1_allocate_new_prf2		 = 1;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -234,7 +258,7 @@ module test_prf;
 
 
 		@(posedge clock);
-		$display("@@@ RAT1 stop sending allocate_a_new_register_signal!!");
+		$display("@@@ RAT1 stop sending allocate_new_register_signal!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
@@ -245,8 +269,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 1;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -259,7 +285,7 @@ module test_prf;
 		rrat2_prf_free_idx		 = 0;
 		
 		@(negedge clock);  
-		$display("@@@ RAT2 allocate a new register!!");
+		$display("@@@ RAT2 allocate two new registers!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
@@ -270,8 +296,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 1;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 1;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -295,8 +323,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;				
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -309,7 +339,7 @@ module test_prf;
 		rrat2_prf_free_idx		 = 0;
 
 		@(negedge clock);  
-		$display("@@@ RAT2 allocate a new register!!");
+		$display("@@@ RAT1 and RAT2 allocate new registers!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
 		cdb1_out			 = 0;
@@ -320,8 +350,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 1;			
+		rat1_allocate_new_prf1		 = 1;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 0;
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -346,8 +378,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;	
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -374,8 +408,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -403,8 +439,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -428,8 +466,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;	
 
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
@@ -457,8 +497,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 1;			
-		rat2_allocate_new_prf		 = 1;			
+		rat1_allocate_new_prf1		 = 1;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 0;
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -482,8 +524,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;	
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -509,8 +553,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -535,8 +581,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 6'b101101;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;	
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -560,8 +608,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;	
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -585,8 +635,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 1;			
-		rat2_allocate_new_prf		 = 1;			
+		rat1_allocate_new_prf1		 = 1;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 0;	
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -610,8 +662,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -636,8 +690,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 48'b001100100000000000000000000000000000000000000000;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -659,8 +715,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -685,8 +743,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;		
 		rrat1_prf_free_list		 = 48'b001100100000000000000000000000000000000000000000;			
 		rrat2_prf_free_list		 = 48'b000000100000000000000000000000000000000000000000;			
 		rat1_prf_free_list		 = 48'b010101100000000000000111100000001111000000010111;			
@@ -709,8 +769,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -736,8 +798,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 6'b101111;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -759,8 +823,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -785,8 +851,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 6'b101110;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 1;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 1;			
+		rat2_allocate_new_prf2		 = 1;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -808,8 +876,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -834,8 +904,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			
@@ -858,8 +930,10 @@ module test_prf;
 		inst1_opb_prf_idx		 = 0;				
 		inst2_opa_prf_idx		 = 0;			
 		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf		 = 0;			
-		rat2_allocate_new_prf		 = 0;			
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
 		rrat1_prf_free_list		 = 0;			
 		rrat2_prf_free_list		 = 0;			
 		rat1_prf_free_list		 = 0;			

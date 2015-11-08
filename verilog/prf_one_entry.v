@@ -39,34 +39,34 @@ module prf_one_entry(
 	begin
 		if(reset)
         	begin
-            		prf_in_use  		<= `SD 1'b0;
-            		prf_is_valid	    	<= `SD 1'b0;
-            		value   		<= `SD 64'b0;
+            		prf_in_use  			<= `SD 1'b0;
+            		prf_is_valid	    		<= `SD 1'b0;
+            		value   			<= `SD 64'b0;
         	end   
         	else
         	begin
-			prf_in_use		<= `SD prf_in_use_next;
-			prf_is_valid		<= `SD prf_is_valid_next;
-			value			<= `SD value_next;
+			prf_in_use			<= `SD prf_in_use_next;
+			prf_is_valid			<= `SD prf_is_valid_next;
+			value				<= `SD value_next;
         	end
     	end
 
 	always_comb
 	begin
-		prf_in_use_next      		= prf_in_use;
-               	prf_is_valid_next    		= prf_is_valid;
-               	value_next           		= value;
+		prf_in_use_next      			= prf_in_use;
+               	prf_is_valid_next    			= prf_is_valid;
+               	value_next           			= value;
 		if(free_this_entry)
 		begin
-			prf_in_use_next		= 1'b0;
-            		prf_is_valid_next    	= 1'b0;
-			value_next		= 0;
+			prf_in_use_next			= 1'b0;
+            		prf_is_valid_next    		= 1'b0;
+			value_next			= 0;
 		end
 		else if(assign_a_free_reg)   
             	begin
-                	prf_in_use_next      	= 1'b1;
-                	prf_is_valid_next    	= 1'b0;
-			value_next		= 0;
+                	prf_in_use_next      		= 1'b1;
+                	prf_is_valid_next    		= 1'b0;
+			value_next			= 0;
             	end   
 		else if(write_prf_enable)
            	begin
@@ -78,9 +78,9 @@ module prf_one_entry(
 			end
 			else
 			begin
-				prf_in_use_next      		= prf_in_use;
-               			prf_is_valid_next    		= prf_is_valid;
-               			value_next           		= value;
+				prf_in_use_next      	= prf_in_use;
+               			prf_is_valid_next    	= prf_is_valid;
+               			value_next           	= value;
 			end
             	end
 		else
