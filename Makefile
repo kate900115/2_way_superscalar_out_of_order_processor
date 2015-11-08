@@ -21,27 +21,14 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-<<<<<<< HEAD
-		test_bench/test_prf.v
-SIMFILES = 	verilog/prf.v		\
-		verilog/prf_one_entry.v 	\
-		verilog/priority_selector.v  \
+		test_bench/test_pc.v
+SIMFILES = 	verilog/pc.v		\
 
-SYNFILES = prf.vg 
+SYNFILES = pc.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-prf.vg:	$(SIMFILES) prf.tcl 
-	dc_shell-t -f prf.tcl | tee synth.out
-=======
-		test_bench/test_rat.v
-SIMFILES = 	verilog/rat.v		
-
-SYNFILES = rat.vg 
-LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
-
-rat.vg:	$(SIMFILES) rat.tcl 
-	dc_shell-t -f rat.tcl | tee synth.out
->>>>>>> 48a7c630bbb6300c47ae5bd46f3727a1c15394f6
+pc.vg:	$(SIMFILES) pc.tcl 
+	dc_shell-t -f pc.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
@@ -68,4 +55,4 @@ clean:
           dve *.vpd *.vcd *.dump ucli.key 
 
 nuke:	clean
-	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.syn *.mr *.pvl *.md
+	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.mr *.pvl *.syn *.txt
