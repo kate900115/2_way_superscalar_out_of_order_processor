@@ -1,25 +1,23 @@
 #/***********************************************************/
-#/*   FILE        : mult.tcl                                */
+#/*   FILE        : mult_stage.tcl                          */
 #/*   Description : Default Synopsys Design Compiler Script */
-#/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
+#/*   Usage       : dc_shell -tcl_mode -f default.tcl       */
 #/*   You'll need to minimally set design_name & read files */
 #/***********************************************************/
 
 #/***********************************************************/
-#/* The following lines must be updated for every           */
+#/* The following five lines must be updated for every      */
 #/* new design                                              */
 #/***********************************************************/
-set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-<<<<<<< HEAD
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb_one_entry.v" "./verilog/cdb.v" "./verilog/priority_selector.v" ]
-=======
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v"]
->>>>>>> 48a7c630bbb6300c47ae5bd46f3727a1c15394f6
-elaborate cdb
-set design_name cdb
+
+read_file -f sverilog [list "mult_stage.v"]
+set design_name mult_stage
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 10
+set CLK_PERIOD 4.25
+#8 stage: 4.25
+#4 stage: 6.64
+#2 stage: 11
 
 
 #/***********************************************************/
@@ -28,8 +26,8 @@ set CLK_PERIOD 10
 #/* when synthesizing your final project.                   */
 #/***********************************************************/
 set SYN_DIR ./
+set search_path "/afs/umich.edu/class/eecs470/lib/synopsys/"
 set target_library "lec25dscc25_TT.db"
-
 set link_library [concat  "*" $target_library]
 
 #/***********************************************************/
@@ -91,7 +89,7 @@ set dc_shell_status [ set chk_file [format "%s%s"  [format "%s%s"  $SYN_DIR $des
 
 #/* if we didnt find errors at this point, run */
 if {  $dc_shell_status != [list] } {
-  current_design $design_name
+   current_design $design_name
   link
   set_wire_load_model -name $WIRE_LOAD -lib $LOGICLIB $design_name
   set_wire_load_mode top
@@ -131,7 +129,7 @@ if {  $dc_shell_status != [list] } {
   redirect -append $rep_file { report_reference -nosplit }
   quit
 } else {
-  quit
+   quit
 }
 
 

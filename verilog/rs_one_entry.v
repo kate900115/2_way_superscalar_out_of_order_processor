@@ -80,18 +80,19 @@ module rs_one_entry(
 	logic  					LoadBFromCDB1;  	// signal to load from the CDB1
 	logic  					LoadAFromCDB2;  	// signal to load from the CDB2 
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
+	logic					next_InUse;
 
 	ALU_FUNC				Alu_func_reg;
 	FU_SELECT				fu_select_reg;
 	FU_SELECT				fu_select;
 
-	assign rs1_available_out= ~InUse; //|| rs1_free;
+	assign rs1_available_out= rs1_ready_out ? rs1_free : ~InUse;
  
 	assign rs1_ready_out 	= InUse && OPaValid_reg && OPbValid_reg; 
  
 	assign rs1_opa_out 	= rs1_free ? OPa_reg : 64'b0;
 
-	assign fu_select_reg_out= fu_select_reg; 
+	assign fu_select_reg_out= fu_select_reg;
  
 	assign rs1_opb_out 	= rs1_free ? OPb_reg : 64'b0; 
  
@@ -112,12 +113,15 @@ module rs_one_entry(
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb2_valid;
 
 	always_comb begin
+		if (rs1_free)
+			next_InUse	= 1'b0;
 		if (inst1_rs1_load_in) begin
 			OPa		= inst1_rs1_opa_in;
        			OPaValid	= inst1_rs1_opa_valid;
        			OPb		= inst1_rs1_opb_in;
        			OPbValid	= inst1_rs1_opb_valid;
 			fu_select	= inst1_fu_select;
+			next_InUse	= 1'b1;
 		end
 		else if (inst2_rs1_load_in) begin
 			OPa		= inst2_rs1_opa_in;
@@ -125,6 +129,7 @@ module rs_one_entry(
        			OPb		= inst2_rs1_opb_in;
        			OPbValid	= inst2_rs1_opb_valid;
 			fu_select	= inst2_fu_select;
+			next_InUse	= 1'b1;
 		end
 		else begin
 			OPa		= OPa_reg;
@@ -132,6 +137,7 @@ module rs_one_entry(
        			OPb		= OPb_reg;
        			OPbValid	= OPbValid_reg;
 			fu_select	= fu_select_reg;
+			next_InUse	= InUse;
     			if (LoadAFromCDB1)
     			begin
         			OPa	 = rs1_cdb1_in;
@@ -172,15 +178,14 @@ module rs_one_entry(
 			Alu_func_reg 	<= `SD ALU_DEFAULT;
 			fu_select_reg	<= `SD FU_DEFAULT;
     		end
-		else if (rs1_free)
-			InUse 	 	<= `SD 0;
-    		else
+		else
     		begin
 			OPa_reg		<= `SD OPa;
 			OPaValid_reg	<= `SD OPaValid;
 			OPb_reg		<= `SD OPb;
 			OPbValid_reg	<= `SD OPbValid;
 			fu_select_reg	<= `SD fu_select;
+       			InUse 	 	<= `SD next_InUse;
 			if (inst1_rs1_load_in)
         		begin
 				OP_type  	<= `SD inst1_rs1_op_type_in;
@@ -192,7 +197,7 @@ module rs_one_entry(
 			else if(inst2_rs1_load_in)
 			begin
 				OP_type  	<= `SD inst2_rs1_op_type_in;
-            			InUse 	 	<= `SD 1'b1;
+
             			DestTag  	<= `SD inst2_rs1_dest_in;
 				Rob_idx	 	<= `SD inst2_rs1_rob_idx_in;
 				Alu_func_reg 	<= `SD inst2_rs1_alu_func;

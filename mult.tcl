@@ -10,16 +10,13 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-<<<<<<< HEAD
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb_one_entry.v" "./verilog/cdb.v" "./verilog/priority_selector.v" ]
-=======
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v"]
->>>>>>> 48a7c630bbb6300c47ae5bd46f3727a1c15394f6
-elaborate cdb
-set design_name cdb
+read_file -f ddc [list "mult_stage.ddc"]
+set_dont_touch mult_stage
+read_file -f sverilog [list "pipe_mult.v"]
+set design_name mult
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 10
+set CLK_PERIOD 4.5
 
 
 #/***********************************************************/
@@ -91,7 +88,7 @@ set dc_shell_status [ set chk_file [format "%s%s"  [format "%s%s"  $SYN_DIR $des
 
 #/* if we didnt find errors at this point, run */
 if {  $dc_shell_status != [list] } {
-  current_design $design_name
+   current_design $design_name
   link
   set_wire_load_model -name $WIRE_LOAD -lib $LOGICLIB $design_name
   set_wire_load_mode top
@@ -131,7 +128,7 @@ if {  $dc_shell_status != [list] } {
   redirect -append $rep_file { report_reference -nosplit }
   quit
 } else {
-  quit
+   quit
 }
 
 

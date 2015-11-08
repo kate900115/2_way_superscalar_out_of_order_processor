@@ -11,7 +11,7 @@ module mult(
 				output [63:0] product,
 				output done
 			);
-	parameter stage = 8;
+	parameter stage = 4;
   logic [63:0] mcand_out, mplier_out;
   logic [((stage-1)*64)-1:0] internal_products, internal_mcands, internal_mpliers;
   logic [(stage-2):0] internal_dones;

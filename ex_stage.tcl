@@ -10,13 +10,9 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-<<<<<<< HEAD
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb_one_entry.v" "./verilog/cdb.v" "./verilog/priority_selector.v" ]
-=======
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v"]
->>>>>>> 48a7c630bbb6300c47ae5bd46f3727a1c15394f6
-elaborate cdb
-set design_name cdb
+analyze -f sverilog [list "sys_defs.vh" "./verilog/mult_stage.v" "./verilog/pipe_mult.v" "./verilog/ex_stage.v"]
+elaborate ex_stage
+set design_name ex_stage
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 10
