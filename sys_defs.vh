@@ -312,10 +312,10 @@ typedef enum logic [1:0] {
 } RS_FULL;
 
 typedef enum logic [1:0] {
-  INST1_TWO_THREAD1  = 2'h0,
-  INST1_THREAD1  = 2'h1,			//if inst1 is thread1 , and inst2 is thread2
-  INST2_THREAD1  = 2'h2,			//if inst2 is thread1,  and inst2 is thread1
-  INST1_ZERO_THREAD1 = 2'h3
+  INST1_TWO_THREAD1		= 2'h0,
+  INST1_THREAD1			= 2'h1, //if inst1 is thread1 , and inst2 is thread2
+  INST2_THREAD1			= 2'h2, //if inst2 is thread1,  and inst2 is thread1
+  INST1_ZERO_THREAD1	= 2'h3
 } THREAD_NUMBER;
 
 typedef enum logic [2:0] {
