@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : rs.tcl                                */
+#/*   FILE        : if_stage.tcl                                */
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
 #/*   You'll need to minimally set design_name & read files */
@@ -10,9 +10,9 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-analyze -f sverilog [list "sys_defs.vh" "./verilog/rs_one_entry.v" "./verilog/rs.v" "./verilog/priority_selector.v" "./verilog/two_stage_priority_selector.v"]
-elaborate rs
-set design_name rs
+analyze -f sverilog [list "sys_defs.vh" "./verilog/pc.v" "./verilog/if_stage.v"]
+elaborate if_stage
+set design_name if_stage
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 10

@@ -2,7 +2,7 @@
 //                                                                     //
 //   Modulename :  pc.v                                                //
 //                                                                     //
-//  Description :  PC of the two way Out		               // 
+//  Description :  PC of the two way Out		               		   // 
 //                 of Order Machine; fetch instruction,     	       //
 //                 compute next PC location, and send them             //
 //                 down the pipeline.                                  //
@@ -12,34 +12,36 @@
 //`timescale 1ns/100ps
 
 module pc(
-	input         		clock,                   	// system clock
-	input         		reset,                   	// system reset
+	input         			clock,                   		// system clock
+	input         			reset,                   		// system reset
 
-	input         		branch_is_taken,         	// taken-branch signal
-	input  [63:0] 		fu_target_pc,            	// target pc: use if take_branch is TRUE
+	input         			branch_is_taken,         		// taken-branch signal
+	input  [63:0] 			fu_target_pc,            		// target pc: use if take_branch is TRUE
 
-	input  [63:0] 		Imem2proc_data,          	// Data coming back from instruction-memory
-	input         		rs_stall,		 	// when RS is full, we need to stop PC
-	input	  		rob_stall,		 	// when RoB is full, we need to stop PC
-	input			memory_structure_hazard_stall,  // If data and instruction want to use memory at the same time
-	input			pc_enable,			// 		
-
+	input  [63:0] 			Imem2proc_data,          		// Data coming back from instruction-memory
+	input			    	Imem2proc_valid,				//
+	input         			rs_stall,		 				// when RS is full, we need to stop PC
+	input	  				rob_stall,		 				// when RoB is full, we need to stop PC
+	input					memory_structure_hazard_stall,  // If data and instruction want to use memory at the same time
+	input					pc_enable,						// 	
+	input					is_two_threads,					//
+ 
 	
-	output logic [63:0] 	proc2Imem_addr,    	 	// Address sent to Instruction memory
-	output logic [63:0] 	next_PC_out,        	 	// PC of instruction after fetched (PC+4).
-	output logic [31:0] 	inst1_out,        	 	// fetched instruction out
-	output logic [31:0]	inst2_out, 
-	output logic        	inst1_is_valid,  		 	// when low, instruction is garbage
-	output logic        	inst2_is_valid  		 	// when low, instruction is garbage
+	output logic [63:0] 	proc2Imem_addr,    	 			// Address sent to Instruction memory
+	output logic [63:0] 	next_PC_out,        	 		// PC of instruction after fetched (PC+8). for debug
+	output logic [31:0] 	inst1_out,        	 			// fetched instruction out
+	output logic [31:0]		inst2_out, 
+	output logic        	inst1_is_valid,  		 		// when low, instruction is garbage
+	output logic        	inst2_is_valid  		 		// when low, instruction is garbage
   );
 
 
-	logic  [63:0] 		PC_reg;             	 	// PC we are currently fetching
-	logic  [63:0]	 	next_PC;
-	logic  [31:0]	 	current_inst1;
-	logic  [31:0]	 	current_inst2;
+	logic  [63:0] 			PC_reg;             	 		// PC we are currently fetching
+	logic  [63:0]	 		next_PC;
+	logic  [31:0]	 		current_inst1;
+	logic  [31:0]	 		current_inst2;
 		
-	logic      		PC_stall;    	
+	logic      				PC_stall;    	
 
 
 	assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
@@ -56,40 +58,62 @@ module pc(
   	// The take-branch signal must override stalling (otherwise it may be lost)
 
 
-  	// Pass PC+4 down pipeline w/instruction
+  	// Pass PC+8 down pipeline w/instruction
 
   	// This register holds the PC value
   	
  
   	always_ff @(posedge clock) 
 	begin
-		// synopsys sync_set_reset "reset"
+			// synopsys sync_set_reset "reset"
     		if(reset)			
     		begin
-	      		PC_reg 		  <= `SD 0;  
+	      		PC_reg 		  	  <= `SD 0;  
       			inst1_is_valid 	  <= `SD 1;
       			inst2_is_valid 	  <= `SD 1;
-			inst1_out	  <= `SD 0;
-			inst2_out	  <= `SD 0;
+				inst1_out	  	  <= `SD 0;
+				inst2_out	 	  <= `SD 0;
     		end
     		else
     		begin
-			if(PC_stall || (!pc_enable))
-			begin
-				PC_reg		  <= `SD next_PC;
-				inst1_is_valid	  <= `SD 0;
-				inst2_is_valid	  <= `SD 0;
-				inst1_out	  <= `SD 0;
-				inst2_out	  <= `SD 0;
-			end
-			else
-			begin
-				PC_reg		  <= `SD next_PC;
-				inst1_is_valid	  <= `SD 1;
-				inst2_is_valid	  <= `SD 1;
-				inst1_out	  <= `SD current_inst1;
-				inst2_out	  <= `SD current_inst2;
-			end
+    			if (is_two_threads)
+				begin
+					if(PC_stall || (pc_enable) || (!Imem2proc_valid))
+					begin
+						PC_reg		 	  <= `SD next_PC;
+						inst1_is_valid	  <= `SD 0;
+						inst2_is_valid	  <= `SD 0;
+						inst1_out	 	  <= `SD 0;
+						inst2_out		  <= `SD 0;
+					end
+					else
+					begin
+						PC_reg			  <= `SD next_PC;
+						inst1_is_valid	  <= `SD 1;
+						inst2_is_valid	  <= `SD 1;
+						inst1_out		  <= `SD current_inst1;
+						inst2_out		  <= `SD current_inst2;
+					end
+				end
+				else
+				begin
+					if(PC_stall || (!pc_enable) || (!Imem2proc_valid))
+					begin
+						PC_reg		 	  <= `SD next_PC;
+						inst1_is_valid	  <= `SD 0;
+						inst2_is_valid	  <= `SD 0;
+						inst1_out	 	  <= `SD 0;
+						inst2_out		  <= `SD 0;
+					end
+					else
+					begin
+						PC_reg			  <= `SD next_PC;
+						inst1_is_valid	  <= `SD 1;
+						inst2_is_valid	  <= `SD 1;
+						inst1_out		  <= `SD current_inst1;
+						inst2_out		  <= `SD current_inst2;
+					end
+				end
     		end
   	end  // always
 
@@ -101,7 +125,7 @@ module pc(
 		end
 		else
 		begin
-			if (PC_stall || (!pc_enable))
+			if (PC_stall || (!pc_enable) || (!Imem2proc_valid))
 			begin
 				next_PC = PC_reg; 
 			end

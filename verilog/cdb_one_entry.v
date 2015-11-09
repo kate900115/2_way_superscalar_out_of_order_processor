@@ -16,25 +16,25 @@ module cdb_one_entry(
 	//fu_select signal will give out the result from which function unit
 	//is selected. the priority is: mem1 > mem2 > mult1 > mult2 > adder1 > adder2.
 
-	input  	[5:0]				fu_select,		
+	input  	[5:0]							fu_select,		
 
-	input  	[63:0]				memory1_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		memory1_dest_reg_idx,
-	input  	[63:0]				memory2_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		memory2_dest_reg_idx,
-	input  	[63:0]				mult1_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		mult1_dest_reg_idx,
-	input  	[63:0]				mult2_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		mult2_dest_reg_idx,
-	input  	[63:0]				adder1_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		adder1_dest_reg_idx,
-	input  	[63:0]				adder2_result_in,
-	input	[$clog2(`PRF_SIZE)-1:0]		adder2_dest_reg_idx,
+	input  	[63:0]							memory1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			memory1_dest_reg_idx,
+	input  	[63:0]							memory2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			memory2_dest_reg_idx,
+	input  	[63:0]							mult1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			mult1_dest_reg_idx,
+	input  	[63:0]							mult2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			mult2_dest_reg_idx,
+	input  	[63:0]							adder1_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			adder1_dest_reg_idx,
+	input  	[63:0]							adder2_result_in,
+	input	[$clog2(`PRF_SIZE)-1:0]			adder2_dest_reg_idx,
 
 	
-	output 	logic				cdb_valid,
+	output 	logic							cdb_valid,
 	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag,
-	output 	logic [63:0]			cdb_out	
+	output 	logic [63:0]					cdb_out	
 );
 
 	

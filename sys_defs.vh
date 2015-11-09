@@ -295,7 +295,7 @@ typedef enum logic [1:0] {
 `define RS_SIZE 	10
 `define PRF_SIZE 	48
 `define ROB_SIZE	16
-`define ARF_SIZE        32
+`define ARF_SIZE    32
 
 
 typedef enum logic [1:0] {
@@ -333,7 +333,10 @@ typedef enum logic [1:0] {
   TWE_EXECUTED  = 2'h2			//if inst2 is thread1,  and inst2 is thread1
 } EXECUTION_STATUS_FOR_HEAD;
 
-
+typedef enum logic {
+	THREAD1_IS_EX  = 1'h0,			
+  	THREAD2_IS_EX  = 1'h1			
+} CURRENT_THREAD_STATE;
 
 
 
