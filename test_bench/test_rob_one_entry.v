@@ -1,7 +1,6 @@
 module test_rob_one_entry;
 	logic	reset;
 	logic	clock;
-	logic	rs_full;                                       	//if rs is full
 
 //after dispatch 
 	logic	[31:0]					inst1_pc_in;                                    //pc in
@@ -10,8 +9,6 @@ module test_rob_one_entry;
 	logic							inst1_is_branch_in;             				//if this instruction is a branch
 	logic 							inst1_rob_load_in;								//tell this entry if we want to load this instruction
 	logic							inst1_if_thread1;								//the it is for thread1, else it is for thread2
-	logic							inst1_mispredict_in;
-	logic							inst1_is_ex_in;
 
 
 	logic	[31:0]					inst2_pc_in;                                    //pc in
@@ -20,8 +17,6 @@ module test_rob_one_entry;
 	logic							inst2_is_branch_in;                             //if this instruction is a branch
 	logic 							inst2_rob_load_in;				//tell this entry if we want to load this instruction
 	logic							inst2_if_thread1;				//the it is for thread1, else it is for thread2
-	logic							inst2_mispredict_in;
-	logic							inst2_is_ex_in;
 //after execution
 	logic							is_ex_in;                                      	//if this instruciont has been executed so that the value of the prf number assigned is valid
 	logic							mispredict_in;                                 	//after execution, if this instruction is a branch and it has been taken , this logic should be "1"
@@ -42,7 +37,7 @@ module test_rob_one_entry;
 		//logic
 		reset,
 		clock,
-		rs_full,				//if rs is full
+		
 		//after dispatch
 		inst1_pc_in,            //pc in
 		inst1_arn_dest_in,      //the architected register number of the destination of this instruction
@@ -50,8 +45,6 @@ module test_rob_one_entry;
 		inst1_is_branch_in,     //if this instruction is a branch
 		inst1_rob_load_in,		//tell this entry if we want to load this instruction
 		inst1_if_thread1,		//the it is for thread1, else it is for thread2
-		inst1_is_branch_in,
-		inst1_is_ex_in,
 
 		inst2_pc_in,            //pc in
 		inst2_arn_dest_in,		//the architected register number of the destination of this instruction
@@ -59,8 +52,6 @@ module test_rob_one_entry;
 		inst2_is_branch_in,		//if this instruction is a branch
 		inst2_rob_load_in,		//tell this entry if we want to load this instruction
 		inst2_if_thread1,		//the it is for thread1, else it is for thread2
-		inst2_is_branch_in,
-		inst2_is_ex_in,
 
 		//after execution
 		is_ex_in,                                      	//if this instruciont has been executed so that the value of the prf number assigned is valid
@@ -103,16 +94,20 @@ module test_rob_one_entry;
 		inst1_prn_dest_in =	4;
 		inst1_is_branch_in = 0;
 		inst1_rob_load_in = 1;
+		inst2_rob_load_in = 0;
 		inst1_if_thread1 = 1;
 		inst1_is_branch_in = 0;
-		inst1_is_ex_in = 0;
+		is_ex_in = 1;
+		enable = 1;
 		if_committed = 0;
 		@(negedge clock);
 		inst1_rob_load_in = 0;
-		inst1_is_ex_in = 1;
+		is_ex_in = 1;
+		mispredict_in = 0;
 		@(negedge clock);
-		inst1_is_ex_in = 0;
+		is_ex_in = 0;
 		if_committed = 1;
+		mispredict_in = 1;
 		@(negedge clock);
 		@(negedge clock);
 		$finish;

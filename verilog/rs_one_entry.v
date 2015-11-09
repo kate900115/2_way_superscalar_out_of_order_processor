@@ -19,12 +19,12 @@ module rs_one_entry(
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs1_dest_in,    	// The destination of this instruction
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs1_dest_in,    	// The destination of this instruction
  
-	input  [63:0] 				rs1_cdb1_in,		// CDB bus from functional units 
+	input  [63:0] 						rs1_cdb1_in,		// CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
-	input  	      				rs1_cdb1_valid,		// The data on the CDB is valid 
-	input  [63:0] 				rs1_cdb2_in,		// CDB bus from functional units 
+	input  	      						rs1_cdb1_valid,		// The data on the CDB is valid 
+	input  [63:0] 						rs1_cdb2_in,		// CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
-	input  	      				rs1_cdb2_valid,		// The data on the CDB is valid 
+	input  	      						rs1_cdb2_valid,		// The data on the CDB is valid 
 
 	input  [63:0] 				inst1_rs1_opa_in,		// Operand a from Rename  
 	input  [63:0] 				inst1_rs1_opb_in,		// Operand a from Rename 
