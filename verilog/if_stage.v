@@ -65,8 +65,7 @@ module if_stage(
 		.rs_stall(rs_stall),		 	
 		.rob_stall(rob_stall),		 	
 		.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
-		.pc_enable(pc_enable1),	
-		.is_two_threads(is_two_threads),		 		
+		.pc_enable(pc_enable1),			 		
 
 		//output
 		.proc2Imem_addr(proc2Imem_addr1),    	 	
@@ -90,8 +89,7 @@ module if_stage(
 		.rs_stall(rs_stall),		 	
 		.rob_stall(rob_stall),		 	
 		.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
-		.pc_enable(pc_enable2),	
-		.is_two_threads(is_two_threads),		 		
+		.pc_enable(pc_enable2),			 		
 	
 		//output
 		.proc2Imem_addr(proc2Imem_addr2),    	 	

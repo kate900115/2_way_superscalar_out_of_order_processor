@@ -10,7 +10,6 @@ module test_pc;
 	logic	  			rob_stall;		 				// when RoB is full, we need to stop PC
 	logic				memory_structure_hazard_stall;  // If data and instruction want to use memory at the same time
 	logic				pc_enable;			
-	logic				is_two_threads;	
 
 	//output
 	logic [63:0] 		proc2Imem_addr;   	 	
@@ -33,8 +32,7 @@ pc pc1(
 	.rs_stall(rs_stall),		 				
 	.rob_stall(rob_stall),		 				
 	.memory_structure_hazard_stall(memory_structure_hazard_stall),  
-	.pc_enable(pc_enable),
-	.is_two_threads(is_two_threads),	
+	.pc_enable(pc_enable),	
 
 	// output 		
 	.proc2Imem_addr(proc2Imem_addr),    	 			
@@ -88,7 +86,6 @@ pc pc1(
 		rob_stall		      		  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 		     		  = 1;
-		is_two_threads				  = 0;
 		@(negedge clock);
 		$display("@@@ next instruction!");
 		branch_is_taken 			  = 0;        			
