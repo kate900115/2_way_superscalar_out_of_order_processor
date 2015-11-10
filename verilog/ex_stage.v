@@ -106,6 +106,9 @@ module ex_stage(
     input  [3:0]			fu_rs_valid_in,
     ALU_FUNC [3:0]     			fu_alu_func_in,	// ALU function select from decoder
 
+    input [3:0] [1:0]                   fu_rs_branch,
+    input [3:0]                         fu_rs_predict,
+
     //input          id_ex_cond_branch,   // is this a cond br? from decoder
     //input          id_ex_uncond_branch, // is this an uncond br? from decoder
 
@@ -122,7 +125,8 @@ module ex_stage(
     output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
     output logic [3:0][63:0]			fu_result_out,
     output logic [3:0]				fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
-    output logic [3:0]				fu_is_available
+    output logic [3:0]				fu_is_available,
+    output logic [1:0]                          fu_mispredict_sig         //mispredict signal generate
   );
 
 	logic		brcond_result;
@@ -133,6 +137,9 @@ module ex_stage(
 	logic  [63:0]	alu_result1;
 	logic  [63:0]	alu_result2;
 	logic  [3:0]	fu_is_in_use;
+
+	logic [3:0]     brcond_result;          
+	logic [1:0]     fu_take_branch_out;
 
 	//assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
 
@@ -180,16 +187,26 @@ module ex_stage(
 
    //
    // instantiate the branch condition tester
-   //
-	//brcond brcond (// Inputs
-	//.opa(id_ex_rega),       // always check regA value
-	//.func(id_ex_IR[28:26]), // inst bits to determine check
-	    // Output
-	//.cond(brcond_result)
-	//);
+   // generate signal if branch is mispredicted
+     generate 
+	genvar i;
+ 	for (i=0 ;i<4 ;i++) begin
+		brcond (// Inputs
+		.opa(fu_rs_opa_in[i]),       // always check regA value
+		.func(fu_rs_op_type_in[i]), // inst bits to determine check
+	    	// Output
+		.cond(brcond_result[i])
+		);
+	end
+     endgenerate
 
-   // ultimate "take branch" signal:
-   //    unconditional, or conditional and the condition is true
+	assign fu_take_branch_out[0] =	fu_rs_branch[1][0] |(fu_rs_branch[1][1] & brcond_result[1]);  //calculate branch correct take or not take
+	assign fu_take_branch_out[1] =	fu_rs_branch[3][0] |(fu_rs_branch[3][1] & brcond_result[3]);
+	
+	assign fu_mispredict_sig[0] = fu_take_branch_out[0] ^ fu_rs_predict[1];
+	assign fu_mispredict_sig[1] = fu_take_branch_out[1] ^ fu_rs_predict[3];
+
+  
 	assign fu_is_available[0] = fu_result_is_valid[0] ? mult1_send_in_success  : ~fu_is_in_use[0];
 	assign fu_is_available[1] = fu_result_is_valid[1] ? adder1_send_in_success : ~fu_is_in_use[1];
 	assign fu_is_available[2] = fu_result_is_valid[2] ? mult2_send_in_success  : ~fu_is_in_use[2];
