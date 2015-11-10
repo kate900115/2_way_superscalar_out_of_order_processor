@@ -121,14 +121,14 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 
 	  	n_opa_PRF_idx1 		= 0;
 	  	n_opb_PRF_idx1 		= 0;
-	  	request1 		= 0;
+	  	request1 			= 0;
 	  	RAT_allo_halt1 		= 0;  
 	  	n_opa_valid_out1 	= 0;
 	   	n_opb_valid_out1 	= 0;
 
 	  	n_opa_PRF_idx2 		= 0;
 	  	n_opb_PRF_idx2 		= 0;
-	  	request2 		= 0;
+	  	request2 			= 0;
 	  	RAT_allo_halt2 		= 0;  
 	  	n_opa_valid_out2 	= 0;
 	   	n_opb_valid_out2 	= 0;
@@ -141,40 +141,40 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 	  		n_PRF_free_list[i]= (rat_reg[i] == mispredict_up_idx[i])? 0:rat_reg[i];  //indicate the PRF_idx to be free
 	  		n_rat_reg[i] 	= mispredict_up_idx[i];  //copy from rrat
 	  	end //for
-	  	request1 		= 0;
+	  	request1 			= 0;
 	  	RAT_allo_halt1 		= 0;
 	  	n_opa_PRF_idx1 		= 0;
 	  	n_opb_PRF_idx1 		= 0;
 	  	n_opa_valid_out1 	= 0;
-	    	n_opb_valid_out1 	= 0;
+	    n_opb_valid_out1 	= 0;
 
-	  	request2 		= 0;
+	  	request2 			= 0;
 	  	RAT_allo_halt2 		= 0;
 	  	n_opa_PRF_idx2 		= 0;
 	  	n_opb_PRF_idx2 		= 0;
 	  	n_opa_valid_out2 	= 0;
-	    	n_opb_valid_out2 	= 0;
+	    n_opb_valid_out2 	= 0;
 
 	  end //else
 	  else if(~inst1_rename && ~inst2_rename) begin
-	  	n_PRF_free_sig 	= 0;
-	  	n_PRF_free_list = 0;
-	  	n_rat_reg 	= rat_reg;
+	  	n_PRF_free_sig 		= 0;
+	  	n_PRF_free_list 	= 0;
+	  	n_rat_reg 			= rat_reg;
 
-	    	n_opa_PRF_idx1 	= 0;
-	  	n_opb_PRF_idx1 	= 0;
-	  	RAT_allo_halt1 	= ~PRF_rename_valid1 && dest_rename_sig1;  //if don't need rename, halt=0;
-	  	n_opa_valid_out1= (~PRF_rename_valid1 && dest_rename_sig1)?0:opa_valid_in1;
-	   	n_opb_valid_out1= (~PRF_rename_valid1 && dest_rename_sig1)?0:opb_valid_in1;
+    	n_opa_PRF_idx1 		= 0;
+	  	n_opb_PRF_idx1 		= 0;
+	  	RAT_allo_halt1 		= ~PRF_rename_valid1 && dest_rename_sig1;  //if don't need rename, halt=0;
+	  	n_opa_valid_out1	= (~PRF_rename_valid1 && dest_rename_sig1)?0:opa_valid_in1;
+	   	n_opb_valid_out1	= (~PRF_rename_valid1 && dest_rename_sig1)?0:opb_valid_in1;
 
-	    	n_opa_PRF_idx2 	= 0;
-	  	n_opb_PRF_idx2 	= 0;
-	  	RAT_allo_halt2 	= ~PRF_rename_valid2 && dest_rename_sig2;  //if don't need rename, halt=0;
-	  	n_opa_valid_out2= (~PRF_rename_valid2 && dest_rename_sig2)?0:opa_valid_in2;
-	   	n_opb_valid_out2= (~PRF_rename_valid2 && dest_rename_sig2)?0:opb_valid_in2;
+	    n_opa_PRF_idx2 		= 0;
+	  	n_opb_PRF_idx2 		= 0;
+	  	RAT_allo_halt2 		= ~PRF_rename_valid2 && dest_rename_sig2;  //if don't need rename, halt=0;
+	  	n_opa_valid_out2	= (~PRF_rename_valid2 && dest_rename_sig2)?0:opa_valid_in2;
+	   	n_opb_valid_out2	= (~PRF_rename_valid2 && dest_rename_sig2)?0:opb_valid_in2;
 
-	  	request1 	= 0;
-	  	request2 	= 0;
+	  	request1 			= 0;
+	  	request2 			= 0;
 	  end //else
 
 	  else if(inst1_rename && ~inst2_rename) begin

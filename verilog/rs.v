@@ -46,13 +46,7 @@ module rs(
 	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input					fu1_mult_available,
-	input					fu1_adder_available,
-	input					fu1_memory_available,
-
-	input					fu2_mult_available,
-	input					fu2_adder_available,
-	input					fu2_memory_available,
+	input  [5:0]				fu_is_available,			//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
   
  	//output
 	output logic [5:0][63:0]		fu_rs_opa_out,       	// This RS' opa 
@@ -87,7 +81,7 @@ module rs(
 
 
 	//internal registers
-	FU_SELECT					inst1_fu_select;
+	FU_SELECT						inst1_fu_select;
 	FU_SELECT        				inst2_fu_select;
 
 	logic	[`RS_SIZE-1:0]				ready_out_for_second_rs;
@@ -242,7 +236,7 @@ module rs(
 			fu_alu_func_out[i]		= ALU_DEFAULT;
 			internal_rs_free[i]		= 0;
 		end
-		if (fu1_mult_available) begin
+		if (fu_is_available[0]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!internal_rs_free[i]) begin
@@ -260,7 +254,7 @@ module rs(
 			end
 		end
 
-		if (fu1_adder_available) begin
+		if (fu_is_available[1]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!internal_rs_free[i]) begin
@@ -278,7 +272,7 @@ module rs(
 			end
 		end
 
-		if (fu1_memory_available) begin
+		if (fu_is_available[2]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
 					if (!internal_rs_free[i]) begin
@@ -296,7 +290,7 @@ module rs(
 			end
 		end
 
-		if (fu2_mult_available) begin
+		if (fu_is_available[3]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!internal_rs_free[i]) begin
@@ -314,7 +308,7 @@ module rs(
 			end
 		end
 
-		if (fu2_adder_available) begin
+		if (fu_is_available[4]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!internal_rs_free[i]) begin
@@ -332,7 +326,7 @@ module rs(
 			end
 		end
 
-		if (fu2_memory_available) begin
+		if (fu_is_available[5]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
 					if (!internal_rs_free[i]) begin

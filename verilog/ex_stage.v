@@ -104,7 +104,7 @@ module ex_stage(
     input  [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
     input  [3:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
     input  [3:0]			fu_rs_valid_in,
-    ALU_FUNC [5:0]     			fu_alu_func_in,	// ALU function select from decoder
+    ALU_FUNC [3:0]     			fu_alu_func_in,	// ALU function select from decoder
 
     //input          id_ex_cond_branch,   // is this a cond br? from decoder
     //input          id_ex_uncond_branch, // is this an uncond br? from decoder
@@ -116,21 +116,13 @@ module ex_stage(
 
     //output	ex_take_branch_out,  // is this a taken branch?
 
-    output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,
-    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out,
-    output logic [3:0][5:0]  			fu_rs_op_type_out,	// incoming instruction
+    output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_cdb_dest_tag_out,
+    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_cdb_rob_idx_out,
+    output logic [3:0][5:0]  			fu_cdb_op_type_out,	// incoming instruction
     output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
     output logic [3:0][63:0]			fu_result_out,
     output logic [3:0]				fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
     output logic [3:0]				fu_is_available
-/*
-    output logic [$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out1,
-    output logic [$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out1,
-    output logic [5:0]  			fu_rs_op_type_out1,	// incoming instruction
-    output ALU_FUNC				fu_alu_func_out1,	// ALU function select from decoder
-    output logic [63:0]				fu_result1,
-    output logic				fu_is_valid1,
-*/
   );
 
 	logic		brcond_result;
@@ -140,8 +132,6 @@ module ex_stage(
 	logic		mult_done2;
 	logic  [63:0]	alu_result1;
 	logic  [63:0]	alu_result2;
-	logic  [5:0]	internal_fu_value_select1;
-	logic  [5:0]	internal_fu_value_select2;
 	logic  [3:0]	fu_is_in_use;
 
 	//assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
@@ -204,6 +194,7 @@ module ex_stage(
 	assign fu_is_available[1] = fu_result_is_valid[1] ? adder1_send_in_success : ~fu_is_in_use[1];
 	assign fu_is_available[2] = fu_result_is_valid[2] ? mult2_send_in_success  : ~fu_is_in_use[2];
 	assign fu_is_available[3] = fu_result_is_valid[3] ? adder2_send_in_success : ~fu_is_in_use[3];
+	//assign fu_is_available[4] = fu_result_is_valid[4] ? lsq1_send_in_success : ~fu_is_in_use[3];
 	always_ff @(posedge clock)
 	begin
 		if (reset) 
