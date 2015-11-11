@@ -22,6 +22,7 @@ module pc(
 	input			    	Imem2proc_valid,				//
 	input         			rs_stall,		 				// when RS is full, we need to stop PC
 	input	  				rob_stall,		 				// when RoB is full, we need to stop PC
+	input					rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input					memory_structure_hazard_stall,  // If data and instruction want to use memory at the same time
 	input					pc_enable,						// 
  
@@ -51,7 +52,7 @@ module pc(
 	assign current_inst1  = Imem2proc_data[63:32];
 	assign current_inst2  = Imem2proc_data[31:0];
 
-	assign PC_stall	      = rs_stall || rob_stall || memory_structure_hazard_stall;
+	assign PC_stall	      = rs_stall || rob_stall || rat_stall || memory_structure_hazard_stall;
 	assign next_PC_out    = next_PC;
 
   	// next PC is target_pc if there is a taken branch or

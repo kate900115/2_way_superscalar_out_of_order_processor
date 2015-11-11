@@ -8,6 +8,7 @@ module test_pc;
 	logic				Imem2proc_valid;
 	logic         		rs_stall;		 				// when RS is full, we need to stop PC
 	logic	  			rob_stall;		 				// when RoB is full, we need to stop PC
+	logic				rat_stall;						
 	logic				memory_structure_hazard_stall;  // If data and instruction want to use memory at the same time
 	logic				pc_enable;			
 
@@ -30,7 +31,8 @@ pc pc1(
 	.Imem2proc_data(Imem2proc_data),
 	.Imem2proc_valid(Imem2proc_valid),          			
 	.rs_stall(rs_stall),		 				
-	.rob_stall(rob_stall),		 				
+	.rob_stall(rob_stall),	
+	.rat_stall(rat_stall),	 				
 	.memory_structure_hazard_stall(memory_structure_hazard_stall),  
 	.pc_enable(pc_enable),	
 
@@ -83,7 +85,8 @@ pc pc1(
 		Imem2proc_data  	  		  = 64'h1234_4567_5678_3456;
 		Imem2proc_valid				  = 1;         			
 		rs_stall		      		  = 0;		 				
-		rob_stall		      		  = 0;	 				
+		rob_stall		      		  = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 		     		  = 1;
 		@(negedge clock);
@@ -93,7 +96,8 @@ pc pc1(
 		Imem2proc_data  			  = 64'h0000_4567_5008_3416;  
 		Imem2proc_valid				  = 1;          			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -103,7 +107,19 @@ pc pc1(
 		Imem2proc_data  		      = 64'h0000_0000_5008_3416; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
+		memory_structure_hazard_stall = 0;  
+		pc_enable 				      = 1;
+		@(negedge clock);
+		$display("@@@ rat stall!");
+		branch_is_taken 		      = 0;        			
+		fu_target_pc			      = 0;           			
+		Imem2proc_data  		      = 64'h0110_1222_5008_3416; 
+		Imem2proc_valid				  = 1;           			
+		rs_stall				      = 0;		 				
+		rob_stall				      = 0;
+		rat_stall					  = 1;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -112,7 +128,8 @@ pc pc1(
 		fu_target_pc			      = 64'h0000_0000_0000_0100;           			
 		Imem2proc_data  		      = 64'h0000_0000_5008_1016;         			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -122,7 +139,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h0000_0010_9008_1406;
 		Imem2proc_valid				  = 1;            			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -132,7 +150,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h0000_1110_5018_0016; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall				      = 1;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -142,7 +161,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h5610_0310_9198_1425; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;	
+		rat_stall					  = 0; 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -152,7 +172,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h5610_7777_6467_1425; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 1;	 				
+		rob_stall				      = 1;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 				      = 1;
 		@(negedge clock);
@@ -162,7 +183,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h1410_7777_6467_1425; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall				      = 0;		 				
-		rob_stall				      = 0;	 				
+		rob_stall				      = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 		    		  = 0;
 		@(negedge clock);
@@ -172,7 +194,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h5610_7687_6467_1425; 
 		Imem2proc_valid				  = 1;           			
 		rs_stall		    		  = 0;		 				
-		rob_stall		    		  = 0;	 				
+		rob_stall		    		  = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 		    		  = 1;
 		@(negedge clock);
@@ -182,7 +205,8 @@ pc pc1(
 		Imem2proc_data  		      = 64'h5672_7617_6157_1425; 
 		Imem2proc_valid				  = 0;           			
 		rs_stall		    		  = 0;		 				
-		rob_stall		    		  = 0;	 				
+		rob_stall		    		  = 0;
+		rat_stall					  = 0;	 				
 		memory_structure_hazard_stall = 0;  
 		pc_enable 		    		  = 1;
 		@(negedge clock);
