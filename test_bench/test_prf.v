@@ -1,62 +1,64 @@
+//`define DEBUG_OUT
 module test_prf;
-	logic				clock;
-	logic				reset;
+	logic							clock;
+	logic							reset;
 
-	logic				cdb1_valid;
+	logic							cdb1_valid;
 	logic	[$clog2(`PRF_SIZE)-1:0]	cdb1_tag;
-	logic   [63:0]			cdb1_out;
-	logic				cdb2_valid;
+	logic   [63:0]					cdb1_out;
+	logic							cdb2_valid;
 	logic	[$clog2(`PRF_SIZE)-1:0]	cdb2_tag;
-	logic   [63:0]			cdb2_out;
+	logic   [63:0]					cdb2_out;
 
-	logic	[$clog2(`PRF_SIZE)-1:0]	inst1_opa_prf_idx;			//opa prf index of instruction1
-	logic	[$clog2(`PRF_SIZE)-1:0]	inst1_opb_prf_idx;			//opb prf index of instruction1
-	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opa_prf_idx;			//opa prf index of instruction2
-	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opb_prf_idx;			//opb prf index of instruction2
+	logic	[$clog2(`PRF_SIZE)-1:0]	inst1_opa_prf_idx;					//opa prf index of instruction1
+	logic	[$clog2(`PRF_SIZE)-1:0]	inst1_opb_prf_idx;					//opb prf index of instruction1
+	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opa_prf_idx;					//opa prf index of instruction2
+	logic	[$clog2(`PRF_SIZE)-1:0]	inst2_opb_prf_idx;					//opb prf index of instruction2
 
-	logic				rat1_allocate_new_prf1;			//the request from rat1 for allocating a new prf entry
-	logic				rat1_allocate_new_prf2;			//the request from rat2 for allocating a new prf entry
-	logic				rat2_allocate_new_prf1;			//the request from rat1 for allocating a new prf entry
-	logic				rat2_allocate_new_prf2;			//the request from rat2 for allocating a new prf entry
+	logic							rat1_allocate_new_prf1;				//the request from rat1 for allocating a new prf entry
+	logic							rat1_allocate_new_prf2;				//the request from rat2 for allocating a new prf entry
+	logic							rat2_allocate_new_prf1;				//the request from rat1 for allocating a new prf entry
+	logic							rat2_allocate_new_prf2;				//the request from rat2 for allocating a new prf entry
 
-	logic	[`PRF_SIZE-1:0]		rrat1_prf_free_list;			//when a branch is mispredict, RRAT1 gives a freelist to PRF
-	logic	[`PRF_SIZE-1:0]		rrat2_prf_free_list;			//when a branch is mispredict, RRAT2 gives a freelist to PRF
-	logic	[`PRF_SIZE-1:0]		rat1_prf_free_list;			//when a branch is mispredict, RAT1 gives a freelist to PRF
-	logic	[`PRF_SIZE-1:0]		rat2_prf_free_list;			//when a branch is mispredict, RAT2 gives a freelist to PRF
-	logic				rrat1_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
-	logic				rrat2_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
+	logic	[`PRF_SIZE-1:0]			rrat1_prf_free_list;				//when a branch is mispredict, RRAT1 gives a freelist to PRF
+	logic	[`PRF_SIZE-1:0]			rrat2_prf_free_list;				//when a branch is mispredict, RRAT2 gives a freelist to PRF
+	logic	[`PRF_SIZE-1:0]			rat1_prf_free_list;					//when a branch is mispredict, RAT1 gives a freelist to PRF
+	logic	[`PRF_SIZE-1:0]			rat2_prf_free_list;					//when a branch is mispredict, RAT2 gives a freelist to PRF
+	logic							rrat1_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
+	logic							rrat2_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
 
-	logic				rrat1_prf_free_valid;			//when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	logic				rrat2_prf_free_valid;			//when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	logic	[$clog2(`PRF_SIZE)-1:0] rrat1_prf_free_idx;			//when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	logic	[$clog2(`PRF_SIZE)-1:0] rrat2_prf_free_idx;			//when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	logic							rrat1_prf_free_valid;				//when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	logic							rrat2_prf_free_valid;				//when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat1_prf_free_idx;					//when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat2_prf_free_idx;					//when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 
-	logic				inst1_opa_valid;			//whether opa load from prf of instruction1 is valid
-	logic				inst1_opb_valid;			//whether opb load from prf of instruction1 is valid
-	logic				inst2_opa_valid;			//whether opa load from prf of instruction2 is valid
-	logic				inst2_opb_valid;			//whether opa load from prf of instruction2 is valid
+	logic							inst1_opa_valid;					//whether opa load from prf of instruction1 is valid
+	logic							inst1_opb_valid;					//whether opb load from prf of instruction1 is valid
+	logic							inst2_opa_valid;					//whether opa load from prf of instruction2 is valid
+	logic							inst2_opb_valid;					//whether opa load from prf of instruction2 is valid
 
-	logic				rat1_prf1_rename_valid_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	logic				rat1_prf2_rename_valid_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	logic				rat2_prf1_rename_valid_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	logic				rat2_prf2_rename_valid_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic							rat1_prf1_rename_valid_out;			//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic							rat1_prf2_rename_valid_out;			//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic							rat2_prf1_rename_valid_out;			//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	logic							rat2_prf2_rename_valid_out;			//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf1_rename_idx_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf2_rename_idx_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf1_rename_idx_out;		//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
-	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf2_rename_idx_out;		//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf1_rename_idx_out;			//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat1_prf2_rename_idx_out;			//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf1_rename_idx_out;			//when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rat2_prf2_rename_idx_out;			//when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
 
-	logic   [63:0]			inst1_opa_prf_value;			//opa prf value of instruction1
-	logic	[63:0]			inst1_opb_prf_value;			//opb prf value of instruction1
-	logic   [63:0]			inst2_opa_prf_value;			//opa prf value of instruction2
-	logic	[63:0]			inst2_opb_prf_value;			//opb prf value of instruction2
+	logic   [63:0]					inst1_opa_prf_value;				//opa prf value of instruction1
+	logic	[63:0]					inst1_opb_prf_value;				//opb prf value of instruction1
+	logic   [63:0]					inst2_opa_prf_value;				//opa prf value of instruction2
+	logic	[63:0]					inst2_opb_prf_value;				//opb prf value of instruction2
+	logic							prf_is_full;	
 
 	//for debug
-	logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1;
-	logic 	[`PRF_SIZE-1:0]		internal_prf_available;
-	logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2;
-	logic 	[`PRF_SIZE-1:0]		internal_prf_available2;
-	logic 	[`PRF_SIZE-1:0]		internal_free_this_entry;
+	logic 	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
+	logic 	[`PRF_SIZE-1:0]			internal_prf_available;
+	logic 	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
+	logic 	[`PRF_SIZE-1:0]			internal_prf_available2;
+	logic 	[`PRF_SIZE-1:0]			internal_free_this_entry;
 
 	prf prf1(
 		//input
@@ -111,6 +113,8 @@ module test_prf;
 		.inst2_opa_prf_value(inst2_opa_prf_value),			
 		.inst2_opb_prf_value(inst2_opb_prf_value),
 		
+		.prf_is_full(prf_is_full),
+		
 		//for debug
 		.internal_assign_a_free_reg1(internal_assign_a_free_reg1),
 		.internal_prf_available(internal_prf_available),
@@ -153,13 +157,14 @@ module test_prf;
 						internal_prf_available=%b\n\
 						internal_assign_a_free_reg2=%b\n\
 						internal_prf_available2=%b\n\
+						prf_is_full=%b\n\
 						internal_free_this_entry=%b",//for debug
 				$time, clock, 
 				inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value,inst2_opb_prf_value,
 				inst1_opa_valid,     inst1_opb_valid,     inst2_opa_valid,    inst2_opb_valid,
 				rat1_prf1_rename_idx_out, rat1_prf1_rename_valid_out, rat1_prf2_rename_idx_out,rat1_prf2_rename_valid_out,
 				rat2_prf1_rename_idx_out, rat2_prf1_rename_valid_out, rat2_prf2_rename_idx_out,rat2_prf2_rename_valid_out,
-				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2,
+				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2,prf_is_full,
 				internal_free_this_entry);
 
 

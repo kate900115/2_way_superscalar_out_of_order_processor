@@ -12,8 +12,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 module prf(
-	input					clock,
-	input					reset,
+	input									clock,
+	input									reset,
 
 	input									cdb1_valid,
 	input	[$clog2(`PRF_SIZE)-1:0]			cdb1_tag,
@@ -62,34 +62,42 @@ module prf(
 	output	logic							inst1_opb_valid,					// whether opb load from prf of instruction1 is valid
 	output  logic							inst2_opa_valid,					// whether opa load from prf of instruction2 is valid
 	output	logic							inst2_opb_valid,					// whether opa load from prf of instruction2 is valid
+	output  logic							prf_is_full,							// if the freelist of prf is empty, prf should give out this signal
 
-	//for debug
-	output logic	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1,
-	output logic	[`PRF_SIZE-1:0]         internal_prf_available,
-	output logic 	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2,
-	output logic 	[`PRF_SIZE-1:0]			internal_prf_available2,
-	output logic 	[`PRF_SIZE-1:0]			internal_free_this_entry
-			
-
+	// for debug
+	//`ifdef DEBUG_OUT
+	output [`PRF_SIZE-1:0]					internal_assign_a_free_reg1,
+	output [`PRF_SIZE-1:0]         			internal_prf_available,
+	output [`PRF_SIZE-1:0]					internal_assign_a_free_reg2,
+	output [`PRF_SIZE-1:0]					internal_prf_available2,
+	output [`PRF_SIZE-1:0]					internal_free_this_entry
+	//`endif	
+		
+	
 );
-	//internal signal for input
-	//logic	[`PRF_SIZE-1:0]					internal_free_this_entry;
+	// internal signal for input
+	
+	logic	[`PRF_SIZE-1:0]					internal_free_this_entry;
+	logic	[`PRF_SIZE-1:0]					internal_assign_a_free_reg1;
+	logic	[`PRF_SIZE-1:0]					internal_assign_a_free_reg2;
 	logic   [`PRF_SIZE-1:0][63:0]			internal_data_in;
 	logic	[`PRF_SIZE-1:0]					internal_write_prf_enable;
-	//logic	[`PRF_SIZE-1:0]					internal_assign_a_free_reg1;
-	//logic	[`PRF_SIZE-1:0]					internal_assign_a_free_reg2;
 	logic	[3:0]							allocate_new_prf;
 
-	//internal signal for output	
-	//logic   [`PRF_SIZE-1:0]				internal_prf_available;
+	// internal signal for output	
+	logic   [`PRF_SIZE-1:0]					internal_prf_available;
 	logic   [`PRF_SIZE-1:0]					internal_prf_ready;
 	logic   [`PRF_SIZE-1:0][63:0]			internal_data_out;
+	logic	[`PRF_SIZE-1:0]					internal_prf_available2;
 
-	//other registers to store value
+	// other registers to store value
 	logic									priority_selector1_en;
 	logic									priority_selector2_en;
-
-	//when RAT wants to allocate new PRF entries.
+	
+	// when all the internal_prf_available=0, the freelist of prf is zero.
+    assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
+    
+	// when RAT wants to allocate new PRF entries.
 	assign allocate_new_prf = {rat1_allocate_new_prf1,rat1_allocate_new_prf2,rat2_allocate_new_prf1,rat2_allocate_new_prf2};	
 
 	always_comb
@@ -217,8 +225,8 @@ module prf(
 		
 		default:
 			begin
-				priority_selector1_en = 1'b0;
-				priority_selector2_en = 1'b0;
+				priority_selector1_en 	   = 1'b0;
+				priority_selector2_en      = 1'b0;
 				rat1_prf1_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat2_prf1_rename_valid_out = 0;
@@ -238,7 +246,7 @@ module prf(
 		.clock(clock),
 		.reset(reset),
 		.free_this_entry(internal_free_this_entry),
-    		.data_in(internal_data_in),
+    	.data_in(internal_data_in),
 		.write_prf_enable(internal_write_prf_enable),
 		.assign_a_free_reg(internal_assign_a_free_reg1 | internal_assign_a_free_reg2),
 
@@ -252,58 +260,27 @@ module prf(
 	//and return the index of this newly allocated register
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl1( 
 		.req(internal_prf_available),
-	        .en( priority_selector1_en),
-        	.gnt(internal_assign_a_free_reg1)
+	    .en( priority_selector1_en),
+        .gnt(internal_assign_a_free_reg1)
 	);
 
-
-	/*always_comb
-	begin
-		rat1_prf_rename_valid_out = 1'b0;
-		rat1_prf_rename_idx_out   = 0;
-		for(int i=0;i<`PRF_SIZE;i++)
-		begin
-			if (internal_assign_a_free_reg1[i]==1'b1)
-			begin
-				rat1_prf_rename_valid_out = 1'b1;
-				rat1_prf_rename_idx_out   = i;
-				break;
-			end
-		end
-	end*/
-
-	//this priority selector choose a second register from free lists for RAT2
-	//and return the index of this newly allocated register
+	
 	
 	//#######ATTENTION########
 	//internal_assign_a_free_reg1 and internal_assign_a_free_reg2 the highest bit might be X when 
 	//so RAT and RRAT should not give out signals like "xxx". 
+	
+	//this priority selector choose a second register from free lists for RAT2
+	//and return the index of this newly allocated register
 
-	assign internal_prf_available2 = (~internal_assign_a_free_reg1)&internal_prf_available;//for debug
+	assign internal_prf_available2 = (~internal_assign_a_free_reg1)&internal_prf_available;
+	
 	priority_selector #(.WIDTH(`PRF_SIZE)) prf_psl2( 
 		.req(internal_prf_available2),
-	        .en(priority_selector2_en),
-        	.gnt(internal_assign_a_free_reg2)
+	    .en(priority_selector2_en),
+        .gnt(internal_assign_a_free_reg2)
 	);
 
-	
-	/*always_comb
-	begin
-		for(int i=0;i<`PRF_SIZE;i++)
-		begin
-			if (internal_assign_a_free_reg2[i]==1'b1)
-			begin
-				rat2_prf_rename_valid_out = 1'b1;
-				rat2_prf_rename_idx_out   = i;
-				break;
-			end
-			else
-			begin
-				rat2_prf_rename_valid_out = 1'b0;
-				rat2_prf_rename_idx_out   = 0;
-			end
-		end
-	end*/
 
 	//store the data from CDB
 	always_comb
@@ -313,7 +290,7 @@ module prf(
 				internal_data_in[i] 	     = 0;
 				internal_write_prf_enable[i] = 1'b0;
 
-			if      ((cdb1_tag == i) && (cdb1_valid))
+			if  ((cdb1_tag == i) && (cdb1_valid))
 
 			begin
 				internal_data_in[i] 	     = cdb1_out;
@@ -341,7 +318,8 @@ module prf(
 			end
 			else
 			begin
-				inst1_opa_prf_value = {58'b0,inst1_opa_prf_idx};//0 lifan
+				// if the value in prf is invalid, we need to return the index of this entry
+				inst1_opa_prf_value = {58'b0,inst1_opa_prf_idx};
 				inst1_opa_valid	    = 1'b0;
 			end
 		end
@@ -356,7 +334,7 @@ module prf(
 			end
 			else
 			begin
-				inst1_opb_prf_value = {58'b0,inst1_opb_prf_idx};//0 lifan
+				inst1_opb_prf_value = {58'b0,inst1_opb_prf_idx};
 				inst1_opb_valid	    = 1'b0;
 			end
 		end
@@ -371,7 +349,7 @@ module prf(
 			end
 			else
 			begin
-				inst2_opa_prf_value = {58'b0,inst2_opa_prf_idx};//0 lifan
+				inst2_opa_prf_value = {58'b0,inst2_opa_prf_idx};
 				inst2_opa_valid	    = 1'b0;
 			end
 		end
@@ -386,7 +364,7 @@ module prf(
 			end
 			else
 			begin
-				inst2_opb_prf_value = {58'b0,inst1_opa_prf_idx};//0 lifan
+				inst2_opb_prf_value = {58'b0,inst1_opa_prf_idx};
 				inst2_opb_valid	    = 1'b0;
 			end
 		end
