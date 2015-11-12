@@ -220,11 +220,15 @@ module id_stage(
 				  
 				  output [63:0] opa_mux_out1;               //instr1 opa and opb value or tag
 			          output [63:0] opb_mux_out1;
+				  output logic  opa_mux_tag1;               //signal to indicate whether it is value or tag,true means value,faulse means tag
+				  output logic  opb_mux_tag1;
 				  output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
 													        // (ZERO_REG if no writeback)
 				 
 				  output [63:0] opa_mux_out2;               //instr2 opa and opb value or tag
 				  output [63:0] opb_mux_out2;
+				  output logic  opa_mux_tag2;               //signal to indicate whether it is value or tag
+				  output logic  opb_mux_tag2;
 				  output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
 
@@ -301,16 +305,40 @@ module id_stage(
 	always_comb
 	begin
 		case (id_opa_select_out1)
-			`ALU_OPA_IS_REGA:     opa_mux_out1 = {59{1'b0},ra_idx1};
-			`ALU_OPA_IS_MEM_DISP: opa_mux_out1 = mem_disp1;
-			`ALU_OPA_IS_NPC:      opa_mux_out1 = if_id_NPC_inst1;
-			`ALU_OPA_IS_NOT3:     opa_mux_out1 = ~64'h3;
+			`ALU_OPA_IS_REGA: begin     
+				opa_mux_out1 = {59{1'b0},ra_idx1};
+				opa_mux_tag1 = `FAULSE;
+				end
+			`ALU_OPA_IS_MEM_DISP: begin
+				opa_mux_out1 = mem_disp1;
+				opa_mux_tag1 = `TRUE;
+				end
+			`ALU_OPA_IS_NPC: begin
+				opa_mux_out1 = if_id_NPC_inst1;
+				opa_mux_tag1 = `TRUE;
+				end
+			`ALU_OPA_IS_NOT3: begin
+				opa_mux_out1 = ~64'h3;
+				opa_mux_tag1 = `TRUE;
+				end
 		endcase
 		case (id_opa_select_out2)
-			`ALU_OPA_IS_REGA:     opa_mux_out2 = {59{1'b0},ra_idx2};
-			`ALU_OPA_IS_MEM_DISP: opa_mux_out2 = mem_disp2;
-			`ALU_OPA_IS_NPC:      opa_mux_out2 = if_id_NPC_inst2;
-			`ALU_OPA_IS_NOT3:     opa_mux_out2 = ~64'h3;
+			`ALU_OPA_IS_REGA: begin
+				opa_mux_out2 = {59{1'b0},ra_idx2};
+				opa_mux_tag2 = `FAULSE;
+				end
+			`ALU_OPA_IS_MEM_DISP: begin
+				opa_mux_out2 = mem_disp2;
+				opa_mux_tag2 = `TRUE;
+				end
+			`ALU_OPA_IS_NPC: begin
+				opa_mux_out2 = if_id_NPC_inst2;
+				opa_mux_tag2 = `TRUE;
+				end	
+			`ALU_OPA_IS_NOT3: begin
+				opa_mux_out2 = ~64'h3;
+				opa_mux_tag2 = `TRUE;
+				end
 		endcase
 	end
 
@@ -324,14 +352,32 @@ module id_stage(
 		opb_mux_out1 = 64'hbaadbeefdeadbeef;
 		opb_mux_out2 = 64'hbaadbeefdeadbeef;
 		case (id_opb_select_out1)
-			`ALU_OPB_IS_REGB:    opb_mux_out1 = {59{1'b0},rb_idx1};
-			`ALU_OPB_IS_ALU_IMM: opb_mux_out1 = alu_imm1;
-			`ALU_OPB_IS_BR_DISP: opb_mux_out1 = br_disp1;
+			`ALU_OPB_IS_REGB: begin
+				opb_mux_out1 = {59{1'b0},rb_idx1};
+				opb_mux_tag1 = `FAULSE;
+				end
+			`ALU_OPB_IS_ALU_IMM: begin
+				opb_mux_out1 = alu_imm1;
+				opa_mux_tag1 = `TRUE;
+				end
+			`ALU_OPB_IS_BR_DISP: begin
+				opb_mux_out1 = br_disp1;
+				opa_mux_tag1 = `TRUE;
+				end
 		endcase
 		case (id_opb_select_out2)
-			`ALU_OPB_IS_REGB:    opb_mux_out2 = {59{1'b0},rb_idx2};
-			`ALU_OPB_IS_ALU_IMM: opb_mux_out2 = alu_imm2;
-			`ALU_OPB_IS_BR_DISP: opb_mux_out2 = br_disp2;
+			`ALU_OPB_IS_REGB: begin
+				opb_mux_out2 = {59{1'b0},rb_idx2};
+				opa_mux_tag2 = `FAULSE;
+				end
+			`ALU_OPB_IS_ALU_IMM: begin
+				opb_mux_out2 = alu_imm2;
+				opa_mux_tag2 = `TRUE;
+				end
+			`ALU_OPB_IS_BR_DISP: begin
+				opb_mux_out2 = br_disp2;
+				opa_mux_tag2 = `TRUE;
+				end
 		endcase  
 	end
 
