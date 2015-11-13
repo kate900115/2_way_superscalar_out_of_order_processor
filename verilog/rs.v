@@ -16,46 +16,40 @@ module rs(
 	input         				reset,          	// reset signal 
 	input         				clock,          	// the clock 
 
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in,     	// The destination of this instruction
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in,     	// The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  inst1_rs_dest_in,     	// The destination of this instruction
+	input  [$clog2(`PRF_SIZE)-1:0]  inst2_rs_dest_in,     	// The destination of this instruction
  
-	input  [63:0]				rs_cdb1_in,     	// CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb1_tag,    	// CDB tag bus from functional units 
-	input					rs_cdb1_valid,  	// The data on the CDB is valid 
-	input  [63:0]				rs_cdb2_in,     	// CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag,    	// CDB tag bus from functional units 
-	input					rs_cdb2_valid,  	// The data on the CDB is valid 
+	input  [63:0]					rs_cdb1_in,     	// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  rs_cdb1_tag,    	// CDB tag bus from functional units 
+	input							rs_cdb1_valid,  	// The data on the CDB is valid 
+	input  [63:0]					rs_cdb2_in,     	// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  rs_cdb2_tag,    	// CDB tag bus from functional units 
+	input							rs_cdb2_valid,  	// The data on the CDB is valid 
 
         //for instruction1
-	input  [63:0] 				inst1_rs_opa_in,      	// Operand a from Rename  
-	input  [63:0] 				inst1_rs_opb_in,      	// Operand a from Rename 
-	input  	     				inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
-	input  ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
+	input  [63:0] 					inst1_rs_opa_in,      	// Operand a from Rename  
+	input  [63:0] 					inst1_rs_opb_in,      	// Operand a from Rename 
+	input  	     					inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         					inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [$clog2(`ROB_SIZE)-1:0]	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
-	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  		        			inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
         
         //for instruction2
-	input  [63:0] 				inst2_rs_opa_in,      	// Operand a from Rename  
-	input  [63:0] 				inst2_rs_opb_in,      	// Operand a from Rename 
-	input  	     				inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
-	input  ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
+	input  [63:0] 					inst2_rs_opa_in,      	// Operand a from Rename  
+	input  [63:0] 					inst2_rs_opb_in,      	// Operand a from Rename 
+	input  	     					inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         					inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [$clog2(`ROB_SIZE)-1:0]	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
-	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  		        			inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	input  [5:0]				fu_is_available,			//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
+	input  [5:0]					fu_is_available,			//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
   
  	//output
 	output logic [5:0][63:0]		fu_rs_opa_out,       	// This RS' opa 
 	output logic [5:0][63:0]		fu_rs_opb_out,       	// This RS' opb 
 	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag  
 	output logic [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0][5:0]			fu_rs_op_type_out,     // This RS' operation type
 	output logic [5:0]				fu_rs_out_valid,	// RS output is valid
-	output ALU_FUNC [5:0]			fu_alu_func_out,
 
 	output							rs_full			// RS is full now
 );
@@ -73,11 +67,9 @@ module rs(
 	logic [`RS_SIZE-1:0]				internal_rs_available_out;	
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opa_out;
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opb_out;
-	logic [`RS_SIZE-1:0][5:0]			internal_rs_op_type_out;
 	logic [`RS_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	internal_rs_dest_tag_out;
 	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] internal_rs_rob_idx_out;
 	FU_SELECT [`RS_SIZE-1:0]			internal_fu_select_reg_out;                            
-	ALU_FUNC  [`RS_SIZE-1:0]			internal_rs_alu_func_out;
 
 
 	//internal registers
@@ -186,10 +178,6 @@ module rs(
 	.inst2_rs1_opb_valid(inst2_OPbValid),
 	.inst2_fu_select(inst2_fu_select),
  	
-	.inst1_rs1_op_type_in(inst1_rs_op_type_in),
-	.inst2_rs1_op_type_in(inst2_rs_op_type_in),
-	.inst1_rs1_alu_func(inst1_rs_alu_func),
-	.inst2_rs1_alu_func(inst2_rs_alu_func),
 	.inst1_rs1_load_in(inst1_internal_rs_load_in),   				
 	.inst2_rs1_load_in(inst2_internal_rs_load_in),   					
 	.inst1_rs1_rob_idx_in(inst1_rs_rob_idx_in),   
@@ -204,8 +192,6 @@ module rs(
 	.rs1_dest_tag_out(internal_rs_dest_tag_out),  	 
 	.rs1_available_out(internal_rs_available_out), 
 	.rs1_rob_idx_out(internal_rs_rob_idx_out),   	
-	.rs1_op_type_out(internal_rs_op_type_out),
-	.rs1_alu_func_out(internal_rs_alu_func_out),
 	.fu_select_reg_out(internal_fu_select_reg_out)
 
 	  );  
@@ -232,8 +218,6 @@ module rs(
 			fu_rs_opb_out[i]		= 0;
 			fu_rs_dest_tag_out[i]	= 0;
 			fu_rs_rob_idx_out[i]	= 0;
-			fu_rs_op_type_out[i]	= 0;
-			fu_alu_func_out[i]		= ALU_DEFAULT;
 			internal_rs_free[i]		= 0;
 		end
 		if (fu_is_available[0]) begin
@@ -245,9 +229,7 @@ module rs(
 						fu_rs_opb_out[0]		= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[0]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[0]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[0]		= 1'b1;
-						fu_alu_func_out[0]		= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -263,9 +245,7 @@ module rs(
 						fu_rs_opb_out[1]		= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[1]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[1]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[1]		= 1'b1;
-						fu_alu_func_out[1]		= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -281,9 +261,7 @@ module rs(
 						fu_rs_opb_out[2]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[2]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[2]	= 1'b1;
-						fu_alu_func_out[2]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -299,9 +277,7 @@ module rs(
 						fu_rs_opb_out[3]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[3]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[3]	= 1'b1;
-						fu_alu_func_out[3]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -317,9 +293,7 @@ module rs(
 						fu_rs_opb_out[4]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[4]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[4]	= 1'b1;
-						fu_alu_func_out[4]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -335,9 +309,7 @@ module rs(
 						fu_rs_opb_out[5]	= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[5]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[5]	= 1'b1;
-						fu_alu_func_out[5]	= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -355,7 +327,7 @@ module rs(
 		.en(1'b1),
 		.gnt_bus({is_full1, is_full2})
 	);
-	rs_full = (is_full1 != 0);
+	assign rs_full = (is_full1 != 0);
 
 	//fu select
 	always_comb begin
