@@ -366,23 +366,24 @@ module rrat rrat1(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-	input				inst1_enable,
-	input				inst2_enable,
+	.inst1_enable(PC_thread1_is_available && PC_inst1_valid),
+	.inst2_enable(PC_thread1_is_available && PC_inst1_valid),
 
-	input [$clog2(`PRF_SIZE)-1:0]	RoB_PRF_idx1,
-	input [$clog2(`ARF_SIZE)-1:0] 	RoB_ARF_idx1,
-	input 				RoB_retire_in1,	//high when instruction retires
-	input 				mispredict_sig1,
+	.RoB_PRF_idx1(rob1_commit1_prn_dest_out),
+	.RoB_ARF_idx1(rob1_commit1_arn_dest_out),
+	.RoB_retire_in1(rob1_commit1_if_rename_out),	//high when instruction retires
+	.mispredict_sig1(rob1_commit1_mispredict_out),
 
-	input [$clog2(`PRF_SIZE)-1:0]	RoB_PRF_idx2,
-	input [$clog2(`ARF_SIZE)-1:0] 	RoB_ARF_idx2,
-	input 				RoB_retire_in2,	//high when instruction retires
-	input 				mispredict_sig2,
-//output
-	output logic 							PRF_free_valid1,
-	output logic [$clog2(`PRF_SIZE)-1:0]	PRF_free_idx1,
-	output logic							PRF_free_valid2,
-	output logic [$clog2(`PRF_SIZE)-1:0]	PRF_free_idx2,
+	.RoB_PRF_idx2(rob1_commit2_prn_dest_out),
+	.RoB_ARF_idx2(rob1_commit2_arn_dest_out),
+	.RoB_retire_in2(rob1_commit2_if_rename_out),	//high when instruction retires
+	.mispredict_sig2(rob1_commit2_mispredict_out),
+
+	//output
+	.PRF_free_valid1(rrat1_PRF_free_valid1),
+	.PRF_free_idx1(rrat1_PRF_free_idx1),
+	.PRF_free_valid2(rrat1_PRF_free_valid2),
+	.PRF_free_idx2(rrat1_PRF_free_idx2),
 	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1)
 
 );
@@ -447,10 +448,10 @@ module prf prf1(
 	input					rrat1_branch_mistaken_free_valid,	// when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
 	input					rrat2_branch_mistaken_free_valid,	// when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
 
-	input					rrat1_prf_free_valid,			// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	input					rrat2_prf_free_valid,			// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	input	[$clog2(`PRF_SIZE)-1:0] 	rrat1_prf_free_idx,			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	input	[$clog2(`PRF_SIZE)-1:0] 	rrat2_prf_free_idx,			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	.rrat1_prf_free_valid(rrat1_PRF_free_valid1),			// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	.rrat2_prf_free_valid(rrat1_PRF_free_valid2),			// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	.rrat1_prf_free_idx(rrat1_PRF_free_idx1),			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	.rrat2_prf_free_idx(rrat1_PRF_free_idx2),			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	.rat1_prf2_rename_valid_out(PRF_RAT1_rename_valid2),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -509,18 +510,18 @@ module rob rob1(
 																						//store in rs
 //when committed, the output of the first instrucion committed
 	output	logic								commit1_is_branch_out,				       	//if this instruction is a branch
-	output	logic								commit1_mispredict_out,				       	//if this instrucion is mispredicted
-	output	logic	[4:0]						commit1_arn_dest_out,                       //the architected register number of the destination of this instruction
-	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit1_prn_dest_out,						//the prf number of the destination of this instruction
-	output	logic								commit1_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
+	.commit1_mispredict_out(rob1_commit1_mispredict_out),				       	//if this instrucion is mispredicted
+	.commit1_arn_dest_out(rob1_commit1_arn_dest_out),                       //the architected register number of the destination of this instruction
+	.commit1_prn_dest_out(rob1_commit1_prn_dest_out),						//the prf number of the destination of this instruction
+	.commit1_if_rename_out(rob1_commit1_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
 	output	logic								commit1_valid,
 	output	logic								commit1_is_thread1,
 //when committed, the output of the second instruction committed
 	output	logic								commit2_is_branch_out,						//if this instruction is a branch
-	output	logic								commit2_mispredict_out,				       	//if this instrucion is mispredicted
-	output	logic	[4:0]						commit2_arn_dest_out,						//the architected register number of the destination of this instruction
-	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit2_prn_dest_out,						//the prf number of the destination of this instruction
-	output	logic								commit2_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
+	.commit2_mispredict_out(rob1_commit2_mispredict_out),				       	//if this instrucion is mispredicted
+	.commit2_arn_dest_out(rob1_commit2_arn_dest_out),						//the architected register number of the destination of this instruction
+	.commit2_prn_dest_out(rob1_commit2_prn_dest_out),						//the prf number of the destination of this instruction
+	.commit2_if_rename_out(rob1_commit2_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
 	output	logic								commit2_valid,
 	output	logic								commit2_is_thread1,
 	output	logic								t1_is_full,
