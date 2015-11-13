@@ -59,6 +59,14 @@ module processor(
     output logic [63:0] mem_wb_NPC,
     output logic [31:0] mem_wb_IR,
     output logic        mem_wb_valid_inst
+
+    //Output from rob
+    output logic [63:0]				ROB_commit1_pc;
+    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
+    output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
+    output logic [63:0]				ROB_commit2_pc;
+    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
+    output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
 );
 //pc output
 logic [31:0]	PC_inst1;
@@ -139,18 +147,18 @@ logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx2;
 logic							RRAT2_RAT2_mispredict_up_idx2;
 
 //rob output
-logic [63:0]					ROB_commit1_pc;
+//logic [63:0]				ROB_commit1_pc;		//output of processor
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
-logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
-logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
-logic							ROB_commit1_if_rename_out;
-logic							ROB_commit1_mispredict;
-logic [63:0]					ROB_commit2_pc;
+//logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;  	//output of processor
+//logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;  	//output of processor
+logic					ROB_commit1_if_rename_out;
+logic					ROB_commit1_mispredict;
+//logic [63:0]				ROB_commit2_pc;		//output of processor
 logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
-logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
-logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
-logic							ROB_commit2_if_rename_out;
-logic							ROB_commit2_mispredict;
+//logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit2_prn_dest;	//output of processor
+//logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;	//output of processor
+logic					ROB_commit2_if_rename_out;
+logic					ROB_commit2_mispredict;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
