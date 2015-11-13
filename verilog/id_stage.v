@@ -236,6 +236,8 @@ module id_stage(
 				output logic  [4:0] id_alu_func_out2,      // ALU function select (ALU_xxx *)
 				output logic  [5:0] id_op_type_inst1,		// op type
 				output logic  [5:0] id_op_type_inst2,
+				output logic  [1:0] id_op_select1,
+				output logic  [1:0] id_op_select2,
 
 				output logic        id_rd_mem_out1,        // does inst read memory?
 				output logic        id_wr_mem_out1,        // does inst write memory?
@@ -431,5 +433,30 @@ module id_stage(
 			default:       id_dest_reg_idx_out2 = `ZERO_REG; 
 		endcase
 	end
+
+	always_comb
+	begin
+		case({id_op_type_inst1[5:3],3'b0})
+			6'h08, 6'h20, 6'h28: id_op_select1=`USE_MEMORY;
+			6'h18, 6'h30, 6'h38: id_op_select1=`USE_BRANCH;
+			default: begin
+				if(id_alu_func_out1==`ALU_MULQ)
+					id_op_select1=`USE_MULTIPLIER;
+				else
+					id_op_select1=`USE_ADDER;
+				end
+		endcase
+		case({id_op_type_inst2[5:3],3'b0})
+			6'h08, 6'h20, 6'h28: id_op_select2=`USE_MEMORY;
+			6'h18, 6'h30, 6'h38: id_op_select2=`USE_BRANCH;
+			default: begin
+				if(id_alu_func_out2==`ALU_MULQ)
+					id_op_select2=`USE_MULTIPLIER;
+				else
+					id_op_select2=`USE_ADDER;
+				end
+		endcase	
+	end
+			
    
 endmodule // module id_stage
