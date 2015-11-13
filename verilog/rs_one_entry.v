@@ -43,8 +43,8 @@ module rs_one_entry(
 
 	input   	        		rs1_free,		// Signal to send data to Func units AND to free this RS
 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs1_rob_idx_in,   	// 
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs1_rob_idx_in,   	// 
+	input  [$clog2(`ROB_SIZE):0]       	inst1_rs1_rob_idx_in,   	// 
+	input  [$clog2(`ROB_SIZE):0]       	inst2_rs1_rob_idx_in,   	// 
 
  	//output
 	output logic							rs1_ready_out,    	// This RS is in use and ready to go to EX 
@@ -52,7 +52,7 @@ module rs_one_entry(
 	output logic [63:0]						rs1_opb_out,       	// This RS' opb 
 	output logic [$clog2(`PRF_SIZE)-1:0]				rs1_dest_tag_out,  	// This RS' destination tag   
 	output logic							rs1_available_out, 	// This RS' is available
-	output logic [$clog2(`ROB_SIZE)-1:0]    			rs1_rob_idx_out,   	// 
+	output logic [$clog2(`ROB_SIZE):0]    			rs1_rob_idx_out,   	// 
 	output FU_SELECT						fu_select_reg_out,
 );  
 
@@ -67,7 +67,7 @@ module rs_one_entry(
 	logic  					OPbValid_reg;         	// Operand B Tag/Value 
 	logic  					InUse;            	// InUse bit 
 	logic  [$clog2(`PRF_SIZE)-1:0]  	DestTag;   		// Destination Tag bit 
-	logic  [$clog2(`ROB_SIZE)-1:0] 		Rob_idx;   		//
+	logic  [$clog2(`ROB_SIZE):0] 		Rob_idx;   		//
  
 	logic  					LoadAFromCDB1;  	// signal to load from the CDB1 
 	logic  					LoadBFromCDB1;  	// signal to load from the CDB1

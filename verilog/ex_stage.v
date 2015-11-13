@@ -101,7 +101,7 @@ module ex_stage(
     input [3:0][63:0]			fu_rs_opa_in,		// register A value from reg file
     input [3:0][63:0]			fu_rs_opb_in,		// register B value from reg file
     input [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
-    input [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
+    input [3:0][$clog2(`ROB_SIZE):0]	fu_rs_rob_idx_in,
     input [3:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
     input [3:0]					fu_rs_valid_in,
     ALU_FUNC [3:0]     			fu_alu_func_in,	// ALU function select from decoder
@@ -120,7 +120,7 @@ module ex_stage(
     //output	ex_take_branch_out,  // is this a taken branch?
 
     output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_cdb_dest_tag_out,
-    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_cdb_rob_idx_out,
+    output logic [3:0][$clog2(`ROB_SIZE):0]	fu_cdb_rob_idx_out,
     output logic [3:0][5:0]  			fu_cdb_op_type_out,	// incoming instruction
     output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
     output logic [3:0][63:0]			fu_result_out,

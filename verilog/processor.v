@@ -140,13 +140,13 @@ logic							RRAT2_RAT2_mispredict_up_idx2;
 
 //rob output
 logic [63:0]					ROB_commit1_pc;
-logic [$clog2(`ROB_SIZE)-1:0]	ROB_inst1_rob_idx;
+logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
 logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
 logic							ROB_commit1_if_rename_out;
 logic							ROB_commit1_mispredict;
 logic [63:0]					ROB_commit2_pc;
-logic [$clog2(`ROB_SIZE)-1:0]	ROB_inst2_rob_idx;
+logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
 logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
 logic							ROB_commit2_if_rename_out;
@@ -156,7 +156,7 @@ logic							ROB_commit2_mispredict;
 logic [5:0][63:0]		RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
-logic [5:0][$clog2(`ROB_SIZE)-1:0]	RS_EX_rob_idx;
+logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
 logic [5:0][5:0]			RS_EX_op_type;
 logic [5:0]					RS_EX_out_valid;
 ALU_FUNC [5:0]				RS_EX_alu_func;
@@ -178,9 +178,11 @@ logic					mult2_send_in_success;
 logic							cdb1_valid;
 logic [63:0]					cdb1_value;
 logic [$clog2(`PRF_SIZE)-1:0]	cdb1_tag;
+logic [$clog2(`ROB_SIZE):0]		cdb1_rob_idx;
 logic							cdb2_valid;
 logic [63:0]					cdb2_value;
 logic [$clog2(`PRF_SIZE)-1:0]	cdb2_tag;
+logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 
 //////////////////////////////////
 //								//
@@ -523,7 +525,7 @@ module rob rob1(
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
 	input	[5:0]							if_fu_executed,		//if the instruction in the first multiplyer has been executed
-	input	[5:0][$clog2(`ROB_SIZE)-1:0]	fu_rob_idx,			//the rob number of the instruction in the first multiplyer
+	input	[5:0][$clog2(`ROB_SIZE):0]	fu_rob_idx,			//the rob number of the instruction in the first multiplyer
 	input	[5:0]							fu_is_thread1,		//the rob number of the instruction in the first multiplyer
 	input	[5:0]							mispredict_in,
 //output
@@ -578,8 +580,6 @@ module rs rs1(
 	.inst1_rs_opb_in(ID_inst1_opb_valid ? ID_inst1_opb : PRF_RS_inst1_opb),      	// Operand a from Rename 
 	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	.inst1_rs_op_type_in(ID_op_type1),  	// Instruction type from decoder
-	.inst1_rs_alu_func(ID_alu_func1),    	// ALU function type from decoder
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
 	.inst1_rs_load_in(ID_inst1_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	//for instruction2
@@ -587,8 +587,6 @@ module rs rs1(
 	.inst2_rs_opb_in(ID_inst2_opb_valid ? ID_inst2_opb : PRF_RS_inst2_opb),      	// Operand a from Rename 
 	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	.inst2_rs_op_type_in(ID_op_type2),  	// Instruction type from decoder
-	.inst2_rs_alu_func(ID_alu_func2),    	// ALU function type from decoder
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
@@ -597,9 +595,7 @@ module rs rs1(
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
 	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
 	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
-	.fu_rs_op_type_out(RS_EX_op_type)
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
-	.fu_alu_func_out(RS_EX_alu_func),
 	
 	.rs_full(RS_full)			// RS is full now
 );
@@ -618,9 +614,7 @@ module ex_stage ex(
     .fu_rs_opb_in(RS_EX_opb[3:0]),		// register B value from reg file
     .fu_rs_dest_tag_in(RS_EX_dest_tag[3:0]),
     .fu_rs_rob_idx_in(RS_EX_rob_idx[3:0]),
-    .fu_rs_op_type_in(RS_EX_op_type[3:0]),	// incoming instruction
     .fu_rs_valid_in(RS_EX_out_valid[3:0]),
-    .fu_alu_func_in(RS_EX_alu_func[3:0]),	// ALU function select from decoder
 
     input id_ex_cond_branch,   // is this a cond br? from decoder
     input id_ex_uncond_branch, // is this an uncond br? from decoder
@@ -632,13 +626,10 @@ module ex_stage ex(
 //output
 //ex_take_branch_out,  // is this a taken branch?
     .fu_cdb_dest_tag_out(EX_CDB_dest_tag),
-    //output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_cdb_rob_idx_out,
-    //output logic [3:0][5:0]  			fu_cdb_op_type_out,	// incoming instruction
-    //output ALU_FUNC [3:0]				fu_alu_func_out,	// ALU function select from decoder
+    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_cdb_rob_idx_out,
     .fu_result_out(EX_CDB_fu_result_out),
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
-
   );
 //////////////////////////////////
 //								//
@@ -650,28 +641,36 @@ module cdb cdb1(
 	.mult1_result_ready(EX_CDB_fu_result_is_valid[0]),
 	.mult1_result_in(EX_CDB_fu_result_out[0]),
 	.mult1_dest_reg_idx(EX_CDB_dest_tag[0]),
+	.mult1_rob_idx(),
 	.adder1_result_ready(EX_CDB_fu_result_is_valid[1]),
 	.adder1_result_in(EX_CDB_fu_result_out[1]),
 	.adder1_dest_reg_idx(EX_CDB_dest_tag[1]),
+	.adder1_rob_idx(),
 	.mult2_result_ready(EX_CDB_fu_result_is_valid[2]),
 	.mult2_result_in(EX_CDB_fu_result_out[2]),
 	.mult2_dest_reg_idx(EX_CDB_dest_tag[2]),
+	.mult2_rob_idx(),
 	.adder2_result_ready(EX_CDB_fu_result_is_valid[3]),
 	.adder2_result_in(EX_CDB_fu_result_out[3]),
 	.adder2_dest_reg_idx(EX_CDB_dest_tag[3]),
+	.adder2_rob_idx
 	//input  								memory1_result_ready,
 	//input  	[63:0]						memory1_result_in,
-	//input	[$clog2(`PRF_SIZE)-1:0]		memory1_dest_reg_idx,
+	//input	[$clog2(`PRF_SIZE)-1:0]			memory1_dest_reg_idx,
+	//memory1_rob_idx
 	//input  								memory2_result_ready,
 	//input  	[63:0]						memory2_result_in,
-	//input	[$clog2(`PRF_SIZE)-1:0]		memory2_dest_reg_idx,
+	//input	[$clog2(`PRF_SIZE)-1:0]			memory2_dest_reg_idx,
+	//memory2_rob_idx
 //output	
 	.cdb1_valid(cdb1_valid),
 	.cdb1_tag(cdb1_tag),
 	.cdb1_out(cdb1_value),
+	.cdb1_rob_idx(),
 	.cdb2_valid(cdb2_valid),
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
+	.cdb2_rob_idx(),
 	.adder1_send_in_success(adder1_send_in_success),
 	.adder2_send_in_success(adder2_send_in_success),
 	.mult1_send_in_success(mult1_send_in_success),

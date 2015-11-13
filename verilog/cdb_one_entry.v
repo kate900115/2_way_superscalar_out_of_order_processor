@@ -20,28 +20,28 @@ module cdb_one_entry(
 
 	input  	[63:0]							memory1_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			memory1_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			memory1_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			memory1_rob_idx,
 	input  	[63:0]							memory2_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			memory2_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			memory2_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			memory2_rob_idx,
 	input  	[63:0]							mult1_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			mult1_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			mult1_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			mult1_rob_idx,
 	input  	[63:0]							mult2_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			mult2_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			mult2_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			mult2_rob_idx,
 	input  	[63:0]							adder1_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			adder1_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			adder1_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			adder1_rob_idx,
 	input  	[63:0]							adder2_result_in,
 	input	[$clog2(`PRF_SIZE)-1:0]			adder2_dest_reg_idx,
-	input	[$clog2(`ROB_SIZE)-1:0]			adder2_rob_idx,
+	input	[$clog2(`ROB_SIZE):0]			adder2_rob_idx,
 
 	
 	output 	logic							cdb_valid,
 	output  logic [$clog2(`PRF_SIZE)-1:0]	cdb_tag,
 	output 	logic [63:0]					cdb_out,
-	output  [$clog2(`ROB_SIZE)-1:0]			cdb_rob_idx
+	output  [$clog2(`ROB_SIZE):0]			cdb_rob_idx
 );
 
 	

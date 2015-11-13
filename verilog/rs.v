@@ -31,7 +31,7 @@ module rs(
 	input  [63:0] 					inst1_rs_opb_in,      	// Operand a from Rename 
 	input  	     					inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         					inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [$clog2(`ROB_SIZE)-1:0]	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
+	input  [$clog2(`ROB_SIZE):0]	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  		        			inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
         
         //for instruction2
@@ -39,7 +39,7 @@ module rs(
 	input  [63:0] 					inst2_rs_opb_in,      	// Operand a from Rename 
 	input  	     					inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         					inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [$clog2(`ROB_SIZE)-1:0]	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
+	input  [$clog2(`ROB_SIZE):0]	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  		        			inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
 	input  [5:0]					fu_is_available,			//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
@@ -48,7 +48,7 @@ module rs(
 	output logic [5:0][63:0]		fu_rs_opa_out,       	// This RS' opa 
 	output logic [5:0][63:0]		fu_rs_opb_out,       	// This RS' opb 
 	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag  
-	output logic [5:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
+	output logic [5:0][$clog2(`ROB_SIZE):0]		fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
 	output logic [5:0]				fu_rs_out_valid,	// RS output is valid
 
 	output							rs_full			// RS is full now
@@ -68,7 +68,7 @@ module rs(
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opa_out;
 	logic [`RS_SIZE-1:0][63:0]			internal_rs_opb_out;
 	logic [`RS_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	internal_rs_dest_tag_out;
-	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] internal_rs_rob_idx_out;
+	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE):0] 	internal_rs_rob_idx_out;
 	FU_SELECT [`RS_SIZE-1:0]			internal_fu_select_reg_out;                            
 
 
