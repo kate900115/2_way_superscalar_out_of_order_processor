@@ -587,10 +587,11 @@ module rs rs1(
 	.rs_cdb2_valid(cdb2_valid),  	// The data on the CDB is valid 
 	//for instruction1
 	.inst1_rs_opa_in(ID_inst1_opa_valid ? ID_inst1_opa : PRF_RS_inst1_opa),      	// Operand a from Rename  
-	.inst1_rs_opb_in(ID_inst1_opb_valid ? ID_inst1_opb : PRF_RS_inst1_opb),      	// Operand a from Rename 
+	.inst1_rs_opb_in(ID_inst1_opb_valid ? ID_inst1_opb : PRF_RS_inst1_opb),      	// Operand a from Rename
 	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
+	.inst1_rs_alu_func(ID_alu_func1),
 	.inst1_rs_load_in(ID_inst1_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	//for instruction2
 	.inst2_rs_opa_in(ID_inst2_opa_valid ? ID_inst2_opa : PRF_RS_inst2_opa),      	// Operand a from Rename  
@@ -598,6 +599,7 @@ module rs rs1(
 	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
+	.inst2_rs_alu_func(ID_alu_func2),
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 //output
@@ -605,6 +607,7 @@ module rs rs1(
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
 	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
 	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
+	.fu_alu_func_out(RS_EX_alu_func)
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
 	
 	.rs_full(RS_full)			// RS is full now
@@ -625,6 +628,7 @@ module ex_stage ex(
     .fu_rs_dest_tag_in(RS_EX_dest_tag[3:0]),
     .fu_rs_rob_idx_in(RS_EX_rob_idx[3:0]),
     .fu_rs_valid_in(RS_EX_out_valid[3:0]),
+	.fu_alu_func_in(RS_EX_alu_func[3:0]),
 
     input id_ex_cond_branch,   // is this a cond br? from decoder
     input id_ex_uncond_branch, // is this an uncond br? from decoder
