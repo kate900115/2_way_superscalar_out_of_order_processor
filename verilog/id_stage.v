@@ -9,7 +9,7 @@
 /////////////////////////////////////////////////////////////////////////
 
 
-`timescale 1ns/100ps
+//`timescale 1ns/100ps
 
 
   // Decode an instruction: given instruction bits IR produce the
@@ -214,21 +214,21 @@ module id_stage(
 				//input  [63:0] wb_reg_wr_data_out,   // Reg write data from WB Stage
 				input         if_id_valid_inst1,
 				input         if_id_valid_inst2,
-				input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC
+				input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC+4
 				input  [63:0] if_id_NPC_inst2,           // incoming instruction2 PC+4
 
 				 
-				output [63:0] opa_mux_out1;               //instr1 opa and opb value or tag
-			    output [63:0] opb_mux_out1;
-				output logic  opa_mux_tag1;               //signal to indicate whether it is value or tag,true means value,faulse means tag
-				output logic  opb_mux_tag1;
+				output logic [63:0] opa_mux_out1,               //instr1 opa and opb value or tag
+			    	output logic [63:0] opb_mux_out1,
+				output logic  opa_mux_tag1,               //signal to indicate whether it is value or tag,true means value,faulse means tag
+				output logic  opb_mux_tag1,
 				output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
 													        // (ZERO_REG if no writeback)
 				 
-				output [63:0] opa_mux_out2;               //instr2 opa and opb value or tag
-				output [63:0] opb_mux_out2;
-				output logic  opa_mux_tag2;               //signal to indicate whether it is value or tag
-				output logic  opb_mux_tag2;
+				output logic [63:0] opa_mux_out2,               //instr2 opa and opb value or tag
+				output logic [63:0] opb_mux_out2,
+				output logic  opa_mux_tag2,               //signal to indicate whether it is value or tag
+				output logic  opb_mux_tag2,
 				output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
 
@@ -262,8 +262,12 @@ module id_stage(
 				output logic        id_valid_inst_out2     // is inst a valid instruction to be 
               );
    
-	logic   [1:0] dest_reg_select;
-	logic   [1:0] dest_reg_select;
+	logic [1:0] dest_reg_select1;
+	logic [1:0] dest_reg_select2;
+	logic [1:0] id_opa_select_out1;
+	logic [1:0] id_opb_select_out1;
+	logic [1:0] id_opa_select_out2;
+	logic [1:0] id_opb_select_out2;
 
 	// instruction fields read from IF/ID pipeline register
 	wire    [4:0] ra_idx1 = if_id_IR1[25:21];   // inst1 operand A register index
@@ -292,8 +296,8 @@ module id_stage(
 	begin
 		case (id_opa_select_out1)
 			`ALU_OPA_IS_REGA: begin     
-				opa_mux_out1 = {59{1'b0},ra_idx1};
-				opa_mux_tag1 = `FAULSE;
+				opa_mux_out1 = {{59{1'b0}},ra_idx1};
+				opa_mux_tag1 = `FALSE;
 				end
 			`ALU_OPA_IS_MEM_DISP: begin
 				opa_mux_out1 = mem_disp1;
@@ -310,8 +314,8 @@ module id_stage(
 		endcase
 		case (id_opa_select_out2)
 			`ALU_OPA_IS_REGA: begin
-				opa_mux_out2 = {59{1'b0},ra_idx2};
-				opa_mux_tag2 = `FAULSE;
+				opa_mux_out2 = {{59{1'b0}},ra_idx2};
+				opa_mux_tag2 = `FALSE;
 				end
 			`ALU_OPA_IS_MEM_DISP: begin
 				opa_mux_out2 = mem_disp2;
@@ -339,30 +343,30 @@ module id_stage(
 		opb_mux_out2 = 64'hbaadbeefdeadbeef;
 		case (id_opb_select_out1)
 			`ALU_OPB_IS_REGB: begin
-				opb_mux_out1 = {59{1'b0},rb_idx1};
-				opb_mux_tag1 = `FAULSE;
+				opb_mux_out1 = {{59{1'b0}},rb_idx1};
+				opb_mux_tag1 = `FALSE;
 				end
 			`ALU_OPB_IS_ALU_IMM: begin
 				opb_mux_out1 = alu_imm1;
-				opa_mux_tag1 = `TRUE;
+				opb_mux_tag1 = `TRUE;
 				end
 			`ALU_OPB_IS_BR_DISP: begin
 				opb_mux_out1 = br_disp1;
-				opa_mux_tag1 = `TRUE;
+				opb_mux_tag1 = `TRUE;
 				end
 		endcase
 		case (id_opb_select_out2)
 			`ALU_OPB_IS_REGB: begin
-				opb_mux_out2 = {59{1'b0},rb_idx2};
-				opa_mux_tag2 = `FAULSE;
+				opb_mux_out2 = {{59{1'b0}},rb_idx2};
+				opb_mux_tag2 = `FALSE;
 				end
 			`ALU_OPB_IS_ALU_IMM: begin
 				opb_mux_out2 = alu_imm2;
-				opa_mux_tag2 = `TRUE;
+				opb_mux_tag2 = `TRUE;
 				end
 			`ALU_OPB_IS_BR_DISP: begin
 				opb_mux_out2 = br_disp2;
-				opa_mux_tag2 = `TRUE;
+				opb_mux_tag2 = `TRUE;
 				end
 		endcase  
 	end
