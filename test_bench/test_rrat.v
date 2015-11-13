@@ -182,7 +182,7 @@ initial begin
 	RoB_PRF_idx2 = 0;
 	mispredict_sig2 = 0;
 	
-	@(negedge clock);
+	#1
 	correct1 = (PRF_free_valid1 == 0 && PRF_free_idx1 == 0 && 
 			mispredict_up_idx[0] == 8 &&
 			mispredict_up_idx[1] == 3 &&
@@ -208,7 +208,7 @@ initial begin
 	RoB_PRF_idx2 = 0;
 	mispredict_sig2 = 0;
 	
-	@(negedge clock);
+	#1
 	correct1 = (PRF_free_valid1 == 0 && PRF_free_idx1 == 0 && mispredict_up_idx == 0);
 	correct2 = (PRF_free_valid2 == 0 && PRF_free_idx2 == 0 && mispredict_up_idx == 0);
 	correct = correct1 & correct2;
