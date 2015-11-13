@@ -327,8 +327,8 @@ module rat rat1(
 	.RAT_allo_halt2(RAT1_PRF_allocate_req2),
 
 	//output together
-	output	logic	[`ARF_SIZE-1:0]	PRF_free_sig,
-	.PRF_free_list()
+	.PRF_free_list_out(RAT1_PRF_free_list),
+	.PRF_free_valid(rat1_prf_free_valid)
 	);
 	
 module rat rat2(
@@ -378,8 +378,8 @@ module rat rat2(
 	.RAT_allo_halt2(RAT2_PRF_allocate_req2),
 
 	//output together
-	output	logic	[`ARF_SIZE-1:0]	PRF_free_sig,
-	output	logic	[`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0] .PRF_free_list()
+	.PRF_free_list_out(RAT2_PRF_free_list),
+	.PRF_free_valid(rat2_prf_free_valid)//high when mispredict
 	);
 
 //////////////////////////////////
@@ -466,10 +466,10 @@ module prf prf1(
 	.rat2_allocate_new_prf1(RAT2_PRF_allocate_req1),			// the request from rat2 for allocating a new prf entry
 	.rat2_allocate_new_prf2(RAT2_PRF_allocate_req2),			// the request from rat2 for allocating a new prf entry
 
-	//input	[`PRF_SIZE-1:0]	rrat1_prf_free_list(RRAT1_PRF_free_list),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
-	//input	[`PRF_SIZE-1:0]	rrat2_prf_free_list(RRAT2_PRF_free_list),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
-	input	[`PRF_SIZE-1:0]	rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
-	input	[`PRF_SIZE-1:0]	rat2_prf_free_list(RAT2_PRF_free_list),			// when a branch is mispredict, RAT2 gives a freelist to PRF
+	.rrat1_branch_mistaken_free_valid(rat1_prf_free_valid),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	.rrat2_branch_mistaken_free_valid(rat2_prf_free_valid),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
+	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
+	.rat2_prf_free_list(RAT2_PRF_free_list),			// when a branch is mispredict, RAT2 gives a freelist to PRF
 	//input					rrat1_branch_mistaken_free_valid(),	// when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
 	//input					rrat2_branch_mistaken_free_valid(),	// when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
 
