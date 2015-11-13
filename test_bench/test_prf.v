@@ -26,11 +26,15 @@ module test_prf;
 	logic	[`PRF_SIZE-1:0]			rat2_prf_free_list;					//when a branch is mispredict, RAT2 gives a freelist to PRF
 	logic							rrat1_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
 	logic							rrat2_branch_mistaken_free_valid;	//when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
-
-	logic							rrat1_prf_free_valid;				//when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	logic							rrat2_prf_free_valid;				//when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	logic	[$clog2(`PRF_SIZE)-1:0] rrat1_prf_free_idx;					//when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	logic	[$clog2(`PRF_SIZE)-1:0] rrat2_prf_free_idx;					//when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	
+	logic							rrat1_prf1_free_valid;				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	logic							rrat2_prf1_free_valid;				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat1_prf1_free_idx;				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat2_prf1_free_idx;				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	logic							rrat1_prf2_free_valid;				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	logic							rrat2_prf2_free_valid;				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat1_prf2_free_idx;				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	logic	[$clog2(`PRF_SIZE)-1:0] rrat2_prf2_free_idx;				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 
 	logic							inst1_opa_valid;					//whether opa load from prf of instruction1 is valid
 	logic							inst1_opb_valid;					//whether opb load from prf of instruction1 is valid
@@ -53,12 +57,16 @@ module test_prf;
 	logic	[63:0]					inst2_opb_prf_value;				//opb prf value of instruction2
 	logic							prf_is_full;	
 
-	//for debug
+	// for debug
 	logic 	[`PRF_SIZE-1:0]			internal_assign_a_free_reg1;
 	logic 	[`PRF_SIZE-1:0]			internal_prf_available;
 	logic 	[`PRF_SIZE-1:0]			internal_assign_a_free_reg2;
 	logic 	[`PRF_SIZE-1:0]			internal_prf_available2;
 	logic 	[`PRF_SIZE-1:0]			internal_free_this_entry;
+	
+	// for writeback
+	logic   [63:0]					writeback_value1;
+	logic   [63:0]					writeback_value2;
 
 	prf prf1(
 		//input
@@ -87,11 +95,15 @@ module test_prf;
 		.rat2_prf_free_list(rat2_prf_free_list),			
 		.rrat1_branch_mistaken_free_valid(rrat1_branch_mistaken_free_valid),	
 		.rrat2_branch_mistaken_free_valid(rrat2_branch_mistaken_free_valid),	
-
-		.rrat1_prf_free_valid(rrat1_prf_free_valid),		
-		.rrat2_prf_free_valid(rrat2_prf_free_valid),		
-		.rrat1_prf_free_idx(rrat1_prf_free_idx),			
-		.rrat2_prf_free_idx(rrat2_prf_free_idx),			
+		
+		.rrat1_prf1_free_valid(rrat1_prf1_free_valid),				
+		.rrat2_prf1_free_valid(rrat2_prf1_free_valid),				
+		.rrat1_prf1_free_idx(rrat1_prf1_free_idx),			
+		.rrat2_prf1_free_idx(rrat2_prf1_free_idx),				
+		.rrat1_prf2_free_valid(rrat1_prf2_free_valid),			
+		.rrat2_prf2_free_valid(rrat2_prf2_free_valid),			
+		.rrat1_prf2_free_idx(rrat1_prf2_free_idx),			
+		.rrat2_prf2_free_idx(rrat2_prf2_free_idx),					
 		
 		//output
 		.rat1_prf1_rename_valid_out(rat1_prf1_rename_valid_out),		
@@ -114,6 +126,10 @@ module test_prf;
 		.inst2_opb_prf_value(inst2_opb_prf_value),
 		
 		.prf_is_full(prf_is_full),
+		
+		//for writebakc
+		.writeback_value1(writeback_value1),
+		.writeback_value2(writeback_value2),
 		
 		//for debug
 		.internal_assign_a_free_reg1(internal_assign_a_free_reg1),
@@ -158,14 +174,16 @@ module test_prf;
 						internal_assign_a_free_reg2=%b\n\
 						internal_prf_available2=%b\n\
 						prf_is_full=%b\n\
-						internal_free_this_entry=%b",//for debug
+						internal_free_this_entry=%b\n\
+						writeback_value1=%h\n\
+						writeback_value2=%h",
 				$time, clock, 
 				inst1_opa_prf_value, inst1_opb_prf_value, inst2_opa_prf_value,inst2_opb_prf_value,
 				inst1_opa_valid,     inst1_opb_valid,     inst2_opa_valid,    inst2_opb_valid,
 				rat1_prf1_rename_idx_out, rat1_prf1_rename_valid_out, rat1_prf2_rename_idx_out,rat1_prf2_rename_valid_out,
 				rat2_prf1_rename_idx_out, rat2_prf1_rename_valid_out, rat2_prf2_rename_idx_out,rat2_prf2_rename_valid_out,
-				internal_assign_a_free_reg1,internal_prf_available,internal_assign_a_free_reg2,internal_prf_available2,prf_is_full,
-				internal_free_this_entry);
+				internal_assign_a_free_reg1, internal_prf_available, internal_assign_a_free_reg2, internal_prf_available2, prf_is_full,
+				internal_free_this_entry, writeback_value1, writeback_value2);
 
 
 		clock = 0;
@@ -182,30 +200,34 @@ module test_prf;
 		//and return the index of this PRF entry.
 		$display("@@@ RAT1 allocate prf1 and RAT2 allocate prf2!!");
 		reset = 0;	
-		cdb1_valid			 = 0;
-		cdb1_tag			 = 0;
-		cdb1_out			 = 0;
-		cdb2_valid			 = 0;
-		cdb2_tag			 = 0;
-		cdb2_out			 = 0;
-		inst1_opa_prf_idx		 = 0;				
-		inst1_opb_prf_idx		 = 0;				
-		inst2_opa_prf_idx		 = 0;			
-		inst2_opb_prf_idx		 = 0;				
-		rat1_allocate_new_prf1		 = 1;			
-		rat1_allocate_new_prf2		 = 0;
-		rat2_allocate_new_prf1		 = 1;			
-		rat2_allocate_new_prf2		 = 0;			
-		rrat1_prf_free_list		 = 0;			
-		rrat2_prf_free_list		 = 0;			
-		rat1_prf_free_list		 = 0;			
-		rat2_prf_free_list		 = 0;
-		rrat1_branch_mistaken_free_valid = 0;	
-		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		cdb1_valid			 			= 0;
+		cdb1_tag			 			= 0;
+		cdb1_out			 			= 0;
+		cdb2_valid			 			= 0;
+		cdb2_tag			 			= 0;
+		cdb2_out			 			= 0;
+		inst1_opa_prf_idx				= 0;				
+		inst1_opb_prf_idx				= 0;				
+		inst2_opa_prf_idx				= 0;			
+		inst2_opb_prf_idx				= 0;				
+		rat1_allocate_new_prf1			= 1;			
+		rat1_allocate_new_prf2  		= 0;
+		rat2_allocate_new_prf1  		= 1;			
+		rat2_allocate_new_prf2		 	= 0;			
+		rrat1_prf_free_list		 		= 0;			
+		rrat2_prf_free_list		 		= 0;			
+		rat1_prf_free_list		 		= 0;			
+		rat2_prf_free_list		 		= 0;
+		rrat1_branch_mistaken_free_valid= 0;	
+		rrat2_branch_mistaken_free_valid= 0;	
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;		
 
 		@(posedge clock);
 		$display("@@@ RAT1 and RAT2 stop sending allocate_a_new_register_signal!!");
@@ -229,10 +251,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		
 		@(negedge clock);
 		$display("@@@ RAT1 allocate two new registers!!");
@@ -256,10 +282,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 
 		@(posedge clock);
@@ -284,10 +314,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		
 		@(negedge clock);  
 		$display("@@@ RAT2 allocate two new registers!!");
@@ -311,10 +345,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(posedge clock);
 		$display("@@@ RAT2 stop sending allocate_a_new_register_signal!!");
@@ -338,10 +376,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock);  
 		$display("@@@ RAT1 and RAT2 allocate new registers!!");
@@ -365,10 +407,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 
 		@(posedge clock);
@@ -393,10 +439,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		//at this time, we allocate 3 PRF entries (101111,101110,101101)
 		//after this, we want to store data from CDB.
 		//from CDB2, we store 5 into #reg 101111.
@@ -423,10 +473,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		cdb2_valid			 = 0;
 		cdb2_tag			 = 0;
@@ -454,10 +508,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		
 		@(negedge clock);
 		$display("@@@ Doing nothing at all!!!");
@@ -483,10 +541,14 @@ module test_prf;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
 
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		@(negedge clock);
 
@@ -512,10 +574,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock);
 		$display("@@@ Load data from a wrong register which is not allocated!!");
@@ -539,10 +605,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;	
 
 
 		@(negedge clock);
@@ -568,10 +638,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock); 
 		//then we want to load data from #reg 101110;
@@ -596,10 +670,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		
 		@(negedge clock);
 		$display("@@@ RRAT wants to free reg#101101!!");
@@ -622,11 +700,15 @@ module test_prf;
 		rat1_prf_free_list		 = 0;			
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
-		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 1;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 6'b101101;
-		rrat2_prf_free_idx		 = 0;		
+		rrat2_branch_mistaken_free_valid = 0;		
+		rrat1_prf1_free_valid 			= 1;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 6'b101101;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;	
 		
 		@(negedge clock);
 		$display("@@@ RAT1 and RAT2 want to allocate new entries!!");
@@ -650,10 +732,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock);
 		$display("@@@ Store data from CDB2!!");
@@ -677,10 +763,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock);
 		$display("@@@ RRAT1 send the freelist in");
@@ -705,10 +795,14 @@ module test_prf;
 		rat2_prf_free_list		 = 48'b011101000000000000000111100000001111000000010111;
 		rrat1_branch_mistaken_free_valid = 1;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -730,10 +824,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 		@(negedge clock);
 		$display("@@@ RRAT1 send the freelist in");
@@ -758,10 +856,14 @@ module test_prf;
 		rat2_prf_free_list		 = 48'b000101100000000000000111100000001111000000010111;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 1;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		
 		@(negedge clock);
 		cdb1_valid			 = 0;
@@ -784,10 +886,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 
 
 		@(negedge clock);
@@ -812,11 +918,15 @@ module test_prf;
 		rat1_prf_free_list		 = 0;			
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
-		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 1;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 6'b101011;
+		rrat2_branch_mistaken_free_valid = 0;		
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 1;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 6'b101011;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -838,10 +948,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 
 		$display("@@@ this time we want to (1)allocate a new entry");
@@ -866,10 +980,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -891,10 +1009,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 
 
@@ -919,10 +1041,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		$display("@@@ load value from this wrong register");
 		cdb1_valid			 = 0;
@@ -945,10 +1071,14 @@ module test_prf;
 		rat2_prf_free_list		 = 0;
 		rrat1_branch_mistaken_free_valid = 0;	
 		rrat2_branch_mistaken_free_valid = 0;	
-		rrat1_prf_free_valid		 = 0;	
-		rrat2_prf_free_valid		 = 0;	
-		rrat1_prf_free_idx		 = 0;
-		rrat2_prf_free_idx		 = 0;
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
 		@(negedge clock);
 		$finish;
 
