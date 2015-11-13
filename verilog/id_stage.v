@@ -205,61 +205,61 @@ endmodule // decoder
 
 module id_stage(
              
-				  input         clock,                // system clock
-				  input         reset,                // system reset
-				  input  [31:0] if_id_IR1,             // incoming instruction1
-				  input  [31:0] if_id_IR2,             // incoming instruction2
-				  //input         wb_reg_wr_en_out,     // Reg write enable from WB Stage
-				  //input   [4:0] wb_reg_wr_idx_out,    // Reg write index from WB Stage
-				  //input  [63:0] wb_reg_wr_data_out,   // Reg write data from WB Stage
-				  input         if_id_valid_inst1,
-				  input         if_id_valid_inst2,
-				  input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC+4
-				  input  [63:0] if_id_NPC_inst2,           // incoming instruction PC+4
+				input         clock,                // system clock
+				input         reset,                // system reset
+				input  [31:0] if_id_IR1,             // incoming instruction1
+				input  [31:0] if_id_IR2,             // incoming instruction2
+				//input         wb_reg_wr_en_out,     // Reg write enable from WB Stage
+				//input   [4:0] wb_reg_wr_idx_out,    // Reg write index from WB Stage
+				//input  [63:0] wb_reg_wr_data_out,   // Reg write data from WB Stage
+				input         if_id_valid_inst1,
+				input         if_id_valid_inst2,
+				input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC
+				input  [63:0] if_id_NPC_inst2,           // incoming instruction2 PC+4
 
-				  
-				  output [63:0] opa_mux_out1;               //instr1 opa and opb value or tag
-			          output [63:0] opb_mux_out1;
-				  output logic  opa_mux_tag1;               //signal to indicate whether it is value or tag,true means value,faulse means tag
-				  output logic  opb_mux_tag1;
-				  output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
+				 
+				output [63:0] opa_mux_out1;               //instr1 opa and opb value or tag
+			    output [63:0] opb_mux_out1;
+				output logic  opa_mux_tag1;               //signal to indicate whether it is value or tag,true means value,faulse means tag
+				output logic  opb_mux_tag1;
+				output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
 													        // (ZERO_REG if no writeback)
 				 
-				  output [63:0] opa_mux_out2;               //instr2 opa and opb value or tag
-				  output [63:0] opb_mux_out2;
-				  output logic  opa_mux_tag2;               //signal to indicate whether it is value or tag
-				  output logic  opb_mux_tag2;
-				  output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
+				output [63:0] opa_mux_out2;               //instr2 opa and opb value or tag
+				output [63:0] opb_mux_out2;
+				output logic  opa_mux_tag2;               //signal to indicate whether it is value or tag
+				output logic  opb_mux_tag2;
+				output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
 
-				  output logic  [4:0] id_alu_func_out1,      // ALU function select (ALU_xxx *)
-				  output logic  [4:0] id_alu_func_out2,      // ALU function select (ALU_xxx *)
-				  output logic  [5:0] id_op_type_inst1,  	// op type
-				  output logic  [5:0] id_op_type_inst2,
+				output logic  [4:0] id_alu_func_out1,      // ALU function select (ALU_xxx *)
+				output logic  [4:0] id_alu_func_out2,      // ALU function select (ALU_xxx *)
+				output logic  [5:0] id_op_type_inst1,		// op type
+				output logic  [5:0] id_op_type_inst2,
 
-				  output logic        id_rd_mem_out1,        // does inst read memory?
-				  output logic        id_wr_mem_out1,        // does inst write memory?
-				  output logic        id_ldl_mem_out1,       // load-lock inst?
-				  output logic        id_stc_mem_out1,       // store-conditional inst?
-				  output logic        id_cond_branch_out1,   // is inst a conditional branch?
-				  output logic        id_uncond_branch_out1, // is inst an unconditional branch 
+				output logic        id_rd_mem_out1,        // does inst read memory?
+				output logic        id_wr_mem_out1,        // does inst write memory?
+				output logic        id_ldl_mem_out1,       // load-lock inst?
+				output logic        id_stc_mem_out1,       // store-conditional inst?
+				output logic        id_cond_branch_out1,   // is inst a conditional branch?
+				output logic        id_uncond_branch_out1, // is inst an unconditional branch 
 													        // or jump?
-				  output logic        id_halt_out1,
-				  output logic        id_cpuid_out1,         // get CPUID inst?
-				  output logic        id_illegal_out1,
-				  output logic        id_valid_inst_out1,     // is inst a valid instruction to be 
-													        // counted for CPI calculations?
-				  output logic        id_rd_mem_out2,        // does inst read memory?
-				  output logic        id_wr_mem_out2,        // does inst write memory?
-				  output logic        id_ldl_mem_out2,       // load-lock inst?
-				  output logic        id_stc_mem_out2,       // store-conditional inst?
-				  output logic        id_cond_branch_out2,   // is inst a conditional branch?
-				  output logic        id_uncond_branch_out2, // is inst an unconditional branch 
-													        // or jump?
-				  output logic        id_halt_out2,
-				  output logic        id_cpuid_out2,         // get CPUID inst?
-				  output logic        id_illegal_out2,
-				  output logic        id_valid_inst_out2     // is inst a valid instruction to be 
+				output logic        id_halt_out1,
+				output logic        id_cpuid_out1,         // get CPUID inst?
+				output logic        id_illegal_out1,
+				output logic        id_valid_inst_out1,     // is inst a valid instruction to be 
+									        // counted for CPI calculations?
+				output logic        id_rd_mem_out2,        // does inst read memory?
+				output logic        id_wr_mem_out2,        // does inst write memory?
+				output logic        id_ldl_mem_out2,       // load-lock inst?
+				output logic        id_stc_mem_out2,       // store-conditional inst?
+				output logic        id_cond_branch_out2,   // is inst a conditional branch?
+				output logic        id_uncond_branch_out2, // is inst an unconditional branch 
+											        		// or jump?
+				output logic        id_halt_out2,
+				output logic        id_cpuid_out2,         // get CPUID inst?
+				output logic        id_illegal_out2,
+				output logic        id_valid_inst_out2     // is inst a valid instruction to be 
               );
    
 	logic   [1:0] dest_reg_select;
@@ -273,20 +273,6 @@ module id_stage(
 	wire    [4:0] ra_idx2 = if_id_IR1[25:21];   // inst2 operand A register index
 	wire    [4:0] rb_idx2 = if_id_IR1[20:16];   // inst2 operand B register index
 	wire    [4:0] rc_idx2 = if_id_IR1[4:0];     // inst2 operand C register index
-
-
-	// Instantiate the register file used by this pipeline
-	/*regfile regf_0 (.rda_idx(ra_idx),
-				  .rda_out(id_ra_value_out), 
-	  
-				  .rdb_idx(rb_idx),
-				  .rdb_out(id_rb_value_out),
-
-				  .wr_clk(clock),
-				  .wr_en(wb_reg_wr_en_out),
-				  .wr_idx(wb_reg_wr_idx_out),
-				  .wr_data(wb_reg_wr_data_out)
-				 );*/
 	
 	wire [63:0] mem_disp1 = { {48{if_id_IR1[15]}}, if_id_IR1[15:0] };
 	wire [63:0] br_disp1  = { {41{if_id_IR1[20]}}, if_id_IR1[20:0], 2'b00 };

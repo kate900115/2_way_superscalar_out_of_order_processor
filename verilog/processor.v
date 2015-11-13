@@ -60,6 +60,34 @@ module processor(
     output logic [31:0] mem_wb_IR,
     output logic        mem_wb_valid_inst
 );
+//pc output
+logic [31:0]	PC_inst1;
+logic [31:0]	PC_inst2;
+logic			PC_inst1_valid;
+logic			PC_inst2_valid;
+logic [63:0]	PC_proc2Imem_addr;
+logic			PC_thread1_is_available;
+//decoder
+logic [63:0]	ID_inst1_opa;
+logic [63:0]	ID_inst1_opb;
+logic			ID_inst1_opa_valid;
+logic			ID_inst1_opb_valid;
+logic [63:0]	ID_inst2_opa;
+logic [63:0]	ID_inst2_opb;
+logic			ID_inst2_opa_valid;
+logic			ID_inst2_opb_valid;
+logic [4:0]		ID_dest_ARF_idx1;
+logic [4:0]		ID_dest_ARF_idx2;
+ALU_FUNC		ID_alu_func1;
+ALU_FUNC		ID_alu_func2;
+logic [5:0]		ID_op_type1;
+logic [5:0]		ID_op_type2;
+logic			ID_inst1_is_cond_branch;
+logic			ID_inst2_is_cond_branch;
+logic			ID_inst1_is_unco_branch;
+logic			ID_inst2_is_unco_branch;
+logic			ID_inst1_is_valid;
+logic			ID_inst2_is_valid;
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opb_idx1;
@@ -99,6 +127,9 @@ logic			PRF_RS_inst2_opb_valid;
 //rrat output
 logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx1;
 logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx2;
+//rob output
+logic [$clog2(`ROB_SIZE)-1:0]		ROB_inst1_rob_idx;
+logic [$clog2(`ROB_SIZE)-1:0]		ROB_inst2_rob_idx;
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
@@ -107,6 +138,7 @@ logic [5:0][$clog2(`ROB_SIZE)-1:0]	RS_EX_rob_idx;
 logic [5:0][5:0]			RS_EX_op_type;
 logic [5:0]					RS_EX_out_valid;
 ALU_FUNC [5:0]				RS_EX_alu_func;
+logic						RS_full;
 
 //ex output
 logic [3:0]							EX_RS_fu_is_available;
@@ -141,27 +173,83 @@ module if_stage pc(
 	input 				thread2_branch_is_taken,
 	input [63:0]		thread1_target_pc,
 	input [63:0]		thread2_target_pc,
-	input         		rs_stall,		 				// when RS is full, we need to stop PC
+	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
 	input	  			rob_stall,		 				// when RoB is full, we need to stop PC
+	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
 	input			    Imem2proc_valid,				// 
 	input				is_two_threads,		
 //output
-	output logic [63:0]	proc2Imem_addr,					// Address sent to Instruction memory
-	output logic [63:0] next_PC_out,
-	output logic [31:0] thread1_inst_out,
-	output logic [31:0] thread2_inst_out,
-	output logic	 	thread1_inst_is_valid,
-	output logic	 	thread2_inst_is_valid
+	.proc2Imem_addr(PC_proc2Imem_addr),
+	//output logic [63:0] next_PC_out,
+	.thread1_inst_out(PC_inst1),
+	.thread2_inst_out(PC_inst2),
+	.thread1_inst_is_valid(PC_inst1_valid),
+	.thread2_inst_is_valid(PC_inst2_valid),
+	.thread1_is_available(PC_thread1_is_available)
 	);
 //////////////////////////////////
 //								//
 //			Decoder				//
 //								//
 //////////////////////////////////
+module id_stage(
+//input
+	.clock(clock),							// system clock
+	.reset(reset), 							// system reset
+	.if_id_IR1(PC_inst1),             		// incoming instruction1
+	.if_id_IR2(PC_inst2),             		// incoming instruction2
 
+	.if_id_valid_inst1(PC_inst1_valid),
+	.if_id_valid_inst2(PC_inst2_valid),
+	.if_id_NPC_inst1(PC_proc2Imem_addr),           // incoming instruction1 PC
+	.if_id_NPC_inst2(PC_proc2Imem_addr+4),           // incoming instruction PC+4
+//output
+	.opa_mux_out1(ID_inst1_opa);               //instr1 opa and opb value or tag
+	.opb_mux_out1(ID_inst1_opb);
+	.opa_mux_tag1(ID_inst1_opa_valid);               //signal to indicate whether it is value or tag,true means value,faulse means tag
+	.opb_mux_tag1(ID_inst1_opb_valid);
+	.id_dest_reg_idx_out1(ID_dest_ARF_idx1),  // destination (writeback) register index
+													        // (ZERO_REG if no writeback)
+				 
+	.opa_mux_out2(ID_inst2_opa);               //instr2 opa and opb value or tag
+	.opb_mux_out2(ID_inst2_opb);
+	.opa_mux_tag2(ID_inst2_opa_valid);               //signal to indicate whether it is value or tag
+	.opb_mux_tag2(ID_inst2_opb_valid);
+	.id_dest_reg_idx_out2(ID_dest_ARF_idx2),  // destination (writeback) register index
+
+
+	.id_alu_func_out1(ID_alu_func1),      // ALU function select (ALU_xxx *)
+	.id_alu_func_out2(ID_alu_func2),      // ALU function select (ALU_xxx *)
+	.id_op_type_inst1(ID_op_type1),
+	.id_op_type_inst2(ID_op_type2),
+
+	.id_rd_mem_out1,        // does inst read memory?
+	.id_wr_mem_out1,        // does inst write memory?
+	.id_ldl_mem_out1,       // load-lock inst?
+	.id_stc_mem_out1,       // store-conditional inst?
+	.id_cond_branch_out1(ID_inst1_is_cond_branch),   // is inst a conditional branch?
+	.id_uncond_branch_out1(ID_inst1_is_unco_branch), // is inst an unconditional branch 
+													        // or jump?
+	.id_halt_out1,
+	.id_cpuid_out1,         // get CPUID inst?
+	.id_illegal_out1,
+	.id_valid_inst_out1(ID_inst1_is_valid),     // is inst a valid instruction to be 
+													        // counted for CPI calculations?
+	.id_rd_mem_out2,        // does inst read memory?
+	.id_wr_mem_out2,        // does inst write memory?
+	.id_ldl_mem_out2,       // load-lock inst?
+	.id_stc_mem_out2,       // store-conditional inst?
+	.id_cond_branch_out2(ID_inst2_is_cond_branch),   // is inst a conditional branch?
+	.id_uncond_branch_out2(ID_inst2_is_unco_branch), // is inst an unconditional branch 
+													        // or jump?
+	.id_halt_out2,
+	.id_cpuid_out2,         // get CPUID inst?
+	.id_illegal_out2,
+	.id_valid_inst_out2(ID_inst2_is_valid)     // is inst a valid instruction to be 
+);
 //////////////////////////////////
 //								//
 //			 RAT				//
@@ -172,23 +260,23 @@ module rat rat1(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
 	
-	input	inst1_enable,	//high if inst can run
-	input	inst2_enable,
-	input	[$clog2(`ARF_SIZE)-1:0]	opa_ARF_idx1,	//we will use opa_ARF_idx to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	opb_ARF_idx1,	//to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	dest_ARF_idx1,	//the ARF index of dest reg
-	input	dest_rename_sig1,	//if high, dest_reg need rename
+	.inst1_enable(PC_thread1_is_available && PC_inst1_valid),	//high if inst can run
+	.inst2_enable(PC_thread1_is_available && PC_inst2_valid),
+	.opa_ARF_idx1(ID_inst1_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
+	.opb_ARF_idx1(ID_inst1_opb[4:0]),	//to find PRF_idx
+	.dest_ARF_idx1(ID_dest_ARF_idx1),	//the ARF index of dest reg
+	.dest_rename_sig1(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
 
-	input	[$clog2(`ARF_SIZE)-1:0]	opa_ARF_idx2,	//we will use opa_ARF_idx to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	opb_ARF_idx2,	//to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	dest_ARF_idx2,	//the ARF index of dest reg
-	input	dest_rename_sig2,	//if high, dest_reg need rename
+	.opa_ARF_idx2(ID_inst2_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
+	.opb_ARF_idx2(ID_inst2_opb[4:0]),	//to find PRF_idx
+	.dest_ARF_idx2(ID_dest_ARF_idx2),	//the ARF index of dest reg
+	.dest_rename_sig2(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
 
 
-	input	opa_valid_in1,	//if high opa_valid is immediate
-	input	opb_valid_in1,
-	input	opa_valid_in2,	//if high opa_valid is immediate
-	input	opb_valid_in2,
+	.opa_valid_in1(ID_inst1_opa_valid),	//if high opa_valid is immediate
+	.opb_valid_in1(ID_inst1_opb_valid),
+	.opa_valid_in2(ID_inst2_opa_valid),	//if high opa_valid is immediate
+	.opb_valid_in2(ID_inst2_opb_valid),
 
 	input	mispredict_sig1,	//indicate whether mispredict happened
 	input	mispredict_sig2,	//indicate whether mispredict happened
@@ -205,16 +293,12 @@ module rat rat1(
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
 	output	logic	request1,  //send to PRF indicate whether it need data
 	.RAT_allo_halt1(RAT1_PRF_allocate_req1),
-	//output	logic	opa_valid_out1,	//if high opa_valid is immediate
-	//output	logic	opb_valid_out1,
 
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
 	output	logic	request2,  //send to PRF indicate whether it need data
 	.RAT_allo_halt2(RAT1_PRF_allocate_req2),
-	//output	logic	opa_valid_out2,	//if high opa_valid is immediate
-	//output	logic	opb_valid_out2,
 
 	//output together
 	output	logic	[`ARF_SIZE-1:0]	PRF_free_sig,
@@ -226,23 +310,24 @@ module rat rat2(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
 	
-	input	inst1_enable,	//high if inst can run
-	input	inst2_enable,
-	input	[$clog2(`ARF_SIZE)-1:0]	opa_ARF_idx1,	//we will use opa_ARF_idx to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	opb_ARF_idx1,	//to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	dest_ARF_idx1,	//the ARF index of dest reg
-	input	dest_rename_sig1,	//if high, dest_reg need rename
+	.inst1_enable(~PC_thread1_is_available && PC_inst1_valid),	//high if inst can run
+	.inst2_enable(~PC_thread1_is_available && PC_inst2_valid),
+	
+	.opa_ARF_idx1(ID_inst1_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
+	.opb_ARF_idx1(ID_inst1_opb[4:0]),	//to find PRF_idx
+	.dest_ARF_idx1(ID_dest_ARF_idx1),	//the ARF index of dest reg
+	.dest_rename_sig1(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
 
-	input	[$clog2(`ARF_SIZE)-1:0]	opa_ARF_idx2,	//we will use opa_ARF_idx to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	opb_ARF_idx2,	//to find PRF_idx
-	input	[$clog2(`ARF_SIZE)-1:0]	dest_ARF_idx2,	//the ARF index of dest reg
-	input	dest_rename_sig2,	//if high, dest_reg need rename
+	.opa_ARF_idx2(ID_inst2_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
+	.opb_ARF_idx2(ID_inst2_opb[4:0]),	//to find PRF_idx
+	.dest_ARF_idx2(ID_dest_ARF_idx2),	//the ARF index of dest reg
+	.dest_rename_sig2(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
 
 
-	input	opa_valid_in1,	//if high opa_valid is immediate
-	input	opb_valid_in1,
-	input	opa_valid_in2,	//if high opa_valid is immediate
-	input	opb_valid_in2,
+	.opa_valid_in1(ID_inst1_opa_valid),	//if high opa_valid is immediate
+	.opb_valid_in1(ID_inst1_opb_valid),
+	.opa_valid_in2(ID_inst2_opa_valid),	//if high opb_valid is immediate
+	.opb_valid_in2(ID_inst2_opb_valid),
 
 	input	mispredict_sig1,	//indicate whether mispredict happened
 	input	mispredict_sig2,	//indicate whether mispredict happened
@@ -259,20 +344,16 @@ module rat rat2(
 	.opb_PRF_idx1(RAT2_PRF_opb_idx1),
 	output	logic	request1,  //send to PRF indicate whether it need data
 	.RAT_allo_halt1(RAT2_PRF_allocate_req1),
-	//output	logic	opa_valid_out1,	//if high opa_valid is immediate
-	//output	logic	opb_valid_out1,
 
 	//output 2
 	.opa_PRF_idx2(RAT2_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT2_PRF_opb_idx2),
 	output	logic	request2,  //send to PRF indicate whether it need data
 	.RAT_allo_halt2(RAT2_PRF_allocate_req2),
-	//output	logic	opa_valid_out2,	//if high opa_valid is immediate
-	//output	logic	opb_valid_out2,
 
 	//output together
 	output	logic	[`ARF_SIZE-1:0]	PRF_free_sig,
-	PRF_free_list()
+	.PRF_free_list()
 	);
 
 //////////////////////////////////
@@ -371,10 +452,11 @@ module prf prf1(
 	input	[$clog2(`PRF_SIZE)-1:0] 	rrat1_prf_free_idx,			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
 	input	[$clog2(`PRF_SIZE)-1:0] 	rrat2_prf_free_idx,			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 	//output
-	rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	rat1_prf2_rename_valid_out(PRF_RAT1_rename_valid2),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	rat2_prf1_rename_valid_out(PRF_RAT2_rename_valid1),		// when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
-	rat2_prf2_rename_valid_out(PRF_RAT2_rename_valid2),		// when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	.rat1_prf2_rename_valid_out(PRF_RAT1_rename_valid2),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	.rat2_prf1_rename_valid_out(PRF_RAT2_rename_valid1),		// when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	.rat2_prf2_rename_valid_out(PRF_RAT2_rename_valid2),		// when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
+	
 	.rat1_prf1_rename_idx_out(PRF_RAT1_rename_idx1),		// when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
 	.rat1_prf2_rename_idx_out(PRF_RAT1_rename_idx2),		// when RAT1 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
 	.rat2_prf1_rename_idx_out(PRF_RAT2_rename_idx1),		// when RAT2 asks the PRF to allocate a new entry, PRF should return the index of this newly allocated entry.
@@ -389,13 +471,6 @@ module prf prf1(
 	.inst1_opb_valid(PRF_RS_inst1_opb_valid),			// whether opb load from prf of instruction1 is valid
 	.inst2_opa_valid(PRF_RS_inst2_opa_valid),			// whether opa load from prf of instruction2 is valid
 	.inst2_opb_valid(PRF_RS_inst2_opb_valid),			// whether opa load from prf of instruction2 is valid
-
-	//for debug
-	//output logic	[`PRF_SIZE-1:0]		internal_assign_a_free_reg1,
-	//output logic	[`PRF_SIZE-1:0]     internal_prf_available,
-	//output logic 	[`PRF_SIZE-1:0]		internal_assign_a_free_reg2,
-	//output logic 	[`PRF_SIZE-1:0]		internal_prf_available2,
-	//output logic 	[`PRF_SIZE-1:0]		internal_free_this_entry
 );
 
 //////////////////////////////////
@@ -410,27 +485,27 @@ module rob rob1(
 	
 	input							is_thread1,					//if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
-	input	[31:0]					inst1_pc_in,				//the pc of the instruction
-	input	[4:0]					inst1_arn_dest_in,			//the arf number of the destinaion of the instruction
-	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,			//the prf number of the destination of this instruction
-	input							inst1_is_branch_in,			//if this instruction is a branch
-	input 							inst1_load_in,				//tell rob if instruction1 is valid
+	.inst1_pc_in(PC_proc2Imem_addr),				//the pc of the instruction
+	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
+	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
+	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_unco_branch),			//if this instruction is a branch
+	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
-	input	[31:0]					inst2_pc_in,				//the pc of the instruction
-	input	[4:0]					inst2_arn_dest_in,			//the arf number of the destinaion of the instruction
-	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,          //the prf number of the destination of this instruction
-	input							inst2_is_branch_in,			//if this instruction is a branch
-	input 							inst2_load_in,		       	//tell rob if instruction2 is valid
+	.inst2_pc_in(PC_proc2Imem_addr+4),				//the pc of the instruction
+	.inst2_arn_dest_in(ID_dest_ARF_idx2),			W//the arf number of the destinaion of the instruction
+	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),          //the prf number of the destination of this instruction
+	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_unco_branch),			//if this instruction is a branch
+	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
 	input	[5:0]							if_fu_executed,		//if the instruction in the first multiplyer has been executed
 	input	[5:0][$clog2(`ROB_SIZE)-1:0]	fu_rob_idx,			//the rob number of the instruction in the first multiplyer
-	input	[5:0]							fu_is_thread1,			//the rob number of the instruction in the first multiplyer
+	input	[5:0]							fu_is_thread1,		//the rob number of the instruction in the first multiplyer
 	input	[5:0]							mispredict_in,
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
-	output	logic	[$clog2(`ROB_SIZE)-1:0]		inst1_rs_rob_idx_in,					//it is combinational logic so that the output is dealt with right after a
-	output	logic	[$clog2(`ROB_SIZE)-1:0]		inst2_rs_rob_idx_in,					//instruction comes in, and then this signal is immediately sent to rs to
+	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
+	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),					//instruction comes in, and then this signal is immediately sent to rs to
 																						//store in rs
 //when committed, the output of the first instrucion committed
 	output	logic								commit1_is_branch_out,				       	//if this instruction is a branch
@@ -463,8 +538,8 @@ module rs rs1(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in,     	// The destination of this instruction
-	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in,     	// The destination of this instruction
+	.inst1_rs_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),     	// The destination of this instruction
+	.inst2_rs_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),     	// The destination of this instruction
 	//cdb input
 	.rs_cdb1_in(cdb1_value),     	// CDB bus from functional units 
 	.rs_cdb1_tag(cdb1_tag),    		// CDB tag bus from functional units 
@@ -473,35 +548,35 @@ module rs rs1(
 	.rs_cdb2_tag(cdb2_tag),    		// CDB tag bus from functional units 
 	.rs_cdb2_valid(cdb2_valid),  	// The data on the CDB is valid 
 	//for instruction1
-	.inst1_rs_opa_in(PRF_RS_inst1_opa),      	// Operand a from Rename  
-	.inst1_rs_opb_in(PRF_RS_inst1_opb),      	// Operand a from Rename 
+	.inst1_rs_opa_in(ID_inst1_opa_valid ? ID_inst1_opa : PRF_RS_inst1_opa),      	// Operand a from Rename  
+	.inst1_rs_opb_in(ID_inst1_opb_valid ? ID_inst1_opb : PRF_RS_inst1_opb),      	// Operand a from Rename 
 	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
-	input  ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
-	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	.inst1_rs_op_type_in(ID_op_type1),  	// Instruction type from decoder
+	.inst1_rs_alu_func(ID_alu_func1),    	// ALU function type from decoder
+	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
+	.inst1_rs_load_in(ID_inst1_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	//for instruction2
-	.inst2_rs_opa_in(PRF_RS_inst2_opa),      	// Operand a from Rename  
-	.inst2_rs_opb_in(PRF_RS_inst2_opb),      	// Operand a from Rename 
+	.inst2_rs_opa_in(ID_inst2_opa_valid ? ID_inst2_opa : PRF_RS_inst2_opa),      	// Operand a from Rename  
+	.inst2_rs_opb_in(ID_inst2_opb_valid ? ID_inst2_opb : PRF_RS_inst2_opb),      	// Operand a from Rename 
 	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
-	input  ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
-	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	.inst2_rs_op_type_in(ID_op_type2),  	// Instruction type from decoder
+	.inst2_rs_alu_func(ID_alu_func2),    	// ALU function type from decoder
+	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
+	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 //output
 	.fu_rs_opa_out(RS_EX_opa),       	// This RS' opa 
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
-	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
-	output logic [5:0][$clog2(`ROB_SIZE)-1:0]	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
-	output logic [5:0][5:0]			.fu_rs_op_type_out(RS_EX_op_type)
-	output logic [5:0]				.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
-	output ALU_FUNC [5:0]			.fu_alu_func_out(RS_EX_alu_func),
-
-	output RS_FULL				rs_full			// RS is full now
+	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
+	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
+	.fu_rs_op_type_out(RS_EX_op_type)
+	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
+	.fu_alu_func_out(RS_EX_alu_func),
+	
+	.rs_full(RS_full)			// RS is full now
 );
 
 //////////////////////////////////
@@ -514,16 +589,16 @@ module ex_stage ex(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-    input  [3:0][63:0]			.fu_rs_opa_in(RS_EX_opa),		// register A value from reg file
-    input  [3:0][63:0]			.fu_rs_opb_in(RS_EX_opa),		// register B value from reg file
-    input  [3:0][$clog2(`PRF_SIZE)-1:0]	.fu_rs_dest_tag_in(RS_EX_dest_tag),
-    input  [3:0][$clog2(`ROB_SIZE)-1:0]	.fu_rs_rob_idx_in(RS_EX_rob_idx),
-    input  [3:0][5:0]  			.fu_rs_op_type_in(RS_EX_op_type),	// incoming instruction
-    input  [3:0]				.fu_rs_valid_in(RS_EX_out_valid),
-    ALU_FUNC [5:0]     			.fu_alu_func_in(RS_EX_alu_func),	// ALU function select from decoder
+    .fu_rs_opa_in(RS_EX_opa[3:0]),		// register A value from reg file
+    .fu_rs_opb_in(RS_EX_opb[3:0]),		// register B value from reg file
+    .fu_rs_dest_tag_in(RS_EX_dest_tag[3:0]),
+    .fu_rs_rob_idx_in(RS_EX_rob_idx[3:0]),
+    .fu_rs_op_type_in(RS_EX_op_type[3:0]),	// incoming instruction
+    .fu_rs_valid_in(RS_EX_out_valid[3:0]),
+    .fu_alu_func_in(RS_EX_alu_func[3:0]),	// ALU function select from decoder
 
-    //input          id_ex_cond_branch,   // is this a cond br? from decoder
-    //input          id_ex_uncond_branch, // is this an uncond br? from decoder
+    input id_ex_cond_branch,   // is this a cond br? from decoder
+    input id_ex_uncond_branch, // is this an uncond br? from decoder
 
     .adder1_send_in_success(adder1_send_in_success),
     .adder2_send_in_success(adder2_send_in_success),

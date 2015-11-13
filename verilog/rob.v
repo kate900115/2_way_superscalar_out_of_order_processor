@@ -19,14 +19,14 @@ module rob(
 	
 	input						is_thread1,					//the two instructions are thread1 or thread2 if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
-	input	[31:0]					inst1_pc_in,				//the pc of the instruction
+	input	[63:0]					inst1_pc_in,				//the pc of the instruction
 	input	[4:0]					inst1_arn_dest_in,			//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0] 		inst1_prn_dest_in,			//the prf number of the destination of this instruction
 	input						inst1_is_branch_in,			//if this instruction is a branch
 	input 						inst1_load_in,				//tell rob if instruction1 is valid
 
 //instruction2 input
-	input	[31:0]					inst2_pc_in,				//the pc of the instruction
+	input	[63:0]					inst2_pc_in,				//the pc of the instruction
 	input	[4:0]					inst2_arn_dest_in,			//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0] 		inst2_prn_dest_in,          //the prf number of the destination of this instruction
 	input						inst2_is_branch_in,			//if this instruction is a branch

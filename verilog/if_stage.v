@@ -31,7 +31,8 @@ module if_stage(
 	output logic [31:0] thread1_inst_out,
 	output logic [31:0] thread2_inst_out,
 	output logic	 	thread1_inst_is_valid,
-	output logic	 	thread2_inst_is_valid
+	output logic	 	thread2_inst_is_valid,
+	output logic		thread1_is_available
 	);
 	
 	
@@ -52,7 +53,9 @@ module if_stage(
 	logic	 	 		thread2_inst2_is_valid;
 	
 	CURRENT_THREAD_STATE current_thread_state;
-	CURRENT_THREAD_STATE next_thread_state;				
+	CURRENT_THREAD_STATE next_thread_state;
+	
+	assign thread1_is_available = ~current_thread_state;
 
 	pc pc1(
 		//input

@@ -33,7 +33,7 @@ module rs(
 	input         				inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst1_rs_op_type_in,  	// Instruction type from decoder
 	input  ALU_FUNC				inst1_rs_alu_func,    	// ALU function type from decoder
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
+	input  [$clog2(`ROB_SIZE)-1:0]	inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  		        		inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
         
         //for instruction2
@@ -43,7 +43,7 @@ module rs(
 	input         				inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  [5:0]      			inst2_rs_op_type_in,  	// Instruction type from decoder
 	input  ALU_FUNC				inst2_rs_alu_func,    	// ALU function type from decoder
-	input  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
+	input  [$clog2(`ROB_SIZE)-1:0]	inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  		        		inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
 	input  [5:0]				fu_is_available,			//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
@@ -57,7 +57,7 @@ module rs(
 	output logic [5:0]				fu_rs_out_valid,	// RS output is valid
 	output ALU_FUNC [5:0]			fu_alu_func_out,
 
-	output RS_FULL				rs_full			// RS is full now
+	output							rs_full			// RS is full now
 );
 
 	
@@ -240,14 +240,14 @@ module rs(
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!internal_rs_free[i]) begin
-						internal_rs_free[i] = 1;
-						fu_rs_opa_out[0]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[0]	= internal_rs_opb_out[i];
+						internal_rs_free[i] 	= 1;
+						fu_rs_opa_out[0]		= internal_rs_opa_out[i];
+						fu_rs_opb_out[0]		= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[0]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[0]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[0]	= 1'b1;
-						fu_alu_func_out[0]	= internal_rs_alu_func_out[i];
+						fu_rs_out_valid[0]		= 1'b1;
+						fu_alu_func_out[0]		= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -258,14 +258,14 @@ module rs(
 			for (int i = 0; i < `RS_SIZE; i++) begin
 				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!internal_rs_free[i]) begin
-						internal_rs_free[i]	= 1;
-						fu_rs_opa_out[1]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[1]	= internal_rs_opb_out[i];
+						internal_rs_free[i]		= 1;
+						fu_rs_opa_out[1]		= internal_rs_opa_out[i];
+						fu_rs_opb_out[1]		= internal_rs_opb_out[i];
 						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[1]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[1]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[1]	= 1'b1;
-						fu_alu_func_out[1]	= internal_rs_alu_func_out[i];
+						fu_rs_out_valid[1]		= 1'b1;
+						fu_alu_func_out[1]		= internal_rs_alu_func_out[i];
 						break;
 					end
 				end
@@ -274,7 +274,7 @@ module rs(
 
 		if (fu_is_available[2]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
-				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MEMORY) begin
+				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!internal_rs_free[i]) begin
 						internal_rs_free[i]	= 1;
 						fu_rs_opa_out[2]	= internal_rs_opa_out[i];
@@ -292,7 +292,7 @@ module rs(
 
 		if (fu_is_available[3]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
-				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_MULTIPLIER) begin
+				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!internal_rs_free[i]) begin
 						internal_rs_free[i]	= 1;
 						fu_rs_opa_out[3]	= internal_rs_opa_out[i];
@@ -310,7 +310,7 @@ module rs(
 
 		if (fu_is_available[4]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
-				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == USE_ADDER) begin
+				if (internal_rs_ready_out[i] && internal_fu_select_reg_out[i] == ) begin
 					if (!internal_rs_free[i]) begin
 						internal_rs_free[i]	= 1;
 						fu_rs_opa_out[4]	= internal_rs_opa_out[i];
@@ -355,12 +355,7 @@ module rs(
 		.en(1'b1),
 		.gnt_bus({is_full1, is_full2})
 	);
-
-	always_comb begin
-		if (is_full2) 		rs_full = RS_TWO_OR_MORE_ENTRY_EMPTY;
-		else if (is_full1) 	rs_full = RS_ONE_ENTRY_EMPTY;
-		else			rs_full = RS_NO_ENTRY_EMPTY;
-	end
+	rs_full = (is_full1 != 0);
 
 	//fu select
 	always_comb begin

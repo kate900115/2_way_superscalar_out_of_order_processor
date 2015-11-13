@@ -98,16 +98,16 @@ module ex_stage(
     input          			clock,			// system clock
     input          			reset,			// system reset
 
-    input  [3:0][63:0]			fu_rs_opa_in,		// register A value from reg file
-    input  [3:0][63:0]			fu_rs_opb_in,		// register B value from reg file
-    input  [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
-    input  [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
-    input  [3:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
-    input  [3:0]			fu_rs_valid_in,
+    input [3:0][63:0]			fu_rs_opa_in,		// register A value from reg file
+    input [3:0][63:0]			fu_rs_opb_in,		// register B value from reg file
+    input [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
+    input [3:0][$clog2(`ROB_SIZE)-1:0]	fu_rs_rob_idx_in,
+    input [3:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
+    input [3:0]					fu_rs_valid_in,
     ALU_FUNC [3:0]     			fu_alu_func_in,	// ALU function select from decoder
 
-    input [3:0] [1:0]                   fu_rs_branch,
-    input [3:0]                         fu_rs_predict,
+    input						fu_rs_branch,
+    input						fu_rs_predict,
 
     //input          id_ex_cond_branch,   // is this a cond br? from decoder
     //input          id_ex_uncond_branch, // is this an uncond br? from decoder
@@ -129,14 +129,14 @@ module ex_stage(
     output logic [1:0]                          fu_mispredict_sig         //mispredict signal generate
   );
 
-	logic		brcond_result;
-	logic  [63:0]	mult_result1;
-	logic  [63:0]	mult_result2;
-	logic		mult_done1;
-	logic		mult_done2;
-	logic  [63:0]	alu_result1;
-	logic  [63:0]	alu_result2;
-	logic  [3:0]	fu_is_in_use;
+	logic			brcond_result;
+	logic [63:0]	mult_result1;
+	logic [63:0]	mult_result2;
+	logic			mult_done1;
+	logic			mult_done2;
+	logic [63:0]	alu_result1;
+	logic [63:0]	alu_result2;
+	logic [3:0]		fu_is_in_use;
 
 	logic [3:0]     brcond_result;          
 	logic [1:0]     fu_take_branch_out;
@@ -184,21 +184,14 @@ module ex_stage(
     // Output
 		.result(alu_result2)
 	);
-
-   //
-   // instantiate the branch condition tester
-   // generate signal if branch is mispredicted
-     generate 
-	genvar i;
- 	for (i=0 ;i<4 ;i++) begin
-		brcond (// Inputs
-		.opa(fu_rs_opa_in[i]),       // always check regA value
-		.func(fu_rs_op_type_in[i]), // inst bits to determine check
+	
+	// fu5: brcond
+	brcond (// Inputs
+		.opa(fu_rs_opa_in[4]),       // always check regA value
+		.func(fu_rs_op_type_in[4]), // inst bits to determine check
 	    	// Output
-		.cond(brcond_result[i])
-		);
-	end
-     endgenerate
+		.cond(brcond_result)
+	);
 
 	assign fu_take_branch_out[0] =	fu_rs_branch[1][0] |(fu_rs_branch[1][1] & brcond_result[1]);  //calculate branch correct take or not take
 	assign fu_take_branch_out[1] =	fu_rs_branch[3][0] |(fu_rs_branch[3][1] & brcond_result[3]);

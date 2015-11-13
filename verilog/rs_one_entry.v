@@ -59,7 +59,7 @@ module rs_one_entry(
 	output logic [$clog2(`ROB_SIZE)-1:0]    			rs1_rob_idx_out,   	// 
 	output logic [5:0]					  	rs1_op_type_out,     	// 
 	output FU_SELECT						fu_select_reg_out,
-	output ALU_FUNC                         			rs1_alu_func_out 
+	output ALU_FUNC                         rs1_alu_func_out 
 );  
 
 
@@ -90,11 +90,11 @@ module rs_one_entry(
  
 	assign rs1_ready_out 	= InUse && OPaValid_reg && OPbValid_reg; 
  
-	assign rs1_opa_out 	= rs1_free ? OPa_reg : 64'b0;
+	assign rs1_opa_out 		= rs1_free ? OPa_reg : 64'b0;
 
 	assign fu_select_reg_out= fu_select_reg;
  
-	assign rs1_opb_out 	= rs1_free ? OPb_reg : 64'b0; 
+	assign rs1_opb_out 		= rs1_free ? OPb_reg : 64'b0; 
  
 	assign rs1_dest_tag_out = rs1_free ? DestTag : 0; 
 
@@ -116,18 +116,18 @@ module rs_one_entry(
 		if (rs1_free)
 			next_InUse	= 1'b0;
 		if (inst1_rs1_load_in) begin
-			OPa		= inst1_rs1_opa_in;
-       			OPaValid	= inst1_rs1_opa_valid;
-       			OPb		= inst1_rs1_opb_in;
-       			OPbValid	= inst1_rs1_opb_valid;
+			OPa			= inst1_rs1_opa_in;
+       		OPaValid	= inst1_rs1_opa_valid;
+       		OPb			= inst1_rs1_opb_in;
+       		OPbValid	= inst1_rs1_opb_valid;
 			fu_select	= inst1_fu_select;
 			next_InUse	= 1'b1;
 		end
 		else if (inst2_rs1_load_in) begin
-			OPa		= inst2_rs1_opa_in;
-       			OPaValid	= inst2_rs1_opa_valid;
-       			OPb		= inst2_rs1_opb_in;
-       			OPbValid	= inst2_rs1_opb_valid;
+			OPa			= inst2_rs1_opa_in;
+       		OPaValid	= inst2_rs1_opa_valid;
+       		OPb			= inst2_rs1_opb_in;
+       		OPbValid	= inst2_rs1_opb_valid;
 			fu_select	= inst2_fu_select;
 			next_InUse	= 1'b1;
 		end
@@ -167,30 +167,30 @@ module rs_one_entry(
 	begin
     		if (reset)
     		begin
-            		OPa_reg	 	<= `SD 0;
-            		OPb_reg	 	<= `SD 0;
-            		OPaValid_reg 	<= `SD 0;
-            		OPbValid_reg	<= `SD 0;
-			OP_type  	<= `SD 5'b0;
-            		InUse 	 	<= `SD 1'b0; 
-           		DestTag  	<= `SD 0;
-			Rob_idx	 	<= `SD 0;
-			Alu_func_reg 	<= `SD ALU_DEFAULT;
-			fu_select_reg	<= `SD FU_DEFAULT;
+           		OPa_reg	 	<= `SD 0;
+           		OPb_reg	 	<= `SD 0;
+          		OPaValid_reg 	<= `SD 0;
+     	   		OPbValid_reg	<= `SD 0;
+				OP_type  	<= `SD 5'b0;
+           		InUse 	 	<= `SD 1'b0; 
+          		DestTag  	<= `SD 0;
+				Rob_idx	 	<= `SD 0;
+				Alu_func_reg 	<= `SD ALU_DEFAULT;
+				fu_select_reg	<= `SD FU_DEFAULT;
     		end
 		else
     		begin
-			OPa_reg		<= `SD OPa;
-			OPaValid_reg	<= `SD OPaValid;
-			OPb_reg		<= `SD OPb;
-			OPbValid_reg	<= `SD OPbValid;
-			fu_select_reg	<= `SD fu_select;
+				OPa_reg		<= `SD OPa;
+				OPaValid_reg	<= `SD OPaValid;
+				OPb_reg		<= `SD OPb;
+				OPbValid_reg	<= `SD OPbValid;
+				fu_select_reg	<= `SD fu_select;
        			InUse 	 	<= `SD next_InUse;
 			if (inst1_rs1_load_in)
         		begin
 				OP_type  	<= `SD inst1_rs1_op_type_in;
-            			InUse 	 	<= `SD 1'b1;
-            			DestTag  	<= `SD inst1_rs1_dest_in;
+            	InUse 	 	<= `SD 1'b1;
+            	DestTag  	<= `SD inst1_rs1_dest_in;
 				Rob_idx	 	<= `SD inst1_rs1_rob_idx_in;
 				Alu_func_reg 	<= `SD inst1_rs1_alu_func;
         		end
@@ -198,7 +198,7 @@ module rs_one_entry(
 			begin
 				OP_type  	<= `SD inst2_rs1_op_type_in;
 
-            			DestTag  	<= `SD inst2_rs1_dest_in;
+            	DestTag  	<= `SD inst2_rs1_dest_in;
 				Rob_idx	 	<= `SD inst2_rs1_rob_idx_in;
 				Alu_func_reg 	<= `SD inst2_rs1_alu_func;
 			end
