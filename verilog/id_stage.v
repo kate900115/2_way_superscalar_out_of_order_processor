@@ -218,16 +218,16 @@ module id_stage(
 				input  [63:0] if_id_NPC_inst2,           // incoming instruction2 PC+4
 
 				 
-				output logic [63:0] opa_mux_out1,               //instr1 opa and opb value or tag
+				output logic [63:0] opa_mux_out1,          //instr1 opa and opb value or tag
 			    	output logic [63:0] opb_mux_out1,
-				output logic  opa_mux_tag1,               //signal to indicate whether it is value or tag,true means value,faulse means tag
+				output logic  opa_mux_tag1,                //signal to indicate whether it is value or tag,true means value,faulse means tag
 				output logic  opb_mux_tag1,
 				output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
-													        // (ZERO_REG if no writeback)
+													       // (ZERO_REG if no writeback)
 				 
-				output logic [63:0] opa_mux_out2,               //instr2 opa and opb value or tag
+				output logic [63:0] opa_mux_out2,          //instr2 opa and opb value or tag
 				output logic [63:0] opb_mux_out2,
-				output logic  opa_mux_tag2,               //signal to indicate whether it is value or tag
+				output logic  opa_mux_tag2,                //signal to indicate whether it is value or tag
 				output logic  opb_mux_tag2,
 				output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
@@ -260,7 +260,7 @@ module id_stage(
 				output logic        id_cpuid_out2,         // get CPUID inst?
 				output logic        id_illegal_out2,
 				output logic        id_valid_inst_out2     // is inst a valid instruction to be 
-              );
+);
    
 	logic [1:0] dest_reg_select1;
 	logic [1:0] dest_reg_select2;

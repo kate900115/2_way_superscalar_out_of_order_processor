@@ -42,6 +42,7 @@ module rob(
 	output	logic	[$clog2(`ROB_SIZE)-1:0]		inst2_rs_rob_idx_in,					//instruction comes in, and then this signal is immediately sent to rs to
 																						//store in rs
 //when committed, the output of the first instrucion committed
+	output	logic	[63:0]			commit1_pc_out,
 	output	logic					commit1_is_branch_out,				       	//if this instruction is a branch
 	output	logic					commit1_mispredict_out,				       	//if this instrucion is mispredicted
 	output	logic	[4:0]				commit1_arn_dest_out,                       //the architected register number of the destination of this instruction
@@ -50,6 +51,7 @@ module rob(
 	output	logic					commit1_valid,
 	output	logic					commit1_is_thread1,
 //when committed, the output of the second instruction committed
+	output  logic	[63:0]			commit2_pc_out,
 	output	logic					commit2_is_branch_out,						//if this instruction is a branch
 	output	logic					commit2_mispredict_out,				       	//if this instrucion is mispredicted
 	output	logic	[4:0]				commit2_arn_dest_out,						//the architected register number of the destination of this instruction
@@ -73,13 +75,14 @@ module rob(
 	logic	[$clog2(`ROB_SIZE)-1:0]			next_t2_head;
 	logic	[$clog2(`ROB_SIZE)-1:0]			next_t2_tail;
 //internal logic variable needed
+	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_thread1_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_branch_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_available_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_mispredict_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_mispredict_in;
-	logic	[`ROB_SIZE-1:0][4:0]						rob1_internal_arn_dest_out;
-	logic	[`ROB_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]				rob1_internal_prn_dest_out;
+	logic	[`ROB_SIZE-1:0][4:0]					rob1_internal_arn_dest_out;
+	logic	[`ROB_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	rob1_internal_prn_dest_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_if_rename_out;
 //internal_inst1_rob_load_in and internal_inst2_rob_load_in determine the number of entry we want to load instruction1 and instruction2
 	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_rob_load_in;
@@ -87,14 +90,15 @@ module rob(
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_ex_in;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_ex_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_if_committed;
-	
+
+	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_thread1_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_branch_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_available_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_mispredict_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_mispredict_in;
-	logic	[`ROB_SIZE-1:0][4:0]						rob2_internal_arn_dest_out;
-	logic	[`ROB_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]				rob2_internal_prn_dest_out;
+	logic	[`ROB_SIZE-1:0][4:0]					rob2_internal_arn_dest_out;
+	logic	[`ROB_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	rob2_internal_prn_dest_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_if_rename_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_rob_load_in;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_rob_load_in;
@@ -123,8 +127,9 @@ module rob(
 	.is_ex_in(rob1_internal_is_ex_in),
 	.mispredict_in(rob1_internal_mispredict_in),
 	.enable(1'b1),
-	.if_committed(rob1_internal_if_committed),            						//it must be 1 so that we can see all output
+	.if_committed(rob1_internal_if_committed),
 //
+	.pc_out(rob1_internal_pc_out),
 	.is_thread1_out(rob1_internal_is_thread1_out),
 	.is_ex_out(rob1_internal_is_ex_out),
 	.is_branch_out(rob1_internal_is_branch_out), 
@@ -156,8 +161,9 @@ module rob(
 	.is_ex_in(rob2_internal_is_ex_in),
 	.mispredict_in(rob2_internal_mispredict_in),
 	.enable(1'b1),
-	.if_committed(rob2_internal_if_committed),            						//it must be 1 so that we can see all output
+	.if_committed(rob2_internal_if_committed),
 //
+	.pc_out(rob2_internal_pc_out),
 	.is_thread1_out(rob2_internal_is_thread1_out),
 	.is_ex_out(rob2_internal_is_ex_out),
 	.is_branch_out(rob2_internal_is_branch_out), 
@@ -227,6 +233,7 @@ module rob(
 	rob2_internal_if_committed = 0;
 		if (rob1_internal_is_ex_out[t1_head] && t1_head != t1_tail)
 		begin
+			commit1_pc_out			= rob1_internal_pc_out[t1_head];
 			commit1_is_branch_out	= rob1_internal_is_branch_out[t1_head];
 			commit1_mispredict_out	= rob1_internal_mispredict_out[t1_head];
 			commit1_arn_dest_out	= rob1_internal_arn_dest_out[t1_head];
@@ -236,6 +243,7 @@ module rob(
 			rob1_internal_if_committed[t1_head] = 1;
 			if (rob1_internal_is_ex_out[t1_head+1] && t1_head+1 != t1_tail)
 			begin
+				commit2_pc_out			= rob1_internal_pc_out[t1_head+1];
 				commit2_is_branch_out	= rob1_internal_is_branch_out[t1_head+1];
 				commit2_mispredict_out	= rob1_internal_mispredict_out[t1_head+1];
 				commit2_arn_dest_out	= rob1_internal_arn_dest_out[t1_head+1];
@@ -249,6 +257,7 @@ module rob(
 			end
 			else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
 			begin
+				commit2_pc_out			= rob2_internal_pc_out[t2_head];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
@@ -268,6 +277,7 @@ module rob(
 		end
 		else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
 		begin
+			commit1_pc_out			= rob2_internal_pc_out[t2_head];
 			commit1_is_branch_out	= rob2_internal_is_branch_out[t2_head];
 			commit1_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 			commit1_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
@@ -277,6 +287,7 @@ module rob(
 			rob2_internal_if_committed[t2_head] = 1;
 			if (rob2_internal_is_ex_out[t2_head+1] && t2_head+1 != t2_tail)
 			begin
+				commit2_pc_out			= rob2_internal_pc_out[t1_head+1];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head+1];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head+1];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head+1];

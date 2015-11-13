@@ -212,34 +212,34 @@ module ex_stage(
 			fu_rs_dest_tag_out[0]	<= `SD 0;
 			fu_rs_rob_idx_out[0]	<= `SD 0;
 			fu_rs_op_type_out[0]	<= `SD 0;
-			fu_alu_func_out[0]	<= `SD ALU_DEFAULT;
+			fu_alu_func_out[0]		<= `SD ALU_DEFAULT;
 			fu_result_is_valid[0]	<= `SD 1'b0;
-			fu_result_out[0]	<= `SD 0;
-			fu_is_in_use[0]		<= `SD 1'b0;
+			fu_result_out[0]		<= `SD 0;
+			fu_is_in_use[0]			<= `SD 1'b0;
 			
 			fu_rs_dest_tag_out[1]	<= `SD 0;
 			fu_rs_rob_idx_out[1]	<= `SD 0;
 			fu_rs_op_type_out[1]	<= `SD 0;
-			fu_alu_func_out[1]	<= `SD ALU_DEFAULT;
+			fu_alu_func_out[1]		<= `SD ALU_DEFAULT;
 			fu_result_is_valid[1]	<= `SD 1'b0;
-			fu_result_out[1]	<= `SD 0;
-			fu_is_in_use[1]		<= `SD 1'b0;
+			fu_result_out[1]		<= `SD 0;
+			fu_is_in_use[1]			<= `SD 1'b0;
 
 			fu_rs_dest_tag_out[2]	<= `SD 0;
 			fu_rs_rob_idx_out[2]	<= `SD 0;
 			fu_rs_op_type_out[2]	<= `SD 0;
-			fu_alu_func_out[2]	<= `SD ALU_DEFAULT;
+			fu_alu_func_out[2]		<= `SD ALU_DEFAULT;
 			fu_result_is_valid[2]	<= `SD 1'b0;
-			fu_result_out[2]	<= `SD 0;
-			fu_is_in_use[2]		<= `SD 1'b0;
+			fu_result_out[2]		<= `SD 0;
+			fu_is_in_use[2]			<= `SD 1'b0;
 
 			fu_rs_dest_tag_out[3]	<= `SD 0;
 			fu_rs_rob_idx_out[3]	<= `SD 0;
 			fu_rs_op_type_out[3]	<= `SD 0;
-			fu_alu_func_out[3]	<= `SD ALU_DEFAULT;
+			fu_alu_func_out[3]		<= `SD ALU_DEFAULT;
 			fu_result_is_valid[3]	<= `SD 1'b0;
-			fu_result_out[3]	<= `SD 0;
-			fu_is_in_use[3]		<= `SD 1'b0;
+			fu_result_out[3]		<= `SD 0;
+			fu_is_in_use[3]			<= `SD 1'b0;
 		end
 		else begin
 			if (fu_rs_valid_in[0])
@@ -247,14 +247,14 @@ module ex_stage(
 				fu_rs_dest_tag_out[0]	<= `SD fu_rs_dest_tag_in[0];
 				fu_rs_rob_idx_out[0]	<= `SD fu_rs_rob_idx_in[0];
 				fu_rs_op_type_out[0]	<= `SD fu_rs_op_type_in[0];
-				fu_alu_func_out[0]	<= `SD fu_alu_func_in[0];
+				fu_alu_func_out[0]		<= `SD fu_alu_func_in[0];
 				fu_result_is_valid[0]	<= `SD 1'b0;
-				fu_is_in_use[0]		<= `SD 1'b1;
+				fu_is_in_use[0]			<= `SD 1'b1;
 			end
 			else if (mult_done1) begin
-				fu_result_out[0]	<= `SD mult_result1;
+				fu_result_out[0]		<= `SD mult_result1;
 				fu_result_is_valid[0]	<= `SD 1'b1;
-				fu_is_in_use[0]		<= `SD 1'b0;
+				fu_is_in_use[0]			<= `SD 1'b0;
 			end
 			else if (mult1_send_in_success) begin
 				fu_result_is_valid[0]	<= `SD 1'b0;
@@ -265,8 +265,8 @@ module ex_stage(
 				fu_rs_dest_tag_out[1]	<= `SD fu_rs_dest_tag_in[1];
 				fu_rs_rob_idx_out[1]	<= `SD fu_rs_rob_idx_in[1];
 				fu_rs_op_type_out[1]	<= `SD fu_rs_op_type_in[1];
-				fu_alu_func_out[1]	<= `SD fu_alu_func_in[1];
-				fu_result_out[1]	<= `SD alu_result1;
+				fu_alu_func_out[1]		<= `SD fu_alu_func_in[1];
+				fu_result_out[1]		<= `SD alu_result1;
 				fu_result_is_valid[1]	<= `SD 1'b1;
 			end
 			else if (adder1_send_in_success)
@@ -279,14 +279,14 @@ module ex_stage(
 				fu_rs_dest_tag_out[2]	<= `SD fu_rs_dest_tag_in[2];
 				fu_rs_rob_idx_out[2]	<= `SD fu_rs_rob_idx_in[2];
 				fu_rs_op_type_out[2]	<= `SD fu_rs_op_type_in[2];
-				fu_alu_func_out[2]	<= `SD fu_alu_func_in[2];
+				fu_alu_func_out[2]		<= `SD fu_alu_func_in[2];
 				fu_result_is_valid[2]	<= `SD 1'b0;
-				fu_is_in_use[2]		<= `SD 1'b1;
+				fu_is_in_use[2]			<= `SD 1'b1;
 			end
 			else if (mult_done2) begin
-				fu_result_out[2]	<= `SD mult_result2;
+				fu_result_out[2]		<= `SD mult_result2;
 				fu_result_is_valid[2]	<= `SD 1'b1;
-				fu_is_in_use[2]		<= `SD 1'b0;
+				fu_is_in_use[2]			<= `SD 1'b0;
 			end
 			else if (mult2_send_in_success) begin
 				fu_result_is_valid[2]	<= `SD 1'b0;
@@ -297,8 +297,8 @@ module ex_stage(
 				fu_rs_dest_tag_out[3]	<= `SD fu_rs_dest_tag_in[3];
 				fu_rs_rob_idx_out[3]	<= `SD fu_rs_rob_idx_in[3];
 				fu_rs_op_type_out[3]	<= `SD fu_rs_op_type_in[3];
-				fu_alu_func_out[3]	<= `SD fu_alu_func_in[3];
-				fu_result_out[3]	<= `SD alu_result2;
+				fu_alu_func_out[3]		<= `SD fu_alu_func_in[3];
+				fu_result_out[3]		<= `SD alu_result2;
 				fu_result_is_valid[3]	<= `SD 1'b1;
 			end
 			else if (adder2_send_in_success)

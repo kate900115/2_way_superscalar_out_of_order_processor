@@ -308,7 +308,7 @@ typedef enum logic [1:0] {
   USE_MULTIPLIER  = 2'h0,
   USE_ADDER       = 2'h1,
   USE_MEMORY      = 2'h2,
-  FU_DEFAULT	  = 2'h3
+  USE_BRANCH	  = 2'h3
 } FU_SELECT;
 
 typedef enum logic [1:0] {

@@ -361,7 +361,7 @@ module rs(
 	always_comb begin
 		if 	({inst1_rs_op_type_in[5:3],3'b0} == 6'h10 && inst1_rs_alu_func == ALU_MULQ)
 			inst1_fu_select = USE_MULTIPLIER;
-		else if (	({inst1_rs_op_type_in[5:3],3'b0} == 6'h20) || 
+		else if (({inst1_rs_op_type_in[5:3],3'b0} == 6'h20) || 
 				({inst1_rs_op_type_in[5:3],3'b0} == 6'h28))
 			inst1_fu_select = USE_MEMORY; 
 		else 
