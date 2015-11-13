@@ -59,7 +59,7 @@ module rs(
 	logic [2*`RS_SIZE-1:0]				internal_rs_load_in;			//instruction1 go to the entries according to this,
 	logic [`RS_SIZE-1:0] 				inst1_internal_rs_load_in;		//when dispatching two instructions it tell us the address of entries to load each instructions
 	logic [`RS_SIZE-1:0] 				inst2_internal_rs_load_in;		//instruction2 go to the entries according to this
-				
+
 	logic [`RS_SIZE-1:0]	 			internal_rs_free;			//tell rs which entry we want to send to FU1
 	
 	//output of one entry
@@ -201,7 +201,7 @@ module rs(
 	//then make the load of the two entries to be 1
 	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) tsps1(                                  
 		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in | inst2_rs_load_in),							       
+		.en(inst1_rs_load_in | inst2_rs_load_in),
 		.gnt_bus({inst1_internal_rs_load_in, inst2_internal_rs_load_in})
 	);
 

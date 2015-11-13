@@ -31,7 +31,7 @@ module alu(
   function signed_lt;
     input [63:0] a, b;
 
-    if (a[63] == b[63]) 
+    if (a[63] == b[63])
       signed_lt = (a < b); // signs match: signed compare same as unsigned
     else
       signed_lt = a[63];   // signs differ: a is smaller if neg, larger if pos
@@ -120,12 +120,12 @@ module ex_stage(
     //output	ex_take_branch_out,  // is this a taken branch?
 
     output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_cdb_dest_tag_out,
-    output logic [3:0][$clog2(`ROB_SIZE):0]	fu_cdb_rob_idx_out,
-    output logic [3:0][5:0]  			fu_cdb_op_type_out,	// incoming instruction
-    output ALU_FUNC [3:0]			fu_alu_func_out,	// ALU function select from decoder
-    output logic [3:0][63:0]			fu_result_out,
-    output logic [3:0]				fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
-    output logic [3:0]				fu_is_available,
+    output logic [3:0][$clog2(`ROB_SIZE):0]		fu_cdb_rob_idx_out,
+    output logic [3:0][5:0]  					fu_cdb_op_type_out,	// incoming instruction
+    output ALU_FUNC [3:0]						fu_alu_func_out,	// ALU function select from decoder
+    output logic [3:0][63:0]					fu_result_out,
+    output logic [3:0]							fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
+    output logic [3:0]							fu_is_available,
     output logic [1:0]                          fu_mispredict_sig         //mispredict signal generate
   );
 

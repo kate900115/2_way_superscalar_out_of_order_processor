@@ -32,10 +32,12 @@ module rob(
 	input							inst2_is_branch_in,			//if this instruction is a branch
 	input 							inst2_load_in,		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
-	input	[1:0]					if_fu_executed,		//if the instruction in the first multiplyer has been executed ************************************
-	input	[1:0][$clog2(`ROB_SIZE):0]	fu_rob_idx,			//the rob number of the instruction in the first multiplyer************************************
-	input	[1:0]					fu_is_thread1,			//the rob number of the instruction in the first multiplyer********************************
-	input	[1:0]					mispredict_in,
+	input							if_fu_executed1,		//if the instruction in the first multiplyer has been executed ************************************
+	input	[$clog2(`ROB_SIZE):0]	fu_rob_idx1,			//the rob number of the instruction in the first multiplyer************************************
+	input							mispredict_in1,
+	input							if_fu_executed2,		//if the instruction in the first multiplyer has been executed ************************************
+	input	[$clog2(`ROB_SIZE):0]	fu_rob_idx2,			//the rob number of the instruction in the first multiplyer************************************
+	input							mispredict_in2,
 
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	output	logic	[$clog2(`ROB_SIZE):0]		inst1_rs_rob_idx_in,					//it is combinational logic so that the output is dealt with right after a
@@ -183,29 +185,25 @@ module rob(
 			rob2_internal_is_ex_in[j] = 1'b0;
 			rob1_internal_mispredict_in[j] = 1'b0;
 			rob2_internal_mispredict_in[j] = 1'b0;
-		end
-		for (int i = 0; i < 6; i++)
-		begin
-			if (if_fu_executed[i])
+			if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx1[$clog2(`ROB_SIZE)])
 			begin
-				for (int j = 0; j < `ROB_SIZE; j++)
-				begin
-					if (j == fu_rob_idx[i])
-					begin
-						if (fu_is_thread1[i])
-						begin
-							rob1_internal_is_ex_in[j] = 1'b1;
-							rob1_internal_mispredict_in[j] = mispredict_in[j];
-							//break;
-						end
-						else
-						begin
-							rob2_internal_is_ex_in[j] = 1'b1;
-							rob2_internal_mispredict_in[j] = mispredict_in[j];
-							//break;
-						end
-					end
-				end
+				rob1_internal_is_ex_in[j] = 1'b1;
+				rob1_internal_mispredict_in[j] = mispredict_in[j];
+			end
+			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx2[$clog2(`ROB_SIZE)])
+			begin
+				rob1_internal_is_ex_in[j] = 1'b1;
+				rob1_internal_mispredict_in[j] = mispredict_in[j];
+			end
+			else if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx1[$clog2(`ROB_SIZE)])
+			begin
+				rob2_internal_is_ex_in[j] = 1'b1;
+				rob2_internal_mispredict_in[j] = mispredict_in[j];
+			end
+			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)])
+			begin
+				rob2_internal_is_ex_in[j] = 1'b1;
+				rob2_internal_mispredict_in[j] = mispredict_in[j];
 			end
 		end
 	end

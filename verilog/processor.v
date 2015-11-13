@@ -524,10 +524,12 @@ module rob rob1(
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_unco_branch),			//if this instruction is a branch
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
-	input	[5:0]							if_fu_executed,		//if the instruction in the first multiplyer has been executed
-	input	[5:0][$clog2(`ROB_SIZE):0]	fu_rob_idx,			//the rob number of the instruction in the first multiplyer
-	input	[5:0]							fu_is_thread1,		//the rob number of the instruction in the first multiplyer
-	input	[5:0]							mispredict_in,
+	.if_fu_executed1(cdb1_valid),		//if the instruction in the first multiplyer has been executed ************************************
+	.fu_rob_idx1(cdb1_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
+	.mispredict_in1,
+	.if_fu_executed2(cdb2_valid),		//if the instruction in the first multiplyer has been executed ************************************
+	.fu_rob_idx2(cdb2_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
+	.mispredict_in2,
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
