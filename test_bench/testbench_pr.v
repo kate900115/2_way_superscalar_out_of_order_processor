@@ -92,6 +92,14 @@ module testbench;
     logic [31:0] mem_wb_IR,
     logic        mem_wb_valid_inst
 
+    //Output from rob
+    logic [63:0]				ROB_commit1_pc;
+    logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;
+    logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;
+    logic [63:0]				ROB_commit2_pc;
+    logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit2_prn_dest;
+    logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;
+
     processor processor_0(
 	//input
     .clock(clock),                    // System clock
