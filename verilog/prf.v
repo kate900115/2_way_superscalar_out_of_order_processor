@@ -39,10 +39,14 @@ module prf(
 	input									rrat1_branch_mistaken_free_valid,	// when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
 	input									rrat2_branch_mistaken_free_valid,	// when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
 
-	input									rrat1_prf_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	input									rrat2_prf_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf_free_idx,					// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf_free_idx,					// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf1_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf1_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf1_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf1_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf2_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf2_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf2_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf2_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 
 	output	logic							rat1_prf1_rename_valid_out,			// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	output	logic							rat1_prf2_rename_valid_out,			// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -62,7 +66,11 @@ module prf(
 	output	logic							inst1_opb_valid,					// whether opb load from prf of instruction1 is valid
 	output  logic							inst2_opa_valid,					// whether opa load from prf of instruction2 is valid
 	output	logic							inst2_opb_valid,					// whether opa load from prf of instruction2 is valid
-	output  logic							prf_is_full,							// if the freelist of prf is empty, prf should give out this signal
+	output  logic							prf_is_full,						// if the freelist of prf is empty, prf should give out this signal
+	
+	// for write back
+	output [63:0]							writeback_value1,
+	output [63:0]							writeback_value2,
 
 	// for debug
 	//`ifdef DEBUG_OUT
@@ -71,8 +79,7 @@ module prf(
 	output [`PRF_SIZE-1:0]					internal_assign_a_free_reg2,
 	output [`PRF_SIZE-1:0]					internal_prf_available2,
 	output [`PRF_SIZE-1:0]					internal_free_this_entry
-	//`endif	
-		
+	//`endif		
 	
 );
 	// internal signal for input
@@ -93,6 +100,11 @@ module prf(
 	// other registers to store value
 	logic									priority_selector1_en;
 	logic									priority_selector2_en;
+	
+	
+	// for writeback
+	assign writeback_value1 = cdb1_out;
+	assign writeback_value2 = cdb2_out;
 	
 	// when all the internal_prf_available=0, the freelist of prf is zero.
     assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
@@ -380,8 +392,10 @@ module prf(
 		//RRAT will give out the physical register index to tell which entry of PRF should be free
 		for(int i=0;i<`PRF_SIZE;i++)
 		begin
-			if 	(((rrat1_prf_free_idx==i)&&(rrat1_prf_free_valid))||
-				 ((rrat2_prf_free_idx==i)&&(rrat2_prf_free_valid)))
+			if 	(((rrat1_prf1_free_idx==i)&&(rrat1_prf1_free_valid))||
+				 ((rrat1_prf2_free_idx==i)&&(rrat1_prf2_free_valid))||
+				 ((rrat2_prf1_free_idx==i)&&(rrat2_prf1_free_valid))||
+				 ((rrat2_prf2_free_idx==i)&&(rrat2_prf2_free_valid)))
 			begin
 				internal_free_this_entry[i] = 1'b1;
 			end
