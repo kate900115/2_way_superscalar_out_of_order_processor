@@ -17,7 +17,8 @@ module if_stage(
 	input [63:0]		thread1_target_pc,
 	input [63:0]		thread2_target_pc,
 	input         		rs_stall,		 				// when RS is full, we need to stop PC
-	input	  			rob_stall,		 				// when RoB is full, we need to stop PC
+	input	  			rob1_stall,		 				// when RoB1 is full, we need to stop PC1
+	input				rob2_stall,						// when RoB2 is full, we need to stop PC2
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
@@ -67,7 +68,7 @@ module if_stage(
 		.Imem2proc_data(Imem2proc_data),  
 		.Imem2proc_valid(Imem2proc_valid),        	
 		.rs_stall(rs_stall),		 	
-		.rob_stall(rob_stall),	
+		.rob_stall(rob1_stall),	
 		.rat_stall(rat_stall),	 	
 		.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
 		.pc_enable(pc_enable1),			 		
@@ -92,7 +93,7 @@ module if_stage(
 		.Imem2proc_data(Imem2proc_data), 
 		.Imem2proc_valid(Imem2proc_valid),         	
 		.rs_stall(rs_stall),		 	
-		.rob_stall(rob_stall),	
+		.rob_stall(rob2_stall),	
 		.rat_stall(rat_stall),	 	
 		.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
 		.pc_enable(pc_enable2),			 		
