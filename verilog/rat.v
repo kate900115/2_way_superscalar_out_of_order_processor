@@ -61,13 +61,15 @@ module rat(
 	output	logic	opb_valid_out2,
 
 	//output together
-	output	logic	[`ARF_SIZE-1:0]	PRF_free_sig,
-	output	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] PRF_free_list
+	output	logic	[`PRF_SIZE-1:0]	PRF_free_list_out,
+	output	logic			PRF_free_valid
 	);
 
 	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] rat_reg, n_rat_reg;
 	logic	inst1_rename;
 	logic	inst2_rename;
+	logic	[`ARF_SIZE-1:0]	PRF_free_sig;
+	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] PRF_free_list;
 	//logic	[$clog2(`ARF_SIZE)-1:0]	i;
 
 assign inst1_rename = PRF_rename_valid1 & dest_rename_sig1 & inst1_enable;
@@ -221,14 +223,26 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 		request2 	= 1;
 
 	  end //else
+
+	for(int i=0; i<`ARF_SIZE; i++) begin
+		if(PRF_free_sig[i] == 1) begin
+		  PRF_free_valid = 1;
+		  break;
+		end // if
+		else PRF_free_valid = 0;
+		if(PRF_free_sig[i] == 1)
+		  PRF_free_list_out[PRF_free_list[i]] = 1;
+		else
+		  PRF_free_list_out[PRF_free_list[i]] = 0;
+	end //for
 		//$display("rat_reg[4]:%h",rat_reg[4]);
 		//$display("rat_reg[3]:%h",rat_reg[3]);
 		//$display("rat_reg[2]:%h",rat_reg[2]);
 		//$display("rat_reg[1]:%h",rat_reg[1]);
 		//$display("rat_reg[0]:%h",rat_reg[0]);
 
-		$display("PRF_free_list[3]:%h",PRF_free_list[3]);
-		$display("PRF_free_list[0]:%h",PRF_free_list[0]);
+		//$display("PRF_free_list[3]:%h",PRF_free_list[3]);
+		//$display("PRF_free_list[0]:%h",PRF_free_list[0]);
 
 	end  //always_comb
 endmodule

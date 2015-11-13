@@ -31,18 +31,20 @@ module rrat(
 	input 				mispredict_sig2,
 
 	//output
-	output logic 						PRF_free_valid1,
-	output logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx1,
 
-	output logic 						PRF_free_valid2,
-	output logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx2,
-
+	output logic			PRF_free_valid,
+	output logic			PRF_free_list_out,
 	output logic [`ARF_SIZE-1:0] [$clog2(`PRF_SIZE)-1:0]	mispredict_up_idx
 
 );
 
 	logic [`ARF_SIZE-1:0] [$clog2(`PRF_SIZE)-1:0] rrat_reg, n_rrat_reg;
-	logic i;
+	logic i, j;
+	logic 						PRF_free_valid1;
+	logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx1;
+
+	logic 						PRF_free_valid2;
+	logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx2;
 
 always_ff @(posedge clock) begin
 	if(reset) begin
@@ -86,6 +88,14 @@ always_comb begin
 			n_rrat_reg[i]	= rrat_reg[i];
 		end //else
 	end  //for
+
+	PRF_free_valid = PRF_free_valid1  | PRF_free_valid1;
+	for(int j=0; j<`PRF_SIZE; j++) begin
+		if (j==PRF_free_idx1 | j == PRF_free_idx2)
+		PRF_free_list_out[j] = 1;
+		else
+		PRF_free_list_out[j] = 0;
+	end
 	//$display("rrat_reg[0]:%d", rrat_reg[0]);	
 	//$display("rrat_reg[1]:%d", rrat_reg[1]);	
 	//$display("rrat_reg[2]:%d", rrat_reg[2]);	
