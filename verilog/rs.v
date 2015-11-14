@@ -240,6 +240,9 @@ module rs(
 			fu_rs_dest_tag_out[i]	= 0;
 			fu_rs_rob_idx_out[i]	= 0;
 			internal_rs_free_enable_fu[i]		= 0;
+			fu_rs_op_type_out[i]	= 0;
+			fu_alu_func_out[i]		= ALU_DEFAULT;
+			
 		end
 		if (fu_is_available[0]) begin
 			for (int i = 0; i < `RS_SIZE; i++) begin
@@ -403,4 +406,5 @@ module rs(
 		begin
 			internal_rs_free = 0;
 		end
+	end
 endmodule

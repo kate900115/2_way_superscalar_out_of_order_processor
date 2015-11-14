@@ -60,6 +60,7 @@ module rs_one_entry(
 	output ALU_FUNC							rs1_alu_func_out,
 	output logic [$clog2(`ROB_SIZE):0]    	rs1_rob_idx_out,	 		  	// 
 	output FU_SELECT						fu_select_reg_out,
+	output [5:0]							rs1_op_type_out
 );
 
 
@@ -100,11 +101,13 @@ module rs_one_entry(
  
 	assign rs1_opb_out 		= rs1_free_enable_fu ? OPb_reg : 64'b0;
  
-	assign rs1_dest_tag_out = rs1_free_enable_fu ? DestTag : 0; 
+	assign rs1_dest_tag_out = rs1_free_enable_fu ? DestTag_reg : 0; 
 
-	assign rs1_rob_idx_out	= Rob_idx;
+	assign rs1_rob_idx_out	= Rob_idx_reg;
 	
 	assign rs1_alu_func_out = rs1_free_enable_fu ? Alu_func_reg : ALU_DEFAULT;
+	
+	assign rs1_op_type_out	= rs1_free_enable_fu ? op_type_reg : 0;
 
 	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa_reg[$clog2(`PRF_SIZE)-1:0]) && !OPaValid_reg && InUse && rs1_cdb1_valid; 
 
@@ -198,8 +201,8 @@ module rs_one_entry(
      	   		OPbValid_reg	<= `SD 0;
            		InUse 	 		<= `SD 1'b0;
            		fu_select_reg	<= `SD FU_DEFAULT;
-          		DestTag  		<= `SD 0;
-				Rob_idx	 		<= `SD 0;
+          		DestTag_reg		<= `SD 0;
+				Rob_idx_reg		<= `SD 0;
 				Alu_func_reg 	<= `SD ALU_DEFAULT;
     		end
 		else

@@ -3,6 +3,19 @@ module testbench_rs;
 	logic         				reset;          // reset signal 
 	logic         				clock;          // the clock 
 
+	logic  [$clog2(`ROB_SIZE):0]				inst1_rs_rob_idx_in;  	// The rob index of instruction 1
+	FU_SELECT									inst1_rs_fu_select_in;
+        
+    //for instruction2
+	logic  [$clog2(`ROB_SIZE):0]				inst2_rs_rob_idx_in;  	// The rob index of instruction 2
+	FU_SELECT		        					inst2_rs_fu_select_in;
+
+	logic  [5:0]								fu_is_available;		//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
+	
+	logic										thread1_branch_is_taken;// when a branch of thread1 is taken, we need to flush all the instructions of thread1 in RS
+	logic										thread2_branch_is_taken;// when a branch of thread2 is taken, we need to flush all the instructions of thread2 in RS
+  
+ 	//output
 	logic  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in;     // The destination of this instruction
 	logic  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in;     // The destination of this instruction
  
@@ -12,50 +25,50 @@ module testbench_rs;
 	logic  [63:0]						rs_cdb2_in;     // CDB bus from functional units 
 	logic  [$clog2(`PRF_SIZE)-1:0]  	rs_cdb2_tag;    // CDB tag bus from functional units 
 	logic								rs_cdb2_valid;  // The data on the CDB is valid 
-
-                                                                 //*** for instruction1
+	                                                    //*** for instruction1
 	logic  [63:0] 				inst1_rs_opa_in;      // Operand a from Rename  
 	logic  [63:0] 				inst1_rs_opb_in;      // Operand a from Rename 
 	logic  	     				inst1_rs_opa_valid;   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	logic         				inst1_rs_opb_valid;   // Is Opb a tag or immediate data (READ THIS COMMENT) 
 	logic  [5:0]      			inst1_rs_op_type_in;  // Instruction type from decoder
-	ALU_FUNC				inst1_rs_alu_func;	// ALU function type from decoder
+	ALU_FUNC					inst1_rs_alu_func;	  // ALU function type from decoder
         
-                                                                //*** for instruction2
+                                                      //*** for instruction2
 	logic  [63:0] 				inst2_rs_opa_in;      // Operand a from Rename  
 	logic  [63:0] 				inst2_rs_opb_in;      // Operand a from Rename 
 	logic  	     				inst2_rs_opa_valid;   // Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	logic         				inst2_rs_opb_valid;   // Is Opb a tag or immediate data (READ THIS COMMENT) 
 	logic  [5:0]      			inst2_rs_op_type_in;  // Instruction type from decoder
-	ALU_FUNC				inst2_rs_alu_func;	// ALU function type from decoder
+	ALU_FUNC					inst2_rs_alu_func;	  // ALU function type from decoder
 
 	logic  		        		inst1_rs_load_in;     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	logic 		        		inst2_rs_load_in;     // Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 
-	logic  [$clog2(`ROB_SIZE)-1:0]       	inst1_rs_rob_idx_in;  // 
-	logic  [$clog2(`ROB_SIZE)-1:0]       	inst2_rs_rob_idx_in;  //
+	logic  [$clog2(`ROB_SIZE)-1:0]      inst1_rs_rob_idx_in;  // 
+	logic  [$clog2(`ROB_SIZE)-1:0]      inst2_rs_rob_idx_in;  //
 
-	logic					fu1_mult_available;
-	logic					fu1_adder_available;
-	logic					fu1_memory_available;
-	logic					fu2_mult_available;
-	logic					fu2_adder_available;
-	logic					fu2_memory_available;
-  
- 	//outputs
 	logic [5:0][63:0]					fu_rs_opa_out;       	// This RS' opa 
 	logic [5:0][63:0]					fu_rs_opb_out;       	// This RS' opb 
-	logic [5:0][$clog2(`PRF_SIZE)-1:0]			fu_rs_dest_tag_out;  	// This RS' destination tag  
-	logic [5:0][$clog2(`ROB_SIZE)-1:0]    			fu_rs_rob_idx_out;   	// This RS' corresponding ROB index
+	logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out;  	// This RS' destination tag  
+	logic [5:0][$clog2(`ROB_SIZE)-1:0]  fu_rs_rob_idx_out;   	// This RS' corresponding ROB index
 	logic [5:0][5:0]					fu_rs_op_type_out;     // This RS' operation type
-	logic [5:0]						fu_rs_out_valid;		// RS output is valid
+	logic [5:0]							fu_rs_out_valid;		// RS output is valid
 	ALU_FUNC [5:0]						fu_alu_func_out;
+	logic								rs_full;				// RS is full now
 
 	rs DUT(.reset(reset),
 	   .clock(clock),
 	   .inst1_rs_dest_in(inst1_rs_dest_in),
 	   .inst2_rs_dest_in(inst2_rs_dest_in),
-
+	
+		.inst1_rs_rob_idx_in(inst1_rs_rob_idx_in),
+		.inst1_rs_fu_select_in(inst1_rs_fu_select_in),
+		.inst2_rs_rob_idx_in(inst2_rs_rob_idx_in),
+		.inst2_rs_fu_select_in(inst2_rs_fu_select_in),
+		.fu_is_available(fu_is_available),
+		.thread1_branch_is_taken(thread1_branch_is_taken),
+		.thread2_branch_is_taken(thread2_branch_is_taken),
+		
 	   .rs_cdb1_in(rs_cdb1_in),
 	   .rs_cdb1_tag(rs_cdb1_tag),
 	   .rs_cdb1_valid(rs_cdb1_valid),
@@ -81,14 +94,6 @@ module testbench_rs;
 	   .inst2_rs_load_in(inst2_rs_load_in),
 	   .inst1_rs_rob_idx_in(inst1_rs_rob_idx_in),
 	   .inst2_rs_rob_idx_in(inst2_rs_rob_idx_in),
-
-	   .fu1_mult_available(fu1_mult_available),
-	   .fu1_adder_available(fu1_adder_available),
-	   .fu1_memory_available(fu1_memory_available),
-	   .fu2_mult_available(fu2_mult_available),
-	   .fu2_adder_available(fu2_adder_available),
-	   .fu2_memory_available(fu2_memory_available),
-  
 
 	   .fu_rs_opa_out(fu_rs_opa_out),
 	   .fu_rs_opb_out(fu_rs_opb_out),
@@ -130,6 +135,8 @@ module testbench_rs;
 		#5;
 		@(negedge clock);
 		reset = 0;
+		thread1_branch_is_taken = 0;
+		thread2_branch_is_taken = 0;
 		inst1_rs_dest_in	= 1;
 		inst1_rs_opa_in		= 0;
 		inst1_rs_opb_in		= 8;
@@ -139,9 +146,7 @@ module testbench_rs;
 		inst1_rs_alu_func	= ALU_ADDQ;
 		inst1_rs_load_in	= 1;
 		inst1_rs_rob_idx_in	= 1;
-		fu1_mult_available	= 1;
-		fu1_adder_available	= 1;
-		fu1_memory_available	= 1;
+		fu_is_available	= 6'b111111;
 		
 		inst2_rs_dest_in	= 2;
 		inst2_rs_opa_in		= 0;
@@ -152,11 +157,7 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 2;
-		fu2_mult_available	= 1;
-		fu2_adder_available	= 1;
-		fu2_memory_available	= 1;
 		#5
-
 		@(negedge clock);
 		inst1_rs_dest_in	= 3;
 		inst1_rs_opa_in		= 2;
@@ -167,9 +168,7 @@ module testbench_rs;
 		inst1_rs_alu_func	= ALU_SLL;
 		inst1_rs_load_in	= 1;
 		inst1_rs_rob_idx_in	= 3;
-		fu1_mult_available	= 1;
-		fu1_adder_available	= 1;
-		fu1_memory_available	= 1;
+		fu_is_available	= 6'b111111;
 		
 		inst2_rs_dest_in	= 4;
 		inst2_rs_opa_in		= 1;
@@ -180,9 +179,6 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 1;
-		fu2_mult_available	= 1;
-		fu2_adder_available	= 1;
-		fu2_memory_available	= 1;
 		#5
 
 		@(negedge clock);
@@ -195,9 +191,7 @@ module testbench_rs;
 		inst1_rs_alu_func	= ALU_BIS;
 		inst1_rs_load_in	= 1;
 		inst1_rs_rob_idx_in	= 3;
-		fu1_mult_available	= 1;
-		fu1_adder_available	= 1;
-		fu1_memory_available	= 1;
+		fu_is_available	= 6'b111111;
 		
 		inst2_rs_dest_in	= 6;
 		inst2_rs_opa_in		= 1;
@@ -208,9 +202,6 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 1;
-		fu2_mult_available	= 1;
-		fu2_adder_available	= 1;
-		fu2_memory_available	= 1;
 		#5
 		@(negedge clock);
 		$display("@@@Passed");
