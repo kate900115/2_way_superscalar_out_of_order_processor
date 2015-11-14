@@ -22,11 +22,12 @@ all:    simv
 
 TESTBENCH = 	sys_defs.vh	\
 				test_bench/testbench_pr.v	\
-				#test_bench/mem.v		\
-				#test_bench/pipe_print.c
+				test_bench/mem.v		\
+				test_bench/pipe_print.c
 SIMFILES = 	verilog/cdb.v	\
 			verilog/cdb_one_entry.v	\
 			verilog/ex_stage.v	\
+			verilog/icache.v	\
 			verilog/id_stage.v	\
 			verilog/if_stage.v	\
 			verilog/mult_stage.v	\
@@ -47,7 +48,7 @@ SYNFILES = processor.vg
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
 processor.vg:	$(SIMFILES) processor.tcl 
-	dc_shell-t -f processor.tcl | tee synth.out
+	dc_shell-t -f id_stage.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here

@@ -1,5 +1,5 @@
 //input
-
+module mem;
 input		clock;
 input [63:0]	proc2mem_addr;
 input [63:0]	proc2mem_data;
@@ -54,6 +54,5 @@ always @(negedge clock) begin
 	  end
 	end  //for
 end //always_ff
-
-
+endmodule
 
