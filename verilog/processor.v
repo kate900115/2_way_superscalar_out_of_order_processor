@@ -120,6 +120,8 @@ logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx1;
 logic 							RRAT2_PRF_free_valid2;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx2;
 logic							RRAT2_RAT2_mispredict_up_idx2;
+logic [`PRF_SIZE-1:0]			RRAT1_PRF_free_enable_list;
+logic [`PRF_SIZE-1:0]			RRAT2_PRF_free_enable_list;
 
 //rob output
 logic ROB_t1_is_full;
@@ -433,7 +435,8 @@ module rrat rrat1(
 	.PRF_free_idx1(RRAT1_PRF_free_idx1),
 	.PRF_free_valid2(RRAT1_PRF_free_valid2),
 	.PRF_free_idx2(RRAT1_PRF_free_idx2),
-	.mispredict_up_idx(RRAT1_RAT2_mispredict_up_idx1)
+	.mispredict_up_idx(RRAT1_RAT2_mispredict_up_idx1),
+	.PRF_free_enable_list(RRAT1_PRF_free_enable_list)
 );
 
 module rrat rrat2(
@@ -458,8 +461,8 @@ module rrat rrat2(
 	.PRF_free_idx1(RRAT2_PRF_free_idx1),
 	.PRF_free_valid2(RRAT2_PRF_free_valid2),
 	.PRF_free_idx2(RRAT2_PRF_free_idx2),
-	.mispredict_up_idx(RRAT2_RAT2_mispredict_up_idx1)
-
+	.mispredict_up_idx(RRAT2_RAT2_mispredict_up_idx1),
+	.PRF_free_enable_list(RRAT2_PRF_free_enable_list)
 );
 
 //////////////////////////////////
@@ -489,8 +492,8 @@ module prf prf1(
 	.rat2_allocate_new_prf1(RAT2_PRF_allocate_req1),			// the request from rat2 for allocating a new prf entry
 	.rat2_allocate_new_prf2(RAT2_PRF_allocate_req2),			// the request from rat2 for allocating a new prf entry
 
-	input	[`PRF_SIZE-1:0]					rrat1_prf_free_list,				// when a branch is mispredict, RRAT1 gives a freelist to PRF
-	input	[`PRF_SIZE-1:0]					rrat2_prf_free_list,				// when a branch is mispredict, RRAT2 gives a freelist to PRF
+	.rrat1_prf_free_list(RRAT1_PRF_free_enable_list),				// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	.rrat2_prf_free_list(RRAT2_PRF_free_enable_list),				// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rrat1_branch_mistaken_free_valid(ROB_commit1_mispredict),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
 	.rrat2_branch_mistaken_free_valid(ROB_commit2_mispredict),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF

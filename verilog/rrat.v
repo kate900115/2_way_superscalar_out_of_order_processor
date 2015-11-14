@@ -22,22 +22,22 @@ module rrat(
 
 	input [$clog2(`PRF_SIZE)-1:0]	RoB_PRF_idx1,
 	input [$clog2(`ARF_SIZE)-1:0] 	RoB_ARF_idx1,
-	input 				RoB_retire_in1,	//high when instruction retires
-	input 				mispredict_sig1,
+	input 							RoB_retire_in1,	//high when instruction retires
+	input 							mispredict_sig1,
 
 	input [$clog2(`PRF_SIZE)-1:0]	RoB_PRF_idx2,
 	input [$clog2(`ARF_SIZE)-1:0] 	RoB_ARF_idx2,
-	input 				RoB_retire_in2,	//high when instruction retires
-	input 				mispredict_sig2,
+	input 							RoB_retire_in2,	//high when instruction retires
+	input 							mispredict_sig2,
 
 	//output
 
-	output	logic 						PRF_free_valid1,
-	output  logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx1,
-	output	logic 						PRF_free_valid2,
-	output	logic [$clog2(`PRF_SIZE)-1:0] 			PRF_free_idx2,
+	output	logic 											PRF_free_valid1,
+	output  logic [$clog2(`PRF_SIZE)-1:0] 					PRF_free_idx1,
+	output	logic 											PRF_free_valid2,
+	output	logic [$clog2(`PRF_SIZE)-1:0] 					PRF_free_idx2,
 	output  logic [`ARF_SIZE-1:0] [$clog2(`PRF_SIZE)-1:0]	mispredict_up_idx,
-	output  logic [`PRF_SIZE-1:0]				PRF_free_enable_list
+	output  logic [`PRF_SIZE-1:0]							PRF_free_enable_list
 
 );
 
