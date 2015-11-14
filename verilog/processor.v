@@ -28,13 +28,15 @@ module processor(
 
 //output
     //Output from rob
+    output logic							ROB_commit1_valid,
     output logic [63:0]						ROB_commit1_pc,
-    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest,
+	output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest,
 	output logic 							ROB_commit1_wr_en,
     output logic [63:0]						PRF_writeback_value1,
+    output logic							ROB_commit2_valid,
     output logic [63:0]						ROB_commit2_pc,
-    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest,
-	output logic 							ROB_commit1_wr_en,
+    output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
+	output logic 							ROB_commit2_wr_en,
     output logic [63:0]						PRF_writeback_value2,
 );
 //pc output
@@ -132,8 +134,9 @@ logic							cdb1_branch_taken;
 logic							cdb2_branch_taken;
 logic [63:0]					ROB_commit1_target_pc;
 logic [63:0]					ROB_commit2_target_pc;
-logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest,
-logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
+logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest,
+logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest,
+
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -217,7 +220,7 @@ module if_stage pc(
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t1_is_full),						// when RoB2 is full, we need to stop PC2
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
-	.thread1_structure_hazard_stall(11111111),	// If data and instruction want to use memory at the same time
+	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	input [63:0]		Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
 	input			    Imem2proc_valid(mem2proc_tag),				// 
@@ -417,12 +420,12 @@ module rrat rrat1(
 
 	.RoB_PRF_idx1(ROB_commit1_prn_dest),
 	.RoB_ARF_idx1(ROB_commit1_arn_dest),
-	.RoB_retire_in1(ROB_commit1_if_rename),	//high when instruction retires
+	.RoB_retire_in1(ROB_commit1_valid && ROB_commit1_is_thread1),	//high when instruction retires
 	.mispredict_sig1(ROB_commit1_mispredict),
 
 	.RoB_PRF_idx2(ROB_commit2_prn_dest),
 	.RoB_ARF_idx2(ROB_commit2_arn_dest),
-	.RoB_retire_in2(ROB_commit2_if_rename),	//high when instruction retires
+	.RoB_retire_in2(ROB_commit2_valid && ROB_commit2_is_thread1),	//high when instruction retires
 	.mispredict_sig2(ROB_commit2_mispredict),
 
 	//output
@@ -443,12 +446,12 @@ module rrat rrat2(
 
 	.RoB_PRF_idx1(ROB_commit1_prn_dest),
 	.RoB_ARF_idx1(ROB_commit1_arn_dest),
-	.RoB_retire_in1(ROB_commit1_if_rename),	//high when instruction retires
+	.RoB_retire_in1(ROB_commit1_valid && ~ROB_commit1_is_thread1),	//high when instruction retires
 	.mispredict_sig1(ROB_commit1_mispredict),
 
 	.RoB_PRF_idx2(ROB_commit2_prn_dest),
 	.RoB_ARF_idx2(ROB_commit2_arn_dest),
-	.RoB_retire_in2(ROB_commit2_if_rename),	//high when instruction retires
+	.RoB_retire_in2(ROB_commit2_valid && ~ROB_commit2_is_thread1),	//high when instruction retires
 	.mispredict_sig2(ROB_commit2_mispredict),
 //output
 	.PRF_free_valid1(RRAT2_PRF_free_valid1),
@@ -577,7 +580,7 @@ module rob rob1(
 	.commit1_mispredict_out(ROB_commit1_mispredict),				       	//if this instrucion is mispredicted
 	.commit1_arn_dest_out(ROB_commit1_arn_dest_out),                       //the architected register number of the destination of this instruction
 	.commit1_prn_dest_out(ROB_commit1_prn_dest_out),						//the prf number of the destination of this instruction
-	.commit1_if_rename_out(ROB_commit1_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
+	.commit1_if_rename_out(ROB_commit1_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit1_valid(ROB_commit1_is_valid),
 	.commit1_is_thread1(ROB_commit1_is_thread1),
 //when committed, the output of the second instruction committed
@@ -587,7 +590,7 @@ module rob rob1(
 	.commit2_mispredict_out(ROB_commit2_mispredict),				       	//if this instrucion is mispredicted
 	.commit2_arn_dest_out(ROB_commit2_arn_dest_out),						//the architected register number of the destination of this instruction
 	.commit2_prn_dest_out(ROB_commit2_prn_dest_out),						//the prf number of the destination of this instruction
-	.commit2_if_rename_out(ROB_commit2_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
+	.commit2_if_rename_out(ROB_commit2_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit2_valid(ROB_commit2_is_valid),
 	.commit2_is_thread1(ROB_commit2_is_thread1),
 	.t1_is_full(ROB_t1_is_full),
