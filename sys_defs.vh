@@ -40,6 +40,7 @@
 // float to integer conversion is rounding to nearest
 
 
+<<<<<<< HEAD
 //////////////////////////////////////////////
 //
 // Error codes
@@ -52,36 +53,37 @@ typedef enum logic [3:0] {
   HALTED_ON_HALT         = 4'h2,
   HALTED_ON_ILLEGAL      = 4'h3
 } ERROR_CODE;
+=======
+>>>>>>> f788cf4602821836cb5b0923ad7364f0ab3b9df7
 
-
-//////////////////////////////////////////////
-//
-// Datapath control signals
-//
-//////////////////////////////////////////////
 
 //
 // ALU opA input mux selects
 //
-`define ALU_OPA_IS_REGA         2'h0
-`define ALU_OPA_IS_MEM_DISP     2'h1
-`define ALU_OPA_IS_NPC          2'h2
-`define ALU_OPA_IS_NOT3         2'h3
+typedef enum logic [1:0] {
+  ALU_OPA_IS_REGA        = 2'h0,
+  ALU_OPA_IS_MEM_DISP    = 2'h1,
+  ALU_OPA_IS_NPC         = 2'h2,
+  ALU_OPA_IS_NOT3        = 2'h3
+} ALU_OPA_SELECT;
 
 //
 // ALU opB input mux selects
 //
-`define ALU_OPB_IS_REGB         2'h0
-`define ALU_OPB_IS_ALU_IMM      2'h1
-`define ALU_OPB_IS_BR_DISP      2'h2
+typedef enum logic [1:0] {
+  ALU_OPB_IS_REGB       = 2'h0,
+  ALU_OPB_IS_ALU_IMM    = 2'h1,
+  ALU_OPB_IS_BR_DISP    = 2'h2
+} ALU_OPB_SELECT;
 
 //
 // Destination register select
 //
-`define DEST_IS_REGC    2'h0
-`define DEST_IS_REGA    2'h1
-`define DEST_NONE       2'h2
-
+typedef enum logic [1:0] {
+  DEST_IS_REGC  = 2'h0,
+  DEST_IS_REGA  = 2'h1,
+  DEST_NONE     = 2'h2
+} DEST_REG_SEL;
 
 //
 // ALU function code input
@@ -104,8 +106,7 @@ typedef enum logic [4:0] {
   ALU_CMPLT     = 5'h0d,
   ALU_CMPLE     = 5'h0e,
   ALU_CMPULT    = 5'h0f,
-  ALU_CMPULE    = 5'h10,
-  ALU_DEFAULT	= 5'h1f
+  ALU_CMPULE    = 5'h10
 } ALU_FUNC;
 
 //////////////////////////////////////////////
@@ -128,9 +129,11 @@ typedef enum logic [4:0] {
 //
 // Memory bus commands control signals
 //
-`define BUS_NONE       2'h0
-`define BUS_LOAD       2'h1
-`define BUS_STORE      2'h2
+typedef enum logic [1:0] {
+  BUS_NONE     = 2'h0,
+  BUS_LOAD     = 2'h1,
+  BUS_STORE    = 2'h2
+} BUS_COMMAND;
 
 //
 // useful boolean single-bit definitions
@@ -321,33 +324,6 @@ typedef enum logic [1:0] {
   RS_ONE_ENTRY_EMPTY	     = 2'h1,
   RS_NO_ENTRY_EMPTY	     = 2'h2
 } RS_FULL;
-
-typedef enum logic [1:0] {
-  INST1_TWO_THREAD1		= 2'h0,
-  INST1_THREAD1			= 2'h1, //if inst1 is thread1 , and inst2 is thread2
-  INST2_THREAD1			= 2'h2, //if inst2 is thread1,  and inst2 is thread1
-  INST1_ZERO_THREAD1	= 2'h3
-} THREAD_NUMBER;
-
-typedef enum logic [2:0] {
-  TWO_ZERO	= 3'h0,
-  ONE_ONE	= 3'h1,			
-  ONE_ZERO	= 3'h2,
-  ZERO_TWO	= 3'h3,
-  ZERO_ONE	= 3'h4,
-  ZERO_ZERO	= 3'h5	
-} COMMIT_STATUS;
-
-typedef enum logic [1:0] {
-  ZERO_EXECUTED = 2'h0,
-  ONE_EXECUTED  = 2'h1,			//if inst1 is thread1 , and inst2 is thread2
-  TWE_EXECUTED  = 2'h2			//if inst2 is thread1,  and inst2 is thread1
-} EXECUTION_STATUS_FOR_HEAD;
-
-typedef enum logic {
-	THREAD1_IS_EX  = 1'h0,			
-  	THREAD2_IS_EX  = 1'h1			
-} CURRENT_THREAD_STATE;
 
 `endif
 
