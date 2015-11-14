@@ -62,7 +62,7 @@ always_comb begin
 	if(mispredict_sig1 & inst1_enable)
 	  		mispredict_up_idx = rrat_reg;
 	else if(mispredict_sig2 & inst2_enable) begin
-			for(i=0; i<`ARF_SIZE; i++) begin
+			for(int i=0; i<`ARF_SIZE; i++) begin
 				if(i==RoB_ARF_idx1)
 				mispredict_up_idx[i] = RoB_PRF_idx1;
 				else

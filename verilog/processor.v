@@ -85,6 +85,12 @@ logic	RAT1_PRF_allocate_req2;
 logic	RAT2_PRF_allocate_req1;
 logic	RAT2_PRF_allocate_req2;
 
+logic	[`PRF_SIZE-1:0]		RAT1_PRF_free_list;
+logic	[`PRF_SIZE-1:0]		RAT2_PRF_free_list;
+logic				rat1_prf_free_valid;
+logic				rat2_prf_free_valid;
+
+
 //prf output
 logic	PRF_RAT1_rename_valid1;
 logic	PRF_RAT1_rename_valid2;
@@ -319,7 +325,8 @@ rat rat1(
 	.PRF_rename_idx1(PRF_RAT1_rename_idx1),								//the PRF alocated for dest
 	.PRF_rename_valid2(PRF_RAT1_rename_valid2),							//we get valid signal from prf if the dest address has been request
 	.PRF_rename_idx2(PRF_RAT1_rename_idx2),								//the PRF alocated for dest
-//output
+
+	//output
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
 	//output	logic	request1,  //send to PRF indicate whether it need data
