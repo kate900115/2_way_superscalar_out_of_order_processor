@@ -105,7 +105,7 @@ typedef enum logic [4:0] {
   ALU_CMPLE     = 5'h0e,
   ALU_CMPULT    = 5'h0f,
   ALU_CMPULE    = 5'h10,
-  ALU_DEFAULT	= 5'1f
+  ALU_DEFAULT	= 5'h1f
 } ALU_FUNC;
 
 //////////////////////////////////////////////
@@ -323,6 +323,11 @@ typedef enum logic [1:0] {
   RS_ONE_ENTRY_EMPTY	     = 2'h1,
   RS_NO_ENTRY_EMPTY	     = 2'h2
 } RS_FULL;
+
+typedef enum logic {
+	THREAD1_IS_EX  = 1'h0,			
+  	THREAD2_IS_EX  = 1'h1			
+} CURRENT_THREAD_STATE;
 
 `endif
 
