@@ -97,11 +97,11 @@ module rs_one_entry(
 
 	assign fu_select_reg_out= fu_select_reg;
  
-	assign rs1_opb_out 		= rs1_free ? OPb_reg : 64'b0; 
+	assign rs1_opb_out 		= rs1_free ? OPb_reg : 64'b0;
  
 	assign rs1_dest_tag_out = rs1_free ? DestTag : 0; 
 
-	assign rs1_rob_idx_out	= rs1_free ? Rob_idx : 0;
+	assign rs1_rob_idx_out	= Rob_idx;
 	
 	assign rs1_alu_func_out = rs1_free ? Alu_func_reg : ALU_DEFAULT;
 

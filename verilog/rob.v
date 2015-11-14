@@ -47,6 +47,7 @@ module rob(
 																						//store in rs
 //when committed, the output of the first instrucion committed
 	output	logic	[63:0]			commit1_pc_out,
+	output  logic	[63:0]			commit1_target_pc_out,
 	output	logic					commit1_is_branch_out,				       	//if this instruction is a branch
 	output	logic					commit1_mispredict_out,				       	//if this instrucion is mispredicted
 	output	logic	[4:0]			commit1_arn_dest_out,                       //the architected register number of the destination of this instruction
@@ -56,6 +57,7 @@ module rob(
 	output	logic					commit1_is_thread1,
 //when committed, the output of the second instruction committed
 	output  logic	[63:0]			commit2_pc_out,
+	output  logic	[63:0]			commit2_target_pc_out,
 	output	logic					commit2_is_branch_out,						//if this instruction is a branch
 	output	logic					commit2_mispredict_out,				       	//if this instrucion is mispredicted
 	output	logic	[4:0]			commit2_arn_dest_out,						//the architected register number of the destination of this instruction
@@ -247,6 +249,7 @@ module rob(
 		if (rob1_internal_is_ex_out[t1_head] && t1_head != t1_tail)
 		begin
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
+			commit1_target_pc_out	= rob1_internal_target_pc_out[t1_head];
 			commit1_is_branch_out	= rob1_internal_is_branch_out[t1_head];
 			commit1_mispredict_out	= rob1_internal_mispredict_out[t1_head];
 			commit1_arn_dest_out	= rob1_internal_arn_dest_out[t1_head];
@@ -257,6 +260,7 @@ module rob(
 			if (rob1_internal_is_ex_out[t1_head+1] && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
 				commit2_pc_out			= rob1_internal_pc_out[t1_head+1];
+				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+1];
 				commit2_is_branch_out	= rob1_internal_is_branch_out[t1_head+1];
 				commit2_mispredict_out	= rob1_internal_mispredict_out[t1_head+1];
 				commit2_arn_dest_out	= rob1_internal_arn_dest_out[t1_head+1];
@@ -271,6 +275,7 @@ module rob(
 			else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
 			begin
 				commit2_pc_out			= rob2_internal_pc_out[t2_head];
+				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
@@ -291,6 +296,7 @@ module rob(
 		else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
 		begin
 			commit1_pc_out			= rob2_internal_pc_out[t2_head];
+			commit1_target_pc_out	= rob1_internal_target_pc_out[t2_head];
 			commit1_is_branch_out	= rob2_internal_is_branch_out[t2_head];
 			commit1_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 			commit1_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
@@ -300,7 +306,8 @@ module rob(
 			rob2_internal_if_committed[t2_head] = 1;
 			if (rob2_internal_is_ex_out[t2_head+1] && t2_head+1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
-				commit2_pc_out			= rob2_internal_pc_out[t1_head+1];
+				commit2_pc_out			= rob2_internal_pc_out[t2_head+1];
+				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head+1];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head+1];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head+1];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head+1];
