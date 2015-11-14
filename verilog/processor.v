@@ -20,12 +20,7 @@ module processor(
     output logic [63:0] proc2mem_data,      // Data sent to memory
 
     output logic [3:0]  pipeline_completed_insts,
-    output ERROR_CODE   pipeline_error_status,
-    output logic [4:0]  pipeline_commit_wr_idx,
-    output logic [63:0] pipeline_commit_wr_data,
-    output logic        pipeline_commit_wr_en,
-    output logic [63:0] pipeline_commit_NPC,
-
+    //output ERROR_CODE   pipeline_error_status,
 
     // testing hooks (these must be exported so we can test
     // the synthesized version) data is tested by looking at
@@ -33,14 +28,14 @@ module processor(
 
 //output
     //Output from rob
-    output logic [63:0]						ROB_commit1_pc;
-    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
-    output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
-    output logic [63:0]						PRF_writeback_value1;
-    output logic [63:0]						ROB_commit2_pc;
-    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
-    output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
-    output logic [63:0]						PRF_writeback_value2;
+    output logic [63:0]						ROB_commit1_pc,
+    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest,
+	output logic 							ROB_commit1_wr_en,
+    output logic [63:0]						PRF_writeback_value1,
+    output logic [63:0]						ROB_commit2_pc,
+    output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest,
+	output logic 							ROB_commit1_wr_en,
+    output logic [63:0]						PRF_writeback_value2,
 );
 //pc output
 logic [31:0]	PC_inst1;
@@ -137,6 +132,8 @@ logic							cdb1_branch_taken;
 logic							cdb2_branch_taken;
 logic [63:0]					ROB_commit1_target_pc;
 logic [63:0]					ROB_commit2_target_pc;
+logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest,
+logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -201,6 +198,8 @@ assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && 
 							(ROB_commit1_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
 							(~ROB_commit1_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
+assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
+assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -218,14 +217,14 @@ module if_stage pc(
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t1_is_full),						// when RoB2 is full, we need to stop PC2
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
-	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
+	.thread1_structure_hazard_stall(11111111),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
-	input			    Imem2proc_valid,				// 
+	input [63:0]		Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
+	input			    Imem2proc_valid(mem2proc_tag),				// 
 	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
-	//output logic [63:0] next_PC_out,
+	.next_PC_out(,
 	.thread1_inst_out(PC_inst1),
 	.thread2_inst_out(PC_inst2),
 	.thread1_inst_is_valid(PC_inst1_valid),
