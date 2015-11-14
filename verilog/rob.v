@@ -14,8 +14,8 @@
 module rob(
 	
 //normal input
-	input						reset,
-	input						clock,
+	input							reset,
+	input							clock,
 	
 	input							is_thread1,					//the two instructions are thread1 or thread2 if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input

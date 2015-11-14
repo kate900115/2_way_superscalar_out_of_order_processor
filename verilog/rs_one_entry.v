@@ -13,42 +13,42 @@
 
 module rs_one_entry(
 
-	input         				reset,          	// reset signal 
-	input         				clock,          	// the clock 
+	input         				reset,          				// reset signal 
+	input         				clock,          				// the clock 
 
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs1_dest_in,    	// The destination of this instruction
 	input  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs1_dest_in,    	// The destination of this instruction
  
-	input  [63:0] 						rs1_cdb1_in,		// CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb1_tag,    	// CDB tag bus from functional units 
-	input  	      						rs1_cdb1_valid,		// The data on the CDB is valid 
-	input  [63:0] 						rs1_cdb2_in,		// CDB bus from functional units 
-	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
-	input  	      						rs1_cdb2_valid,		// The data on the CDB is valid 
+	input  [63:0] 						rs1_cdb1_in,			// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb1_tag,    		// CDB tag bus from functional units 
+	input  	      						rs1_cdb1_valid,			// The data on the CDB is valid 
+	input  [63:0] 						rs1_cdb2_in,			// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    		// CDB tag bus from functional units 
+	input  	      						rs1_cdb2_valid,			// The data on the CDB is valid 
 
-	input  [63:0] 				inst1_rs1_opa_in,		// Operand a from Rename  
-	input  [63:0] 				inst1_rs1_opb_in,		// Operand a from Rename 
-	input  	     				inst1_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT)
-	input         				inst1_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [63:0] 				inst1_rs1_opa_in,				// Operand a from Rename  
+	input  [63:0] 				inst1_rs1_opb_in,				// Operand a from Rename 
+	input  	     				inst1_rs1_opa_valid,			// Is Opa a Tag or immediate data (READ THIS COMMENT)
+	input         				inst1_rs1_opb_valid,			// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  ALU_FUNC				inst1_rs1_alu_func,
 	input  FU_SELECT			inst1_rs1_fu_select,
-	input  [5:0]				inst1_rs1_op_type_in,		// Instruction type of rs1
+	input  [5:0]				inst1_rs1_op_type_in,			// Instruction type of rs1
 
-	input  [63:0] 				inst2_rs1_opa_in,		// Operand a from Rename  
-	input  [63:0] 				inst2_rs1_opb_in,		// Operand a from Rename 
-	input  	     				inst2_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         				inst2_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input  [63:0] 				inst2_rs1_opa_in,				// Operand a from Rename  
+	input  [63:0] 				inst2_rs1_opb_in,				// Operand a from Rename 
+	input  	     				inst2_rs1_opa_valid,			// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input         				inst2_rs1_opb_valid,			// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  ALU_FUNC				inst2_rs1_alu_func,
 	input  FU_SELECT			inst2_rs1_fu_select,
-	input  [5:0]				inst2_rs1_op_type_in,		// Instruction type of rs1
+	input  [5:0]				inst2_rs1_op_type_in,			// Instruction type of rs1
 
-	input  		        		inst1_rs1_load_in,		// *****rs1 need two loads for each      Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	input  		        		inst1_rs1_load_in,				// *****rs1 need two loads for each      Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input  		        		inst2_rs1_load_in,
 
-	input   	        		rs1_free,		// Signal to send data to Func units AND to free this RS
+	input   	        		rs1_free,						// Signal to send data to Func units AND to free this RS
 
-	input  [$clog2(`ROB_SIZE):0]       	inst1_rs1_rob_idx_in,   	// 
-	input  [$clog2(`ROB_SIZE):0]       	inst2_rs1_rob_idx_in,   	// 
+	input  [$clog2(`ROB_SIZE):0]       	inst1_rs1_rob_idx_in,   // 
+	input  [$clog2(`ROB_SIZE):0]       	inst2_rs1_rob_idx_in,   // 
 
  	//output
 	output logic							rs1_ready_out,    	// This RS is in use and ready to go to EX 
@@ -62,15 +62,15 @@ module rs_one_entry(
 );
 
 
-	logic  [63:0] 			OPa;              	// Operand A 
-	logic  [63:0] 			OPb;              	// Operand B 
-	logic  					OPaValid;         	// Operand a Tag/Value 
-	logic  					OPbValid;         	// Operand B Tag/Value
-	logic  [63:0] 			OPa_reg;              	// Operand A 
-	logic  [63:0] 			OPb_reg;              	// Operand B 
-	logic  					OPaValid_reg;         	// Operand a Tag/Value 
-	logic  					OPbValid_reg;         	// Operand B Tag/Value 
-	logic  					InUse;            	// InUse bit 
+	logic  [63:0] 						OPa;              	// Operand A 
+	logic  [63:0] 						OPb;              	// Operand B 
+	logic  								OPaValid;         	// Operand a Tag/Value 
+	logic  								OPbValid;         	// Operand B Tag/Value
+	logic  [63:0] 						OPa_reg;              	// Operand A 
+	logic  [63:0] 						OPb_reg;              	// Operand B 
+	logic  								OPaValid_reg;         	// Operand a Tag/Value 
+	logic  								OPbValid_reg;         	// Operand B Tag/Value 
+	logic  								InUse;            	// InUse bit 
 	logic  [$clog2(`PRF_SIZE)-1:0]  	DestTag;   		// Destination Tag bit 
 	logic  [$clog2(`ROB_SIZE):0] 		Rob_idx;
 	logic  [$clog2(`PRF_SIZE)-1:0]  	DestTag_reg;   		// Destination Tag bit 
