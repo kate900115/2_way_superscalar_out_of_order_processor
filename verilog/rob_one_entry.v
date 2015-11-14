@@ -36,6 +36,7 @@ module rob_one_entry(
 //after execution
 	input				is_ex_in,                       //if this instruciont has been executed so that the value of the prf number assigned is valid
 	input				mispredict_in,                  //after execution, if this instruction is a branch and it has been taken , this input should be "1"
+	input	[63:0]		target_pc_in,
 	input				enable,					       	//if the input can be loaded to this entry
  	input				if_committed,					//if this ROB entry hit the head of the ROB and is about to be committed
 
@@ -47,6 +48,7 @@ module rob_one_entry(
 	output				is_branch_out,				       	//if this instruction is a branch
 	output				available_out,				       	//if this rob entry is available
 	output				mispredict_out,				       	//if this instrucion is mispredicted
+	output	[63:0]		target_pc_out,
 	output	[4:0]		arn_dest_out,                       //the architected register number of the destination of this instruction
 	output	[$clog2(`PRF_SIZE)-1:0]	prn_dest_out,                       //the prf number of the destination of this instruction
 	output				if_rename_out				       	//if this entry is committed at this moment(tell RRAT)
@@ -62,15 +64,17 @@ module rob_one_entry(
 	logic				is_executed;				//if this instruction stored in this entry has been executed
 	logic				mispredict;                 //if this instrucion has was mispredicted
 	logic				inuse;                      //if this entry is in use
+	logic	[63:0]		target_pc;
 
 	logic				next_thread;
 	logic	[31:0]		next_pc;					//pc stored in this entry
 	logic	[4:0]		next_arn_dest;              //the architected register number of the destination of this instruction stored in this entry
-	logic	[$clog2(`PRF_SIZE)-1:0] next_prn_dest;              //the prf number assigned to the destination of this instruction
+	logic	[$clog2(`PRF_SIZE)-1:0] next_prn_dest;  //the prf number assigned to the destination of this instruction
 	logic				next_is_branch;             //if this instruction stored in this entry is a branch
 	logic				next_is_executed;			//if this instruction stored in this entry has been executed
 	logic				next_mispredict;            //if this instrucion has was mispredicted
-	logic				next_inuse;                      //if this entry is in use
+	logic				next_inuse;                 //if this entry is in use
+	logic	[63:0]		next_target_pc;
 
 //describe the output function
 	assign is_thread1_out = if_committed ? thread : 0;
@@ -78,6 +82,7 @@ module rob_one_entry(
 	assign mispredict_out = if_committed ? mispredict : 0;
 	assign arn_dest_out = if_committed ? arn_dest : 0;
 	assign prn_dest_out = if_committed ? prn_dest : 0;
+	assign target_pc_out = if_committed ? target_pc : 0;
 	assign if_rename_out = if_committed;						//if this entry is committed the output information is important
 	assign is_ex_out = is_executed;
 	assign available_out = ~inuse;			//if this entry is not in use, it is available
@@ -92,6 +97,7 @@ module rob_one_entry(
 		next_is_executed	= is_executed;
 		next_mispredict		= mispredict;
 		next_inuse			= inuse;
+		next_target_pc		= target_pc;
 		if (inst1_rob_load_in)
 		begin
 			next_thread			= is_thread1;
@@ -117,6 +123,7 @@ module rob_one_entry(
 		else if (inuse && is_ex_in) begin
 			next_is_executed 	= is_ex_in;
 			next_mispredict		= mispredict_in;
+			next_target_pc		= target_pc_in;
 		end
 		else if (if_committed)
 		begin
@@ -136,6 +143,7 @@ module rob_one_entry(
 			is_executed	<=	`SD 0;
 			mispredict	<=	`SD 0;
 			inuse		<=	`SD 0;
+			target_pc	<=	`SD 0;
 		end
 		//if we want to load an instruction, the behavior is as follows:
 		else if (enable)
@@ -148,6 +156,7 @@ module rob_one_entry(
 			is_executed	<=	`SD next_is_executed;
 			mispredict	<=	`SD next_mispredict;
 			inuse		<=	`SD next_inuse;
+			target_pc	<=	`SD next_target_pc;
 		end
 	end//end always_ff                            
 endmodule
