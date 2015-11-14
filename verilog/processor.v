@@ -488,28 +488,22 @@ module prf prf1(
 
 	input	[`PRF_SIZE-1:0]					rrat1_prf_free_list,				// when a branch is mispredict, RRAT1 gives a freelist to PRF
 	input	[`PRF_SIZE-1:0]					rrat2_prf_free_list,				// when a branch is mispredict, RRAT2 gives a freelist to PRF
-	.rrat1_branch_mistaken_free_valid(),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
-	.rrat2_branch_mistaken_free_valid(),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
+	.rrat1_branch_mistaken_free_valid(ROB_commit1_mispredict),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	.rrat2_branch_mistaken_free_valid(ROB_commit2_mispredict),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
 	.rat2_prf_free_list(RAT2_PRF_free_list),			// when a branch is mispredict, RAT2 gives a freelist to PRF
-	//input					rrat1_branch_mistaken_free_valid(),	// when a branch is mispredict, RRAT1 gives out a signal enable PRF to free its register files
-	//input					rrat2_branch_mistaken_free_valid(),	// when a branch is mispredict, RRAT2 gives out a signal enable PRF to free its register files
 
-	.rrat1_prf_free_valid(RRAT1_PRF_free_valid1),			// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	.rrat2_prf_free_valid(RRAT2_PRF_free_valid1),			// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	.rrat1_prf_free_idx(RRAT1_PRF_free_idx1),			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	.rrat2_prf_free_idx(RRAT2_PRF_free_idx1),			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
-	input									rrat1_prf1_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	input									rrat2_prf1_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf1_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf1_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
-	input									rrat1_prf2_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
-	input									rrat2_prf2_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf2_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
-	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf2_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	.rrat1_prf1_free_valid(RRAT1_PRF_free_valid1),				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	.rrat2_prf1_free_valid(RRAT2_PRF_free_valid1),				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	.rrat1_prf1_free_idx(RRAT1_PRF_free_idx1),				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	.rrat2_prf1_free_idx(RRAT2_PRF_free_idx1),				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	.rrat1_prf2_free_valid(RRAT1_PRF_free_valid2),				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	.rrat2_prf2_free_valid(RRAT2_PRF_free_valid2),				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	.rrat1_prf2_free_idx(RRAT1_PRF_free_idx2),				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	.rrat2_prf2_free_idx(RRAT2_PRF_free_idx2),				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 	
-	input	[$clog2(`PRF_SIZE)-1:0]			rob1_retire_idx,					// when rob1 retires an instruction, prf gives out the corresponding value.
-	input	[$clog2(`PRF_SIZE)-1:0]			rob2_retire_idx,					// when rob2 retires an instruction, prf gives out the corresponding value.
+	.rob1_retire_idx(ROB_commit1_prn_dest_out),					// when rob1 retires an instruction, prf gives out the corresponding value.
+	.rob2_retire_idx(ROB_commit2_prn_dest_out),					// when rob2 retires an instruction, prf gives out the corresponding value.
 
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -534,8 +528,8 @@ module prf prf1(
 
 	.prf_is_full(PRF_is_full),						// if the freelist of prf is empty, prf should give out this signal
 	// for write back
-	output [63:0]							writeback_value1,
-	output [63:0]							writeback_value2,
+	.writeback_value1(PRF_writeback_value1),
+	.writeback_value2(PRF_writeback_value2)
 );
 
 //////////////////////////////////
