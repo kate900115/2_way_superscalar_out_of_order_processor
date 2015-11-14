@@ -15,7 +15,7 @@ module testbench_rs;
 	logic										thread1_branch_is_taken;// when a branch of thread1 is taken, we need to flush all the instructions of thread1 in RS
 	logic										thread2_branch_is_taken;// when a branch of thread2 is taken, we need to flush all the instructions of thread2 in RS
   
- 	//output
+ 	
 	logic  [$clog2(`PRF_SIZE)-1:0]  	inst1_rs_dest_in;     // The destination of this instruction
 	logic  [$clog2(`PRF_SIZE)-1:0]  	inst2_rs_dest_in;     // The destination of this instruction
  
@@ -46,7 +46,7 @@ module testbench_rs;
 
 	logic  [$clog2(`ROB_SIZE)-1:0]      inst1_rs_rob_idx_in;  // 
 	logic  [$clog2(`ROB_SIZE)-1:0]      inst2_rs_rob_idx_in;  //
-
+//output
 	logic [5:0][63:0]					fu_rs_opa_out;       	// This RS' opa 
 	logic [5:0][63:0]					fu_rs_opb_out;       	// This RS' opb 
 	logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out;  	// This RS' destination tag  
@@ -130,10 +130,12 @@ module testbench_rs;
 					      fu_rs_dest_tag_out[4], fu_rs_rob_idx_out[4], fu_rs_op_type_out[4], fu_alu_func_out[4], fu_rs_opa_out[4], fu_rs_opb_out[4], fu_rs_out_valid[4],
 					      fu_rs_dest_tag_out[5], fu_rs_rob_idx_out[5], fu_rs_op_type_out[5], fu_alu_func_out[5], fu_rs_opa_out[5], fu_rs_opb_out[5], fu_rs_out_valid[5],rs_full);
 		clock = 0;
+		$display("reset");
 		//***RESET**
 		reset = 1;
 		#5;
 		@(negedge clock);
+		$display("first instruction");
 		reset = 0;
 		thread1_branch_is_taken = 0;
 		thread2_branch_is_taken = 0;
@@ -157,8 +159,18 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 2;
+		
+		rs_cdb1_in			= 0; 
+		rs_cdb1_tag			= 0;		
+		rs_cdb1_valid		= 0;
+		rs_cdb2_in			= 0; 		 
+		rs_cdb2_tag			= 0;
+		rs_cdb2_valid		= 0; 
+		inst1_rs_fu_select_in = 0;
+		inst2_rs_fu_select_in = 0;
 		#5
 		@(negedge clock);
+		$display("second instruction");
 		inst1_rs_dest_in	= 3;
 		inst1_rs_opa_in		= 2;
 		inst1_rs_opb_in		= 16;
@@ -179,9 +191,18 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 1;
+		rs_cdb1_in			= 0; 
+		rs_cdb1_tag			= 0;		
+		rs_cdb1_valid		= 0;
+		rs_cdb2_in			= 0; 		 
+		rs_cdb2_tag			= 0;
+		rs_cdb2_valid		= 0; 
+		inst1_rs_fu_select_in = 0;
+		inst2_rs_fu_select_in = 0;
 		#5
 
 		@(negedge clock);
+		$display("third instruction");
 		inst1_rs_dest_in	= 5;
 		inst1_rs_opa_in		= 4;
 		inst1_rs_opb_in		= 3;
@@ -202,6 +223,14 @@ module testbench_rs;
 		inst2_rs_alu_func	= ALU_ADDQ;
 		inst2_rs_load_in	= 1;
 		inst2_rs_rob_idx_in	= 1;
+		rs_cdb1_in			= 0; 
+		rs_cdb1_tag			= 0;		
+		rs_cdb1_valid		= 0;
+		rs_cdb2_in			= 0; 		 
+		rs_cdb2_tag			= 0;
+		rs_cdb2_valid		= 0; 
+		inst1_rs_fu_select_in = 0;
+		inst2_rs_fu_select_in = 0;
 		#5
 		@(negedge clock);
 		$display("@@@Passed");

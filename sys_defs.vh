@@ -105,7 +105,7 @@ typedef enum logic [4:0] {
   ALU_CMPLE     = 5'h0e,
   ALU_CMPULT    = 5'h0f,
   ALU_CMPULE    = 5'h10,
-  ALU_DEFAULT	= 5'1f
+  ALU_DEFAULT	= 5'h1f
 } ALU_FUNC;
 
 //////////////////////////////////////////////
