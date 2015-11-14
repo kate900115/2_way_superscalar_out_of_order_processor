@@ -1,0 +1,1351 @@
+                                        
+                           Design Compiler Graphical 
+                                 DC Ultra (TM)
+                                  DFTMAX (TM)
+                              Power Compiler (TM)
+                                 DesignWare (R)
+                                 DC Expert (TM)
+                               Design Vision (TM)
+                               HDL Compiler (TM)
+                               VHDL Compiler (TM)
+                                  DFT Compiler
+                               Design Compiler(R)
+                                        
+                 Version K-2015.06 for linux64 - May 28, 2015 
+                                        
+                    Copyright (c) 1988 - 2015 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+            or distribution of this software is strictly prohibited.
+Initializing...
+#/***********************************************************/
+#/*   FILE        : rs.tcl                                */
+#/*   Description : Default Synopsys Design Compiler Script */
+#/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
+#/*   You'll need to minimally set design_name & read files */
+#/***********************************************************/
+#/***********************************************************/
+#/* The following lines must be updated for every           */
+#/* new design                                              */
+#/***********************************************************/
+set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
+./ /afs/umich.edu/class/eecs470/lib/synopsys/
+analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v" "./verilog/cdb_one_entry.v" "./verilog/ex_stage.v" "./verilog/id_stage.v" "./verilog/if_stage.v" "./verilog/mult_stage.v" "./verilog/pc.v" "./verilog/pipe_mult.v" "./verilog/prf.v" "./verilog/prf_one_entry.v" "./verilog/priority_selector.v" "./verilog/processor.v"  "./verilog/rat.v" "./verilog/rob.v" "./verilog/rob_one_entry.v" "./verilog/rrat.v" "./verilog/rs.v" "./verilog/rs_one_entry.v"]
+Running PRESTO HDLC
+Compiling source file ./sys_defs.vh
+Compiling source file ./verilog/cdb.v
+Compiling source file ./verilog/cdb_one_entry.v
+Compiling source file ./verilog/ex_stage.v
+Compiling source file ./verilog/id_stage.v
+Compiling source file ./verilog/if_stage.v
+Compiling source file ./verilog/mult_stage.v
+Compiling source file ./verilog/pc.v
+Compiling source file ./verilog/pipe_mult.v
+Compiling source file ./verilog/prf.v
+Warning:  ./verilog/prf.v:92: Redeclaration of port 'internal_free_this_entry'. (VER-331)
+Warning:  ./verilog/prf.v:93: Redeclaration of port 'internal_assign_a_free_reg1'. (VER-331)
+Warning:  ./verilog/prf.v:94: Redeclaration of port 'internal_assign_a_free_reg2'. (VER-331)
+Warning:  ./verilog/prf.v:100: Redeclaration of port 'internal_prf_available'. (VER-331)
+Warning:  ./verilog/prf.v:103: Redeclaration of port 'internal_prf_available2'. (VER-331)
+Compiling source file ./verilog/prf_one_entry.v
+Compiling source file ./verilog/priority_selector.v
+Compiling source file ./verilog/processor.v
+Warning:  ./verilog/processor.v:337: the undeclared symbol 'RAT1_PRF_free_list' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:338: the undeclared symbol 'rat1_prf_free_valid' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:388: the undeclared symbol 'RAT2_PRF_free_list' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:389: the undeclared symbol 'rat2_prf_free_valid' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:420: the undeclared symbol 'RRAT1_RAT2_mispredict_up_idx1' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:446: the undeclared symbol 'RRAT2_RAT2_mispredict_up_idx1' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:467: the undeclared symbol 'RAT_PRF_opa_idx1' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:468: the undeclared symbol 'RAT_PRF_opb_idx1' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:469: the undeclared symbol 'RAT_PRF_opa_idx2' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:470: the undeclared symbol 'RAT_PRF_opb_idx2' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:493: the undeclared symbol 'ROB_commit1_prn_dest_out' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:494: the undeclared symbol 'ROB_commit2_prn_dest_out' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:566: the undeclared symbol 'ROB_commit1_arn_dest_out' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:569: the undeclared symbol 'ROB_commit1_is_valid' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:576: the undeclared symbol 'ROB_commit2_arn_dest_out' assumed to have the default net type, which is 'wire'. (VER-936)
+Warning:  ./verilog/processor.v:579: the undeclared symbol 'ROB_commit2_is_valid' assumed to have the default net type, which is 'wire'. (VER-936)
+Compiling source file ./verilog/rat.v
+Compiling source file ./verilog/rob.v
+Compiling source file ./verilog/rob_one_entry.v
+Compiling source file ./verilog/rrat.v
+Compiling source file ./verilog/rs.v
+Compiling source file ./verilog/rs_one_entry.v
+Presto compilation completed successfully.
+Warning: Can't read link_library file 'your_library.db'. (UID-3)
+1
+elaborate processor
+Loading db file '/usr/caen/synopsys-synth-2015.06/libraries/syn/gtech.db'
+Loading db file '/usr/caen/synopsys-synth-2015.06/libraries/syn/standard.sldb'
+  Loading link library 'gtech'
+Warning: Can't read link_library file 'your_library.db'. (UID-3)
+Running PRESTO HDLC
+Presto compilation completed successfully.
+Elaborated 1 design.
+Current design is now 'processor'.
+Warning: Can't read link_library file 'your_library.db'. (UID-3)
+Information: Building the design 'if_stage'. (HDL-193)
+
+Statistics for case statements in always block at line 122 in file
+	'./verilog/if_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           137            |    auto/auto     |
+===============================================
+
+Inferred memory devices in process
+	in routine if_stage line 110 in file
+		'./verilog/if_stage.v'.
+====================================================================================
+|      Register Name       |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+====================================================================================
+| current_thread_state_reg | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+====================================================================================
+
+Inferred memory devices in process
+	in routine if_stage line 122 in file
+		'./verilog/if_stage.v'.
+=============================================================================
+|     Register Name     | Type  | Width | Bus | MB | AR | AS | SR | SS | ST |
+=============================================================================
+| next_thread_state_reg | Latch |   1   |  N  | N  | N  | N  | -  | -  | -  |
+=============================================================================
+Warning:  ./verilog/if_stage.v:122: Netlist for always_comb block contains a latch. (ELAB-974)
+Presto compilation completed successfully.
+Information: Building the design 'id_stage'. (HDL-193)
+
+Statistics for case statements in always block at line 276 in file
+	'./verilog/id_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           278            |    auto/auto     |
+|           296            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 319 in file
+	'./verilog/id_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           325            |    auto/auto     |
+|           342            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 406 in file
+	'./verilog/id_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           408            |    auto/auto     |
+|           414            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 422 in file
+	'./verilog/id_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           424            |    auto/auto     |
+|           434            |    auto/auto     |
+===============================================
+Presto compilation completed successfully.
+Information: Building the design 'rat'. (HDL-193)
+Warning:  ./verilog/rat.v:138: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rat.v:169: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rat.v:199: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rat.v:199: signed to unsigned conversion occurs. (VER-318)
+
+Inferred memory devices in process
+	in routine rat line 78 in file
+		'./verilog/rat.v'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     rat_reg_reg     | Flip-flop |  192  |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+
+Inferred memory devices in process
+	in routine rat line 87 in file
+		'./verilog/rat.v'.
+=============================================================================
+|     Register Name     | Type  | Width | Bus | MB | AR | AS | SR | SS | ST |
+=============================================================================
+|     n_rat_reg_reg     | Latch |  192  |  Y  | N  | N  | N  | -  | -  | -  |
+| PRF_free_list_out_reg | Latch |  48   |  Y  | N  | N  | N  | -  | -  | -  |
+=============================================================================
+Statistics for MUX_OPs
+===========================================================
+| block name/line  | Inputs | Outputs | # sel inputs | MB |
+===========================================================
+|     rat/147      |   32   |    6    |      5       | N  |
+|     rat/148      |   32   |    6    |      5       | N  |
+|     rat/178      |   32   |    6    |      5       | N  |
+|     rat/179      |   32   |    6    |      5       | N  |
+===========================================================
+Warning:  ./verilog/rat.v:87: Netlist for always_comb block contains a latch. (ELAB-974)
+Presto compilation completed successfully.
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Information: Building the design 'rrat'. (HDL-193)
+Warning:  ./verilog/rrat.v:75: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:78: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:94: signed to unsigned conversion occurs. (VER-318)
+Error:  ./verilog/rrat.v:65: Loop exceeded maximum iteration limit. (ELAB-900)
+*** Presto compilation terminated with 1 errors. ***
+Information: Building the design 'prf'. (HDL-193)
+Warning:  ./verilog/prf.v:134: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:148: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:174: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:189: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:214: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:229: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/prf.v:307: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:313: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:327: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:343: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:358: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:373: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:389: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:402: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:425: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/prf.v:425: signed to unsigned conversion occurs. (VER-318)
+
+Statistics for case statements in always block at line 117 in file
+	'./verilog/prf.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           119            |    auto/auto     |
+===============================================
+Presto compilation completed successfully.
+Error: Width mismatch on port 'inst1_opa_prf_idx' of reference to 'prf' in 'processor'. (LINK-3)
+Information: Building the design 'rob'. (HDL-193)
+Warning:  ./verilog/rob.v:201: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rob.v:207: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rob.v:213: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rob.v:219: signed to unsigned conversion occurs. (VER-318)
+
+Inferred memory devices in process
+	in routine rob line 193 in file
+		'./verilog/rob.v'.
+======================================================================================
+|         Register Name          | Type  | Width | Bus | MB | AR | AS | SR | SS | ST |
+======================================================================================
+| rob1_internal_target_pc_in_reg | Latch |  16   |  Y  | N  | N  | N  | -  | -  | -  |
+| rob2_internal_target_pc_in_reg | Latch |  16   |  Y  | N  | N  | N  | -  | -  | -  |
+======================================================================================
+
+Inferred memory devices in process
+	in routine rob line 229 in file
+		'./verilog/rob.v'.
+=================================================================================
+|       Register Name       | Type  | Width | Bus | MB | AR | AS | SR | SS | ST |
+=================================================================================
+| commit2_target_pc_out_reg | Latch |  64   |  Y  | N  | N  | N  | -  | -  | -  |
+|    commit1_pc_out_reg     | Latch |  64   |  Y  | N  | N  | N  | -  | -  | -  |
+| commit1_target_pc_out_reg | Latch |  64   |  Y  | N  | N  | N  | -  | -  | -  |
+|    commit2_pc_out_reg     | Latch |  64   |  Y  | N  | N  | N  | -  | -  | -  |
+=================================================================================
+
+Inferred memory devices in process
+	in routine rob line 329 in file
+		'./verilog/rob.v'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     t2_head_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+|     t1_head_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+
+Inferred memory devices in process
+	in routine rob line 403 in file
+		'./verilog/rob.v'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     t2_tail_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+|     t1_tail_reg     | Flip-flop |   4   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Statistics for MUX_OPs
+===========================================================
+| block name/line  | Inputs | Outputs | # sel inputs | MB |
+===========================================================
+|     rob/249      |   16   |    5    |      4       | N  |
+|     rob/296      |   16   |    5    |      4       | N  |
+|     rob/251      |   16   |   64    |      4       | N  |
+|     rob/252      |   64   |    1    |      6       | N  |
+|     rob/255      |   16   |    5    |      4       | N  |
+|     rob/256      |   16   |    6    |      4       | N  |
+|     rob/260      |   16   |    1    |      4       | N  |
+|     rob/262      |   16   |   64    |      4       | N  |
+|     rob/263      |   64   |    1    |      6       | N  |
+|     rob/264      |   16   |    1    |      4       | N  |
+|     rob/265      |   16   |    1    |      4       | N  |
+|     rob/266      |   16   |    5    |      4       | N  |
+|     rob/267      |   16   |    6    |      4       | N  |
+|     rob/268      |   16   |    1    |      4       | N  |
+|     rob/269      |   16   |    1    |      4       | N  |
+|     rob/277      |   16   |   64    |      4       | N  |
+|     rob/278      |   64   |    2    |      6       | N  |
+|     rob/281      |   16   |    5    |      4       | N  |
+|     rob/282      |   16   |    6    |      4       | N  |
+|     rob/307      |   16   |    1    |      4       | N  |
+|     rob/309      |   16   |   64    |      4       | N  |
+|     rob/310      |   64   |    1    |      6       | N  |
+|     rob/311      |   16   |    1    |      4       | N  |
+|     rob/312      |   16   |    1    |      4       | N  |
+|     rob/313      |   16   |    5    |      4       | N  |
+|     rob/314      |   16   |    6    |      4       | N  |
+|     rob/315      |   16   |    1    |      4       | N  |
+|     rob/316      |   16   |    1    |      4       | N  |
+===========================================================
+Warning:  ./verilog/rob.v:193: Netlist for always_comb block contains a latch. (ELAB-974)
+Warning:  ./verilog/rob.v:229: Netlist for always_comb block contains a latch. (ELAB-974)
+Presto compilation completed successfully.
+Error: Width mismatch on port 'commit1_arn_dest_out' of reference to 'rob' in 'processor'. (LINK-3)
+Information: Building the design 'rs'. (HDL-193)
+Presto compilation completed successfully.
+Information: Building the design 'ex_stage'. (HDL-193)
+
+Inferred memory devices in process
+	in routine ex_stage line 221 in file
+		'./verilog/ex_stage.v'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+| fu_mispredict_sig_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_dest_tag_out_reg | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_rob_idx_out_reg  | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_op_type_out_reg  | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+|  fu_alu_func_out_reg   | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_result_is_valid_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   fu_result_out_reg    | Flip-flop |  384  |  Y  | N  | N  | N  | N  | N  | N  |
+|    fu_is_in_use_reg    | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+==================================================================================
+Presto compilation completed successfully.
+Error:  ./verilog/ex_stage.v:181: The width of port func on instance alu2 of design alu is inconsistent with other instantiations of the same design. (ELAB-369)
+Error:  Cannot resolve pin func[4] on cell alu:alu2. (ELAB-327)
+Information: Building the design 'cdb'. (HDL-193)
+Presto compilation completed successfully.
+Information: Building the design 'pc'. (HDL-193)
+
+Inferred memory devices in process
+	in routine pc line 70 in file
+		'./verilog/pc.v'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|    inst2_out_reg    | Flip-flop |  32   |  Y  | N  | N  | N  | Y  | N  | N  |
+|     PC_reg_reg      | Flip-flop |  64   |  Y  | N  | N  | N  | Y  | N  | N  |
+| inst1_is_valid_reg  | Flip-flop |   1   |  N  | N  | N  | N  | N  | Y  | N  |
+| inst2_is_valid_reg  | Flip-flop |   1   |  N  | N  | N  | N  | N  | Y  | N  |
+|    inst1_out_reg    | Flip-flop |  32   |  Y  | N  | N  | N  | Y  | N  | N  |
+===============================================================================
+Presto compilation completed successfully.
+Information: Building the design 'decoder'. (HDL-193)
+
+Statistics for case statements in always block at line 43 in file
+	'./verilog/id_stage.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            61            |    auto/auto     |
+|            63            |    auto/auto     |
+|            77            |    auto/auto     |
+|            79            |    auto/auto     |
+|            90            |    auto/auto     |
+|           100            |    auto/auto     |
+|           107            |    auto/auto     |
+|           119            |     no/auto      |
+|           139            |    auto/auto     |
+|           160            |    auto/auto     |
+===============================================
+Presto compilation completed successfully.
+Information: Building the design 'rs_one_entry'. (HDL-193)
+
+Inferred memory devices in process
+	in routine rs_one_entry line 194 in file
+		'./verilog/rs_one_entry.v'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|   op_type_reg_reg   | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|     OPa_reg_reg     | Flip-flop |  64   |  Y  | N  | N  | N  | N  | N  | N  |
+|     OPb_reg_reg     | Flip-flop |  64   |  Y  | N  | N  | N  | N  | N  | N  |
+|  OPaValid_reg_reg   | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|  OPbValid_reg_reg   | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|      InUse_reg      | Flip-flop |   1   |  N  | N  | N  | N  | N  | N  | N  |
+|  fu_select_reg_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+|   DestTag_reg_reg   | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   Rob_idx_reg_reg   | Flip-flop |   5   |  Y  | N  | N  | N  | N  | N  | N  |
+|  Alu_func_reg_reg   | Flip-flop |   5   |  Y  | N  | N  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully.
+Information: Building the design 'priority_selector' instantiated from design 'rs' with
+	the parameters "REQS=2,WIDTH=10". (HDL-193)
+Presto compilation completed successfully.
+Information: Building the design 'cdb_one_entry'. (HDL-193)
+
+Statistics for case statements in always block at line 52 in file
+	'./verilog/cdb_one_entry.v'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            54            |    auto/auto     |
+===============================================
+Presto compilation completed successfully.
+Information: Building the design 'priority_selector' instantiated from design 'cdb' with
+	the parameters "WIDTH=6". (HDL-193)
+Presto compilation completed successfully.
+Information: Building the design 'wand_sel' instantiated from design 'priority_selector_REQS2_WIDTH10' with
+	the parameters "10". (HDL-193)
+Presto compilation completed successfully.
+Information: Building the design 'wand_sel' instantiated from design 'priority_selector_WIDTH6' with
+	the parameters "6". (HDL-193)
+Presto compilation completed successfully.
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+1
+set design_name processor
+processor
+set clock_name clock
+clock
+set reset_name reset
+reset
+set CLK_PERIOD 10
+10
+#/***********************************************************/
+#/* The rest of this file may be left alone for most small  */
+#/* to moderate sized designs.  You may need to alter it    */
+#/* when synthesizing your final project.                   */
+#/***********************************************************/
+set SYN_DIR ./
+./
+set target_library "lec25dscc25_TT.db"
+lec25dscc25_TT.db
+set link_library [concat  "*" $target_library]
+* lec25dscc25_TT.db
+#/***********************************************************/
+#/* Set some flags for optimisation */
+set compile_top_all_paths "true"
+true
+set auto_wire_load_selection "false"
+false
+#/***********************************************************/
+#/*  Clk Periods/uncertainty/transition                     */
+set CLK_TRANSITION 0.1
+0.1
+set CLK_UNCERTAINTY 0.1
+0.1
+set CLK_LATENCY 0.1
+0.1
+#/* Input/output Delay values */
+set AVG_INPUT_DELAY 0.1
+0.1
+set AVG_OUTPUT_DELAY 0.1
+0.1
+#/* Critical Range (ns) */
+set CRIT_RANGE 1.0
+1.0
+#/***********************************************************/
+#/* Design Constrains: Not all used                         */
+set MAX_TRANSITION 1.0
+1.0
+set FAST_TRANSITION 0.1
+0.1
+set MAX_FANOUT 32
+32
+set MID_FANOUT 8
+8
+set LOW_FANOUT 1
+1
+set HIGH_DRIVE 0
+0
+set HIGH_LOAD 1.0
+1.0
+set AVG_LOAD 0.1
+0.1
+set AVG_FANOUT_LOAD 10
+10
+#/***********************************************************/
+#/*BASIC_INPUT = cb18os120_tsmc_max/nd02d1/A1
+#BASIC_OUTPUT = cb18os120_tsmc_max/nd02d1/ZN*/
+set DRIVING_CELL dffacs1
+dffacs1
+#/* DONT_USE_LIST = {   } */
+#/*************operation cons**************/
+#/*OP_WCASE = WCCOM;
+#OP_BCASE = BCCOM;*/
+set WIRE_LOAD "tsmcwire"
+tsmcwire
+set LOGICLIB lec25dscc25_TT
+lec25dscc25_TT
+#/*****************************/
+#/* Sourcing the file that sets the Search path and the libraries(target,link) */
+set sys_clk $clock_name
+clock
+set netlist_file [format "%s%s"  [format "%s%s"  $SYN_DIR $design_name] ".vg"]
+./processor.vg
+set ddc_file [format "%s%s"  [format "%s%s"  $SYN_DIR $design_name] ".ddc"]
+./processor.ddc
+set rep_file [format "%s%s"  [format "%s%s"  $SYN_DIR $design_name] ".rep"]
+./processor.rep
+set dc_shell_status [ set chk_file [format "%s%s"  [format "%s%s"  $SYN_DIR $design_name] ".chk"] ]
+./processor.chk
+#/* if we didnt find errors at this point, run */
+if {  $dc_shell_status != [list] } {
+  current_design $design_name
+  link
+  set_wire_load_model -name $WIRE_LOAD -lib $LOGICLIB $design_name
+  set_wire_load_mode top
+  set_fix_multiple_port_nets -outputs -buffer_constants
+  create_clock -period $CLK_PERIOD -name $sys_clk [find port $sys_clk]
+  set_clock_uncertainty $CLK_UNCERTAINTY $sys_clk
+  set_fix_hold $sys_clk
+  group_path -from [all_inputs] -name input_grp
+  group_path -to [all_outputs] -name output_grp
+  set_driving_cell  -lib_cell $DRIVING_CELL [all_inputs]
+  remove_driving_cell [find port $sys_clk]
+  set_fanout_load $AVG_FANOUT_LOAD [all_outputs]
+  set_load $AVG_LOAD [all_outputs]
+  set_input_delay $AVG_INPUT_DELAY -clock $sys_clk [all_inputs]
+  remove_input_delay -clock $sys_clk [find port $sys_clk]
+  set_output_delay $AVG_OUTPUT_DELAY -clock $sys_clk [all_outputs]
+  set_dont_touch $reset_name
+  set_resistance 0 $reset_name
+  set_drive 0 $reset_name
+  set_critical_range $CRIT_RANGE [current_design]
+  set_max_delay $CLK_PERIOD [all_outputs]
+  set MAX_FANOUT $MAX_FANOUT
+  set MAX_TRANSITION $MAX_TRANSITION
+  uniquify
+  ungroup -all -flatten
+  redirect $chk_file { check_design }
+  compile -map_effort high
+  write -hier -format verilog -output $netlist_file $design_name
+  write -hier -format ddc -output $ddc_file $design_name
+  redirect $rep_file { report_design -nosplit }
+  redirect -append $rep_file { report_area }
+  redirect -append $rep_file { report_timing -max_paths 2 -input_pins -nets -transition_time -nosplit }
+  redirect -append $rep_file { report_constraint -max_delay -verbose -nosplit }
+  remove_design -all
+  read_file -format verilog $netlist_file
+  current_design $design_name
+  redirect -append $rep_file { report_reference -nosplit }
+  quit
+} else {
+  quit
+}
+Current design is 'processor'.
+Loading db file '/afs/umich.edu/class/eecs470/lib/synopsys/lec25dscc25_TT.db'
+
+  Linking design 'processor'
+  Using the following designs and libraries:
+  --------------------------------------------------------------------------
+  * (16 designs)              /home/golifan/Downloads/EECS470/project4/group7f15/processor.db, etc
+  lec25dscc25_TT (library)    /afs/umich.edu/class/eecs470/lib/synopsys/lec25dscc25_TT.db
+
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Information: Building the design 'rrat'. (HDL-193)
+Warning:  ./verilog/rrat.v:75: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:78: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:94: signed to unsigned conversion occurs. (VER-318)
+Error:  ./verilog/rrat.v:65: Loop exceeded maximum iteration limit. (ELAB-900)
+*** Presto compilation terminated with 1 errors. ***
+Error: Width mismatch on port 'inst1_opa_prf_idx' of reference to 'prf' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'prf' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'commit1_arn_dest_out' of reference to 'rob' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rob' in 'processor'. (LINK-5)
+Information: Building the design 'ex_stage'. (HDL-193)
+
+Inferred memory devices in process
+	in routine ex_stage line 221 in file
+		'./verilog/ex_stage.v'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+| fu_mispredict_sig_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_dest_tag_out_reg | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_rob_idx_out_reg  | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_op_type_out_reg  | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+|  fu_alu_func_out_reg   | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_result_is_valid_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   fu_result_out_reg    | Flip-flop |  384  |  Y  | N  | N  | N  | N  | N  | N  |
+|    fu_is_in_use_reg    | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+==================================================================================
+Presto compilation completed successfully.
+Error:  ./verilog/ex_stage.v:181: The width of port func on instance alu2 of design alu is inconsistent with other instantiations of the same design. (ELAB-369)
+Error:  Cannot resolve pin func[4] on cell alu:alu2. (ELAB-327)
+Warning: Unable to resolve reference 'rrat' in 'processor'. (LINK-5)
+Warning: Unable to resolve reference 'ex_stage' in 'processor'. (LINK-5)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design rule attributes from the driving cell will be
+	set on the port. (UID-401)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Current design is 'processor'.
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Uniquified 2 instances of design 'pc'. (OPT-1056)
+Information: Uniquified 2 instances of design 'decoder'. (OPT-1056)
+Information: Uniquified 10 instances of design 'rs_one_entry'. (OPT-1056)
+Information: Uniquified 2 instances of design 'priority_selector_REQS2_WIDTH10'. (OPT-1056)
+Information: Uniquified 2 instances of design 'cdb_one_entry'. (OPT-1056)
+Information: Uniquified 2 instances of design 'priority_selector_WIDTH6'. (OPT-1056)
+Information: Uniquified 4 instances of design 'wand_sel_WIDTH10'. (OPT-1056)
+Information: Uniquified 2 instances of design 'wand_sel_WIDTH6'. (OPT-1056)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning:  ./verilog/rrat.v:75: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:78: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:94: signed to unsigned conversion occurs. (VER-318)
+Error:  ./verilog/rrat.v:65: Loop exceeded maximum iteration limit. (ELAB-900)
+*** Presto compilation terminated with 1 errors. ***
+Error: Width mismatch on port 'inst1_opa_prf_idx' of reference to 'prf' in 'processor'. (LINK-3)
+Error: Width mismatch on port 'commit1_arn_dest_out' of reference to 'rob' in 'processor'. (LINK-3)
+
+Inferred memory devices in process
+	in routine ex_stage line 221 in file
+		'./verilog/ex_stage.v'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+| fu_mispredict_sig_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_dest_tag_out_reg | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_rob_idx_out_reg  | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_op_type_out_reg  | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+|  fu_alu_func_out_reg   | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_result_is_valid_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   fu_result_out_reg    | Flip-flop |  384  |  Y  | N  | N  | N  | N  | N  | N  |
+|    fu_is_in_use_reg    | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+==================================================================================
+Presto compilation completed successfully.
+Error:  ./verilog/ex_stage.v:181: The width of port func on instance alu2 of design alu is inconsistent with other instantiations of the same design. (ELAB-369)
+Error:  Cannot resolve pin func[4] on cell alu:alu2. (ELAB-327)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Updating graph... (UID-83)
+Warning: Design 'processor' contains 12 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Information: Evaluating DesignWare library utilization. (UISN-27)
+
+============================================================================
+| DesignWare Building Block Library  |         Version         | Available |
+============================================================================
+| Basic DW Building Blocks           | K-2015.06-DWBB_201506.0 |     *     |
+| Licensed DW Building Blocks        |                         |           |
+============================================================================
+
+Warning: Dont_touch on net 'reset' may be overridden by compile because it
+	is connected to generic logic. Use all_connected to see net
+	connections. (OPT-461)
+
+Information: There are 1508 potential problems in your design. Please run 'check_design' for more information. (LINT-99)
+
+
+
+  Beginning Pass 1 Mapping
+  ------------------------
+  Processing 'processor'
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[9]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[8]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[7]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[6]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[5]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[4]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[3]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[2]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[1]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[5]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[4]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[3]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'rs1/rs1[0]/op_type_reg_reg[0]' will be removed. (OPT-1207)
+Warning: Cell 'U8/U1' (*GEN*4072) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U64/U1' (*GEN*4067) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U65/U1' (*GEN*4066) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U66/U1' (*GEN*4065) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U67/U1' (*GEN*4064) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U68/U1' (*GEN*4063) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U69/U1' (*GEN*4062) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U70/U1' (*GEN*4061) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U71/U1' (*GEN*4060) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U72/U1' (*GEN*4059) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U73/U1' (*GEN*4058) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U297/U1' (*GEN*3834) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U298/U1' (*GEN*3833) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U299/U1' (*GEN*3832) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U300/U1' (*GEN*3831) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U302/U1' (*GEN*3829) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U304/U1' (*GEN*3827) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U625/U1' (*GEN*3506) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U626/U1' (*GEN*3505) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U627/U1' (*GEN*3504) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U628/U1' (*GEN*3503) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U630/U1' (*GEN*3501) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U632/U1' (*GEN*3499) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U953/U1' (*GEN*3178) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U954/U1' (*GEN*3177) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U955/U1' (*GEN*3176) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U956/U1' (*GEN*3175) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U958/U1' (*GEN*3173) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U960/U1' (*GEN*3171) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1281/U1' (*GEN*2850) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1282/U1' (*GEN*2849) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1283/U1' (*GEN*2848) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1284/U1' (*GEN*2847) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1286/U1' (*GEN*2845) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1288/U1' (*GEN*2843) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1609/U1' (*GEN*2522) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1610/U1' (*GEN*2521) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1611/U1' (*GEN*2520) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1612/U1' (*GEN*2519) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1614/U1' (*GEN*2517) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1616/U1' (*GEN*2515) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1937/U1' (*GEN*2194) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1938/U1' (*GEN*2193) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1939/U1' (*GEN*2192) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1940/U1' (*GEN*2191) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1942/U1' (*GEN*2189) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U1944/U1' (*GEN*2187) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2280/U1' (*GEN*1851) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2281/U1' (*GEN*1850) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2282/U1' (*GEN*1849) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2283/U1' (*GEN*1848) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2284/U1' (*GEN*1847) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2285/U1' (*GEN*1846) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2286/U1' (*GEN*1845) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2287/U1' (*GEN*1844) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2288/U1' (*GEN*1843) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2302/U1' (*GEN*1829) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2318/U1' (*GEN*1813) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Warning: Cell 'U2319/U1' (*GEN*1812) cannot be exactly translated 1 for 1 into target library.  Ignoring set_compile_directives. (TRANS-9)
+Information: The register 'pc/pc2/inst2_out_reg[31]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[30]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[29]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[28]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[27]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[26]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[25]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[24]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[23]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[22]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[21]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[20]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[19]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[18]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[17]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[16]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[15]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[14]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[13]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[12]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[11]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[10]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[9]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[8]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[7]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[6]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[5]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[4]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[3]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[2]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[1]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_out_reg[0]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_is_valid_reg' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst2_is_valid_reg' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[31]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[30]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[29]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[28]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[27]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[26]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[25]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[24]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[23]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[22]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[21]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[20]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[19]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[18]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[17]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[16]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[15]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[14]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[13]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[12]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[11]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[10]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[9]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[8]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[7]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[6]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[5]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[4]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[3]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[2]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[1]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/inst1_out_reg[0]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/PC_reg_reg[2]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/PC_reg_reg[1]' will be removed. (OPT-1207)
+Information: The register 'pc/pc2/PC_reg_reg[0]' will be removed. (OPT-1207)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Information: Building the design 'rrat'. (HDL-193)
+Warning:  ./verilog/rrat.v:75: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:78: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:94: signed to unsigned conversion occurs. (VER-318)
+Error:  ./verilog/rrat.v:65: Loop exceeded maximum iteration limit. (ELAB-900)
+*** Presto compilation terminated with 1 errors. ***
+Error: Width mismatch on port 'inst1_opa_prf_idx' of reference to 'prf' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'prf' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'commit1_arn_dest_out' of reference to 'rob' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rob' in 'processor'. (LINK-5)
+Information: Building the design 'ex_stage'. (HDL-193)
+
+Inferred memory devices in process
+	in routine ex_stage line 221 in file
+		'./verilog/ex_stage.v'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+| fu_mispredict_sig_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_dest_tag_out_reg | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_rob_idx_out_reg  | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_op_type_out_reg  | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+|  fu_alu_func_out_reg   | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_result_is_valid_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   fu_result_out_reg    | Flip-flop |  384  |  Y  | N  | N  | N  | N  | N  | N  |
+|    fu_is_in_use_reg    | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+==================================================================================
+Presto compilation completed successfully.
+Error:  ./verilog/ex_stage.v:181: The width of port func on instance alu2 of design alu is inconsistent with other instantiations of the same design. (ELAB-369)
+Error:  Cannot resolve pin func[4] on cell alu:alu2. (ELAB-327)
+Warning: Unable to resolve reference 'rrat' in 'processor'. (LINK-5)
+Warning: Unable to resolve reference 'ex_stage' in 'processor'. (LINK-5)
+
+  Updating timing information
+Information: Updating design information... (UID-85)
+
+  Beginning Implementation Selection
+  ----------------------------------
+  Processing 'processor_DW01_cmp6_0'
+  Processing 'processor_DW01_cmp6_1'
+  Processing 'processor_DW01_cmp6_2'
+  Processing 'processor_DW01_cmp6_3'
+  Processing 'processor_DW01_cmp6_4'
+  Processing 'processor_DW01_cmp6_5'
+  Processing 'processor_DW01_cmp6_6'
+  Processing 'processor_DW01_cmp6_7'
+  Processing 'processor_DW01_cmp6_8'
+  Processing 'processor_DW01_cmp6_9'
+  Processing 'processor_DW01_cmp6_10'
+  Processing 'processor_DW01_cmp6_11'
+  Processing 'processor_DW01_cmp6_12'
+  Processing 'processor_DW01_cmp6_13'
+  Processing 'processor_DW01_cmp6_14'
+  Processing 'processor_DW01_cmp6_15'
+  Processing 'processor_DW01_cmp6_16'
+  Processing 'processor_DW01_cmp6_17'
+  Processing 'processor_DW01_cmp6_18'
+  Processing 'processor_DW01_cmp6_19'
+  Processing 'processor_DW01_cmp6_20'
+  Processing 'processor_DW01_cmp6_21'
+  Processing 'processor_DW01_cmp6_22'
+  Processing 'processor_DW01_cmp6_23'
+  Processing 'processor_DW01_cmp6_24'
+  Processing 'processor_DW01_cmp6_25'
+  Processing 'processor_DW01_cmp6_26'
+  Processing 'processor_DW01_cmp6_27'
+  Processing 'processor_DW01_cmp6_28'
+  Processing 'processor_DW01_cmp6_29'
+  Processing 'processor_DW01_cmp6_30'
+  Processing 'processor_DW01_cmp6_31'
+  Processing 'processor_DW01_cmp6_32'
+  Processing 'processor_DW01_cmp6_33'
+  Processing 'processor_DW01_cmp6_34'
+  Processing 'processor_DW01_cmp6_35'
+  Processing 'processor_DW01_cmp6_36'
+  Processing 'processor_DW01_cmp6_37'
+  Processing 'processor_DW01_cmp6_38'
+  Processing 'processor_DW01_cmp6_39'
+  Processing 'processor_DW01_cmp6_40'
+  Processing 'processor_DW01_cmp6_41'
+  Processing 'processor_DW01_cmp6_42'
+  Processing 'processor_DW01_cmp6_43'
+  Processing 'processor_DW01_cmp6_44'
+  Processing 'processor_DW01_cmp6_45'
+  Processing 'processor_DW01_cmp6_46'
+  Processing 'processor_DW01_cmp6_47'
+  Processing 'processor_DW01_add_0'
+  Processing 'processor_DW01_add_1'
+
+  Beginning Mapping Optimizations  (High effort)
+  -------------------------------
+  Mapping Optimization (Phase 1)
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:00:44 2117573.5      0.00       0.0      45.2                                0.00  
+    0:00:44 2117573.5      0.00       0.0      45.2                                0.00  
+    0:00:44 2117573.5      0.00       0.0      45.2                                0.00  
+    0:00:44 2117573.5      0.00       0.0      45.2                                0.00  
+    0:00:44 2117573.5      0.00       0.0      45.2                                0.00  
+    0:00:51 1292544.1      0.57     180.5      92.9                                0.00  
+    0:00:53 1277669.1      0.00       0.0     144.8                                0.00  
+    0:00:55 1276466.4      0.14      30.1     144.3                                0.00  
+    0:00:56 1277203.9      0.00       0.0     144.3                                0.00  
+    0:00:56 1276357.9      0.05       5.1     144.2                                0.00  
+    0:00:57 1276457.1      0.00       0.0     144.2                                0.00  
+    0:00:57 1276216.6      0.00       0.0     144.2                                0.00  
+    0:00:58 1276216.6      0.00       0.0     144.2                                0.00  
+    0:00:58 1276216.6      0.00       0.0     144.2                                0.00  
+    0:00:58 1276216.6      0.00       0.0     144.2                                0.00  
+    0:00:58 1276216.6      0.00       0.0     144.2                                0.00  
+    0:00:59 1276241.9      0.00       0.0     127.7                                0.00  
+    0:00:59 1276267.3      0.00       0.0     111.1                                0.00  
+    0:00:59 1276267.3      0.00       0.0     111.1                                0.00  
+    0:00:59 1276267.3      0.00       0.0     111.1                                0.00  
+    0:00:59 1276267.3      0.00       0.0     111.1                                0.00  
+
+
+
+  Beginning Delay Optimization Phase
+  ----------------------------------
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:01:00 1276267.3      0.00       0.0     111.1                                0.00  
+    0:01:00 1276267.3      0.00       0.0     111.1                                0.00  
+    0:01:03 1273439.2      0.00       0.0     265.4                                0.00  
+
+
+  Beginning Design Rule Fixing  (max_transition)  (max_fanout)
+  ----------------------------
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:01:03 1273439.2      0.00       0.0     265.4                                0.00  
+    0:01:05 1273581.5      0.00       0.0     167.1 n2552                          0.00  
+    0:01:06 1273581.5      0.00       0.0     167.1 cdb2_tag[5]                    0.00  
+    0:01:15 1273707.0      0.00       0.0     111.1                                0.00  
+
+
+  Beginning Critical Range Optimization
+  -------------------------------------
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:01:15 1273707.0      0.00       0.0     111.1                                0.00  
+
+
+  Beginning Area-Recovery Phase  (cleanup)
+  -----------------------------
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:01:15 1273707.0      0.00       0.0     111.1                                0.00  
+    0:01:16 1273707.0      0.00       0.0     111.1                                0.00  
+    0:01:17 1263122.9      0.01       1.4     111.0                                0.00  
+    0:01:18 1256957.6      0.00       0.0     110.9                                0.00  
+    0:01:19 1252413.1      0.06      10.7     110.8                                0.00  
+    0:01:20 1248934.6      0.00       0.0     110.6                                0.00  
+    0:01:20 1246076.4      0.00       0.0     110.5                                0.00  
+    0:01:21 1243426.9      0.00       0.0     110.3                                0.00  
+    0:01:22 1241020.6      0.00       0.0     110.1                                0.00  
+    0:01:22 1239717.0      0.00       0.0     110.0                                0.00  
+    0:01:23 1238847.6      0.00       0.0     109.8                                0.00  
+    0:01:23 1238229.0      0.00       0.0     109.7                                0.00  
+    0:01:24 1237827.7      0.00       0.0     109.6                                0.00  
+    0:01:24 1237593.6      0.00       0.0     109.5                                0.00  
+    0:01:24 1237593.6      0.00       0.0     109.5                                0.00  
+    0:01:24 1237593.6      0.00       0.0     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:24 1236681.2      0.01       0.5     109.5                                0.00  
+    0:01:25 1236689.5      0.00       0.0     109.5                                0.00  
+
+
+  Beginning Critical Range Optimization
+  -------------------------------------
+
+                                  TOTAL                                                  
+   ELAPSED            WORST NEG   SETUP    DESIGN                              MIN DELAY 
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT             COST    
+  --------- --------- --------- --------- --------- ------------------------- -----------
+    0:01:25 1236689.5      0.00       0.0     109.5                                0.00  
+    0:01:25 1236689.5      0.00       0.0     109.5                                0.00  
+Loading db file '/afs/umich.edu/class/eecs470/lib/synopsys/lec25dscc25_TT.db'
+
+
+Note: Symbol # after min delay cost means estimated hold TNS across all active scenarios 
+
+
+  Optimization Complete
+  ---------------------
+Warning: Design 'processor' contains 1 high-fanout nets. A fanout number of 1000 will be used for delay calculations involving these nets. (TIM-134)
+     Net 'clock': 1682 load(s), 1 driver(s), 7 inout(s)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'PRF_free_list_out' of reference to 'rat' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rat' in 'processor'. (LINK-5)
+Information: Building the design 'rrat'. (HDL-193)
+Warning:  ./verilog/rrat.v:75: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:78: signed to unsigned assignment occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:82: signed to unsigned conversion occurs. (VER-318)
+Warning:  ./verilog/rrat.v:94: signed to unsigned conversion occurs. (VER-318)
+Error:  ./verilog/rrat.v:65: Loop exceeded maximum iteration limit. (ELAB-900)
+*** Presto compilation terminated with 1 errors. ***
+Error: Width mismatch on port 'inst1_opa_prf_idx' of reference to 'prf' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'prf' in 'processor'. (LINK-5)
+Error: Width mismatch on port 'commit1_arn_dest_out' of reference to 'rob' in 'processor'. (LINK-3)
+Warning: Unable to resolve reference 'rob' in 'processor'. (LINK-5)
+Information: Building the design 'ex_stage'. (HDL-193)
+
+Inferred memory devices in process
+	in routine ex_stage line 221 in file
+		'./verilog/ex_stage.v'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+| fu_mispredict_sig_reg  | Flip-flop |   2   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_dest_tag_out_reg | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_rob_idx_out_reg  | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_rs_op_type_out_reg  | Flip-flop |  36   |  Y  | N  | N  | N  | N  | N  | N  |
+|  fu_alu_func_out_reg   | Flip-flop |  30   |  Y  | N  | N  | N  | N  | N  | N  |
+| fu_result_is_valid_reg | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+|   fu_result_out_reg    | Flip-flop |  384  |  Y  | N  | N  | N  | N  | N  | N  |
+|    fu_is_in_use_reg    | Flip-flop |   6   |  Y  | N  | N  | N  | N  | N  | N  |
+==================================================================================
+Presto compilation completed successfully.
+Error:  ./verilog/ex_stage.v:181: The width of port func on instance alu2 of design alu is inconsistent with other instantiations of the same design. (ELAB-369)
+Error:  Cannot resolve pin func[4] on cell alu:alu2. (ELAB-327)
+Warning: Unable to resolve reference 'rrat' in 'processor'. (LINK-5)
+Warning: Unable to resolve reference 'ex_stage' in 'processor'. (LINK-5)
+Writing verilog file '/home/golifan/Downloads/EECS470/project4/group7f15/processor.vg'.
+Warning: Verilog 'assign' or 'tran' statements are written out. (VO-4)
+Warning: Changed instance name pc/pc1/inst1_out_reg[4] to pc/pc1/inst1_out_reg[4]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[0] to pc/pc1/inst2_out_reg[0]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[2] to pc/pc1/inst2_out_reg[2]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[25] to pc/pc1/inst1_out_reg[25]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[2] to pc/pc1/inst1_out_reg[2]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[3] to pc/pc1/inst1_out_reg[3]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[0] to pc/pc1/inst1_out_reg[0]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[25] to pc/pc1/inst2_out_reg[25]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[24] to pc/pc1/inst2_out_reg[24]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[23] to pc/pc1/inst2_out_reg[23]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[22] to pc/pc1/inst2_out_reg[22]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[21] to pc/pc1/inst2_out_reg[21]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[20] to pc/pc1/inst2_out_reg[20]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[19] to pc/pc1/inst2_out_reg[19]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[18] to pc/pc1/inst2_out_reg[18]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[19] to pc/pc1/inst1_out_reg[19]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[18] to pc/pc1/inst1_out_reg[18]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[17] to pc/pc1/inst1_out_reg[17]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[16] to pc/pc1/inst1_out_reg[16]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[15] to pc/pc1/inst1_out_reg[15]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[14] to pc/pc1/inst1_out_reg[14]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[13] to pc/pc1/inst1_out_reg[13]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[12] to pc/pc1/inst1_out_reg[12]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[11] to pc/pc1/inst1_out_reg[11]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[1] to pc/pc1/inst1_out_reg[1]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[29] to pc/pc1/inst2_out_reg[29]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[28] to pc/pc1/inst2_out_reg[28]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[27] to pc/pc1/inst2_out_reg[27]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[17] to pc/pc1/inst2_out_reg[17]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[16] to pc/pc1/inst2_out_reg[16]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[15] to pc/pc1/inst2_out_reg[15]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[14] to pc/pc1/inst2_out_reg[14]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[13] to pc/pc1/inst2_out_reg[13]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[12] to pc/pc1/inst2_out_reg[12]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[11] to pc/pc1/inst2_out_reg[11]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[9] to pc/pc1/inst2_out_reg[9]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[8] to pc/pc1/inst2_out_reg[8]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[7] to pc/pc1/inst2_out_reg[7]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[4] to pc/pc1/inst2_out_reg[4]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[3] to pc/pc1/inst2_out_reg[3]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[1] to pc/pc1/inst2_out_reg[1]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[29] to pc/pc1/inst1_out_reg[29]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[28] to pc/pc1/inst1_out_reg[28]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[27] to pc/pc1/inst1_out_reg[27]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[24] to pc/pc1/inst1_out_reg[24]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[23] to pc/pc1/inst1_out_reg[23]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[22] to pc/pc1/inst1_out_reg[22]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[21] to pc/pc1/inst1_out_reg[21]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[20] to pc/pc1/inst1_out_reg[20]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[9] to pc/pc1/inst1_out_reg[9]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[8] to pc/pc1/inst1_out_reg[8]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[7] to pc/pc1/inst1_out_reg[7]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[10] to pc/pc1/inst1_out_reg[10]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[31] to pc/pc1/inst2_out_reg[31]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[30] to pc/pc1/inst2_out_reg[30]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[26] to pc/pc1/inst2_out_reg[26]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[10] to pc/pc1/inst2_out_reg[10]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[6] to pc/pc1/inst2_out_reg[6]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst2_out_reg[5] to pc/pc1/inst2_out_reg[5]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[31] to pc/pc1/inst1_out_reg[31]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[30] to pc/pc1/inst1_out_reg[30]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[26] to pc/pc1/inst1_out_reg[26]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[6] to pc/pc1/inst1_out_reg[6]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Changed instance name pc/pc1/inst1_out_reg[5] to pc/pc1/inst1_out_reg[5]_inst in module processor. Please use the change_names command to make the correct changes before invoking the verilog writer.   (VO-1)
+Warning: Design 'processor' has '2' unresolved references. For more detailed information, use the "link" command. (UID-341)
+Writing ddc file './processor.ddc'.
+Removing design 'processor'
+Removing design 'processor_DW01_add_1'
+Removing design 'processor_DW01_add_3'
+Removing design 'rat'
+Removing design 'prf'
+Removing design 'rob'
+Removing library 'gtech'
+Removing library 'lec25dscc25_TT'
+Removing library 'standard.sldb'
+Loading db file '/afs/umich.edu/class/eecs470/lib/synopsys/lec25dscc25_TT.db'
+Loading db file '/usr/caen/synopsys-synth-2015.06/libraries/syn/gtech.db'
+Loading db file '/usr/caen/synopsys-synth-2015.06/libraries/syn/standard.sldb'
+  Loading link library 'lec25dscc25_TT'
+  Loading link library 'gtech'
+Loading verilog file '/home/golifan/Downloads/EECS470/project4/group7f15/processor.vg'
+Detecting input file type automatically (-rtl or -netlist).
+Running DC verilog reader
+Performing 'read' command.
+Compiling source file /home/golifan/Downloads/EECS470/project4/group7f15/processor.vg
+Reading with netlist reader (equivalent to -netlist option).
+Verilog netlist reader completed successfully.
+Current design is now '/home/golifan/Downloads/EECS470/project4/group7f15/processor_DW01_add_1.db:processor_DW01_add_1'
+Loaded 3 designs.
+Current design is 'processor_DW01_add_1'.
+Current design is 'processor'.
+
+Thank you...
