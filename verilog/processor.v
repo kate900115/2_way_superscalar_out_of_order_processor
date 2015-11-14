@@ -88,12 +88,14 @@ logic [4:0]		ID_dest_ARF_idx1;
 logic [4:0]		ID_dest_ARF_idx2;
 ALU_FUNC		ID_alu_func1;
 ALU_FUNC		ID_alu_func2;
+FU_SELECT		ID_fu_select1;
+FU_SELECT		ID_fu_select2;
 logic [5:0]		ID_op_type1;
 logic [5:0]		ID_op_type2;
 logic			ID_inst1_is_cond_branch;
 logic			ID_inst2_is_cond_branch;
-logic			ID_inst1_is_unco_branch;
-logic			ID_inst2_is_unco_branch;
+logic			ID_inst1_is_uncond_branch;
+logic			ID_inst2_is_uncond_branch;
 logic			ID_inst1_is_valid;
 logic			ID_inst2_is_valid;
 //rat output
@@ -171,17 +173,19 @@ ALU_FUNC [5:0]				RS_EX_alu_func;
 logic						RS_full;
 
 //ex output
-logic [3:0]							EX_RS_fu_is_available;
-logic [3:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag,
-logic [3:0][63:0]					EX_CDB_fu_result_out;
-logic [3:0]							EX_CDB_fu_result_is_valid;
+logic [5:0]							EX_RS_fu_is_available;
+logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag,
+logic [5:0][63:0]					EX_CDB_fu_result_out;
+logic [5:0]							EX_CDB_fu_result_is_valid;
+logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
 
 //ex success send to cdb
 logic					adder1_send_in_success;
 logic					adder2_send_in_success;
 logic					mult1_send_in_success;
 logic					mult2_send_in_success;
-
+logic					memory1_send_in_success;
+logic					memory2_send_in_success;
 //cdb output
 logic							cdb1_valid;
 logic [63:0]					cdb1_value;
@@ -257,13 +261,16 @@ module id_stage(
 	.id_alu_func_out2(ID_alu_func2),      // ALU function select (ALU_xxx *)
 	.id_op_type_inst1(ID_op_type1),
 	.id_op_type_inst2(ID_op_type2),
+	
+	.id_op_select1(ID_fu_select1),		// op type
+	.id_op_select2(ID_fu_select2),
 
 	//.id_rd_mem_out1,        // does inst read memory?
 	//.id_wr_mem_out1,        // does inst write memory?
 	//.id_ldl_mem_out1,       // load-lock inst?
 	//.id_stc_mem_out1,       // store-conditional inst?
 	.id_cond_branch_out1(ID_inst1_is_cond_branch),   // is inst a conditional branch?
-	.id_uncond_branch_out1(ID_inst1_is_unco_branch), // is inst an unconditional branch 
+	.id_uncond_branch_out1(ID_inst1_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
 	//.id_halt_out1,
 	//.id_cpuid_out1,         // get CPUID inst?
@@ -275,7 +282,7 @@ module id_stage(
 	//.id_ldl_mem_out2,       // load-lock inst?
 	//.id_stc_mem_out2,       // store-conditional inst?
 	.id_cond_branch_out2(ID_inst2_is_cond_branch),   // is inst a conditional branch?
-	.id_uncond_branch_out2(ID_inst2_is_unco_branch), // is inst an unconditional branch 
+	.id_uncond_branch_out2(ID_inst2_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
 	//.id_halt_out2,
 	//.id_cpuid_out2,         // get CPUID inst?
@@ -323,7 +330,7 @@ module rat rat1(
 //output
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
-	output	logic	request1,  //send to PRF indicate whether it need data
+	//output	logic	request1,  //send to PRF indicate whether it need data
 	.RAT_allo_halt1(RAT1_PRF_allocate_req1),
 
 
@@ -331,7 +338,7 @@ module rat rat1(
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
-	output	logic	request2,  //send to PRF indicate whether it need data
+	//output	logic	request2,  //send to PRF indicate whether it need data
 	.RAT_allo_halt2(RAT1_PRF_allocate_req2),
 
 	//output together
@@ -376,13 +383,13 @@ module rat rat2(
 //output
 	.opa_PRF_idx1(RAT2_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT2_PRF_opb_idx1),
-	output	logic	request1,  //send to PRF indicate whether it need data
+	//output	logic	request1,  //send to PRF indicate whether it need data
 	.RAT_allo_halt1(RAT2_PRF_allocate_req1),
 
 	//output 2
 	.opa_PRF_idx2(RAT2_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT2_PRF_opb_idx2),
-	output	logic	request2,  //send to PRF indicate whether it need data
+	//output	logic	request2,  //send to PRF indicate whether it need data
 	.RAT_allo_halt2(RAT2_PRF_allocate_req2),
 
 	//output together
@@ -517,27 +524,27 @@ module rob rob1(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
 	
-	input							is_thread1,					//if it ==1, it is for thread1, else it is for thread 2
+	.is_thread1(PC_thread1_is_available),					//if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
 	.inst1_pc_in(PC_proc2Imem_addr),				//the pc of the instruction
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
-	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_unco_branch),			//if this instruction is a branch
+	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
 	.inst2_pc_in(PC_proc2Imem_addr+4),				//the pc of the instruction
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			W//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),          //the prf number of the destination of this instruction
-	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_unco_branch),			//if this instruction is a branch
+	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
 	.if_fu_executed1(cdb1_valid),		//if the instruction in the first multiplyer has been executed ************************************
 	.fu_rob_idx1(cdb1_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
-	.mispredict_in1,
+	.mispredict_in1(cdb1_branch_taken),
 	.if_fu_executed2(cdb2_valid),		//if the instruction in the first multiplyer has been executed ************************************
 	.fu_rob_idx2(cdb2_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
-	.mispredict_in2,
+	.mispredict_in2(cdb2_branch_taken),
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
@@ -592,6 +599,8 @@ module rs rs1(
 	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
 	.inst1_rs_alu_func(ID_alu_func1),
+	.inst1_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
+	.inst1_rs_fu_select_in(ID_fu_select1),
 	.inst1_rs_load_in(ID_inst1_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	//for instruction2
 	.inst2_rs_opa_in(ID_inst2_opa_valid ? ID_inst2_opa : PRF_RS_inst2_opa),      	// Operand a from Rename  
@@ -600,6 +609,8 @@ module rs rs1(
 	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 	.inst2_rs_alu_func(ID_alu_func2),
+	.inst2_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
+	.inst2_rs_fu_select_in(ID_fu_select2),
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 //output
@@ -623,27 +634,28 @@ module ex_stage ex(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-    .fu_rs_opa_in(RS_EX_opa[3:0]),		// register A value from reg file
-    .fu_rs_opb_in(RS_EX_opb[3:0]),		// register B value from reg file
-    .fu_rs_dest_tag_in(RS_EX_dest_tag[3:0]),
-    .fu_rs_rob_idx_in(RS_EX_rob_idx[3:0]),
-    .fu_rs_valid_in(RS_EX_out_valid[3:0]),
-	.fu_alu_func_in(RS_EX_alu_func[3:0]),
-
-    input id_ex_cond_branch,   // is this a cond br? from decoder
-    input id_ex_uncond_branch, // is this an uncond br? from decoder
+    .fu_rs_opa_in(RS_EX_opa),		// register A value from reg file
+    .fu_rs_opb_in(RS_EX_opb),		// register B value from reg file
+    .fu_rs_dest_tag_in(RS_EX_dest_tag),
+    .fu_rs_rob_idx_in(RS_EX_rob_idx),
+    .fu_rs_op_type_in(RS_EX_op_type),
+    .fu_rs_valid_in(RS_EX_out_valid),
+	.fu_alu_func_in(RS_EX_alu_func),
 
     .adder1_send_in_success(adder1_send_in_success),
     .adder2_send_in_success(adder2_send_in_success),
     .mult1_send_in_success(mult1_send_in_success),
     .mult2_send_in_success(mult2_send_in_success),
+    .memory1_send_in_success(memory1_send_in_success),
+    .memory2_send_in_success(memory2_send_in_success),
 //output
 //ex_take_branch_out,  // is this a taken branch?
     .fu_cdb_dest_tag_out(EX_CDB_dest_tag),
-    output logic [3:0][$clog2(`ROB_SIZE)-1:0]	fu_cdb_rob_idx_out,
     .fu_result_out(EX_CDB_fu_result_out),
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
+    .fu_cdb_rob_idx_out(EX_CDB_rob_idx),
+    .fu_mispredict_sig(),
   );
 //////////////////////////////////
 //								//
@@ -655,42 +667,46 @@ module cdb cdb1(
 	.mult1_result_ready(EX_CDB_fu_result_is_valid[0]),
 	.mult1_result_in(EX_CDB_fu_result_out[0]),
 	.mult1_dest_reg_idx(EX_CDB_dest_tag[0]),
-	.mult1_rob_idx(),
+	.mult1_rob_idx(EX_CDB_rob_idx[0]),
 	.adder1_result_ready(EX_CDB_fu_result_is_valid[1]),
 	.adder1_result_in(EX_CDB_fu_result_out[1]),
 	.adder1_dest_reg_idx(EX_CDB_dest_tag[1]),
-	.adder1_rob_idx(),
+	.adder1_rob_idx(EX_CDB_rob_idx[1]),
+	.adder1_branch_taken
 	.mult2_result_ready(EX_CDB_fu_result_is_valid[2]),
 	.mult2_result_in(EX_CDB_fu_result_out[2]),
 	.mult2_dest_reg_idx(EX_CDB_dest_tag[2]),
-	.mult2_rob_idx(),
+	.mult2_rob_idx(EX_CDB_rob_idx[2]),
 	.adder2_result_ready(EX_CDB_fu_result_is_valid[3]),
 	.adder2_result_in(EX_CDB_fu_result_out[3]),
 	.adder2_dest_reg_idx(EX_CDB_dest_tag[3]),
-	.adder2_rob_idx
-	//input  								memory1_result_ready,
-	//input  	[63:0]						memory1_result_in,
-	//input	[$clog2(`PRF_SIZE)-1:0]			memory1_dest_reg_idx,
-	//memory1_rob_idx
-	//input  								memory2_result_ready,
-	//input  	[63:0]						memory2_result_in,
-	//input	[$clog2(`PRF_SIZE)-1:0]			memory2_dest_reg_idx,
-	//memory2_rob_idx
+	.adder2_rob_idx(EX_CDB_rob_idx[3]),
+	.adder2_branch_taken
+	.memory1_result_ready(EX_CDB_fu_result_is_valid[4]),
+	.memory1_result_inEX_CDB_fu_result_out[4]),
+	.memory1_dest_reg_idxEX_CDB_dest_tag[4]),
+	.memory1_rob_idx(EX_CDB_rob_idx[4]),
+	.memory2_result_ready(EX_CDB_fu_result_is_valid[5]),
+	.memory2_result_inEX_CDB_fu_result_out[5]),
+	.memory2_dest_reg_idxEX_CDB_dest_tag[5]),
+	.memory2_rob_idx(EX_CDB_rob_idx[5]),
 //output	
 	.cdb1_valid(cdb1_valid),
 	.cdb1_tag(cdb1_tag),
 	.cdb1_out(cdb1_value),
-	.cdb1_rob_idx(),
+	.cdb1_rob_idx(cdb1_rob_idx),
+	.cdb1_taken_branch
 	.cdb2_valid(cdb2_valid),
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
-	.cdb2_rob_idx(),
+	.cdb2_rob_idx(cdb2_rob_idx),
+	.cdb2_taken_branch
 	.adder1_send_in_success(adder1_send_in_success),
 	.adder2_send_in_success(adder2_send_in_success),
 	.mult1_send_in_success(mult1_send_in_success),
 	.mult2_send_in_success(mult2_send_in_success),
-	//output 	logic				memory1_send_in_success,
-	//output 	logic				memory2_send_in_success
+	.memory1_send_in_success(memory1_send_in_success),
+	.memory2_send_in_success(memory2_send_in_success)
 );
 //////////////////////////////////
 //								//

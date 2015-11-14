@@ -25,20 +25,22 @@ module rs_one_entry(
 	input  [63:0] 						rs1_cdb2_in,		// CDB bus from functional units 
 	input  [$clog2(`PRF_SIZE)-1:0]  	rs1_cdb2_tag,    	// CDB tag bus from functional units 
 	input  	      						rs1_cdb2_valid,		// The data on the CDB is valid 
-	input  	      						rs1_cdb2_valid,		// The data on the CDB is valid 
 
 	input  [63:0] 				inst1_rs1_opa_in,		// Operand a from Rename  
 	input  [63:0] 				inst1_rs1_opb_in,		// Operand a from Rename 
-	input  	     				inst1_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	input  	     				inst1_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT)
+	input         				inst1_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  ALU_FUNC				inst1_rs1_alu_func,
-	input  FU_SELECT			inst1_fu_select,
+	input  FU_SELECT			inst1_rs1_fu_select,
+	input  [5:0]				inst1_rs1_op_type_in,		// Instruction type of rs1
 
 	input  [63:0] 				inst2_rs1_opa_in,		// Operand a from Rename  
 	input  [63:0] 				inst2_rs1_opb_in,		// Operand a from Rename 
 	input  	     				inst2_rs1_opa_valid,		// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         				inst2_rs1_opb_valid,		// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input  ALU_FUNC				inst2_rs1_alu_func,
-	input  FU_SELECT			inst2_fu_select,
+	input  FU_SELECT			inst2_rs1_fu_select,
+	input  [5:0]				inst2_rs1_op_type_in,		// Instruction type of rs1
 
 	input  		        		inst1_rs1_load_in,		// *****rs1 need two loads for each      Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input  		        		inst2_rs1_load_in,
@@ -57,7 +59,7 @@ module rs_one_entry(
 	output ALU_FUNC							rs1_alu_func_out,
 	output logic [$clog2(`ROB_SIZE):0]    	rs1_rob_idx_out,   	// 
 	output FU_SELECT						fu_select_reg_out,
-);  
+);
 
 
 	logic  [63:0] 			OPa;              	// Operand A 
@@ -80,6 +82,8 @@ module rs_one_entry(
 	logic  					LoadBFromCDB2;  	// signal to load from the CDB2  
 	logic					next_InUse;
 
+	logic [5:0]				op_type;
+	logic [5:0]				op_type_reg;
 	ALU_FUNC				Alu_func;
 	ALU_FUNC				Alu_func_reg;
 	FU_SELECT				fu_select;
@@ -115,10 +119,11 @@ module rs_one_entry(
        		OPaValid	= inst1_rs1_opa_valid;
        		OPb			= inst1_rs1_opb_in;
        		OPbValid	= inst1_rs1_opb_valid;
-			fu_select	= inst1_fu_select;
+			fu_select	= inst1_rs1_fu_select;
 			DestTag		= inst1_rs1_dest_in;
 			Rob_idx		= inst1_rs1_rob_idx_in;
 			Alu_func	= inst1_rs1_alu_func;
+			op_type		= inst1_rs1_op_type_in;
 			next_InUse	= 1'b1;
 		end
 		else if (inst2_rs1_load_in) begin
@@ -126,10 +131,11 @@ module rs_one_entry(
        		OPaValid	= inst2_rs1_opa_valid;
        		OPb			= inst2_rs1_opb_in;
        		OPbValid	= inst2_rs1_opb_valid;
-			fu_select	= inst2_fu_select;
+			fu_select	= inst2_rs1_fu_select;
 			DestTag		= inst2_rs1_dest_in;
 			Rob_idx		= inst2_rs1_rob_idx_in;
 			Alu_func	= inst2_rs1_alu_func;
+			op_type		= inst2_rs1_op_type_in;
 			next_InUse	= 1'b1;
 		end
 		else begin
@@ -141,6 +147,7 @@ module rs_one_entry(
 			DestTag		= DestTag_reg;
 			Rob_idx		= Rob_idx_reg;
 			Alu_func	= Alu_func_reg;
+			op_type		= op_type_reg;
 			next_InUse	= InUse;
     			if (LoadAFromCDB1)
     			begin
@@ -193,6 +200,7 @@ module rs_one_entry(
        			DestTag_reg		<= `SD DestTag;
        			Rob_idx_reg		<= `SD Rob_idx;
        			Alu_func_reg 	<= `SD Alu_func;
+       			op_type_reg		<= `SD op_type;
     		end // else !reset
 	end // always @
 endmodule

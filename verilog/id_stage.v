@@ -219,7 +219,7 @@ module id_stage(
 
 				 
 				output logic [63:0] opa_mux_out1,          //instr1 opa and opb value or tag
-			    	output logic [63:0] opb_mux_out1,
+			    output logic [63:0] opb_mux_out1,
 				output logic  opa_mux_tag1,                //signal to indicate whether it is value or tag,true means value,faulse means tag
 				output logic  opb_mux_tag1,
 				output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
@@ -236,8 +236,8 @@ module id_stage(
 				output logic  [4:0] id_alu_func_out2,      // ALU function select (ALU_xxx *)
 				output logic  [5:0] id_op_type_inst1,		// op type
 				output logic  [5:0] id_op_type_inst2,
-				output logic  [1:0] id_op_select1,
-				output logic  [1:0] id_op_select2,
+				output logic  FU_SELECT id_op_select1,
+				output logic  FU_SELECT id_op_select2,
 
 				output logic        id_rd_mem_out1,        // does inst read memory?
 				output logic        id_wr_mem_out1,        // does inst write memory?
