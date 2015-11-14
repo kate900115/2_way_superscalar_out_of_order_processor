@@ -37,7 +37,7 @@ module processor(
     output logic [63:0]						ROB_commit2_pc,
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
-    output logic [63:0]						PRF_writeback_value2,
+    output logic [63:0]						PRF_writeback_value2
 );
 //pc output
 logic [31:0]	PC_inst1;
@@ -87,8 +87,8 @@ logic	RAT2_PRF_allocate_req2;
 
 //prf output
 logic	PRF_RAT1_rename_valid1;
-logic	PRF_RAT1_rename_valid1;
-logic	PRF_RAT2_rename_valid2;
+logic	PRF_RAT1_rename_valid2;
+logic	PRF_RAT2_rename_valid1;
 logic	PRF_RAT2_rename_valid2;
 
 logic [$clog2(`PRF_SIZE)-1:0]	PRF_RAT1_rename_idx1;
@@ -136,9 +136,12 @@ logic							cdb1_branch_taken;
 logic							cdb2_branch_taken;
 logic [63:0]					ROB_commit1_target_pc;
 logic [63:0]					ROB_commit2_target_pc;
-logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest,
-logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest,
-
+logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
+logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
+logic 							ROB_commit1_is_thread1;
+logic 							ROB_commit1_is_branch;
+logic 							ROB_commit2_is_thread1;
+logic							ROB_commit2_is_branch;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -152,12 +155,11 @@ logic						RS_full;
 
 //ex output
 logic [5:0]							EX_RS_fu_is_available;
-logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag,
+logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
 logic [5:0][63:0]					EX_CDB_fu_result_out;
 logic [5:0]							EX_CDB_fu_result_is_valid;
 logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
 logic [1:0]							EX_CDB_mispredict_sig;
-
 //ex success send to cdb
 logic					adder1_send_in_success;
 logic					adder2_send_in_success;
@@ -165,6 +167,7 @@ logic					mult1_send_in_success;
 logic					mult2_send_in_success;
 logic					memory1_send_in_success;
 logic					memory2_send_in_success;
+
 //cdb output
 logic							cdb1_valid;
 logic [63:0]					cdb1_value;
@@ -178,31 +181,10 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
 
-//when committed, the output of the first instrucion committed
-	.commit1_pc_out(ROB_commit1_pc),
-	.commit1_target_pc_out(ROB_commit1_target_pc),
-	.commit1_is_branch_out(ROB_commit1_is_branch),				       	//if this instruction is a branch
-	.commit1_mispredict_out(ROB_commit1_mispredict),				       	//if this instrucion is mispredicted
-	.commit1_arn_dest_out(ROB_commit1_arn_dest_out),                       //the architected register number of the destination of this instruction
-	.commit1_prn_dest_out(ROB_commit1_prn_dest_out),						//the prf number of the destination of this instruction
-	.commit1_if_rename_out(ROB_commit1_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
-	.commit1_valid(ROB_commit1_is_valid),
-	.commit1_is_thread1(ROB_commit1_is_thread1),
-//when committed, the output of the second instruction committed
-	.commit2_pc_out(ROB_commit2_pc),
-	.commit2_target_pc_out(ROB_commit2_target_pc),
-	.commit2_is_branch_out(ROB_commit2_is_branch),						//if this instruction is a branch
-	.commit2_mispredict_out(ROB_commit2_mispredict),				       	//if this instrucion is mispredicted
-	.commit2_arn_dest_out(ROB_commit2_arn_dest_out),						//the architected register number of the destination of this instruction
-	.commit2_prn_dest_out(ROB_commit2_prn_dest_out),						//the prf number of the destination of this instruction
-	.commit2_if_rename_out(ROB_commit2_if_rename_out),				       	//if this entry is committed at this moment(tell RRAT)
-	.commit2_valid(ROB_commit2_is_valid),
-	.commit2_is_thread1(ROB_commit2_is_thread1),
-
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(ROB_commit1_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(~ROB_commit1_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 //////////////////////////////////
@@ -210,7 +192,7 @@ assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 //			  PC				//
 //								//
 //////////////////////////////////
-module if_stage pc(
+if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
@@ -224,12 +206,12 @@ module if_stage pc(
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	input [63:0]		Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
-	input			    Imem2proc_valid(mem2proc_tag),				// 
+	.Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
+	.Imem2proc_valid(mem2proc_tag != 0),				// 
 	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
-	.next_PC_out(,
+	//.next_PC_out(,
 	.thread1_inst_out(PC_inst1),
 	.thread2_inst_out(PC_inst2),
 	.thread1_inst_is_valid(PC_inst1_valid),
@@ -241,7 +223,7 @@ module if_stage pc(
 //			Decoder				//
 //								//
 //////////////////////////////////
-module id_stage(
+id_stage id(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
@@ -253,17 +235,17 @@ module id_stage(
 	.if_id_NPC_inst1(PC_proc2Imem_addr),           // incoming instruction1 PC
 	.if_id_NPC_inst2(PC_proc2Imem_addr+4),           // incoming instruction PC+4
 //output
-	.opa_mux_out1(ID_inst1_opa);               //instr1 opa and opb value or tag
-	.opb_mux_out1(ID_inst1_opb);
-	.opa_mux_tag1(ID_inst1_opa_valid);               //signal to indicate whether it is value or tag,true means value,faulse means tag
-	.opb_mux_tag1(ID_inst1_opb_valid);
+	.opa_mux_out1(ID_inst1_opa),               //instr1 opa and opb value or tag
+	.opb_mux_out1(ID_inst1_opb),
+	.opa_mux_tag1(ID_inst1_opa_valid),               //signal to indicate whether it is value or tag,true means value,faulse means tag
+	.opb_mux_tag1(ID_inst1_opb_valid),
 	.id_dest_reg_idx_out1(ID_dest_ARF_idx1),  // destination (writeback) register index
 													        // (ZERO_REG if no writeback)
 				 
-	.opa_mux_out2(ID_inst2_opa);               //instr2 opa and opb value or tag
-	.opb_mux_out2(ID_inst2_opb);
-	.opa_mux_tag2(ID_inst2_opa_valid);               //signal to indicate whether it is value or tag
-	.opb_mux_tag2(ID_inst2_opb_valid);
+	.opa_mux_out2(ID_inst2_opa),               //instr2 opa and opb value or tag
+	.opb_mux_out2(ID_inst2_opb),
+	.opa_mux_tag2(ID_inst2_opa_valid),               //signal to indicate whether it is value or tag
+	.opb_mux_tag2(ID_inst2_opb_valid),
 	.id_dest_reg_idx_out2(ID_dest_ARF_idx2),  // destination (writeback) register index
 
 
@@ -304,7 +286,7 @@ module id_stage(
 //			 RAT				//
 //								//
 //////////////////////////////////
-module rat rat1(
+rat rat1(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
@@ -329,7 +311,7 @@ module rat rat1(
 
 	.mispredict_sig1(ROB_commit1_mispredict && ROB_commit1_is_thread1),	//indicate whether mispredict happened
 	.mispredict_sig2(ROB_commit2_mispredict && ROB_commit2_is_thread1),	//indicate whether mispredict happened
-	mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),
 
 	//Notion: valid1 and idx is the first PRF to use!!!!!!
 	//Not for inst1!!!!!!!!!!
@@ -356,7 +338,7 @@ module rat rat1(
 	.PRF_free_valid(rat1_prf_free_valid)
 	);
 	
-module rat rat2(
+rat rat2(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
@@ -412,7 +394,7 @@ module rat rat2(
 //			 RRAT				//
 //								//
 //////////////////////////////////
-module rrat rrat1(
+rrat rrat1(
 	//input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
@@ -439,7 +421,7 @@ module rrat rrat1(
 	.PRF_free_enable_list(RRAT1_PRF_free_enable_list)
 );
 
-module rrat rrat2(
+rrat rrat2(
 	//input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
@@ -470,7 +452,7 @@ module rrat rrat2(
 //			 PRF				//
 //								//
 //////////////////////////////////
-module prf prf1(
+prf prf1(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
@@ -543,7 +525,7 @@ module prf prf1(
 //			 ROB				//
 //								//
 //////////////////////////////////
-module rob rob1(
+rob rob1(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset
@@ -558,8 +540,8 @@ module rob rob1(
 
 //instruction2 input
 	.inst2_pc_in(PC_proc2Imem_addr+4),				//the pc of the instruction
-	.inst2_arn_dest_in(ID_dest_ARF_idx2),			W//the arf number of the destinaion of the instruction
-	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),          //the prf number of the destination of this instruction
+	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
+	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
@@ -606,7 +588,7 @@ module rob rob1(
 //			  RS				//
 //								//
 //////////////////////////////////
-module rs rs1(
+rs rs1(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
@@ -646,7 +628,7 @@ module rs rs1(
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
 	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
 	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
-	.fu_alu_func_out(RS_EX_alu_func)
+	.fu_alu_func_out(RS_EX_alu_func),
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
 	
 	.rs_full(RS_full)			// RS is full now
@@ -657,7 +639,7 @@ module rs rs1(
 //		   EX_stage				//
 //								//
 //////////////////////////////////
-module ex_stage ex(
+ex_stage ex(
 //input
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
@@ -678,19 +660,19 @@ module ex_stage ex(
     .memory2_send_in_success(memory2_send_in_success),
 //output
 //ex_take_branch_out,  // is this a taken branch?
-    .fu_cdb_dest_tag_out(EX_CDB_dest_tag),
+    .fu_rs_dest_tag_out(EX_CDB_dest_tag),
     .fu_result_out(EX_CDB_fu_result_out),
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
-    .fu_cdb_rob_idx_out(EX_CDB_rob_idx),
-    .fu_mispredict_sig(EX_CDB_mispredict_sig),
+    .fu_rs_rob_idx_out(EX_CDB_rob_idx),
+    .fu_mispredict_sig(EX_CDB_mispredict_sig)
   );
 //////////////////////////////////
 //								//
 //			 CDB				//
 //								//
 //////////////////////////////////
-module cdb cdb1(
+cdb cdb1(
 //input
 	.mult1_result_ready(EX_CDB_fu_result_is_valid[0]),
 	.mult1_result_in(EX_CDB_fu_result_out[0]),
@@ -711,12 +693,12 @@ module cdb cdb1(
 	.adder2_rob_idx(EX_CDB_rob_idx[3]),
 	.adder2_branch_taken(EX_CDB_mispredict_sig[1]),
 	.memory1_result_ready(EX_CDB_fu_result_is_valid[4]),
-	.memory1_result_inEX_CDB_fu_result_out[4]),
-	.memory1_dest_reg_idxEX_CDB_dest_tag[4]),
+	.memory1_result_in(EX_CDB_fu_result_out[4]),
+	.memory1_dest_reg_idx(EX_CDB_dest_tag[4]),
 	.memory1_rob_idx(EX_CDB_rob_idx[4]),
 	.memory2_result_ready(EX_CDB_fu_result_is_valid[5]),
-	.memory2_result_inEX_CDB_fu_result_out[5]),
-	.memory2_dest_reg_idxEX_CDB_dest_tag[5]),
+	.memory2_result_in(EX_CDB_fu_result_out[5]),
+	.memory2_dest_reg_idx(EX_CDB_dest_tag[5]),
 	.memory2_rob_idx(EX_CDB_rob_idx[5]),
 //output	
 	.cdb1_valid(cdb1_valid),

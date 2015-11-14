@@ -243,12 +243,12 @@ module id_stage(
 				output logic        id_valid_inst_out2     // is inst a valid instruction to be 
 );
    
-	logic DEST_REG_SEL dest_reg_select1;
-	logic DEST_REG_SEL dest_reg_select2;
-	logic ALU_OPA_SELECT id_opa_select_out1;
-	logic ALU_OPB_SELECT id_opb_select_out1;
-	logic ALU_OPA_SELECT id_opa_select_out2;
-	logic ALU_OPB_SELECT id_opb_select_out2;
+	DEST_REG_SEL dest_reg_select1;
+	DEST_REG_SEL dest_reg_select2;
+	ALU_OPA_SELECT id_opa_select_out1;
+	ALU_OPB_SELECT id_opb_select_out1;
+	ALU_OPA_SELECT id_opa_select_out2;
+	ALU_OPB_SELECT id_opb_select_out2;
 
 	// instruction fields read from IF/ID pipeline register
 	wire    [4:0] ra_idx1 = if_id_IR1[25:21];   // inst1 operand A register index
@@ -335,6 +335,9 @@ module id_stage(
 				opb_mux_out1 = br_disp1;
 				opb_mux_tag1 = `TRUE;
 				end
+			default: begin
+				opb_mux_tag1 = `TRUE;
+			end
 		endcase
 		case (id_opb_select_out2)
 			ALU_OPB_IS_REGB: begin
@@ -349,12 +352,15 @@ module id_stage(
 				opb_mux_out2 = br_disp2;
 				opb_mux_tag2 = `TRUE;
 				end
+			default: begin
+				opb_mux_tag2 = `TRUE;
+			end
 		endcase  
 	end
 
 	
 	// instantiate the instruction decoder
-	decode decode_1 (// Input
+	decoder decode_1 (// Input
 					 .inst(if_id_IR1),
 					 .valid_inst_in(if_id_valid_inst1),
 
@@ -365,17 +371,17 @@ module id_stage(
 					 .dest_reg(dest_reg_select1),
 					 .rd_mem(id_rd_mem_out1),
 					 .wr_mem(id_wr_mem_out1),
-					 .ldl_mem(id_ldl_mem_out1),
-					 .stc_mem(id_stc_mem_out1),
+					 //.ldl_mem(id_ldl_mem_out1),
+					 //.stc_mem(id_stc_mem_out1),
 					 .cond_branch(id_cond_branch_out1),
 					 .uncond_branch(id_uncond_branch_out1),
 					 .halt(id_halt_out1),
-					 .cpuid(id_cpuid_out1),
+					 //.cpuid(id_cpuid_out1),
 					 .illegal(id_illegal_out1),
 					 .valid_inst(id_valid_inst_out1)
 					);
 
-	decode decode_2 (// Input
+	decoder decode_2 (// Input
 					 .inst(if_id_IR2),
 					 .valid_inst_in(if_id_valid_inst2),
 
@@ -386,12 +392,12 @@ module id_stage(
 					 .dest_reg(dest_reg_select2),
 					 .rd_mem(id_rd_mem_out2),
 					 .wr_mem(id_wr_mem_out2),
-					 .ldl_mem(id_ldl_mem_out2),
-					 .stc_mem(id_stc_mem_out2),
+					 //.ldl_mem(id_ldl_mem_out2),
+					 //.stc_mem(id_stc_mem_out2),
 					 .cond_branch(id_cond_branch_out2),
 					 .uncond_branch(id_uncond_branch_out2),
 					 .halt(id_halt_out2),
-					 .cpuid(id_cpuid_out2),
+					 //.cpuid(id_cpuid_out2),
 					 .illegal(id_illegal_out2),
 					 .valid_inst(id_valid_inst_out2)
 					);
@@ -417,7 +423,7 @@ module id_stage(
 	begin
 		case({id_op_type_inst1[5:3],3'b0})
 			6'h08, 6'h20, 6'h28: id_op_select1 = USE_MEMORY;
-			6'h18, 6'h30, 6'h38: id_op_select1 = USE_BRANCH;
+			//6'h18, 6'h30, 6'h38: id_op_select1 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out1 == ALU_MULQ)
 					id_op_select1 = USE_MULTIPLIER;
@@ -427,7 +433,7 @@ module id_stage(
 		endcase
 		case({id_op_type_inst2[5:3],3'b0})
 			6'h08, 6'h20, 6'h28: id_op_select2 = USE_MEMORY;
-			6'h18, 6'h30, 6'h38: id_op_select2 = USE_BRANCH;
+			//6'h18, 6'h30, 6'h38: id_op_select2 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out2 == ALU_MULQ)
 					id_op_select2 = USE_MULTIPLIER;
