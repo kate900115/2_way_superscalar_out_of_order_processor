@@ -32,41 +32,15 @@ module processor(
     // the final values in memory
 
 //output
-    // Outputs from IF-Stage 
-    output logic [63:0] if_NPC_out,
-    output logic [31:0] if_IR_out,
-    output logic        if_valid_inst_out,
-
-    // Outputs from IF/ID Pipeline Register
-    output logic [63:0] if_id_NPC,
-    output logic [31:0] if_id_IR,
-    output logic        if_id_valid_inst,
-
-
-    // Outputs from ID/EX Pipeline Register
-    output logic [63:0] id_ex_NPC,
-    output logic [31:0] id_ex_IR,
-    output logic        id_ex_valid_inst,
-
-
-    // Outputs from EX/MEM Pipeline Register
-    output logic [63:0] ex_mem_NPC,
-    output logic [31:0] ex_mem_IR,
-    output logic        ex_mem_valid_inst,
-
-
-    // Outputs from MEM/WB Pipeline Register
-    output logic [63:0] mem_wb_NPC,
-    output logic [31:0] mem_wb_IR,
-    output logic        mem_wb_valid_inst
-
     //Output from rob
-    output logic [63:0]				ROB_commit1_pc;
+    output logic [63:0]						ROB_commit1_pc;
     output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
-    output logic [63:0]				ROB_commit2_pc;
+    output logic [63:0]						PRF_writeback_value1;
+    output logic [63:0]						ROB_commit2_pc;
     output logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
+    output logic [63:0]						PRF_writeback_value2;
 );
 //pc output
 logic [31:0]	PC_inst1;
@@ -151,24 +125,18 @@ logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx2;
 logic							RRAT2_RAT2_mispredict_up_idx2;
 
 //rob output
-//logic [63:0]				ROB_commit1_pc;		//output of processor
 logic ROB_t1_is_full;
 logic ROB_t2_is_full;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
-//logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;  	//output of processor
-//logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;  	//output of processor
-logic					ROB_commit1_if_rename_out;
-logic					ROB_commit1_mispredict;
-//logic [63:0]				ROB_commit2_pc;		//output of processor
+logic							ROB_commit1_if_rename_out;
+logic							ROB_commit1_mispredict;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
-//logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit2_prn_dest;	//output of processor
-//logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;	//output of processor
-logic					ROB_commit2_if_rename_out;
-logic					ROB_commit2_mispredict;
-logic					cdb1_branch_taken;
-logic					cdb2_branch_taken;
-logic [63:0]			ROB_commit1_target_pc;
-logic [63:0]			ROB_commit2_target_pc;
+logic							ROB_commit2_if_rename_out;
+logic							ROB_commit2_mispredict;
+logic							cdb1_branch_taken;
+logic							cdb2_branch_taken;
+logic [63:0]					ROB_commit1_target_pc;
+logic [63:0]					ROB_commit2_target_pc;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -249,12 +217,12 @@ module if_stage pc(
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t1_is_full),						// when RoB2 is full, we need to stop PC2
-	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
-	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
-	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
+	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
+	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
+	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
 	input			    Imem2proc_valid,				// 
-	input				is_two_threads,	
+	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
 	//output logic [63:0] next_PC_out,
