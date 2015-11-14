@@ -47,7 +47,12 @@ module prf(
 	input									rrat2_prf2_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
 	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf2_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
 	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf2_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
-
+	
+	//for writeback
+	input	[$clog2(`PRF_SIZE)-1:0]			rob1_retire_idx,					// when rob1 retires an instruction, prf gives out the corresponding value.
+	input	[$clog2(`PRF_SIZE)-1:0]			rob2_retire_idx,					// when rob2 retires an instruction, prf gives out the corresponding value.
+	
+	//output
 	output	logic							rat1_prf1_rename_valid_out,			// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	output	logic							rat1_prf2_rename_valid_out,			// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	output	logic							rat2_prf1_rename_valid_out,			// when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -68,9 +73,9 @@ module prf(
 	output	logic							inst2_opb_valid,					// whether opa load from prf of instruction2 is valid
 	output  logic							prf_is_full,						// if the freelist of prf is empty, prf should give out this signal
 	
-	// for write back
-	output [63:0]							writeback_value1,
-	output [63:0]							writeback_value2,
+	// for writeback
+	output  logic   [63:0]					writeback_value1,					
+	output  logic	[63:0]					writeback_value2,
 
 	// for debug
 	//`ifdef DEBUG_OUT
@@ -102,9 +107,6 @@ module prf(
 	logic									priority_selector2_en;
 	
 	
-	// for writeback
-	assign writeback_value1 = cdb1_out;
-	assign writeback_value2 = cdb2_out;
 	
 	// when all the internal_prf_available=0, the freelist of prf is zero.
     assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
@@ -380,6 +382,34 @@ module prf(
 				inst2_opb_valid	    = 1'b0;
 			end
 		end
+		
+		// for writeback
+		for(int i=0;i<`PRF_SIZE;i++)
+		begin
+			if ((rob1_retire_idx == i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+			begin
+				writeback_value1 = internal_data_out[i];
+				break;
+			end
+			else
+			begin
+				writeback_value1 = 0;
+			end
+		end
+		
+		for(int i=0;i<`PRF_SIZE;i++)
+		begin
+			if ((rob2_retire_idx == i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+			begin
+				writeback_value2 = internal_data_out[i];
+				break;
+			end
+			else
+			begin
+				writeback_value2 = 0;
+			end
+		end
+		
 	end
 
 
