@@ -85,23 +85,25 @@
 // ALU function code input
 // probably want to leave these alone
 //
-`define ALU_ADDQ        5'h00
-`define ALU_SUBQ        5'h01
-`define ALU_AND         5'h02
-`define ALU_BIC         5'h03
-`define ALU_BIS         5'h04
-`define ALU_ORNOT       5'h05
-`define ALU_XOR         5'h06
-`define ALU_EQV         5'h07
-`define ALU_SRL         5'h08
-`define ALU_SLL         5'h09
-`define ALU_SRA         5'h0a
-`define ALU_MULQ        5'h0b
-`define ALU_CMPEQ       5'h0c
-`define ALU_CMPLT       5'h0d
-`define ALU_CMPLE       5'h0e
-`define ALU_CMPULT      5'h0f
-`define ALU_CMPULE      5'h10
+typedef enum logic [4:0] {
+  ALU_ADDQ      = 5'h00,
+  ALU_SUBQ      = 5'h01,
+  ALU_AND       = 5'h02,
+  ALU_BIC       = 5'h03,
+  ALU_BIS       = 5'h04,
+  ALU_ORNOT     = 5'h05,
+  ALU_XOR       = 5'h06,
+  ALU_EQV       = 5'h07,
+  ALU_SRL       = 5'h08,
+  ALU_SLL       = 5'h09,
+  ALU_SRA       = 5'h0a,
+  ALU_MULQ      = 5'h0b,
+  ALU_CMPEQ     = 5'h0c,
+  ALU_CMPLT     = 5'h0d,
+  ALU_CMPLE     = 5'h0e,
+  ALU_CMPULT    = 5'h0f,
+  ALU_CMPULE    = 5'h10
+} ALU_FUNC;
 
 //////////////////////////////////////////////
 //

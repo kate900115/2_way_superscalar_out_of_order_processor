@@ -104,7 +104,7 @@ module ex_stage(
     input [5:0][$clog2(`ROB_SIZE):0]	fu_rs_rob_idx_in,
     input [5:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
     input [5:0]					fu_rs_valid_in,
-    ALU_FUNC [5:0]     			fu_alu_func_in,	// ALU function select from decoder
+    input ALU_FUNC [5:0]     			fu_alu_func_in,	// ALU function select from decoder
 
     input	adder1_send_in_success,
     input	adder2_send_in_success,
