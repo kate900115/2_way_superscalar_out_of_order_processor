@@ -21,15 +21,14 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-				test_bench/test_if_stage.v
-SIMFILES = 	verilog/if_stage.v	\
-			verilog/pc.v
+				test_bench/test_id_stage.v
+SIMFILES = 	verilog/id_stage.v
 
-SYNFILES = if_stage.vg 
+SYNFILES = id_stage.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-if_stage.vg:	$(SIMFILES) if_stage.tcl 
-	dc_shell-t -f if_stage.tcl | tee synth.out
+id_stage.vg:	$(SIMFILES) id_stage.tcl 
+	dc_shell-t -f id_stage.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here

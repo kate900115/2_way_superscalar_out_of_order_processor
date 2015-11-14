@@ -25,7 +25,7 @@ module decode(// Inputs
 
 
 				  output logic [1:0] opa_select, opb_select, dest_reg, // mux selects
-				  output logic [4:0] alu_func,
+				  output ALU_FUNC alu_func,
 				  output logic rd_mem, wr_mem, ldl_mem, stc_mem, cond_branch, uncond_branch,
 				  output logic halt,           // non-zero on a halt
 				  output logic cpuid,          // get CPUID instruction
@@ -86,35 +86,35 @@ module decode(// Inputs
 					case (inst[31:26])
 						`INTA_GRP:
 							case (inst[11:5])
-								`CMPULT_INST:  alu_func = `ALU_CMPULT;
-								`ADDQ_INST:    alu_func = `ALU_ADDQ;
-								`SUBQ_INST:    alu_func = `ALU_SUBQ;
-								`CMPEQ_INST:   alu_func = `ALU_CMPEQ;
-								`CMPULE_INST:  alu_func = `ALU_CMPULE;
-								`CMPLT_INST:   alu_func = `ALU_CMPLT;
-								`CMPLE_INST:   alu_func = `ALU_CMPLE;
+								`CMPULT_INST:  alu_func = ALU_CMPULT;
+								`ADDQ_INST:    alu_func = ALU_ADDQ;
+								`SUBQ_INST:    alu_func = ALU_SUBQ;
+								`CMPEQ_INST:   alu_func = ALU_CMPEQ;
+								`CMPULE_INST:  alu_func = ALU_CMPULE;
+								`CMPLT_INST:   alu_func = ALU_CMPLT;
+								`CMPLE_INST:   alu_func = ALU_CMPLE;
 								default:        illegal = `TRUE;
 							endcase // case(inst[11:5])
 						`INTL_GRP:
 							case (inst[11:5])
-								`AND_INST:    alu_func = `ALU_AND;
-								`BIC_INST:    alu_func = `ALU_BIC;
-								`BIS_INST:    alu_func = `ALU_BIS;
-								`ORNOT_INST:  alu_func = `ALU_ORNOT;
-								`XOR_INST:    alu_func = `ALU_XOR;
-								`EQV_INST:    alu_func = `ALU_EQV;
+								`AND_INST:    alu_func = ALU_AND;
+								`BIC_INST:    alu_func = ALU_BIC;
+								`BIS_INST:    alu_func = ALU_BIS;
+								`ORNOT_INST:  alu_func = ALU_ORNOT;
+								`XOR_INST:    alu_func = ALU_XOR;
+								`EQV_INST:    alu_func = ALU_EQV;
 								default:       illegal = `TRUE;
 							endcase // case(inst[11:5])
 						`INTS_GRP:
 							case (inst[11:5])
-								`SRL_INST:  alu_func = `ALU_SRL;
-								`SLL_INST:  alu_func = `ALU_SLL;
-								`SRA_INST:  alu_func = `ALU_SRA;
+								`SRL_INST:  alu_func = ALU_SRL;
+								`SLL_INST:  alu_func = ALU_SLL;
+								`SRA_INST:  alu_func = ALU_SRA;
 								default:    illegal = `TRUE;
 							endcase // case(inst[11:5])
 						`INTM_GRP:
 							case (inst[11:5])
-								`MULQ_INST:       alu_func = `ALU_MULQ;
+								`MULQ_INST:       alu_func = ALU_MULQ;
 								default:          illegal = `TRUE;
 							endcase // case(inst[11:5])
 						`ITFP_GRP:       illegal = `TRUE;       // unimplemented
@@ -132,7 +132,7 @@ module decode(// Inputs
 							// JMP, JSR, RET, and JSR_CO have identical semantics
 							opa_select = `ALU_OPA_IS_NOT3;
 							opb_select = `ALU_OPB_IS_REGB;
-							alu_func = `ALU_AND; // clear low 2 bits (word-align)
+							alu_func = ALU_AND; // clear low 2 bits (word-align)
 							dest_reg = `DEST_IS_REGA;
 							uncond_branch = `TRUE;
 						end
@@ -143,7 +143,7 @@ module decode(// Inputs
 				begin
 					opa_select = `ALU_OPA_IS_MEM_DISP;
 					opb_select = `ALU_OPB_IS_REGB;
-					alu_func = `ALU_ADDQ;
+					alu_func = ALU_ADDQ;
 					dest_reg = `DEST_IS_REGA;
 					case (inst[31:26])
 						`LDA_INST:  /* defaults are OK */;
@@ -177,7 +177,7 @@ module decode(// Inputs
 				begin
 					opa_select = `ALU_OPA_IS_NPC;
 					opb_select = `ALU_OPB_IS_BR_DISP;
-					alu_func = `ALU_ADDQ;
+					alu_func = ALU_ADDQ;
 					case (inst[31:26])
 						`FBEQ_INST, `FBLT_INST, `FBLE_INST,
 						`FBNE_INST, `FBGE_INST, `FBGT_INST:
@@ -232,12 +232,12 @@ module id_stage(
 				output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
 
-				output logic  [4:0] id_alu_func_out1,      // ALU function select (ALU_xxx *)
-				output logic  [4:0] id_alu_func_out2,      // ALU function select (ALU_xxx *)
+				output ALU_FUNC id_alu_func_out1,      // ALU function select (ALU_xxx *)
+				output ALU_FUNC id_alu_func_out2,      // ALU function select (ALU_xxx *)
 				output logic  [5:0] id_op_type_inst1,		// op type
 				output logic  [5:0] id_op_type_inst2,
-				output logic  FU_SELECT id_op_select1,
-				output logic  FU_SELECT id_op_select2,
+				output FU_SELECT id_op_select1,
+				output FU_SELECT id_op_select2,
 
 				output logic        id_rd_mem_out1,        // does inst read memory?
 				output logic        id_wr_mem_out1,        // does inst write memory?
@@ -437,23 +437,23 @@ module id_stage(
 	always_comb
 	begin
 		case({id_op_type_inst1[5:3],3'b0})
-			6'h08, 6'h20, 6'h28: id_op_select1=`USE_MEMORY;
-			6'h18, 6'h30, 6'h38: id_op_select1=`USE_BRANCH;
+			6'h08, 6'h20, 6'h28: id_op_select1 = USE_MEMORY;
+			6'h18, 6'h30, 6'h38: id_op_select1 = USE_BRANCH;
 			default: begin
-				if(id_alu_func_out1==`ALU_MULQ)
-					id_op_select1=`USE_MULTIPLIER;
+				if(id_alu_func_out1 == ALU_MULQ)
+					id_op_select1 = USE_MULTIPLIER;
 				else
-					id_op_select1=`USE_ADDER;
+					id_op_select1 = USE_ADDER;
 				end
 		endcase
 		case({id_op_type_inst2[5:3],3'b0})
-			6'h08, 6'h20, 6'h28: id_op_select2=`USE_MEMORY;
-			6'h18, 6'h30, 6'h38: id_op_select2=`USE_BRANCH;
+			6'h08, 6'h20, 6'h28: id_op_select2 = USE_MEMORY;
+			6'h18, 6'h30, 6'h38: id_op_select2 = USE_BRANCH;
 			default: begin
-				if(id_alu_func_out2==`ALU_MULQ)
-					id_op_select2=`USE_MULTIPLIER;
+				if(id_alu_func_out2 == ALU_MULQ)
+					id_op_select2 = USE_MULTIPLIER;
 				else
-					id_op_select2=`USE_ADDER;
+					id_op_select2 = USE_ADDER;
 				end
 		endcase	
 	end
