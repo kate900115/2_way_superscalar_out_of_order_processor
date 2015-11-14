@@ -150,6 +150,8 @@ logic							RRAT2_RAT2_mispredict_up_idx2;
 
 //rob output
 //logic [63:0]				ROB_commit1_pc;		//output of processor
+logic ROB_t1_is_full;
+logic ROB_t2_is_full;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
 //logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;  	//output of processor
 //logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;  	//output of processor
@@ -207,16 +209,17 @@ module if_stage pc(
 	.reset(reset), 							// system reset
 	input 				thread1_branch_is_taken,
 	input 				thread2_branch_is_taken,
-	input [63:0]		thread1_target_pc,
-	input [63:0]		thread2_target_pc,
+	input [63:0]		thread1_target_pc(),
+	input [63:0]		thread2_target_pc(),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
-	input	  			rob_stall,		 				// when RoB is full, we need to stop PC
+	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
+	.rob2_stall(ROB_t1_is_full),						// when RoB2 is full, we need to stop PC2
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
 	input			    Imem2proc_valid,				// 
-	input				is_two_threads,		
+	input				is_two_threads,	
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
 	//output logic [63:0] next_PC_out,
@@ -481,6 +484,8 @@ module prf prf1(
 	.rat2_allocate_new_prf1(RAT2_PRF_allocate_req1),			// the request from rat2 for allocating a new prf entry
 	.rat2_allocate_new_prf2(RAT2_PRF_allocate_req2),			// the request from rat2 for allocating a new prf entry
 
+	input	[`PRF_SIZE-1:0]					rrat1_prf_free_list,				// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	input	[`PRF_SIZE-1:0]					rrat2_prf_free_list,				// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rrat1_branch_mistaken_free_valid(rat1_prf_free_valid),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
 	.rrat2_branch_mistaken_free_valid(rat2_prf_free_valid),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
@@ -492,6 +497,15 @@ module prf prf1(
 	.rrat2_prf_free_valid(RRAT2_PRF_free_valid1),			// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
 	.rrat1_prf_free_idx(RRAT1_PRF_free_idx1),			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
 	.rrat2_prf_free_idx(RRAT2_PRF_free_idx1),			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf1_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf1_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf1_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf1_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf2_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf2_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf2_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf2_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	.rat1_prf2_rename_valid_out(PRF_RAT1_rename_valid2),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -512,6 +526,11 @@ module prf prf1(
 	.inst1_opb_valid(PRF_RS_inst1_opb_valid),			// whether opb load from prf of instruction1 is valid
 	.inst2_opa_valid(PRF_RS_inst2_opa_valid),			// whether opa load from prf of instruction2 is valid
 	.inst2_opb_valid(PRF_RS_inst2_opb_valid),			// whether opa load from prf of instruction2 is valid
+
+	output  logic							prf_is_full,						// if the freelist of prf is empty, prf should give out this signal
+	// for write back
+	output [63:0]							writeback_value1,
+	output [63:0]							writeback_value2,
 );
 
 //////////////////////////////////
