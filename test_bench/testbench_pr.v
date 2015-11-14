@@ -13,20 +13,20 @@
 module testbench;
 
 	//variables used in the testbench
-    logic         clock,                    // System clock
-    logic         reset,                    // System reset
+    logic         clock;                    // System clock
+    logic         reset;                    // System reset
     int           wb_fileno;
 
-    logic [3:0]   mem2proc_response,        // Tag from memory about current request
-    logic [63:0]  mem2proc_data,            // Data coming back from memory
-    logic [3:0]   mem2proc_tag,              // Tag from memory about current reply
+    logic [3:0]   mem2proc_response;        // Tag from memory about current request
+    logic [63:0]  mem2proc_data;            // Data coming back from memory
+    logic [3:0]   mem2proc_tag;              // Tag from memory about current reply
 
-    logic [1:0]   proc2mem_command,    // command sent to memory
-    logic [63:0]  proc2mem_addr,      // Address sent to memory
-    logic [63:0]  proc2mem_data,      // Data sent to memory
+    logic [1:0]   proc2mem_command;    // command sent to memory
+    logic [63:0]  proc2mem_addr;      // Address sent to memory
+    logic [63:0]  proc2mem_data;      // Data sent to memory
 
-    logic [3:0]   pipeline_completed_insts,
-    ERROR_CODE   pipeline_error_status,
+    logic [3:0]   pipeline_completed_insts;
+    //ERROR_CODE   pipeline_error_status;
 
     // testing hooks (these must be exported so we can test
     // the synthesized version) data is tested by looking at
@@ -35,16 +35,16 @@ module testbench;
     //output
     // Outputs from IF-Stage 
     //Output from rob
-    logic					ROB_commit1_valid,
-    logic [63:0]				PRF_writeback_value1;
-    logic [63:0]				ROB_commit1_pc;
-    logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_arn_dest;
-    logic					ROB_commit1_wr_en;
-    logic					ROB_commit2_valid,
-    logic [63:0]				PRF_writeback_value2;
-    logic [63:0]				ROB_commit2_pc;
-    logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit2_arn_dest;
-    logic					ROB_commit2_wr_en;
+    logic							ROB_commit1_valid;
+    logic [63:0]					PRF_writeback_value1;
+    logic [63:0]					ROB_commit1_pc;
+    logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
+    logic							ROB_commit1_wr_en;
+    logic							ROB_commit2_valid;
+    logic [63:0]					PRF_writeback_value2;
+    logic [63:0]					ROB_commit2_pc;
+    logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
+    logic							ROB_commit2_wr_en;
 
     processor processor_0(
 	//input
@@ -61,7 +61,7 @@ module testbench;
 
     .pipeline_completed_insts(pipeline_completed_insts),
     
-    .pipeline_error_status(pipeline_error_status),
+    //.pipeline_error_status(pipeline_error_status),
     //.pipeline_commit_wr_idx(pipeline_commit_wr_idx),
     //.pipeline_commit_wr_data(pipeline_commit_wr_data),
     //.pipeline_commit_wr_en(pipeline_commit_wr_en),
@@ -76,12 +76,12 @@ module testbench;
     //Output from rob
     .ROB_commit1_valid(ROB_commit1_valid),
     .ROB_commit1_pc(ROB_commit1_pc),
-    .ROB_commit1_prn_dest(ROB_commit1_prn_dest),
+    .ROB_commit1_arn_dest(ROB_commit1_arn_dest),
     .ROB_commit1_wr_en(ROB_commit1_wr_en),
     .PRF_writeback_value1(PRF_writeback_value1),
-    .ROB_commit2_valid(ROB_commit2_valid)
-    .ROB,_commit2_pc(ROB_commit2_pc),
-    .ROB_commit2_prn_dest(ROB_commit2_prn_dest),
+    .ROB_commit2_valid(ROB_commit2_valid),
+    .ROB_commit2_pc(ROB_commit2_pc),
+    .ROB_commit2_arn_dest(ROB_commit2_arn_dest),
     .ROB_commit1_wr_en(ROB_commit1_wr_en),
     .PRF_writeback_value2(PRF_writeback_value2)		
 );
@@ -126,28 +126,27 @@ module testbench;
          if(ROB_commit1_wr_en)
            $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                      ROB_commit1_pc,
-                     ROB_commit1_prn_dest,
+                     ROB_commit1_arn_dest,
                      PRF_writeback_value1);
         else
           $fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);
 	if(ROB_commit2_wr_en)
            $fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                      ROB_commit2_pc,
-                     ROB_commit2_prn_dest,
+                     ROB_commit2_arn_dest,
                      PRF_writeback_value2);
         else
           $fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
       end
 
       // deal with any halting conditions
-      if(pipeline_error_status != NO_ERROR) begin
+      /*if(pipeline_error_status != NO_ERROR) begin
         print_close(); // close the pipe_print output file
         $fclose(wb_fileno);
         #100 $finish;
-      end
+      end*/
 
-    end  // if(reset)   
-  end 
+    end  // if(reset) 
 
 endmodule  // module testbench
 
