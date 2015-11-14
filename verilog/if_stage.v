@@ -131,6 +131,7 @@ module if_stage(
 			thread2_inst_out 	 		  = thread1_inst2_out;
 			thread1_inst_is_valid		  = thread1_inst1_is_valid;
 			thread2_inst_is_valid		  = thread1_inst2_is_valid;
+			next_thread_state			  = THREAD1_IS_EX;
 		end
 		else
 		begin
@@ -158,6 +159,18 @@ module if_stage(
 					thread1_inst_is_valid = thread2_inst1_is_valid;
 					thread2_inst_is_valid = thread2_inst2_is_valid;
 					next_thread_state 	  = THREAD1_IS_EX;
+				end
+				default
+				begin
+					pc_enable1			  = 1'b1;
+					pc_enable2			  = 1'b0;
+					proc2Imem_addr		  = proc2Imem_addr1;
+					next_PC_out 		  = next_PC_out2;
+					thread1_inst_out 	  = thread1_inst1_out;
+					thread2_inst_out 	  = thread1_inst2_out;
+					thread1_inst_is_valid = thread1_inst1_is_valid;
+					thread2_inst_is_valid = thread1_inst2_is_valid;
+					next_thread_state     = THREAD2_IS_EX;
 				end
 			endcase
 		end
