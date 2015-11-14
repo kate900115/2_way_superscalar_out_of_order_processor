@@ -40,7 +40,6 @@
 // float to integer conversion is rounding to nearest
 
 
-<<<<<<< HEAD
 //////////////////////////////////////////////
 //
 // Error codes
@@ -53,8 +52,7 @@ typedef enum logic [3:0] {
   HALTED_ON_HALT         = 4'h2,
   HALTED_ON_ILLEGAL      = 4'h3
 } ERROR_CODE;
-=======
->>>>>>> f788cf4602821836cb5b0923ad7364f0ab3b9df7
+
 
 
 //
