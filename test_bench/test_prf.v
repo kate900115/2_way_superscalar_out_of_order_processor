@@ -1,5 +1,6 @@
 //`define DEBUG_OUT
 module test_prf;
+	//input
 	logic							clock;
 	logic							reset;
 
@@ -40,6 +41,11 @@ module test_prf;
 	logic							inst1_opb_valid;					//whether opb load from prf of instruction1 is valid
 	logic							inst2_opa_valid;					//whether opa load from prf of instruction2 is valid
 	logic							inst2_opb_valid;					//whether opa load from prf of instruction2 is valid
+	
+	logic	[$clog2(`PRF_SIZE)-1:0]	rob1_retire_idx;					// when rob1 retires an instruction, prf gives out the corresponding value.
+	logic	[$clog2(`PRF_SIZE)-1:0]	rob2_retire_idx;					// when rob2 retires an instruction, prf gives out the corresponding value.
+	
+	// output
 
 	logic							rat1_prf1_rename_valid_out;			//when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	logic							rat1_prf2_rename_valid_out;			//when RAT2 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -103,7 +109,9 @@ module test_prf;
 		.rrat1_prf2_free_valid(rrat1_prf2_free_valid),			
 		.rrat2_prf2_free_valid(rrat2_prf2_free_valid),			
 		.rrat1_prf2_free_idx(rrat1_prf2_free_idx),			
-		.rrat2_prf2_free_idx(rrat2_prf2_free_idx),					
+		.rrat2_prf2_free_idx(rrat2_prf2_free_idx),	
+		.rob1_retire_idx(rob1_retire_idx),
+		.rob2_retire_idx(rob2_retire_idx),				
 		
 		//output
 		.rat1_prf1_rename_valid_out(rat1_prf1_rename_valid_out),		
@@ -227,7 +235,9 @@ module test_prf;
 		rrat1_prf2_free_valid			= 0;		
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
-		rrat2_prf2_free_idx				= 0;		
+		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;			
 
 		@(posedge clock);
 		$display("@@@ RAT1 and RAT2 stop sending allocate_a_new_register_signal!!");
@@ -259,6 +269,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		
 		@(negedge clock);
 		$display("@@@ RAT1 allocate two new registers!!");
@@ -290,7 +302,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(posedge clock);
 		$display("@@@ RAT1 stop sending allocate_new_register_signal!!");
@@ -322,6 +335,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		
 		@(negedge clock);  
 		$display("@@@ RAT2 allocate two new registers!!");
@@ -353,6 +368,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(posedge clock);
 		$display("@@@ RAT2 stop sending allocate_a_new_register_signal!!");
@@ -384,6 +401,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(negedge clock);  
 		$display("@@@ RAT1 and RAT2 allocate new registers!!");
@@ -415,7 +434,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(posedge clock);
 		$display("@@@ RAT2 stop sending allocate_a_new_register_signal!!");
@@ -447,6 +467,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		//at this time, we allocate 3 PRF entries (101111,101110,101101)
 		//after this, we want to store data from CDB.
 		//from CDB2, we store 5 into #reg 101111.
@@ -481,6 +503,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		cdb2_valid			 = 0;
 		cdb2_tag			 = 0;
@@ -516,7 +540,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-		
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ Doing nothing at all!!!");
 		cdb1_valid			 = 0;
@@ -549,6 +574,9 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
+		
 		@(negedge clock);
 		@(negedge clock);
 
@@ -582,7 +610,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ Load data from a wrong register which is not allocated!!");
 		cdb1_valid			 = 0;
@@ -613,7 +642,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;	
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(negedge clock);
 
@@ -646,7 +676,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock); 
 		//then we want to load data from #reg 101110;
 		$display("@@@ Load data from reg#101101!!");
@@ -678,7 +709,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-		
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ RRAT wants to free reg#101101!!");
 		cdb1_valid			 = 0;
@@ -709,7 +741,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;	
-		
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ RAT1 and RAT2 want to allocate new entries!!");
 		cdb1_valid			 = 0;
@@ -740,7 +773,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ Store data from CDB2!!");
 		cdb1_valid			 = 0;
@@ -771,7 +805,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ RRAT1 send the freelist in");
 		$display("@@@ RRAT1 because of the freelist!!");
@@ -803,6 +838,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -832,7 +869,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ RRAT1 send the freelist in");
 		$display("@@@ RRAT1 because of the freelist!!");
@@ -864,7 +902,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-		
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -894,7 +933,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
-
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 
 		@(negedge clock);
 		$display("@@@ this time we want to (1)free one entry");
@@ -927,6 +967,9 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
+		
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -956,6 +999,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 
 		$display("@@@ this time we want to (1)allocate a new entry");
@@ -988,6 +1033,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -1017,6 +1064,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 
 
@@ -1049,6 +1098,40 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
+		@(negedge clock);
+		$display("@@@ rob index in 6'b101110");
+		cdb1_valid						= 0;
+		cdb1_tag			 			= 0;
+		cdb1_out			 			= 0;
+		cdb2_valid			 			= 0;
+		cdb2_tag			 			= 0;
+		cdb2_out			 			= 0;
+		inst1_opa_prf_idx		 		= 0;				
+		inst1_opb_prf_idx		 = 0;				
+		inst2_opa_prf_idx		 = 0;			
+		inst2_opb_prf_idx		 = 0;				
+		rat1_allocate_new_prf1		 = 0;			
+		rat1_allocate_new_prf2		 = 0;
+		rat2_allocate_new_prf1		 = 0;			
+		rat2_allocate_new_prf2		 = 0;			
+		rrat1_prf_free_list		 = 0;			
+		rrat2_prf_free_list		 = 0;			
+		rat1_prf_free_list		 = 0;			
+		rat2_prf_free_list		 = 0;
+		rrat1_branch_mistaken_free_valid = 0;	
+		rrat2_branch_mistaken_free_valid = 0;	
+		rrat1_prf1_free_valid 			= 0;				
+		rrat2_prf1_free_valid 			= 0;				
+		rrat1_prf1_free_idx				= 0;			
+		rrat2_prf1_free_idx				= 0;				
+		rrat1_prf2_free_valid			= 0;		
+		rrat2_prf2_free_valid			= 0;			
+		rrat1_prf2_free_idx				= 0;			
+		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 6'b101110;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$display("@@@ load value from this wrong register");
 		cdb1_valid			 = 0;
@@ -1079,6 +1162,8 @@ module test_prf;
 		rrat2_prf2_free_valid			= 0;			
 		rrat1_prf2_free_idx				= 0;			
 		rrat2_prf2_free_idx				= 0;
+		rob1_retire_idx					= 0;
+		rob2_retire_idx					= 0;
 		@(negedge clock);
 		$finish;
 
