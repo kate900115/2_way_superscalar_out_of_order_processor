@@ -163,6 +163,8 @@ logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
 //logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;	//output of processor
 logic					ROB_commit2_if_rename_out;
 logic					ROB_commit2_mispredict;
+logic					cdb1_branch_taken;
+logic					cdb2_branch_taken;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -180,6 +182,7 @@ logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag,
 logic [5:0][63:0]					EX_CDB_fu_result_out;
 logic [5:0]							EX_CDB_fu_result_is_valid;
 logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
+logic [1:0]							EX_CDB_mispredict_sig;
 
 //ex success send to cdb
 logic					adder1_send_in_success;
@@ -207,8 +210,8 @@ module if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
-	input 				thread1_branch_is_taken,
-	input 				thread2_branch_is_taken,
+	.thread1_branch_is_taken(ROB_commit1_mispredict),
+	.thread2_branch_is_taken(ROB_commit2_mispredict),
 	input [63:0]		thread1_target_pc(),
 	input [63:0]		thread2_target_pc(),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
@@ -674,7 +677,7 @@ module ex_stage ex(
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
     .fu_cdb_rob_idx_out(EX_CDB_rob_idx),
-    .fu_mispredict_sig(),
+    .fu_mispredict_sig(EX_CDB_mispredict_sig),
   );
 //////////////////////////////////
 //								//
@@ -691,7 +694,7 @@ module cdb cdb1(
 	.adder1_result_in(EX_CDB_fu_result_out[1]),
 	.adder1_dest_reg_idx(EX_CDB_dest_tag[1]),
 	.adder1_rob_idx(EX_CDB_rob_idx[1]),
-	.adder1_branch_taken
+	.adder1_branch_taken(EX_CDB_mispredict_sig[0]),
 	.mult2_result_ready(EX_CDB_fu_result_is_valid[2]),
 	.mult2_result_in(EX_CDB_fu_result_out[2]),
 	.mult2_dest_reg_idx(EX_CDB_dest_tag[2]),
@@ -700,7 +703,7 @@ module cdb cdb1(
 	.adder2_result_in(EX_CDB_fu_result_out[3]),
 	.adder2_dest_reg_idx(EX_CDB_dest_tag[3]),
 	.adder2_rob_idx(EX_CDB_rob_idx[3]),
-	.adder2_branch_taken
+	.adder2_branch_taken(EX_CDB_mispredict_sig[1]),
 	.memory1_result_ready(EX_CDB_fu_result_is_valid[4]),
 	.memory1_result_inEX_CDB_fu_result_out[4]),
 	.memory1_dest_reg_idxEX_CDB_dest_tag[4]),
@@ -714,12 +717,12 @@ module cdb cdb1(
 	.cdb1_tag(cdb1_tag),
 	.cdb1_out(cdb1_value),
 	.cdb1_rob_idx(cdb1_rob_idx),
-	.cdb1_taken_branch
+	.cdb1_branch_is_taken(cdb1_branch_taken),
 	.cdb2_valid(cdb2_valid),
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	.cdb2_rob_idx(cdb2_rob_idx),
-	.cdb2_taken_branch
+	.cdb2_branch_is_taken(cdb2_branch_taken),
 	.adder1_send_in_success(adder1_send_in_success),
 	.adder2_send_in_success(adder2_send_in_success),
 	.mult1_send_in_success(mult1_send_in_success),
