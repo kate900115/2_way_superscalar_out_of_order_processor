@@ -39,66 +39,22 @@ module testbench;
 
     logic [3:0]  pipeline_completed_insts,
     ERROR_CODE   pipeline_error_status,
-    logic [4:0]  pipeline_commit_wr_idx,
-    logic [63:0] pipeline_commit_wr_data,
-    logic        pipeline_commit_wr_en,
-    logic [63:0] pipeline_commit_NPC,
 
-    logic [63:0] if_NPC_out;
-    logic [31:0] if_IR_out;
-    logic        if_valid_inst_out;
-    logic [63:0] if_id_NPC;
-    logic [31:0] if_id_IR;
-    logic        if_id_valid_inst;
-    logic [63:0] id_ex_NPC;
-    logic [31:0] id_ex_IR;
-    logic        id_ex_valid_inst;
-    logic [63:0] ex_mem_NPC;
-    logic [31:0] ex_mem_IR;
-    logic        ex_mem_valid_inst;
-    logic [63:0] mem_wb_NPC;
-    logic [31:0] mem_wb_IR;
-    logic        mem_wb_valid_inst;
     // testing hooks (these must be exported so we can test
     // the synthesized version) data is tested by looking at
     // the final values in memory
 
 //output
     // Outputs from IF-Stage 
-    logic [63:0] if_NPC_out,
-    logic [31:0] if_IR_out,
-    logic        if_valid_inst_out,
-
-    // Outputs from IF/ID Pipeline Register
-    logic [63:0] if_id_NPC,
-    logic [31:0] if_id_IR,
-    logic        if_id_valid_inst,
-
-
-    // Outputs from ID/EX Pipeline Register
-    logic [63:0] id_ex_NPC,
-    logic [31:0] id_ex_IR,
-    logic        id_ex_valid_inst,
-
-
-    // Outputs from EX/MEM Pipeline Register
-    logic [63:0] ex_mem_NPC,
-    logic [31:0] ex_mem_IR,
-    logic        ex_mem_valid_inst,
-
-
-    // Outputs from MEM/WB Pipeline Register
-    logic [63:0] mem_wb_NPC,
-    logic [31:0] mem_wb_IR,
-    logic        mem_wb_valid_inst
-
     //Output from rob
-    logic [63:0]				ROB_commit1_pc;
+	logic [63:0]						PRF_writeback_value1;
+    logic [63:0]						ROB_commit1_pc;
     logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;
-    logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;
-    logic [63:0]				ROB_commit2_pc;
+    logic								ROB_commit1_wr_en;
+	logic [63:0]						PRF_writeback_value2;
+    logic [63:0]						ROB_commit2_pc;
     logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit2_prn_dest;
-    logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;
+    logic								ROB_commit2_wr_en;
 
     processor processor_0(
 	//input
