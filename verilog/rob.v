@@ -198,6 +198,8 @@ module rob(
 			rob2_internal_is_ex_in[j] = 1'b0;
 			rob1_internal_mispredict_in[j] = 1'b0;
 			rob2_internal_mispredict_in[j] = 1'b0;
+			rob1_internal_target_pc_in[j] = 0;
+			rob2_internal_target_pc_in[j] = 0;
 			if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx1[$clog2(`ROB_SIZE)])
 			begin
 				rob1_internal_is_ex_in[j] = 1'b1;
@@ -246,6 +248,10 @@ module rob(
 	commit2_valid = 0;
 	rob1_internal_if_committed = 0;
 	rob2_internal_if_committed = 0;
+	commit1_pc_out = 0;
+	commit2_pc_out = 0;
+	commit1_target_pc_out = 0;
+	commit2_target_pc_out = 0;
 		if (rob1_internal_is_ex_out[t1_head] && t1_head != t1_tail)
 		begin
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
