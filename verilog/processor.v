@@ -150,6 +150,8 @@ logic							RRAT2_RAT2_mispredict_up_idx2;
 
 //rob output
 //logic [63:0]				ROB_commit1_pc;		//output of processor
+logic ROB_t1_is_full;
+logic ROB_t2_is_full;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
 //logic [$clog2(`PRF_SIZE)-1:0]		ROB_commit1_prn_dest;  	//output of processor
 //logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit1_arn_dest;  	//output of processor
@@ -161,6 +163,8 @@ logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
 //logic [$clog2(`ARF_SIZE)-1:0]		ROB_commit2_arn_dest;	//output of processor
 logic					ROB_commit2_if_rename_out;
 logic					ROB_commit2_mispredict;
+logic					cdb1_branch_taken;
+logic					cdb2_branch_taken;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -178,6 +182,7 @@ logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag,
 logic [5:0][63:0]					EX_CDB_fu_result_out;
 logic [5:0]							EX_CDB_fu_result_is_valid;
 logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
+logic [1:0]							EX_CDB_mispredict_sig;
 
 //ex success send to cdb
 logic					adder1_send_in_success;
@@ -205,18 +210,19 @@ module if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
-	input 				thread1_branch_is_taken,
-	input 				thread2_branch_is_taken,
-	input [63:0]		thread1_target_pc,
-	input [63:0]		thread2_target_pc,
+	.thread1_branch_is_taken(ROB_commit1_mispredict),
+	.thread2_branch_is_taken(ROB_commit2_mispredict),
+	input [63:0]		thread1_target_pc(),
+	input [63:0]		thread2_target_pc(),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
-	input	  			rob_stall,		 				// when RoB is full, we need to stop PC
+	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
+	.rob2_stall(ROB_t1_is_full),						// when RoB2 is full, we need to stop PC2
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
 	input			    Imem2proc_valid,				// 
-	input				is_two_threads,		
+	input				is_two_threads,	
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
 	//output logic [63:0] next_PC_out,
@@ -481,6 +487,8 @@ module prf prf1(
 	.rat2_allocate_new_prf1(RAT2_PRF_allocate_req1),			// the request from rat2 for allocating a new prf entry
 	.rat2_allocate_new_prf2(RAT2_PRF_allocate_req2),			// the request from rat2 for allocating a new prf entry
 
+	input	[`PRF_SIZE-1:0]					rrat1_prf_free_list,				// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	input	[`PRF_SIZE-1:0]					rrat2_prf_free_list,				// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rrat1_branch_mistaken_free_valid(rat1_prf_free_valid),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
 	.rrat2_branch_mistaken_free_valid(rat2_prf_free_valid),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
@@ -492,6 +500,15 @@ module prf prf1(
 	.rrat2_prf_free_valid(RRAT2_PRF_free_valid1),			// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
 	.rrat1_prf_free_idx(RRAT1_PRF_free_idx1),			// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
 	.rrat2_prf_free_idx(RRAT2_PRF_free_idx1),			// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf1_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf1_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf1_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf1_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+	input									rrat1_prf2_free_valid,				// when an instruction retires from RRAT1, RRAT1 gives out a signal enable PRF to free its register. 
+	input									rrat2_prf2_free_valid,				// when an instruction retires from RRAT2, RRAT1 gives out a signal enable PRF to free its register.
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat1_prf2_free_idx,				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
+	input	[$clog2(`PRF_SIZE)-1:0] 		rrat2_prf2_free_idx,				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
+
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
 	.rat1_prf2_rename_valid_out(PRF_RAT1_rename_valid2),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -512,6 +529,11 @@ module prf prf1(
 	.inst1_opb_valid(PRF_RS_inst1_opb_valid),			// whether opb load from prf of instruction1 is valid
 	.inst2_opa_valid(PRF_RS_inst2_opa_valid),			// whether opa load from prf of instruction2 is valid
 	.inst2_opb_valid(PRF_RS_inst2_opb_valid),			// whether opa load from prf of instruction2 is valid
+
+	output  logic							prf_is_full,						// if the freelist of prf is empty, prf should give out this signal
+	// for write back
+	output [63:0]							writeback_value1,
+	output [63:0]							writeback_value2,
 );
 
 //////////////////////////////////
@@ -655,7 +677,7 @@ module ex_stage ex(
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
     .fu_cdb_rob_idx_out(EX_CDB_rob_idx),
-    .fu_mispredict_sig(),
+    .fu_mispredict_sig(EX_CDB_mispredict_sig),
   );
 //////////////////////////////////
 //								//
@@ -672,7 +694,7 @@ module cdb cdb1(
 	.adder1_result_in(EX_CDB_fu_result_out[1]),
 	.adder1_dest_reg_idx(EX_CDB_dest_tag[1]),
 	.adder1_rob_idx(EX_CDB_rob_idx[1]),
-	.adder1_branch_taken
+	.adder1_branch_taken(EX_CDB_mispredict_sig[0]),
 	.mult2_result_ready(EX_CDB_fu_result_is_valid[2]),
 	.mult2_result_in(EX_CDB_fu_result_out[2]),
 	.mult2_dest_reg_idx(EX_CDB_dest_tag[2]),
@@ -681,7 +703,7 @@ module cdb cdb1(
 	.adder2_result_in(EX_CDB_fu_result_out[3]),
 	.adder2_dest_reg_idx(EX_CDB_dest_tag[3]),
 	.adder2_rob_idx(EX_CDB_rob_idx[3]),
-	.adder2_branch_taken
+	.adder2_branch_taken(EX_CDB_mispredict_sig[1]),
 	.memory1_result_ready(EX_CDB_fu_result_is_valid[4]),
 	.memory1_result_inEX_CDB_fu_result_out[4]),
 	.memory1_dest_reg_idxEX_CDB_dest_tag[4]),
@@ -695,12 +717,12 @@ module cdb cdb1(
 	.cdb1_tag(cdb1_tag),
 	.cdb1_out(cdb1_value),
 	.cdb1_rob_idx(cdb1_rob_idx),
-	.cdb1_taken_branch
+	.cdb1_branch_is_taken(cdb1_branch_taken),
 	.cdb2_valid(cdb2_valid),
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	.cdb2_rob_idx(cdb2_rob_idx),
-	.cdb2_taken_branch
+	.cdb2_branch_is_taken(cdb2_branch_taken),
 	.adder1_send_in_success(adder1_send_in_success),
 	.adder2_send_in_success(adder2_send_in_success),
 	.mult1_send_in_success(mult1_send_in_success),
