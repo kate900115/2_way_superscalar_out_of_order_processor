@@ -46,13 +46,10 @@
 //
 //////////////////////////////////////////////
 
-typedef enum logic [3:0] {
-  NO_ERROR               = 4'h0,
-  HALTED_ON_MEMORY_ERROR = 4'h1,
-  HALTED_ON_HALT         = 4'h2,
-  HALTED_ON_ILLEGAL      = 4'h3
-} ERROR_CODE;
-
+`define NO_ERROR 4'h0
+`define HALTED_ON_MEMORY_ERROR 4'h1
+`define HALTED_ON_HALT 4'h2
+`define HALTED_ON_ILLEGAL 4'h3
 
 
 //
@@ -128,11 +125,9 @@ typedef enum logic [4:0] {
 //
 // Memory bus commands control signals
 //
-typedef enum logic [1:0] {
-  BUS_NONE     = 2'h0,
-  BUS_LOAD     = 2'h1,
-  BUS_STORE    = 2'h2
-} BUS_COMMAND;
+`define BUS_NONE       2'h0
+`define BUS_LOAD       2'h1
+`define BUS_STORE      2'h2
 
 //
 // useful boolean single-bit definitions
