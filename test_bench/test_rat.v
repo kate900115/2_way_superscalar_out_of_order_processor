@@ -44,7 +44,7 @@ module test_rat;
 	logic			PRF_free_valid;
 	logic correct1, correct2, correct;
 
-	rat rat1(
+	rat ratrat(
 	//input
 	.reset(reset),
 	.clock(clock),
@@ -130,7 +130,6 @@ initial begin
 	reset = 0;
 	//HERE we initial the reg
 	//#5
-	@(negedge clock);
 	reset 			= 0;
 	inst1_enable		= 1;
 	opa_ARF_idx1 		= 0;
@@ -323,19 +322,19 @@ initial begin
 	mispredict_up_idx 	= 0;
 
 	#1
-	correct = 		opa_PRF_idx1 == 3 &&
+	correct1 = 		opa_PRF_idx1 == 3 &&
 				opb_PRF_idx1 == 5 &&
 				request1 == 1 &&
 				RAT_allo_halt1 == 0;
 
-	correct = 		opa_PRF_idx2 == 8 &&
+	correct2 = 		opa_PRF_idx2 == 8 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 1 &&
 				PRF_free_valid == 0 &&
 				PRF_free_list_out == 0 &&
 				RAT_allo_halt2 == 0;
 	correct = correct1 && correct2;
-	assert(correct) $display("@@@passed9");
+	assert(correct) $display("@@@passed5");
 		else #1 exit_on_error;
 
 	$finish;
