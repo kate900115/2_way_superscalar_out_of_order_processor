@@ -63,7 +63,7 @@ module rob_one_entry(
 
 //information of the instruction stored in this rob entry 
 	logic				thread;
-	logic	[31:0]		pc;							//pc stored in this entry
+	logic	[63:0]		pc;							//pc stored in this entry
 	logic	[4:0]		arn_dest;                   //the architected register number of the destination of this instruction stored in this entry
 	logic	[$clog2(`PRF_SIZE)-1:0] prn_dest;                   //the prf number assigned to the destination of this instruction
 	logic				is_branch;                  //if this instruction stored in this entry is a branch
@@ -75,7 +75,7 @@ module rob_one_entry(
 	logic				illegal;
 
 	logic				next_thread;
-	logic	[31:0]		next_pc;					//pc stored in this entry
+	logic	[63:0]		next_pc;					//pc stored in this entry
 	logic	[4:0]		next_arn_dest;              //the architected register number of the destination of this instruction stored in this entry
 	logic	[$clog2(`PRF_SIZE)-1:0] next_prn_dest;  //the prf number assigned to the destination of this instruction
 	logic				next_is_branch;             //if this instruction stored in this entry is a branch
@@ -96,6 +96,9 @@ module rob_one_entry(
 	assign if_rename_out = if_committed;						//if this entry is committed the output information is important
 	assign is_ex_out = is_executed;
 	assign available_out = ~inuse;			//if this entry is not in use, it is available
+	assign halt_out = if_committed? halt : 0;
+	assign illegal_out = if_committed? illegal : 0;
+	assign pc_out	= if_committed? pc : 0;
 
 	always_comb
 	begin

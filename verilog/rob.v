@@ -12,82 +12,83 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module rob(
-	
-//normal input
-	input							reset,
-	input							clock,
-	
-	input							is_thread1,					//the two instructions are thread1 or thread2 if it ==1, it is for thread1, else it is for thread 2
-//instruction1 input
-	input	[63:0]					inst1_pc_in,				//the pc of the instruction
-	input	[4:0]					inst1_arn_dest_in,			//the arf number of the destinaion of the instruction
-	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,			//the prf number of the destination of this instruction
-	input							inst1_is_branch_in,			//if this instruction is a branch
-	input							inst1_is_halt_in,
-	input							inst1_is_illegal_in,
-	input 							inst1_load_in,				//tell rob if instruction1 is valid
+	//input
+	//normal input
+	input										reset,
+	input										clock,
+				
+	input										is_thread1,							//the two instructions are thread1 or thread2 if it ==1, it is for thread1, else it is for thread 2
+	//instruction1 input
+	input	[63:0]								inst1_pc_in,						//the pc of the instruction
+	input	[4:0]								inst1_arn_dest_in,					//the arf number of the destinaion of the instruction
+	input	[$clog2(`PRF_SIZE)-1:0]				inst1_prn_dest_in,					//the prf number of the destination of this instruction
+	input										inst1_is_branch_in,					//if this instruction is a branch
+	input										inst1_is_halt_in,
+	input										inst1_is_illegal_in,
+	input 										inst1_load_in,						//tell rob if instruction1 is valid
 
-//instruction2 input
-	input	[63:0]					inst2_pc_in,				//the pc of the instruction
-	input	[4:0]					inst2_arn_dest_in,			//the arf number of the destinaion of the instruction
-	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,          //the prf number of the destination of this instruction
-	input							inst2_is_branch_in,			//if this instruction is a branch
-	input							inst2_is_halt_in,
-	input							inst2_is_illegal_in,
-	input 							inst2_load_in,		       	//tell rob if instruction2 is valid
-//when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
-	input							if_fu_executed1,		//if the instruction in the first multiplyer has been executed ************************************
-	input	[$clog2(`ROB_SIZE):0]	fu_rob_idx1,			//the rob number of the instruction in the first multiplyer************************************
-	input							mispredict_in1,
-	input	[63:0]					target_pc_in1,
-	input							if_fu_executed2,		//if the instruction in the first multiplyer has been executed ************************************
-	input	[$clog2(`ROB_SIZE):0]	fu_rob_idx2,			//the rob number of the instruction in the first multiplyer************************************
-	input							mispredict_in2,
-	input	[63:0]					target_pc_in2,
+	//instruction2 input
+	input	[63:0]								inst2_pc_in,						//the pc of the instruction
+	input	[4:0]								inst2_arn_dest_in,					//the arf number of the destinaion of the instruction
+	input	[$clog2(`PRF_SIZE)-1:0] 			inst2_prn_dest_in,      		    //the prf number of the destination of this instruction
+	input										inst2_is_branch_in,					//if this instruction is a branch
+	input										inst2_is_halt_in,
+	input										inst2_is_illegal_in,
+	input 										inst2_load_in,		    		   	//tell rob if instruction2 is valid
+	//when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
+	input										if_fu_executed1,					//if the instruction in the first FU has been executed 
+	input	[$clog2(`ROB_SIZE):0]				fu_rob_idx1,						//the rob number of the instruction in the first FU
+	input										mispredict_in1,
+	input	[63:0]								target_pc_in1,
+	input										if_fu_executed2,					//if the instruction in the second has been executed
+	input	[$clog2(`ROB_SIZE):0]				fu_rob_idx2,						//the rob number of the instruction in the first multiplyer
+	input										mispredict_in2,
+	input	[63:0]								target_pc_in2,
 
-//after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
-	output	logic	[$clog2(`ROB_SIZE):0]		inst1_rs_rob_idx_in,					//it is combinational logic so that the output is dealt with right after a
-	output	logic	[$clog2(`ROB_SIZE):0]		inst2_rs_rob_idx_in,					//instruction comes in, and then this signal is immediately sent to rs to
-																						//store in rs
-//when committed, the output of the first instrucion committed
-	output	logic	[63:0]			commit1_pc_out,
-	output  logic	[63:0]			commit1_target_pc_out,
-	output	logic					commit1_is_branch_out,				       	//if this instruction is a branch
-	output	logic					commit1_mispredict_out,				       	//if this instrucion is mispredicted
-	output	logic	[4:0]			commit1_arn_dest_out,                       //the architected register number of the destination of this instruction
-	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit1_prn_dest_out,						//the prf number of the destination of this instruction
-	output	logic					commit1_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
-	output	logic					commit1_valid,
-	output  logic					commit1_is_halt_out,
-	output  logic					commit1_is_illegal_out,
-	output	logic					commit1_is_thread1,
-//when committed, the output of the second instruction committed
-	output  logic	[63:0]			commit2_pc_out,
-	output  logic	[63:0]			commit2_target_pc_out,
-	output	logic					commit2_is_branch_out,						//if this instruction is a branch
-	output	logic					commit2_mispredict_out,				       	//if this instrucion is mispredicted
-	output	logic	[4:0]			commit2_arn_dest_out,						//the architected register number of the destination of this instruction
-	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit2_prn_dest_out,						//the prf number of the destination of this instruction
-	output	logic					commit2_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
-	output  logic					commit2_is_halt_out,
-	output  logic					commit2_is_illegal_out,
-	output	logic					commit2_valid,
-	output	logic					commit2_is_thread1,
-	output	logic					t1_is_full,
-	output	logic					t2_is_full
+	//output
+	//after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
+	output	logic	[$clog2(`ROB_SIZE):0]		inst1_rs_rob_idx_in,				//it is combinational logic so that the output is dealt with right after a
+	output	logic	[$clog2(`ROB_SIZE):0]		inst2_rs_rob_idx_in,				//instruction comes in, and then this signal is immediately sent to rs to
+																					//store in rs
+	//when committed, the output of the first instrucion committed
+	output	logic	[63:0]						commit1_pc_out,
+	output  logic	[63:0]						commit1_target_pc_out,
+	output	logic								commit1_is_branch_out,				//if this instruction is a branch
+	output	logic								commit1_mispredict_out,		       	//if this instrucion is mispredicted
+	output	logic	[4:0]						commit1_arn_dest_out,               //the architected register number of the destination of this instruction
+	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit1_prn_dest_out,				//the prf number of the destination of this instruction
+	output	logic								commit1_if_rename_out,		     	//if this entry is committed at this moment(tell RRAT)
+	output	logic								commit1_valid,
+	output  logic								commit1_is_halt_out,
+	output  logic								commit1_is_illegal_out,
+	output	logic								commit1_is_thread1,
+	//when committed, the output of the second instruction committed
+	output  logic	[63:0]						commit2_pc_out,
+	output  logic	[63:0]						commit2_target_pc_out,
+	output	logic								commit2_is_branch_out,				//if this instruction is a branch
+	output	logic								commit2_mispredict_out,				//if this instrucion is mispredicted
+	output	logic	[4:0]						commit2_arn_dest_out,				//the architected register number of the destination of this instruction
+	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit2_prn_dest_out,				//the prf number of the destination of this instruction
+	output	logic								commit2_if_rename_out,				//if this entry is committed at this moment(tell RRAT)
+	output  logic								commit2_is_halt_out,
+	output  logic								commit2_is_illegal_out,
+	output	logic								commit2_valid,
+	output	logic								commit2_is_thread1,
+	output	logic								t1_is_full,
+	output	logic								t2_is_full
 );
 
 //data logic variable needed
 
 //function variable needed
-	logic 	[$clog2(`ROB_SIZE)-1:0]			t1_head;
-	logic 	[$clog2(`ROB_SIZE)-1:0]			t1_tail;
-	logic 	[$clog2(`ROB_SIZE)-1:0]			t2_head;
-	logic 	[$clog2(`ROB_SIZE)-1:0]			t2_tail;
-	logic	[$clog2(`ROB_SIZE)-1:0]			next_t1_head;
-	logic	[$clog2(`ROB_SIZE)-1:0]			next_t1_tail;
-	logic	[$clog2(`ROB_SIZE)-1:0]			next_t2_head;
-	logic	[$clog2(`ROB_SIZE)-1:0]			next_t2_tail;
+	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_head;
+	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_tail;
+	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_head;
+	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_tail;
+	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_head;
+	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_tail;
+	logic	[$clog2(`ROB_SIZE)-1:0]					next_t2_head;
+	logic	[$clog2(`ROB_SIZE)-1:0]					next_t2_tail;
 //internal logic variable needed
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_thread1_out;
@@ -140,9 +141,10 @@ module rob(
 
 //instantiate rob 1 for thread1
 	rob_one_entry rob1[`ROB_SIZE-1:0] (
+	//input
 	.reset(reset),
 	.clock(clock),
-//
+
 	.is_thread1(is_thread1),
 	
 	.inst1_pc_in(inst1_pc_in),
@@ -150,23 +152,23 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob1_internal_inst1_rob_load_in),
-	.inst1_halt_in(rob1_internal_inst1_is_halt_in),
-	.inst1_illegal_in(rob1_internal_inst1_is_illegal_in),
+	.inst1_halt_in(inst1_is_halt_in),
+	.inst1_illegal_in(inst1_is_illegal_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob1_internal_inst2_rob_load_in),
-	.inst2_halt_in(rob1_internal_inst2_is_halt_in),
-	.inst2_illegal_in(rob1_internal_inst2_is_illegal_in),
-//
+	.inst2_halt_in(inst2_is_halt_in),
+	.inst2_illegal_in(inst2_is_illegal_in),
+
 	.is_ex_in(rob1_internal_is_ex_in),
 	.mispredict_in(rob1_internal_mispredict_in),
 	.target_pc_in(rob1_internal_target_pc_in),
 	.enable(1'b1),
 	.if_committed(rob1_internal_if_committed),
-//
+
 	.pc_out(rob1_internal_pc_out),
 	.is_thread1_out(rob1_internal_is_thread1_out),
 	.is_ex_out(rob1_internal_is_ex_out),
@@ -192,16 +194,16 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob2_internal_inst1_rob_load_in),
-	.inst1_halt_in(rob2_internal_inst1_is_halt_in),
-	.inst1_illegal_in(rob2_internal_inst1_is_illegal_in),
+	.inst1_halt_in(inst1_is_halt_in),
+	.inst1_illegal_in(inst1_is_illegal_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob2_internal_inst2_rob_load_in),
-	.inst2_halt_in(rob2_internal_inst2_is_halt_in),
-	.inst2_illegal_in(rob2_internal_inst2_is_illegal_in),
+	.inst2_halt_in(inst2_is_halt_in),
+	.inst2_illegal_in(inst2_is_illegal_in),
 //
 	.is_ex_in(rob2_internal_is_ex_in),
 	.mispredict_in(rob2_internal_mispredict_in),
@@ -223,7 +225,7 @@ module rob(
 	.illegal_out(rob2_internal_is_illegal_out)
 	);
 	
-	//execution state input									#####################################################
+	//execution state input					
 	always_comb
 	begin
 		for (int j = 0; j < `ROB_SIZE; j++)
@@ -236,32 +238,32 @@ module rob(
 			rob2_internal_target_pc_in[j] = 0;
 			if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx1[$clog2(`ROB_SIZE)])
 			begin
-				rob1_internal_is_ex_in[j] = 1'b1;
+				rob1_internal_is_ex_in[j] = if_fu_executed1;
 				rob1_internal_mispredict_in[j] = mispredict_in1;
 				rob1_internal_target_pc_in[j] = target_pc_in1;
 			end
 			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx2[$clog2(`ROB_SIZE)])
 			begin
-				rob1_internal_is_ex_in[j] = 1'b1;
+				rob1_internal_is_ex_in[j] = if_fu_executed2;
 				rob1_internal_mispredict_in[j] = mispredict_in2;
 				rob1_internal_target_pc_in[j] = target_pc_in2;
 			end
 			else if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx1[$clog2(`ROB_SIZE)])
 			begin
-				rob2_internal_is_ex_in[j] = 1'b1;
+				rob2_internal_is_ex_in[j] = if_fu_executed1;
 				rob2_internal_mispredict_in[j] = mispredict_in1;
 				rob2_internal_target_pc_in[j] = target_pc_in1;
 			end
 			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)])
 			begin
-				rob2_internal_is_ex_in[j] = 1'b1;
+				rob2_internal_is_ex_in[j] = if_fu_executed2;
 				rob2_internal_mispredict_in[j] = mispredict_in2;
 				rob2_internal_target_pc_in[j] = target_pc_in2;
 			end
 		end
 	end
 	
-	//commit										################################################
+	//commit									
 	always_comb
 	begin
 	commit1_is_branch_out	= 0;
@@ -380,7 +382,7 @@ module rob(
 		end
 	end
 	
-	//the head move ###################################################################################################
+	//the head move 
 	always_ff @(posedge clock)
 	begin
 		if (reset)
@@ -395,7 +397,7 @@ module rob(
 		end
 	end
 
-//tail_behavior is to determine how many of the two instructions are for thread1 ###################################################
+	//tail_behavior is to determine how many of the two instructions are for thread1 
 	always_comb
 	begin
 		rob1_internal_inst1_rob_load_in = 0;
@@ -444,17 +446,17 @@ module rob(
 			end
 		end
 		
-		if (t1_tail + 1 == t1_head)
+		if (t1_tail + 1 == t1_head || t1_tail + 2 == t1_head)
 		begin
 			t1_is_full = 1;
 		end
-		if (t2_tail + 1 == t2_head)
+		if (t2_tail + 1 == t2_head || t2_tail + 2 == t2_head)
 		begin
 			t2_is_full = 1;
 		end
 	end
 	
-//the tail move						###################################################
+	//the tail move		
 	always_ff @(posedge clock)
 	begin
 		if (reset)
