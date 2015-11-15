@@ -26,16 +26,16 @@ module rob_one_entry(
 	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst1_is_branch_in,             //if this instruction is a branch
 	input 				inst1_rob_load_in,				//tell this entry if we want to load this instruction
-	input				inst1_halt_in;
-	input				inst1_illegal_in;
+	input				inst1_halt_in,
+	input				inst1_illegal_in,
 
 	input	[63:0]		inst2_pc_in,                    //pc in
 	input	[4:0]		inst2_arn_dest_in,              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst2_is_branch_in,             //if this instruction is a branch
 	input 				inst2_rob_load_in,				//tell this entry if we want to load this instruction
-	input				inst2_halt_in;
-	input				inst2_illegal_in;
+	input				inst2_halt_in,
+	input				inst2_illegal_in,
 
 //after execution
 	input				is_ex_in,                       //if this instruciont has been executed so that the value of the prf number assigned is valid
