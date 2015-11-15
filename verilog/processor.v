@@ -328,7 +328,7 @@ rat rat1(
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
 	.request1(RAT1_PRF_allocate_req1),  //send to PRF indicate whether it need data
-	.RAT_allo_halt1(),
+	//.RAT_allo_halt1(),
 
 
 
@@ -336,7 +336,7 @@ rat rat1(
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
 	.request2(RAT1_PRF_allocate_req2),  //send to PRF indicate whether it need data
-	.RAT_allo_halt2(),
+	//.RAT_allo_halt2(),
 
 	//output together
 	.PRF_free_list_out(RAT1_PRF_free_list),
