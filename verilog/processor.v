@@ -69,6 +69,11 @@ logic			ID_inst1_is_uncond_branch;
 logic			ID_inst2_is_uncond_branch;
 logic			ID_inst1_is_valid;
 logic			ID_inst2_is_valid;
+logic			ID_inst1_is_halt;
+logic			ID_inst2_is_halt;
+logic			ID_inst1_is_illegal;
+logic			ID_inst2_is_illegal;
+
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opb_idx1;
@@ -146,6 +151,10 @@ logic 							ROB_commit1_is_thread1;
 logic 							ROB_commit1_is_branch;
 logic 							ROB_commit2_is_thread1;
 logic							ROB_commit2_is_branch;
+logic							ROB_commit1_is_halt;
+logic							ROB_commit1_is_illegal;
+logic							ROB_commit2_is_halt;
+logic							ROB_commit2_is_illegal;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -268,9 +277,9 @@ id_stage id(
 	.id_cond_branch_out1(ID_inst1_is_cond_branch),   // is inst a conditional branch?
 	.id_uncond_branch_out1(ID_inst1_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
-	//.id_halt_out1,
+	.id_halt_out1(ID_inst1_is_halt),
 	//.id_cpuid_out1,         // get CPUID inst?
-	//.id_illegal_out1,
+	.id_illegal_out1(ID_inst1_is_illegal),
 	.id_valid_inst_out1(ID_inst1_is_valid),     // is inst a valid instruction to be 
 													        // counted for CPI calculations?
 	//.id_rd_mem_out2,        // does inst read memory?
@@ -280,9 +289,9 @@ id_stage id(
 	.id_cond_branch_out2(ID_inst2_is_cond_branch),   // is inst a conditional branch?
 	.id_uncond_branch_out2(ID_inst2_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
-	//.id_halt_out2,
+	.id_halt_out2(ID_inst2_is_halt),
 	//.id_cpuid_out2,         // get CPUID inst?
-	//.id_illegal_out2,
+	.id_illegal_out2(ID_inst2_is_illegal),
 	.id_valid_inst_out2(ID_inst2_is_valid)     // is inst a valid instruction to be 
 );
 //////////////////////////////////
@@ -545,6 +554,8 @@ rob rob1(
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
 	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
+	.inst1_is_halt_in(ID_inst1_is_halt),
+	.inst1_is_illegal_in(ID_inst1_is_illegal),
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
@@ -552,6 +563,8 @@ rob rob1(
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
+	.inst2_is_halt_in(ID_inst2_is_halt),
+	.inst2_is_illegal_in(ID_inst2_is_illegal),
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
 	.if_fu_executed1(cdb1_valid),		//if the instruction in the first multiplyer has been executed ************************************
@@ -576,6 +589,8 @@ rob rob1(
 	.commit1_prn_dest_out(ROB_commit1_prn_dest),						//the prf number of the destination of this instruction
 	.commit1_if_rename_out(ROB_commit1_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit1_valid(ROB_commit1_is_valid),
+	.commit1_is_halt_out(ROB_commit1_is_halt),
+	.commit1_is_illegal_out(ROB_commit1_is_illegal),
 	.commit1_is_thread1(ROB_commit1_is_thread1),
 //when committed, the output of the second instruction committed
 	.commit2_pc_out(ROB_commit2_pc),
@@ -586,6 +601,8 @@ rob rob1(
 	.commit2_prn_dest_out(ROB_commit2_prn_dest),						//the prf number of the destination of this instruction
 	.commit2_if_rename_out(ROB_commit2_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit2_valid(ROB_commit2_is_valid),
+	.commit2_is_halt_out(ROB_commit2_is_halt),
+	.commit2_is_illegal_out(ROB_commit2_is_illegal),
 	.commit2_is_thread1(ROB_commit2_is_thread1),
 	.t1_is_full(ROB_t1_is_full),
 	.t2_is_full(ROB_t2_is_full)

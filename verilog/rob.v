@@ -23,6 +23,8 @@ module rob(
 	input	[4:0]					inst1_arn_dest_in,			//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,			//the prf number of the destination of this instruction
 	input							inst1_is_branch_in,			//if this instruction is a branch
+	input							inst1_is_halt_in,
+	input							inst1_is_illegal_in,
 	input 							inst1_load_in,				//tell rob if instruction1 is valid
 
 //instruction2 input
@@ -30,6 +32,8 @@ module rob(
 	input	[4:0]					inst2_arn_dest_in,			//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,          //the prf number of the destination of this instruction
 	input							inst2_is_branch_in,			//if this instruction is a branch
+	input							inst2_is_halt_in,
+	input							inst2_is_illegal_in,
 	input 							inst2_load_in,		       	//tell rob if instruction2 is valid
 //when executed,for each function unit,  the number of rob need to know so we can set the if_executed to of the entry to be 1
 	input							if_fu_executed1,		//if the instruction in the first multiplyer has been executed ************************************
@@ -54,6 +58,8 @@ module rob(
 	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit1_prn_dest_out,						//the prf number of the destination of this instruction
 	output	logic					commit1_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
 	output	logic					commit1_valid,
+	output  logic					commit1_is_halt_out,
+	output  logic					commit1_is_illegal_out,
 	output	logic					commit1_is_thread1,
 //when committed, the output of the second instruction committed
 	output  logic	[63:0]			commit2_pc_out,
@@ -63,6 +69,8 @@ module rob(
 	output	logic	[4:0]			commit2_arn_dest_out,						//the architected register number of the destination of this instruction
 	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit2_prn_dest_out,						//the prf number of the destination of this instruction
 	output	logic					commit2_if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
+	output  logic					commit2_is_halt_out,
+	output  logic					commit2_is_illegal_out,
 	output	logic					commit2_valid,
 	output	logic					commit2_is_thread1,
 	output	logic					t1_is_full,
@@ -99,11 +107,11 @@ module rob(
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_in;
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_halt_out;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_invalid_halt_out;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_illegal_out;
 
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_thread1_out;
@@ -122,11 +130,11 @@ module rob(
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_in;
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_halt_out;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_invalid_halt_out;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_illegal_out;
 	
 	
 
@@ -142,16 +150,16 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob1_internal_inst1_rob_load_in),
-	.inst1_halt(rob1_internal_inst1_halt_in),
-	.inst1_invalid_halt(rob1_internal_inst1_invalid_halt_in),
+	.inst1_halt_in(rob1_internal_inst1_halt_in),
+	.inst1_illegal_in(rob1_internal_inst1_illegal_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob1_internal_inst2_rob_load_in),
-	.inst2_halt(rob1_internal_inst2_halt_in),
-	.inst2_invalid_halt(rob1_internal_inst2_invalid_halt_in),
+	.inst2_halt_in(rob1_internal_inst2_halt_in),
+	.inst2_illegal_in(rob1_internal_inst2_illegal_in),
 //
 	.is_ex_in(rob1_internal_is_ex_in),
 	.mispredict_in(rob1_internal_mispredict_in),
@@ -170,7 +178,7 @@ module rob(
 	.prn_dest_out(rob1_internal_prn_dest_out),
 	.if_rename_out(rob1_internal_if_rename_out),
 	.halt_out(rob1_internal_halt_out),
-	.invalid_halt_out(rob1_internal_invalid_halt_out)
+	.illegal_out(rob1_internal_illegal_out)
 	);
 	
 	rob_one_entry rob2[`ROB_SIZE-1:0] (
@@ -184,16 +192,16 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob2_internal_inst1_rob_load_in),
-	.inst1_halt(rob2_internal_inst1_halt_in),
-	.inst1_invalid_halt(rob2_internal_inst1_invalid_halt_in),
+	.inst1_halt_in(rob2_internal_inst1_halt_in),
+	.inst1_illegal_in(rob2_internal_inst1_illegal_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob2_internal_inst2_rob_load_in),
-	.inst2_halt(rob2_internal_inst2_halt_in),
-	.inst2_invalid_halt(rob2_internal_inst2_invalid_halt_in),
+	.inst2_halt_in(rob2_internal_inst2_halt_in),
+	.inst2_illegal_in(rob2_internal_inst2_illegal_in),
 //
 	.is_ex_in(rob2_internal_is_ex_in),
 	.mispredict_in(rob2_internal_mispredict_in),
@@ -212,7 +220,7 @@ module rob(
 	.prn_dest_out(rob2_internal_prn_dest_out),
 	.if_rename_out(rob2_internal_if_rename_out),
 	.halt_out(rob2_internal_halt_out),
-	.invalid_halt_out(rob2_internal_invalid_halt_out)
+	.illegal_out(rob2_internal_illegal_out)
 	);
 	
 	//execution state input									#####################################################
@@ -278,6 +286,10 @@ module rob(
 	commit2_pc_out = 0;
 	commit1_target_pc_out = 0;
 	commit2_target_pc_out = 0;
+	commit1_is_halt_out = 0;
+	commit1_is_illegal_out = 0;
+	commit2_is_halt_out = 0;
+	commit2_is_illegal_out = 0;
 		if (rob1_internal_is_ex_out[t1_head] && t1_head != t1_tail)
 		begin
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
@@ -287,7 +299,10 @@ module rob(
 			commit1_arn_dest_out	= rob1_internal_arn_dest_out[t1_head];
 			commit1_prn_dest_out	= rob1_internal_prn_dest_out[t1_head];
 			commit1_if_rename_out	= rob1_internal_if_rename_out[t1_head];
-			commit1_is_thread1	= rob1_internal_is_thread1_out[t1_head];
+			commit1_is_thread1		= rob1_internal_is_thread1_out[t1_head];
+			commit1_is_halt_out		= rob1_internal_is_halt_out[t1_head];
+			commit1_is_illegal_out	= rob1_internal_is_illegal_out[t1_head];
+
 			rob1_internal_if_committed[t1_head] = 1;
 			if (rob1_internal_is_ex_out[t1_head+1] && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
@@ -299,6 +314,8 @@ module rob(
 				commit2_prn_dest_out	= rob1_internal_prn_dest_out[t1_head+1];
 				commit2_if_rename_out	= rob1_internal_if_rename_out[t1_head+1];
 				commit2_is_thread1		= rob1_internal_is_thread1_out[t1_head+1];
+				commit2_is_halt_out		= rob1_internal_is_halt_out[t1_head+1];
+				commit2_is_illegal_out	= rob1_internal_is_illegal_out[t1_head+1];
 				rob1_internal_if_committed[t1_head+1] = 1;
 				next_t1_head = t1_head + 2;
 				commit1_valid = 1;
@@ -314,6 +331,8 @@ module rob(
 				commit2_prn_dest_out	= rob2_internal_prn_dest_out[t2_head];
 				commit2_if_rename_out	= rob2_internal_if_rename_out[t2_head];
 				commit2_is_thread1		= rob2_internal_is_thread1_out[t2_head];
+				commit2_is_halt_out		= rob2_internal_is_halt_out[t2_head];
+				commit2_is_illegal_out	= rob2_internal_is_illegal_out[t2_head];
 				rob2_internal_if_committed[t2_head] = 1;
 				next_t1_head = t1_head + 1;
 				next_t2_head = t2_head + 1;
@@ -334,7 +353,9 @@ module rob(
 			commit1_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
 			commit1_prn_dest_out	= rob2_internal_prn_dest_out[t2_head];
 			commit1_if_rename_out	= rob2_internal_if_rename_out[t2_head];
-			commit1_is_thread1	= rob2_internal_is_thread1_out[t2_head];
+			commit1_is_thread1		= rob2_internal_is_thread1_out[t2_head];
+			commit1_is_halt_out		= rob2_internal_is_halt_out[t2_head];
+			commit1_is_illegal_out	= rob2_internal_is_illegal_out[t2_head];
 			rob2_internal_if_committed[t2_head] = 1;
 			if (rob2_internal_is_ex_out[t2_head+1] && t2_head+1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
@@ -346,6 +367,8 @@ module rob(
 				commit2_prn_dest_out	= rob2_internal_prn_dest_out[t2_head+1];
 				commit2_if_rename_out	= rob2_internal_if_rename_out[t2_head+1];
 				commit2_is_thread1		= rob2_internal_is_thread1_out[t2_head+1];
+				commit2_is_halt_out		= rob1_internal_is_halt_out[t2_head+1];
+				commit2_is_illegal_out	= rob1_internal_is_illegal_out[t2_head+1];
 				rob2_internal_if_committed[t2_head+1] = 1;
 				next_t2_head = t2_head + 2;
 				commit1_valid = 1;
