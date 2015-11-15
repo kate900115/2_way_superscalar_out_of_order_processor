@@ -120,12 +120,10 @@ logic							RRAT1_PRF_free_valid1;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT1_PRF_free_idx1;
 logic 							RRAT1_PRF_free_valid2;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT1_PRF_free_idx2;
-logic							RRAT1_RAT1_mispredict_up_idx2;
 logic							RRAT2_PRF_free_valid1;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx1;
 logic 							RRAT2_PRF_free_valid2;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx2;
-logic							RRAT2_RAT2_mispredict_up_idx2;
 logic [`PRF_SIZE-1:0]			RRAT1_PRF_free_enable_list;
 logic [`PRF_SIZE-1:0]			RRAT2_PRF_free_enable_list;
 
@@ -371,7 +369,7 @@ rat rat2(
 
 	.mispredict_sig1(ROB_commit1_mispredict && ~ROB_commit1_is_thread1),	//indicate whether mispredict happened
 	.mispredict_sig2(ROB_commit2_mispredict && ~ROB_commit2_is_thread1),	//indicate whether mispredict happened
-	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),	//if mispredict happens, need to copy from rrat
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx2),	//if mispredict happens, need to copy from rrat
 
 	//Notion: valid1 and idx is the first PRF to use!!!!!!
 	//Not for inst1!!!!!!!!!!
@@ -424,7 +422,7 @@ rrat rrat1(
 	.PRF_free_idx1(RRAT1_PRF_free_idx1),
 	.PRF_free_valid2(RRAT1_PRF_free_valid2),
 	.PRF_free_idx2(RRAT1_PRF_free_idx2),
-	.mispredict_up_idx(RRAT1_RAT2_mispredict_up_idx1),
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),
 	.PRF_free_enable_list(RRAT1_PRF_free_enable_list)
 );
 
@@ -450,7 +448,7 @@ rrat rrat2(
 	.PRF_free_idx1(RRAT2_PRF_free_idx1),
 	.PRF_free_valid2(RRAT2_PRF_free_valid2),
 	.PRF_free_idx2(RRAT2_PRF_free_idx2),
-	.mispredict_up_idx(RRAT2_RAT2_mispredict_up_idx1),
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx2),
 	.PRF_free_enable_list(RRAT2_PRF_free_enable_list)
 );
 
