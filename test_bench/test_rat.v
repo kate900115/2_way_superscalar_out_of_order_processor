@@ -34,18 +34,14 @@ module test_rat;
 	logic	[$clog2(`PRF_SIZE)-1:0]	opb_PRF_idx1;
 	logic	request1;  //send to PRF indicate weather it request data
 	logic	RAT_allo_halt1;
-	logic	opa_valid_out1;	//if high opa_valid is immediate
-	logic	opb_valid_out1;
 
 	logic	[$clog2(`PRF_SIZE)-1:0]	opa_PRF_idx2;
 	logic	[$clog2(`PRF_SIZE)-1:0]	opb_PRF_idx2;
 	logic	request2;  //send to PRF indicate weather it request data
 	logic	RAT_allo_halt2;
-	logic	opa_valid_out2;	//if high opa_valid is immediate
-	logic	opb_valid_out2;
 
-	logic	[`ARF_SIZE-1:0]	PRF_free_sig;
-	logic	[`ARF_SIZE-1:0]	[$clog2(`PRF_SIZE)-1:0] PRF_free_list;
+	logic	[`PRF_SIZE-1:0]	PRF_free_list_out;
+	logic			PRF_free_valid;
 	logic correct1, correct2, correct;
 
 	rat rat1(
@@ -87,18 +83,15 @@ module test_rat;
 	.opb_PRF_idx1(opb_PRF_idx1),
 	.request1(request1),
 	.RAT_allo_halt1(RAT_allo_halt1),
-	.opa_valid_out1(opa_valid_out1),
-	.opb_valid_out1(opb_valid_out1),
 
 	.opa_PRF_idx2(opa_PRF_idx2),
 	.opb_PRF_idx2(opb_PRF_idx2),
 	.request2(request2),
 	.RAT_allo_halt2(RAT_allo_halt2),
-	.opa_valid_out2(opa_valid_out2),
-	.opb_valid_out2(opb_valid_out2),
 
-	.PRF_free_sig(PRF_free_sig),
-	.PRF_free_list(PRF_free_list)
+	//output together
+	.PRF_free_list_out(PRF_free_list_out),
+	.PRF_free_valid(PRF_free_valid)
 
 	);
 
@@ -120,24 +113,19 @@ initial begin
 			opb_PRF_idx1:%b, \
 			request1:%b, \
 			RAT_allo_halt1:%b, \
-			opa_valid_out1:%b, \
-			opb_valid_out1:%b, \
 			opa_PRF_idx2:%b, \
 			opb_PRF_idx2:%b, \
 			request2:%b, \
 			RAT_allo_halt2:%b, \
-			opa_valid_out2:%b, \
-			opb_valid_out2:%b, \
-			PRF_free_sig:%b, \
-			PRF_free_list:%b", 
-			$time, clock, opa_PRF_idx1, opb_PRF_idx1, request1,  RAT_allo_halt1, opa_valid_out1, opb_valid_out1,
-			opa_PRF_idx2, opb_PRF_idx2, request2,  RAT_allo_halt2, opa_valid_out2, opb_valid_out2,
-			PRF_free_sig, PRF_free_list);
+			PRF_free_valid:%b, \
+			PRF_free_list_out:%b", 
+			$time, clock, opa_PRF_idx1, opb_PRF_idx1, request1,  RAT_allo_halt1,
+			opa_PRF_idx2, opb_PRF_idx2, request2,  RAT_allo_halt2, 
+			PRF_free_valid, PRF_free_list_out);
 
 	clock = 0;
 	//***RESET**
 	reset = 1;
-	#5;
 	@(negedge clock);
 	reset = 0;
 	//HERE we initial the reg
@@ -168,28 +156,24 @@ initial begin
 
 	mispredict_up_idx 	= 0;
 
-	@(negedge clock);
+ 	#1
 
 	correct1 = 		opa_PRF_idx1 == 0 &&
 				opb_PRF_idx1 == 0 &&
 				request1 == 1 &&
-				RAT_allo_halt1 == 0 &&
-				opa_valid_out1 == 1 &&
-				opb_valid_out1 == 1;
+				RAT_allo_halt1 == 0;
 
 	correct2 = 		opa_PRF_idx2 == 0 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 1 &&
-				RAT_allo_halt2 == 0 &&
-				opa_valid_out2 == 1 &&
-				opb_valid_out2 == 1;
+				RAT_allo_halt2 == 0;
 
-	correct = correct1 && correct2 && PRF_free_sig == 0 && PRF_free_list == 0;
+	correct = correct1 && correct2 && PRF_free_valid == 0 && PRF_free_list_out == 0;
 	assert(correct) $display("@@@passed1");
 		else #1 exit_on_error;
 
 
-	//#5
+	@(negedge clock);
 	reset 			= 0;
 	inst1_enable		= 1;
 	opa_ARF_idx1 		= 0;
@@ -215,26 +199,22 @@ initial begin
 
 	mispredict_up_idx 	= 0;
 
-	@(negedge clock);
+	#1
 	correct1 = 		opa_PRF_idx1 == 0 &&
 				opb_PRF_idx1 == 0 &&
 				request1 == 1 &&
-				RAT_allo_halt1 == 0 &&
-				opa_valid_out1 == 1 &&
-				opb_valid_out1 == 1;
+				RAT_allo_halt1 == 0;
 
 	correct2 = 		opa_PRF_idx2 == 0 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 1 &&
-				RAT_allo_halt2 == 0 &&
-				opa_valid_out2 == 1 &&
-				opb_valid_out2 == 1;
+				RAT_allo_halt2 == 0;
 
-	correct = correct1 && correct2 && PRF_free_sig == 0 && PRF_free_list == 0;
+	correct = correct1 && correct2 && PRF_free_valid == 0 && PRF_free_list_out == 0;
 	assert(correct) $display("@@@passed2");
 		else #1 exit_on_error;
 
-	//#5
+	@(negedge clock);
 	reset 			= 0;
 	opa_ARF_idx1 		= 0;
 	opb_ARF_idx1 		= 0;
@@ -258,28 +238,22 @@ initial begin
 
 	mispredict_up_idx 	= 0;
 
-	//#5
-
-	@(negedge clock);
+	#1
 	correct1 = 		opa_PRF_idx1 == 0 &&
 				opb_PRF_idx1 == 0 &&
 				request1 == 1 &&
-				RAT_allo_halt1 == 0 &&
-				opa_valid_out1 == 1 &&
-				opb_valid_out1 == 1;
+				RAT_allo_halt1 == 0;
 
 	correct2 = 		opa_PRF_idx2 == 0 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 0 &&
-				RAT_allo_halt2 == 0 &&
-				opa_valid_out2 == 0 &&
-				opb_valid_out2 == 0;
+				RAT_allo_halt2 == 0;
 
-	correct = correct1 && correct2 && PRF_free_sig == 0 && PRF_free_list == 0;
+	correct = correct1 && correct2 && PRF_free_valid == 0 && PRF_free_list_out == 0;
 	assert(correct) $display("@@@passed3");
 		else #1 exit_on_error;
 
-	//#5
+	@(negedge clock);
 	reset 			= 0;
 	opa_ARF_idx1 		= 0;
 	opb_ARF_idx1 		= 0;
@@ -307,32 +281,24 @@ initial begin
 	mispredict_up_idx[3]= 6;
 	mispredict_up_idx[4]= 5;
 
-	@(negedge clock);
+	#1
 	correct1 = 		opa_PRF_idx1 == 0 &&
 				opb_PRF_idx1 == 0 &&
 				request1 == 0 &&
-				RAT_allo_halt1 == 0 &&
-				opa_valid_out1 == 0 &&
-				opb_valid_out1 == 0;
+				RAT_allo_halt1 == 0;
 
 	correct2 = 		opa_PRF_idx2 == 0 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 0 &&
-				PRF_free_sig == {{`ARF_SIZE-5{1'b0}},{5'b01001}} &&
-				PRF_free_list[0] == 12 &&
-				PRF_free_list[1] == 0 &&
-				PRF_free_list[2] == 0 &&
-				PRF_free_list[3] == 10 &&
-				PRF_free_list[4] == 0 &&
-				RAT_allo_halt2 == 0 &&
-				opa_valid_out2 == 0 &&
-				opb_valid_out2 == 0;
+				PRF_free_valid == 1 &&
+				PRF_free_list_out == {{`PRF_SIZE-13{1'b0}},{3'b101},{10{1'b0}}} &&
+				RAT_allo_halt2 == 0;
 	correct = correct1 && correct2;
 	assert(correct) $display("@@@passed4");
 		else #1 exit_on_error;
 
 
-	//#5
+	@(negedge clock);
 	reset 			= 0;
 	opa_ARF_idx1 		= 1;
 	opb_ARF_idx1 		= 4;
@@ -356,22 +322,18 @@ initial begin
 
 	mispredict_up_idx 	= 0;
 
-	@(negedge clock);
+	#1
 	correct = 		opa_PRF_idx1 == 3 &&
 				opb_PRF_idx1 == 5 &&
 				request1 == 1 &&
-				RAT_allo_halt1 == 0 &&
-				opa_valid_out1 == 0 &&
-				opb_valid_out1 == 0;
+				RAT_allo_halt1 == 0;
 
 	correct = 		opa_PRF_idx2 == 8 &&
 				opb_PRF_idx2 == 0 &&
 				request2 == 1 &&
-				PRF_free_sig == 0 &&
-				PRF_free_list == 0 &&
-				RAT_allo_halt2 == 0 &&
-				opa_valid_out2 == 0 &&
-				opb_valid_out2 == 0;
+				PRF_free_valid == 0 &&
+				PRF_free_list_out == 0 &&
+				RAT_allo_halt2 == 0;
 	correct = correct1 && correct2;
 	assert(correct) $display("@@@passed9");
 		else #1 exit_on_error;
