@@ -329,16 +329,16 @@ rat rat1(
 	//output
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
-	//output	logic	request1,  //send to PRF indicate whether it need data
-	.RAT_allo_halt1(RAT1_PRF_allocate_req1),
+	.request1(RAT1_PRF_allocate_req1),  //send to PRF indicate whether it need data
+	.RAT_allo_halt1(),
 
 
 
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
-	//output	logic	request2,  //send to PRF indicate whether it need data
-	.RAT_allo_halt2(RAT1_PRF_allocate_req2),
+	.request2(RAT1_PRF_allocate_req2),  //send to PRF indicate whether it need data
+	.RAT_allo_halt2(),
 
 	//output together
 	.PRF_free_list_out(RAT1_PRF_free_list),
@@ -377,7 +377,7 @@ rat rat2(
 	//Not for inst1!!!!!!!!!!
 	.PRF_rename_valid1(PRF_RAT2_rename_valid1),							//we get valid signal from prf if the dest address has been request
 	.PRF_rename_idx1(PRF_RAT2_rename_idx1),	//the PRF alocated for dest
-	.PRF_rename_valid2(PRF_RAT2_rename_valid1),							//we get valid signal from prf if the dest address has been request
+	.PRF_rename_valid2(PRF_RAT2_rename_valid2),							//we get valid signal from prf if the dest address has been request
 	.PRF_rename_idx2(PRF_RAT2_rename_idx2),	//the PRF alocated for dest
 //output
 	.opa_PRF_idx1(RAT2_PRF_opa_idx1),
@@ -471,10 +471,14 @@ prf prf1(
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	//rat
-	.inst1_opa_prf_idx(RAT_PRF_opa_idx1),			// opa prf index of instruction1
-	.inst1_opb_prf_idx(RAT_PRF_opb_idx1),			// opb prf index of instruction1
-	.inst2_opa_prf_idx(RAT_PRF_opa_idx2),			// opa prf index of instruction2
-	.inst2_opb_prf_idx(RAT_PRF_opb_idx2),			// opb prf index of instruction2
+	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1
+	.rat1_inst1_opb_prf_idx(RAT1_PRF_opb_idx1),			// opb prf index of instruction1
+	.rat1_inst2_opa_prf_idx(RAT1_PRF_opa_idx2),			// opa prf index of instruction2
+	.rat1_inst2_opb_prf_idx(RAT1_PRF_opb_idx2),			// opb prf index of instruction2
+	.rat2_inst1_opa_prf_idx(RAT2_PRF_opa_idx1),			// opa prf index of instruction1
+	.rat2_inst1_opb_prf_idx(RAT2_PRF_opb_idx1),			// opb prf index of instruction1
+	.rat2_inst2_opa_prf_idx(RAT2_PRF_opa_idx2),			// opa prf index of instruction2
+	.rat2_inst2_opb_prf_idx(RAT2_PRF_opb_idx2),			// opb prf index of instruction2
 
 	.rat1_allocate_new_prf1(RAT1_PRF_allocate_req1),			// the request from rat1 for allocating a new prf entry
 	.rat1_allocate_new_prf2(RAT1_PRF_allocate_req2),			// the request from rat1 for allocating a new prf entry
