@@ -19,19 +19,23 @@ module rob_one_entry(
 	input				reset,
 	input				clock,
 
-//after dispatch 
+//after dispatch
 	input				is_thread1,
 	input	[63:0]		inst1_pc_in,                    //pc in
 	input	[4:0]		inst1_arn_dest_in,              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst1_is_branch_in,             //if this instruction is a branch
 	input 				inst1_rob_load_in,				//tell this entry if we want to load this instruction
+	input				inst1_halt;
+	input				inst1_invalid_halt;
 
 	input	[63:0]		inst2_pc_in,                    //pc in
 	input	[4:0]		inst2_arn_dest_in,              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst2_is_branch_in,             //if this instruction is a branch
 	input 				inst2_rob_load_in,				//tell this entry if we want to load this instruction
+	input				inst2_halt;
+	input				inst2_invalid_halt;
 
 //after execution
 	input				is_ex_in,                       //if this instruciont has been executed so that the value of the prf number assigned is valid
@@ -51,7 +55,9 @@ module rob_one_entry(
 	output	[63:0]		target_pc_out,
 	output	[4:0]		arn_dest_out,                       //the architected register number of the destination of this instruction
 	output	[$clog2(`PRF_SIZE)-1:0]	prn_dest_out,                       //the prf number of the destination of this instruction
-	output				if_rename_out				       	//if this entry is committed at this moment(tell RRAT)
+	output				if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
+	output				halt_out,
+	output				invalid_halt_out
 );
 
 
@@ -65,6 +71,8 @@ module rob_one_entry(
 	logic				mispredict;                 //if this instrucion has was mispredicted
 	logic				inuse;                      //if this entry is in use
 	logic	[63:0]		target_pc;
+	logic				halt;
+	logic				invalid_halt;
 
 	logic				next_thread;
 	logic	[31:0]		next_pc;					//pc stored in this entry
@@ -75,6 +83,8 @@ module rob_one_entry(
 	logic				next_mispredict;            //if this instrucion has was mispredicted
 	logic				next_inuse;                 //if this entry is in use
 	logic	[63:0]		next_target_pc;
+	logic				next_halt;
+	logic				next_invalid_halt;
 
 //describe the output function
 	assign is_thread1_out = if_committed ? thread : 0;
@@ -98,6 +108,8 @@ module rob_one_entry(
 		next_mispredict		= mispredict;
 		next_inuse			= inuse;
 		next_target_pc		= target_pc;
+		next_halt			= halt;
+		next_invalid_halt	= invalid_halt;
 		if (inst1_rob_load_in)
 		begin
 			next_thread			= is_thread1;
@@ -108,6 +120,8 @@ module rob_one_entry(
 			next_is_executed	= 0;
 			next_mispredict		= 0;
 			next_inuse			= 1'b1;
+			next_halt			= inst1_halt;
+			next_invalid_halt	= inst1_invalid_halt;
 		end
 		else if (inst2_rob_load_in)
 		begin
@@ -119,6 +133,8 @@ module rob_one_entry(
 			next_is_executed	= 0;
 			next_mispredict		= 0;
 			next_inuse			= 1'b1;
+			next_halt			= inst2_halt;
+			next_invalid_halt	= inst2_invalid_halt;
 		end
 		else if (inuse && is_ex_in) begin
 			next_is_executed 	= is_ex_in;
@@ -144,6 +160,8 @@ module rob_one_entry(
 			mispredict	<=	`SD 0;
 			inuse		<=	`SD 0;
 			target_pc	<=	`SD 0;
+			halt		<=	`SD 0;
+			invalid_halt<=	`SD 0;
 		end
 		//if we want to load an instruction, the behavior is as follows:
 		else if (enable)
@@ -157,11 +175,8 @@ module rob_one_entry(
 			mispredict	<=	`SD next_mispredict;
 			inuse		<=	`SD next_inuse;
 			target_pc	<=	`SD next_target_pc;
+			halt		<=	`SD next_halt;
+			invalid_halt<=	`SD next_invalid_halt;
 		end
 	end//end always_ff                            
 endmodule
-
-
-
-
-

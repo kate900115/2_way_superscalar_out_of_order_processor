@@ -120,12 +120,10 @@ logic							RRAT1_PRF_free_valid1;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT1_PRF_free_idx1;
 logic 							RRAT1_PRF_free_valid2;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT1_PRF_free_idx2;
-logic							RRAT1_RAT1_mispredict_up_idx2;
 logic							RRAT2_PRF_free_valid1;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx1;
 logic 							RRAT2_PRF_free_valid2;
 logic [$clog2(`PRF_SIZE)-1:0]	RRAT2_PRF_free_idx2;
-logic							RRAT2_RAT2_mispredict_up_idx2;
 logic [`PRF_SIZE-1:0]			RRAT1_PRF_free_enable_list;
 logic [`PRF_SIZE-1:0]			RRAT2_PRF_free_enable_list;
 
@@ -329,16 +327,16 @@ rat rat1(
 	//output
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
-	//output	logic	request1,  //send to PRF indicate whether it need data
-	.RAT_allo_halt1(RAT1_PRF_allocate_req1),
+	.request1(RAT1_PRF_allocate_req1),  //send to PRF indicate whether it need data
+	//.RAT_allo_halt1(),
 
 
 
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
-	//output	logic	request2,  //send to PRF indicate whether it need data
-	.RAT_allo_halt2(RAT1_PRF_allocate_req2),
+	.request2(RAT1_PRF_allocate_req2),  //send to PRF indicate whether it need data
+	//.RAT_allo_halt2(),
 
 	//output together
 	.PRF_free_list_out(RAT1_PRF_free_list),
@@ -371,13 +369,13 @@ rat rat2(
 
 	.mispredict_sig1(ROB_commit1_mispredict && ~ROB_commit1_is_thread1),	//indicate whether mispredict happened
 	.mispredict_sig2(ROB_commit2_mispredict && ~ROB_commit2_is_thread1),	//indicate whether mispredict happened
-	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),	//if mispredict happens, need to copy from rrat
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx2),	//if mispredict happens, need to copy from rrat
 
 	//Notion: valid1 and idx is the first PRF to use!!!!!!
 	//Not for inst1!!!!!!!!!!
 	.PRF_rename_valid1(PRF_RAT2_rename_valid1),							//we get valid signal from prf if the dest address has been request
 	.PRF_rename_idx1(PRF_RAT2_rename_idx1),	//the PRF alocated for dest
-	.PRF_rename_valid2(PRF_RAT2_rename_valid1),							//we get valid signal from prf if the dest address has been request
+	.PRF_rename_valid2(PRF_RAT2_rename_valid2),							//we get valid signal from prf if the dest address has been request
 	.PRF_rename_idx2(PRF_RAT2_rename_idx2),	//the PRF alocated for dest
 //output
 	.opa_PRF_idx1(RAT2_PRF_opa_idx1),
@@ -424,7 +422,7 @@ rrat rrat1(
 	.PRF_free_idx1(RRAT1_PRF_free_idx1),
 	.PRF_free_valid2(RRAT1_PRF_free_valid2),
 	.PRF_free_idx2(RRAT1_PRF_free_idx2),
-	.mispredict_up_idx(RRAT1_RAT2_mispredict_up_idx1),
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx1),
 	.PRF_free_enable_list(RRAT1_PRF_free_enable_list)
 );
 
@@ -450,7 +448,7 @@ rrat rrat2(
 	.PRF_free_idx1(RRAT2_PRF_free_idx1),
 	.PRF_free_valid2(RRAT2_PRF_free_valid2),
 	.PRF_free_idx2(RRAT2_PRF_free_idx2),
-	.mispredict_up_idx(RRAT2_RAT2_mispredict_up_idx1),
+	.mispredict_up_idx(RRAT_RAT_mispredict_up_idx2),
 	.PRF_free_enable_list(RRAT2_PRF_free_enable_list)
 );
 
@@ -471,10 +469,14 @@ prf prf1(
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	//rat
-	.inst1_opa_prf_idx(RAT_PRF_opa_idx1),			// opa prf index of instruction1
-	.inst1_opb_prf_idx(RAT_PRF_opb_idx1),			// opb prf index of instruction1
-	.inst2_opa_prf_idx(RAT_PRF_opa_idx2),			// opa prf index of instruction2
-	.inst2_opb_prf_idx(RAT_PRF_opb_idx2),			// opb prf index of instruction2
+	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1
+	.rat1_inst1_opb_prf_idx(RAT1_PRF_opb_idx1),			// opb prf index of instruction1
+	.rat1_inst2_opa_prf_idx(RAT1_PRF_opa_idx2),			// opa prf index of instruction2
+	.rat1_inst2_opb_prf_idx(RAT1_PRF_opb_idx2),			// opb prf index of instruction2
+	.rat2_inst1_opa_prf_idx(RAT2_PRF_opa_idx1),			// opa prf index of instruction1
+	.rat2_inst1_opb_prf_idx(RAT2_PRF_opb_idx1),			// opb prf index of instruction1
+	.rat2_inst2_opa_prf_idx(RAT2_PRF_opa_idx2),			// opa prf index of instruction2
+	.rat2_inst2_opb_prf_idx(RAT2_PRF_opb_idx2),			// opb prf index of instruction2
 
 	.rat1_allocate_new_prf1(RAT1_PRF_allocate_req1),			// the request from rat1 for allocating a new prf entry
 	.rat1_allocate_new_prf2(RAT1_PRF_allocate_req2),			// the request from rat1 for allocating a new prf entry
@@ -497,8 +499,8 @@ prf prf1(
 	.rrat1_prf2_free_idx(RRAT1_PRF_free_idx2),				// when an instruction retires from RRAT1, RRAT1 will free a PRF, and this is its index. 
 	.rrat2_prf2_free_idx(RRAT2_PRF_free_idx2),				// when an instruction retires from RRAT2, RRAT2 will free a PRF, and this is its index.
 	
-	.rob1_retire_idx(ROB_commit1_prn_dest_out),					// when rob1 retires an instruction, prf gives out the corresponding value.
-	.rob2_retire_idx(ROB_commit2_prn_dest_out),					// when rob2 retires an instruction, prf gives out the corresponding value.
+	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
+	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
 
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -570,8 +572,8 @@ rob rob1(
 	.commit1_target_pc_out(ROB_commit1_target_pc),
 	.commit1_is_branch_out(ROB_commit1_is_branch),				       	//if this instruction is a branch
 	.commit1_mispredict_out(ROB_commit1_mispredict),				       	//if this instrucion is mispredicted
-	.commit1_arn_dest_out(ROB_commit1_arn_dest_out),                       //the architected register number of the destination of this instruction
-	.commit1_prn_dest_out(ROB_commit1_prn_dest_out),						//the prf number of the destination of this instruction
+	.commit1_arn_dest_out(ROB_commit1_arn_dest),                       //the architected register number of the destination of this instruction
+	.commit1_prn_dest_out(ROB_commit1_prn_dest),						//the prf number of the destination of this instruction
 	.commit1_if_rename_out(ROB_commit1_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit1_valid(ROB_commit1_is_valid),
 	.commit1_is_thread1(ROB_commit1_is_thread1),
@@ -580,8 +582,8 @@ rob rob1(
 	.commit2_target_pc_out(ROB_commit2_target_pc),
 	.commit2_is_branch_out(ROB_commit2_is_branch),						//if this instruction is a branch
 	.commit2_mispredict_out(ROB_commit2_mispredict),				       	//if this instrucion is mispredicted
-	.commit2_arn_dest_out(ROB_commit2_arn_dest_out),						//the architected register number of the destination of this instruction
-	.commit2_prn_dest_out(ROB_commit2_prn_dest_out),						//the prf number of the destination of this instruction
+	.commit2_arn_dest_out(ROB_commit2_arn_dest),						//the architected register number of the destination of this instruction
+	.commit2_prn_dest_out(ROB_commit2_prn_dest),						//the prf number of the destination of this instruction
 	.commit2_if_rename_out(ROB_commit2_valid),				       	//if this entry is committed at this moment(tell RRAT)
 	.commit2_valid(ROB_commit2_is_valid),
 	.commit2_is_thread1(ROB_commit2_is_thread1),

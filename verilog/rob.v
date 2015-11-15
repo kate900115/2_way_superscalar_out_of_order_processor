@@ -96,8 +96,14 @@ module rob(
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_ex_in;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_ex_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_if_committed;
-	logic	[63:0]									rob1_internal_target_pc_in;
-	logic	[63:0]									rob1_internal_target_pc_out;
+	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_in;
+	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_out;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_halt_out;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_invalid_halt_out;
 
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_thread1_out;
@@ -113,8 +119,16 @@ module rob(
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_ex_in;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_ex_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_if_committed;
-	logic	[63:0]									rob2_internal_target_pc_in;
-	logic	[63:0]									rob2_internal_target_pc_out;
+	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_in;
+	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_out;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_invalid_halt_in;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_halt_out;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_invalid_halt_out;
+	
+	
 
 //instantiate rob 1 for thread1
 	rob_one_entry rob1[`ROB_SIZE-1:0] (
@@ -128,12 +142,16 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob1_internal_inst1_rob_load_in),
+	.inst1_halt(rob1_internal_inst1_halt_in),
+	.inst1_invalid_halt(rob1_internal_inst1_invalid_halt_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob1_internal_inst2_rob_load_in),
+	.inst2_halt(rob1_internal_inst2_halt_in),
+	.inst2_invalid_halt(rob1_internal_inst2_invalid_halt_in),
 //
 	.is_ex_in(rob1_internal_is_ex_in),
 	.mispredict_in(rob1_internal_mispredict_in),
@@ -150,7 +168,9 @@ module rob(
 	.target_pc_out(rob1_internal_target_pc_out),
 	.arn_dest_out(rob1_internal_arn_dest_out),
 	.prn_dest_out(rob1_internal_prn_dest_out),
-	.if_rename_out(rob1_internal_if_rename_out)
+	.if_rename_out(rob1_internal_if_rename_out),
+	.halt_out(rob1_internal_halt_out),
+	.invalid_halt_out(rob1_internal_invalid_halt_out)
 	);
 	
 	rob_one_entry rob2[`ROB_SIZE-1:0] (
@@ -164,12 +184,16 @@ module rob(
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
 	.inst1_rob_load_in(rob2_internal_inst1_rob_load_in),
+	.inst1_halt(rob2_internal_inst1_halt_in),
+	.inst1_invalid_halt(rob2_internal_inst1_invalid_halt_in),
 
 	.inst2_pc_in(inst2_pc_in),
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
 	.inst2_rob_load_in(rob2_internal_inst2_rob_load_in),
+	.inst2_halt(rob2_internal_inst2_halt_in),
+	.inst2_invalid_halt(rob2_internal_inst2_invalid_halt_in),
 //
 	.is_ex_in(rob2_internal_is_ex_in),
 	.mispredict_in(rob2_internal_mispredict_in),
@@ -186,7 +210,9 @@ module rob(
 	.target_pc_out(rob2_internal_target_pc_out),
 	.arn_dest_out(rob2_internal_arn_dest_out),
 	.prn_dest_out(rob2_internal_prn_dest_out),
-	.if_rename_out(rob2_internal_if_rename_out)
+	.if_rename_out(rob2_internal_if_rename_out),
+	.halt_out(rob2_internal_halt_out),
+	.invalid_halt_out(rob2_internal_invalid_halt_out)
 	);
 	
 	//execution state input									#####################################################
