@@ -180,16 +180,18 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 	  	PRF_free_list 	= 0;
 
 		for(int i=0; i<`ARF_SIZE; i++) begin
-			unique if(i==dest_ARF_idx1) begin
+		case(i)
+		  dest_ARF_idx1: begin
 	    			n_rat_reg[i] 	= PRF_rename_idx1;
-			end
-			unique if(i==dest_ARF_idx2) begin
+				end
+		  dest_ARF_idx2: begin
 				n_rat_reg[i] 	= PRF_rename_idx2;
-			end
-			else begin
+				end
+		  default: begin
 				n_rat_reg[i]	= rat_reg[i];
-			end //else
-		end  //for
+				end //else
+		endcase  
+		end//for
 
 		opa_PRF_idx1 	= (opa_valid_in1) ? 0:rat_reg[opa_ARF_idx1];  //opa request prf
 		opb_PRF_idx1 	= (opb_valid_in1) ? 0:rat_reg[opb_ARF_idx1];
@@ -215,23 +217,22 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 	end //for
 
 	for(int j=0; j<`PRF_SIZE; j++) begin
+		PRF_free_list_out[j] = 0;
 		for(int i=0; i<`ARF_SIZE; i++) begin
-			if(PRF_free_sig[i] == 1 & PRF_free_list_out[PRF_free_list[i]] == j) begin
+			if(PRF_free_sig[i] == 1 && PRF_free_list[i] == j) begin
 			PRF_free_list_out[j] = 1;
-			break;
 			end
-			else PRF_free_list_out[j] = 0;
 		end//for
 	end//for
 
-		//$display("rat_reg[4]:%h",rat_reg[4]);
-		//$display("rat_reg[3]:%h",rat_reg[3]);
-		//$display("rat_reg[2]:%h",rat_reg[2]);
-		//$display("rat_reg[1]:%h",rat_reg[1]);
-		//$display("rat_reg[0]:%h",rat_reg[0]);
-
-		//$display("PRF_free_list[3]:%h",PRF_free_list[3]);
-		//$display("PRF_free_list[0]:%h",PRF_free_list[0]);
+		$display("rat_reg[4]:%h",rat_reg[4]);
+		$display("rat_reg[3]:%h",rat_reg[3]);
+		$display("rat_reg[2]:%h",rat_reg[2]);
+		$display("rat_reg[1]:%h",rat_reg[1]);
+		$display("rat_reg[0]:%h",rat_reg[0]);
+		$display("PRF_free_sig:%b", PRF_free_sig);
+		$display("PRF_free_list[3]:%h",PRF_free_list[3]);
+		$display("PRF_free_list[0]:%h",PRF_free_list[0]);
 	end  //always_comb
 endmodule
 
