@@ -154,13 +154,13 @@ module ex_stage(
 	alu alu1 (// Inputs
 		.opa(fu_rs_opa_in[1]),
 		.opb(fu_rs_opb_in[1]),
-		.func(fu_alu_func_in[1][2:0]),
+		.func(fu_alu_func_in[1]),
     // Output
 		.result(alu_result1)
 	);
 	brcond b2(// Inputs
 			.opa(fu_rs_opa_in[1]),       // always check regA value
-			.func(fu_rs_op_type_in[1]), // inst bits to determine check
+			.func(fu_rs_op_type_in[1][2:0]), // inst bits to determine check
 				// Output
 			.cond(brcond_result[0])
 	);
