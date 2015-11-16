@@ -41,6 +41,8 @@ module processor(
     output ERROR_CODE   pipeline_error_status
 );
 
+logic	thread1_branch_is_taken;
+logic	thread2_branch_is_taken;
 //pc output
 logic [31:0]	PC_inst1;
 logic [31:0]	PC_inst2;
@@ -212,6 +214,8 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
                                 NO_ERROR;
+assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
+assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -221,8 +225,8 @@ if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
-	.thread1_branch_is_taken(ROB_commit1_mispredict),
-	.thread2_branch_is_taken(ROB_commit2_mispredict),
+	.thread1_branch_is_taken(thread1_branch_is_taken),
+	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
