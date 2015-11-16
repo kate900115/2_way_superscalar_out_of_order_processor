@@ -69,6 +69,7 @@ module mem(
 		mem2proc_response <= `SD next_mem2proc_response;
 		mem2proc_data     <= `SD next_mem2proc_data;
 		mem2proc_tag      <= `SD next_mem2proc_tag;
+		$display("proc2mem_addr:%h", proc2mem_addr);
 	end //always_ff
 
 //initialize

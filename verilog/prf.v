@@ -551,6 +551,8 @@ module prf(
 					internal_free_this_entry[i] = 1'b0;
 				end
 			end
-		end			
+		end		
+		$display("inst1_opa_prf_value:%h", inst1_opa_prf_value);	
+		$display("inst2_opa_prf_value:%h", inst2_opa_prf_value);	
 	end
 endmodule
