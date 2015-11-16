@@ -174,6 +174,7 @@ module if_stage(
 				end
 			endcase
 		end
+			$display("Imem2proc_data:%h", Imem2proc_data);
 	end	
 
 endmodule
