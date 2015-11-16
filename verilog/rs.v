@@ -363,7 +363,7 @@ module rs(
 		.en(1'b1),
 		.gnt_bus({is_full1, is_full2})
 	);
-	assign rs_full = (is_full1 != 0);
+	assign rs_full = (is_full1 == 0);
 	
 	always_comb
 	begin
