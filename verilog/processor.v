@@ -37,7 +37,8 @@ module processor(
     output logic [63:0]						ROB_commit2_pc,
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
-    output logic [63:0]						PRF_writeback_value2
+    output logic [63:0]						PRF_writeback_value2,
+    output ERROR_CODE   pipeline_error_status
 );
 //pc output
 logic [31:0]	PC_inst1;
@@ -200,6 +201,11 @@ assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch &&
 							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
+assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
+                                ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
+                                ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
+                                ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
+                                NO_ERROR;
 //////////////////////////////////
 //								//
 //			  PC				//
