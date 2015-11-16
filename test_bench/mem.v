@@ -10,11 +10,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 `timescale 1ns/100ps
+
 module mem(
 		input		clock,
 		input [63:0]	proc2mem_addr,
 		input [63:0]	proc2mem_data,
-		input [1:0]	proc2mem_command,
+		input [1:0]		proc2mem_command,
 
 		output logic [3:0]	mem2proc_response, // 0= cannot accept
 		output logic [63:0]	mem2proc_data,
@@ -22,7 +23,7 @@ module mem(
 		);
 
 	logic [63:0]	next_mem2proc_data;
-	logic [3:0]	next_mem2proc_responce, next_mem2proc_tag;
+	logic [3:0]	next_mem2proc_response, next_mem2proc_tag;
 
 	logic [63:0]	unified_memory 	[`MEM_64BIT_LINES -1 :0];
 	logic [63:0]	loaded_data	[`NUM_MEM_TAGS :1];
@@ -33,7 +34,7 @@ module mem(
 	logic bus_filled;
 
 	wire valid_address = (proc2mem_addr[2:0] == 3'b0) &&
-		     (proc2mem_add < `MEM_SIZE_IN_BYTES);
+		     (proc2mem_addr < `MEM_SIZE_IN_BYTES);
 
 // Implement the Memory function
 	always @(negedge clock) begin
