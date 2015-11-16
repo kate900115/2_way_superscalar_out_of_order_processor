@@ -401,14 +401,14 @@ rat rat2(
 //output
 	.opa_PRF_idx1(RAT2_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT2_PRF_opb_idx1),
-	//output	logic	request1,  //send to PRF indicate whether it need data
-	.RAT_allo_halt1(RAT2_PRF_allocate_req1),
+	.request1(RAT2_PRF_allocate_req1),  //send to PRF indicate whether it need data
+	//.RAT_allo_halt1(RAT2_PRF_allocate_req1),
 
 	//output 2
 	.opa_PRF_idx2(RAT2_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT2_PRF_opb_idx2),
-	//output	logic	request2,  //send to PRF indicate whether it need data
-	.RAT_allo_halt2(RAT2_PRF_allocate_req2),
+	.request2(RAT2_PRF_allocate_req2),  //send to PRF indicate whether it need data
+	//.RAT_allo_halt2(RAT2_PRF_allocate_req2),
 
 	//output together
 	.PRF_free_list_out(RAT2_PRF_free_list),
@@ -761,7 +761,26 @@ cdb cdb1(
 //			  LSQ				//
 //								//
 //////////////////////////////////
+always_comb begin
+	//RRAT
+	$display("RRAT2_PRF_free_valid1:%h", RRAT2_PRF_free_valid1);
+	//PRF
+	$display("PRF_RS_inst1_opa:%h", PRF_RS_inst1_opa);
+	$display("PRF_RS_inst1_opa_valid:%h", PRF_RS_inst1_opa_valid);
+	//ROB
+	$display("ROB_commit1_target_pc:%h", ROB_commit1_target_pc);
+	$display("ROB_commit1_is_valid:%h", ROB_commit1_is_valid);
+	//RS
+	$display("RS_EX_dest_tag:%h", RS_EX_dest_tag);
+	$display("RS_EX_out_valid:%h", RS_EX_out_valid);
+	//EX
+	$display("EX_CDB_dest_tag:%h", EX_CDB_dest_tag);
+	$display("EX_CDB_fu_result_out:%h", EX_CDB_fu_result_out);
+	//CDB
+	$display("cdb1_valid:%h", cdb1_valid);
+	$display("cdb1_value:%h", cdb1_value);
 
+end
 //////////////////////////////////
 //								//
 //			  MEM				//
