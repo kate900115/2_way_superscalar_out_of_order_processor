@@ -40,6 +40,7 @@ module processor(
     output logic [63:0]						PRF_writeback_value2,
     output ERROR_CODE   pipeline_error_status
 );
+
 //pc output
 logic [31:0]	PC_inst1;
 logic [31:0]	PC_inst2;
@@ -194,6 +195,11 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
+
+assign proc2mem_command = `BUS_LOAD;
+       //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
+assign proc2mem_addr = PC_proc2Imem_addr;
+       //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
 							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
