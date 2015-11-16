@@ -765,7 +765,7 @@ cdb cdb1(
 //			  LSQ				//
 //								//
 //////////////////////////////////
-always_comb begin
+/*always_comb begin
 	//RRAT
 	$display("RRAT2_PRF_free_valid1:%h", RRAT2_PRF_free_valid1);
 	//PRF
@@ -784,7 +784,7 @@ always_comb begin
 	$display("cdb1_valid:%h", cdb1_valid);
 	$display("cdb1_value:%h", cdb1_value);
 
-end
+end*/
 //////////////////////////////////
 //								//
 //			  MEM				//
