@@ -46,10 +46,15 @@
 //
 //////////////////////////////////////////////
 
-`define NO_ERROR 4'h0
-`define HALTED_ON_MEMORY_ERROR 4'h1
-`define HALTED_ON_HALT 4'h2
-`define HALTED_ON_ILLEGAL 4'h3
+
+typedef enum logic [3:0] {
+  NO_ERROR               = 4'h0,
+  HALTED_ON_MEMORY_ERROR = 4'h1,
+  HALTED_ON_HALT_I1         = 4'h2,
+  HALTED_ON_ILLEGAL_I1      = 4'h3,
+  HALTED_ON_HALT_I2         = 4'h4,
+  HALTED_ON_ILLEGAL_I2      = 4'h5
+} ERROR_CODE;
 
 
 //
