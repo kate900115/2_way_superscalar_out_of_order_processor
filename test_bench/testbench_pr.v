@@ -59,6 +59,8 @@ module testbench;
     	logic [63:0]					ROB_commit2_pc;
    		logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
     	logic							ROB_commit2_wr_en;
+    	
+    	
 
 	processor processor_0(
 		//input
@@ -97,7 +99,7 @@ module testbench;
     		.ROB_commit2_pc(ROB_commit2_pc),
     		.ROB_commit2_arn_dest(ROB_commit2_arn_dest),
     		.ROB_commit1_wr_en(ROB_commit1_wr_en),
-    		.PRF_writeback_value2(PRF_writeback_value2)		
+    		.PRF_writeback_value2(PRF_writeback_value2)
 	);
 
 // Instantiate the Data Memory
@@ -175,8 +177,17 @@ module testbench;
 			pipeline_error_status:%b, \
 			ROB_commit1_valid:%b,\
 			ROB_commit1_pc:%b, \
-			clock:%b", 
-			$time, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock);
+			clock:%b,\
+			PC_inst1:%h, \
+    		PC_inst2:%h,\
+    		ID_inst1_opa:%h,\
+    		ID_inst2_opa:%h,\
+    		RAT1_PRF_opa_idx1:%h,\
+   			RAT1_PRF_opa_idx2:%h, \
+   			ROB_t1_is_full: %h, \
+   			ROB_t2_is_full:%h, \
+   			RS_full:%h",
+			$time, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.RS_full);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
@@ -197,7 +208,7 @@ module testbench;
     	
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     print_header("                                                                            D-MEM Bus &\n");
-    print_header("Cycle:      IF      |     ID      |     EX      |     MEM     |     WB      Reg Result");
+    print_header("Cycle:    PC   |    decoder   |   rat   |   prf   |   rrat   |  rob   |   RS |	EX	|	CDB	");
   	end
 
 
@@ -229,7 +240,25 @@ module testbench;
 		  `SD;
 		  `SD;
 
-       	// print the writeback information to writeback.out
+      /* // print the piepline stuff via c code to the pipeline.out
+       print_cycles();
+       //pc, decoder, rat
+       print_stage(" ", PC_inst1, PC_inst2, PC_inst1_valid, PC_inst2_valid);
+       print_stage("|", ID_dest_ARF_idx1, ID_dest_ARF_idx2);
+       print_stage("|", PRF_RS_inst2_opa, RAT1_PRF_allocate_req2);
+       //prf, rrat, rob
+       print_stage("|", PRF_RS_inst1_opa, PRF_RS_inst2_opa);
+       print_stage("|", RRAT1_PRF_free_valid1,RRAT1_PRF_free_idx1, RRAT1_PRF_free_valid2, RRAT1_PRF_free_idx2);
+              print_stage("|", PRF_RS_inst1_opa, PRF_RS_inst2_opa);
+       print_stage("|", RRAT1_PRF_free_valid1,RRAT1_PRF_free_idx1, RRAT1_PRF_free_valid2, RRAT1_PRF_free_idx2);
+       print_reg(pipeline_commit_wr_data[63:32], pipeline_commit_wr_data[31:0],
+                 {27'b0,pipeline_commit_wr_idx}, {31'b0,pipeline_commit_wr_en});
+       print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
+                    proc2mem_addr[63:32], proc2mem_addr[31:0],
+                    proc2mem_data[63:32], proc2mem_data[31:0]);*/
+                    
+                    
+                           	// print the writeback information to writeback.out
 	//for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
 	//pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
        			if(pipeline_completed_insts>0) begin
