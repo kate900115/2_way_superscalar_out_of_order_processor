@@ -10,6 +10,16 @@
 
 `timescale 1ns/100ps
 
+extern void print_header(string str);
+extern void print_cycles();
+extern void print_stage(string div, int inst, int npc, int valid_inst);
+extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
+                      int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
+extern void print_membus(int proc2mem_command, int mem2proc_response,
+                         int proc2mem_addr_hi, int proc2mem_addr_lo,
+                         int proc2mem_data_hi, int proc2mem_data_lo);
+extern void print_close();
+
 `include "sys_defs.vh"
 
 module testbench;
@@ -17,8 +27,8 @@ module testbench;
 	//variables used in the testbench
     	logic         clock;                    // System clock
     	logic         reset;                    // System reset
-	logic [31:0]  clock_count;
-	logic [31:0]  instr_count;
+		logic [31:0]  clock_count;
+		logic [31:0]  instr_count;
     	int           wb_fileno;
 	
     	logic [3:0]   mem2proc_response;        // Tag from memory about current request
@@ -27,7 +37,7 @@ module testbench;
 
     	logic [1:0]   proc2mem_command;    // command sent to memory
     	logic [63:0]  proc2mem_addr;      // Address sent to memory
-   	logic [63:0]  proc2mem_data;      // Data sent to memory
+  	 	logic [63:0]  proc2mem_data;      // Data sent to memory
 
     	logic [3:0]   pipeline_completed_insts;
     	logic [3:0]   pipeline_error_status;
@@ -47,7 +57,7 @@ module testbench;
     	logic							ROB_commit2_valid;
     	logic [63:0]					PRF_writeback_value2;
     	logic [63:0]					ROB_commit2_pc;
-   	logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
+   		logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
     	logic							ROB_commit2_wr_en;
 
 	processor processor_0(
@@ -55,7 +65,7 @@ module testbench;
     		.clock(clock),                    // System clock
     		.reset(reset),                    // System reset
     		.mem2proc_response(mem2proc_response),        // Tag from memory about current request
-    		.mem2proc_data(mem2proc_data),            // Data coming back from memory
+    		.mem2proc_data(64'h205f27bb203f0008),            // Data coming back from memory
     		.mem2proc_tag(mem2proc_tag),              // Tag from memory about current reply
 
 		//output
@@ -161,6 +171,13 @@ module testbench;
 	
 		//#10
    		// Pulse the reset signal
+	$monitor (" @@@ time:%d, \
+			pipeline_error_status:%b, \
+			ROB_commit1_valid:%b,\
+			ROB_commit1_pc:%b, \
+			clock:%b", 
+			$time, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock);
+			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
     		@(posedge clock);
@@ -175,11 +192,12 @@ module testbench;
 	
     		reset = 1'b0;
 		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
-	
+   
     		wb_fileno = $fopen("writeback_t1.out");
     	
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
-
+    print_header("                                                                            D-MEM Bus &\n");
+    print_header("Cycle:      IF      |     ID      |     EX      |     MEM     |     WB      Reg Result");
   	end
 
 
@@ -230,6 +248,9 @@ module testbench;
         			else
         				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
       			end
+      			
+      			//Here only for debug!!!!!!!!!!!!!!!!!
+      			#200 $finish;
 
       // deal with any halting conditions
       /*if(pipeline_error_status != NO_ERROR) begin
