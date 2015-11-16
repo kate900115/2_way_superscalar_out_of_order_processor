@@ -65,7 +65,7 @@ module testbench;
     		.clock(clock),                    // System clock
     		.reset(reset),                    // System reset
     		.mem2proc_response(mem2proc_response),        // Tag from memory about current request
-    		.mem2proc_data(64'h205f27bb203f0008),            // Data coming back from memory
+    		.mem2proc_data(mem2proc_data),            // Data coming back from memory
     		.mem2proc_tag(mem2proc_tag),              // Tag from memory about current reply
 
 		//output
@@ -250,7 +250,7 @@ module testbench;
       			end
       			
       			//Here only for debug!!!!!!!!!!!!!!!!!
-      			#200 $finish;
+      			#500 $finish;
 
       // deal with any halting conditions
       /*if(pipeline_error_status != NO_ERROR) begin
