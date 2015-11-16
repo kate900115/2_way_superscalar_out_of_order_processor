@@ -446,11 +446,11 @@ module rob(
 			end
 		end
 		
-		if (t1_tail + 1 == t1_head || t1_tail + 2 == t1_head)
+		if (t1_tail + 1 == t1_head || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))
 		begin
 			t1_is_full = 1;
 		end
-		if (t2_tail + 1 == t2_head || t2_tail + 2 == t2_head)
+		if (t2_tail + 1 == t2_head || (t2_tail == t2_head && !rob2_internal_available_out[t2_tail]))
 		begin
 			t2_is_full = 1;
 		end
