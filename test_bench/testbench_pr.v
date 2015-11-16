@@ -237,7 +237,7 @@ module testbench;
         #100 $finish;
       end*/
 			// deal with any halting conditions
-			if(pipeline_error_status!=`NO_ERROR)
+			if(pipeline_error_status!=NO_ERROR)
 			begin
 				$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
@@ -246,12 +246,16 @@ module testbench;
 				$display("@@  %t : System halted\n@@", $realtime);
 
 				case(pipeline_error_status)
-					`HALTED_ON_MEMORY_ERROR:  
+					HALTED_ON_MEMORY_ERROR:  
 						$display(	"@@@ System halted on memory error");
-					`HALTED_ON_HALT:          
-						$display(	"@@@ System halted on HALT instruction");
-					`HALTED_ON_ILLEGAL:
-						$display(	"@@@ System halted on illegal instruction");
+					HALTED_ON_HALT_I1:          
+						$display(	"@@@ System halted on HALT_I1 instruction");
+					HALTED_ON_HALT_I2:          
+						$display(	"@@@ System halted on HALT_I2 instruction");
+					HALTED_ON_ILLEGAL_I1:
+						$display(	"@@@ System halted on illegal_I1 instruction");
+					HALTED_ON_ILLEGAL_I2:
+						$display(	"@@@ System halted on illegal_I2 instruction");
 					default: 
 						$display(	"@@@ System halted on unknown error code %x",
 									pipeline_error_status);
