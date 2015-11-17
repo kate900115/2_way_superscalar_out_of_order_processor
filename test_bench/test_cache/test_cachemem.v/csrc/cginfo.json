@@ -1,0 +1,142 @@
+{
+    "CompileProcesses": [
+        "cgproc.17310.json"
+    ],
+    "MlibObjs": {},
+    "PrevCompiledModules": {
+        "std": {
+            "reYIK_d": {
+                "bytes": 28470,
+                "checksum": 4294967295,
+                "mod": "std",
+                "out": "reYIK_d.o",
+                "mode": 4,
+                "archive": "archive.3/_17310_archive_1.a"
+            }
+        },
+        "test_cachemem": {
+            "TayFL_d": {
+                "bytes": 20241,
+                "checksum": 4294967295,
+                "mod": "test_cachemem",
+                "out": "TayFL_d.o",
+                "mode": 4,
+                "archive": "archive.3/_17310_archive_1.a"
+            }
+        },
+        "...MASTER...": {
+            "amcQw_d": {
+                "bytes": 7457,
+                "checksum": 4294967295,
+                "mod": "...MASTER...",
+                "out": "objs/amcQw_d.o",
+                "mode": 4
+            }
+        },
+        "_vcs_unit__1813345417": {
+            "BPW9E_d": {
+                "bytes": 11184,
+                "checksum": 4294967295,
+                "mod": "_vcs_unit__1813345417",
+                "out": "BPW9E_d.o",
+                "mode": 4,
+                "archive": "archive.3/_17310_archive_1.a"
+            }
+        }
+    },
+    "NameTable": {
+        "_vcs_unit__1813345417": [
+            "_vcs_unit__1813345417",
+            "BPW9E",
+            "module"
+        ],
+        "std": [
+            "std",
+            "reYIK",
+            "module"
+        ],
+        "...MASTER...": [
+            "SIM",
+            "amcQw",
+            "module"
+        ],
+        "test_cachemem": [
+            "test_cachemem",
+            "TayFL",
+            "module"
+        ]
+    },
+    "SIMBData": {
+        "out": "amcQwB.o",
+        "bytes": 89474
+    },
+    "CurCompileModules": [
+        "...MASTER...",
+        "_vcs_unit__1813345417",
+        "std",
+        "test_cachemem"
+    ],
+    "CompileStrategy": "fullobj",
+    "stat": {
+        "ru_self_cgstart": {
+            "ru_nvcsw": 153,
+            "ru_maxrss_kb": 51000,
+            "ru_utime_sec": 0.031669999999999997,
+            "ru_stime_sec": 0.022169000000000001,
+            "ru_minflt": 12359,
+            "ru_nivcsw": 31,
+            "ru_majflt": 0
+        },
+        "CodeGen(%)": 31.513958869450519,
+        "ru_childs_cgstart": {
+            "ru_nvcsw": 0,
+            "ru_maxrss_kb": 0,
+            "ru_utime_sec": 0.0,
+            "ru_stime_sec": 0.0,
+            "ru_minflt": 0,
+            "ru_nivcsw": 0,
+            "ru_majflt": 0
+        },
+        "totalObjSize": 170235,
+        "quadSpeed": 51808.138338022363,
+        "nMops": 2021,
+        "mopSpeed": 138681.12262403072,
+        "nQuads": 755,
+        "ru_self_end": {
+            "ru_nvcsw": 205,
+            "ru_maxrss_kb": 60036,
+            "ru_utime_sec": 0.046242999999999999,
+            "ru_stime_sec": 0.031529000000000001,
+            "ru_minflt": 14989,
+            "ru_nivcsw": 40,
+            "ru_majflt": 0
+        },
+        "outputSizePerQuad": 225.0,
+        "ru_childs_end": {
+            "ru_nvcsw": 0,
+            "ru_maxrss_kb": 0,
+            "ru_utime_sec": 0.0,
+            "ru_stime_sec": 0.0,
+            "ru_minflt": 0,
+            "ru_nivcsw": 0,
+            "ru_majflt": 0
+        },
+        "mop/quad": 2.6768211920529801,
+        "Frontend(%)": 68.486041130549481
+    },
+    "Misc": {
+        "cwd": "/home/tianmili/classes/eecs470/projects/project4/test_cache/test_cachemem.v",
+        "csrc": "csrc",
+        "csrc_abs": "/home/tianmili/classes/eecs470/projects/project4/test_cache/test_cachemem.v/csrc",
+        "archive_dir": "archive.3",
+        "daidir": "/home/tianmili/classes/eecs470/projects/project4/test_cache/test_cachemem.v/dve.daidir",
+        "daidir_abs": "/home/tianmili/classes/eecs470/projects/project4/test_cache/test_cachemem.v/dve.daidir",
+        "default_output_dir": "csrc"
+    },
+    "CurCompileUdps": {},
+    "CompileStatus": "Successful",
+    "PEModules": [],
+    "LVLData": [
+        "SIM"
+    ]
+}

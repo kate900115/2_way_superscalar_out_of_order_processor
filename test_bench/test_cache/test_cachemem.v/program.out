@@ -1,0 +1,9 @@
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Nov 17 01:07 2015
+$finish called from file "test_cachemem.v", line 75.
+$finish at simulation time                  100
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 100
+CPU Time:      0.170 seconds;       Data structure size:   0.0Mb
+Tue Nov 17 01:07:45 2015
