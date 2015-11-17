@@ -233,9 +233,9 @@ if_stage pc(
 	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
-	.rs_stall(0),//RS_full		 				// when RS is full, we need to stop PC
-	.rob1_stall(0),//(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
-	.rob2_stall(0),//(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
+	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
+	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
+	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
