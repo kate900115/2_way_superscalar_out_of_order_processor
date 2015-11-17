@@ -35,7 +35,7 @@ module testbench;
     	logic [63:0]  mem2proc_data;            // Data coming back from memory
     	logic [3:0]   mem2proc_tag;              // Tag from memory about current reply
 
-    	logic [1:0]   proc2mem_command;    // command sent to memory
+    	BUS_COMMAND   proc2mem_command;    // command sent to memory
     	logic [63:0]  proc2mem_addr;      // Address sent to memory
   	 	logic [63:0]  proc2mem_data;      // Data sent to memory
 
@@ -189,8 +189,9 @@ module testbench;
    			ROB_t1_is_full: %h, \
    			ROB_t2_is_full:%h, \
    			PC_inst1_valid:%h, \
+   			mem2proc_response:%h, \
    			RS_full:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, processor.RS_full);
+			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.RS_full);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
