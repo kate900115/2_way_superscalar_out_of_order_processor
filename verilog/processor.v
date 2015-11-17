@@ -665,6 +665,8 @@ rs rs1(
 	.inst2_rs_fu_select_in(ID_fu_select2),
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
+	.thread1_branch_is_taken(thread1_branch_is_taken),
+	.thread2_branch_is_taken(thread2_branch_is_taken),
 //output
 	.fu_rs_opa_out(RS_EX_opa),       	// This RS' opa 
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 

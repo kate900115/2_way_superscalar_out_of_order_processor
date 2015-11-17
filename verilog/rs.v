@@ -351,6 +351,7 @@ module rs(
 				end
 			end
 		end
+					//	$display("fu_rs_dest_tag_out:%h", fu_rs_dest_tag_out);
 	end
 
 	//to test how many RS_one_entry(s) are available
@@ -406,5 +407,6 @@ module rs(
 		begin
 			internal_rs_free = 0;
 		end
+		$display("internal_rs_available_out:%h", internal_rs_available_out);
 	end
 endmodule

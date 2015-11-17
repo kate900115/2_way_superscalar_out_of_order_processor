@@ -174,10 +174,12 @@ module testbench;
 		//#10
    		// Pulse the reset signal
 	$monitor (" @@@ time:%d, \
-			pipeline_error_status:%b, \
-			ROB_commit1_valid:%b,\
-			ROB_commit1_pc:%b, \
-			clock:%b,\
+			reset:%h, \
+			pipeline_error_status:%h, \
+			ROB_commit1_valid:%h,\
+			ROB_commit1_pc:%h, \
+			clock:%h,\
+			mem2proc_tag:%h, \
 			PC_inst1:%h, \
     		PC_inst2:%h,\
     		ID_inst1_opa:%h,\
@@ -186,8 +188,9 @@ module testbench;
    			RAT1_PRF_opa_idx2:%h, \
    			ROB_t1_is_full: %h, \
    			ROB_t2_is_full:%h, \
+   			PC_inst1_valid:%h, \
    			RS_full:%h",
-			$time, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.RS_full);
+			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, processor.RS_full);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
