@@ -222,7 +222,7 @@ module rs(
 	//then make the load of the two entries to be 1
 	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) tsps1(                                  
 		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in | inst2_rs_load_in),
+		.en(inst1_rs_load_in && inst2_rs_load_in),
 		.gnt_bus({inst1_internal_rs_load_in, inst2_internal_rs_load_in})
 	);
 

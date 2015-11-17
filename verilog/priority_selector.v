@@ -88,7 +88,7 @@ module priority_selector ( // Inputs
       // gnt[j] = tmp_gnt[j] & ~tmp_gnt[j-1] & ~tmp_gnt[j-3]...
       for (k=j+1; k<REQS; k=k+2)
       begin:gnt_mask
-        assign gnt_bus[(k+1)*WIDTH-1 -: WIDTH] = ~gnt_bus[(j+1)*WIDTH-1 -: WIDTH];
+        assign gnt_bus[(k+1)*WIDTH-1 -: WIDTH] = en ? ~gnt_bus[(j+1)*WIDTH-1 -: WIDTH] : 0;
       end
     end
 
