@@ -56,7 +56,7 @@ module if_stage(
 	CURRENT_THREAD_STATE current_thread_state;
 	CURRENT_THREAD_STATE next_thread_state;
 	
-	assign thread1_is_available = ~current_thread_state;
+	assign thread1_is_available = current_thread_state[0];
 
 	pc pc1(
 		//input
@@ -111,7 +111,7 @@ module if_stage(
   	begin
   		if (reset)
   		begin
-			current_thread_state <= `SD THREAD1_IS_EX;		
+			current_thread_state <= `SD PROGRAM_START;		
   		end
   		else
 		begin
@@ -136,6 +136,18 @@ module if_stage(
 		else
 		begin
 			case (current_thread_state)
+				PROGRAM_START:
+				begin
+					pc_enable1			  = 1'b0;
+					pc_enable2			  = 1'b0;
+					proc2Imem_addr		  = proc2Imem_addr1;
+					next_PC_out 		  = next_PC_out2;
+					thread1_inst_out 	  = thread1_inst1_out;
+					thread2_inst_out 	  = thread1_inst2_out;
+					thread1_inst_is_valid = thread1_inst1_is_valid;
+					thread2_inst_is_valid = thread1_inst2_is_valid;
+					next_thread_state     = THREAD2_IS_EX;
+				end
 				THREAD1_IS_EX:
 				begin
 					pc_enable1			  = 1'b0;
@@ -164,6 +176,4 @@ module if_stage(
 		end
 			$display("Imem2proc_data:%h", Imem2proc_data);
 	end	
-
 endmodule
-
