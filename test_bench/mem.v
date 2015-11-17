@@ -15,7 +15,7 @@ module mem(
 		input		clock,
 		input [63:0]	proc2mem_addr,
 		input [63:0]	proc2mem_data,
-		input [1:0]		proc2mem_command,
+		BUS_COMMAND	proc2mem_command,
 
 		output logic [3:0]	mem2proc_response, // 0= cannot accept
 		output logic [63:0]	mem2proc_data,
@@ -42,8 +42,8 @@ module mem(
 		next_mem2proc_response	= 4'b0;
 		next_mem2proc_data     	= 64'bx; 
 		bus_filled		= 1'b0;
-		acquire_tag		= ((proc2mem_command==`BUS_LOAD) ||
-					(proc2mem_command==`BUS_STORE)) && valid_address;
+		acquire_tag		= ((proc2mem_command==BUS_LOAD) ||
+					(proc2mem_command==BUS_STORE)) && valid_address;
 
 		for(int i=1;i<=`NUM_MEM_TAGS;i=i+1) begin
 			if(cycles_left[i]>16'd0) /*IF CYCLES ARE LEFT*/
@@ -53,7 +53,7 @@ module mem(
 				acquire_tag= 1'b0; 
 				cycles_left[i] = `MEM_LATENCY_IN_CYCLES; 
 				// must add support for random lantencies
-				if(proc2mem_command==`BUS_LOAD) begin /*LOAD*/
+				if(proc2mem_command==BUS_LOAD) begin /*LOAD*/
 			  		waiting_for_bus[i] = 1'b1;
 			  		loaded_data[i]     = unified_memory[proc2mem_addr[63:3]];
 				end

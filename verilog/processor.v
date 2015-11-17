@@ -15,7 +15,7 @@ module processor(
     input [63:0]  mem2proc_data,            // Data coming back from memory
     input [3:0]   mem2proc_tag,              // Tag from memory about current reply
 
-    output logic [1:0]  proc2mem_command,    // command sent to memory
+    output BUS_COMMAND  proc2mem_command,    // command sent to memory
     output logic [63:0] proc2mem_addr,      // Address sent to memory
     output logic [63:0] proc2mem_data,      // Data sent to memory
 
@@ -198,7 +198,7 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
 
-assign proc2mem_command = `BUS_LOAD;
+assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
 assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
@@ -229,7 +229,7 @@ if_stage pc(
 	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
-	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
+	.rs_stall(0),		 				// when RS is full, we need to stop PC
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal

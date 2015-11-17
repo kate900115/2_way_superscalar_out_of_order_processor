@@ -128,13 +128,6 @@ typedef enum logic [4:0] {
 `define ZERO_REG        5'd31
 
 //
-// Memory bus commands control signals
-//
-`define BUS_NONE       2'h0
-`define BUS_LOAD       2'h1
-`define BUS_STORE      2'h2
-
-//
 // useful boolean single-bit definitions
 //
 `define FALSE	1'h0
@@ -317,6 +310,12 @@ typedef enum logic [1:0] {
   USE_MEMORY      = 2'h2,
   FU_DEFAULT	  = 2'h3
 } FU_SELECT;
+
+typedef enum logic [1:0] {
+  BUS_NONE     = 2'h0,
+  BUS_LOAD     = 2'h1,
+  BUS_STORE    = 2'h2
+} BUS_COMMAND;
 
 /*typedef enum logic [1:0] {
   RS_TWO_OR_MORE_ENTRY_EMPTY = 2'h0,
