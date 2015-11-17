@@ -198,6 +198,8 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
 
+
+logic Imem2proc_valid;
 assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
 assign proc2mem_addr = PC_proc2Imem_addr;
@@ -213,9 +215,11 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
                                 ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
+                                (mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
                                 NO_ERROR;
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
+assign Imem2proc_valid = (mem2proc_tag != 0);
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -229,14 +233,14 @@ if_stage pc(
 	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
-	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
-	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
-	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
-	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
+	.rs_stall(0),//RS_full		 				// when RS is full, we need to stop PC
+	.rob1_stall(0),//(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
+	.rob2_stall(0),//(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
+	.rat_stall(0),//(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
-	.Imem2proc_valid(mem2proc_tag != 0),				// 
+	.Imem2proc_valid(1), //(Imem2proc_valid),				// 
 	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
