@@ -441,8 +441,8 @@ module id_stage(
 					id_op_select2 = USE_ADDER;
 				end
 		endcase	
-		$display("id_dest_reg_idx_out1:%h", id_dest_reg_idx_out1);
-		$display("id_dest_reg_idx_out2:%h", id_dest_reg_idx_out2);
+		//$display("id_dest_reg_idx_out1:%h", id_dest_reg_idx_out1);
+		//$display("id_dest_reg_idx_out2:%h", id_dest_reg_idx_out2);
 	end
 			
    
