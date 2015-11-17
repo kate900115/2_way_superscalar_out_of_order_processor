@@ -48,7 +48,7 @@ module priority_selector ( // Inputs
       // Zero'th request/grant trivial, just normal priority selector
       if (j == 0) begin
         assign tmp_reqs[WIDTH-1:0]  = req[WIDTH-1:0];
-        assign gnt_bus[WIDTH-1:0]   = tmp_gnts[WIDTH-1:0];
+        assign gnt_bus[WIDTH-1:0]   = en ? tmp_gnts[WIDTH-1:0] : 0;
 
       // First request/grant, uses input request vector but reversed, mask out
       //  granted bit from first request.
@@ -58,7 +58,7 @@ module priority_selector ( // Inputs
           assign tmp_reqs[2*WIDTH-1-k] = req[k];
         end
 
-        assign gnt_bus[2*WIDTH-1 -: WIDTH] = tmp_gnts_rev[2*WIDTH-1 -: WIDTH] & ~tmp_gnts[WIDTH-1:0];
+        assign gnt_bus[2*WIDTH-1 -: WIDTH] = en ? tmp_gnts_rev[2*WIDTH-1 -: WIDTH] & ~tmp_gnts[WIDTH-1:0] : 0;
 
       // Request/grants 2-N.  Request vector for j'th request will be same as
       //  j-2 with grant from j-2 masked out.  Will alternate between normal and
@@ -69,9 +69,9 @@ module priority_selector ( // Inputs
                                                   ~tmp_gnts[(j-1)*WIDTH-1 -: WIDTH];
         
         if (j%2==0)
-          assign gnt_bus[(j+1)*WIDTH-1 -: WIDTH] = tmp_gnts[(j+1)*WIDTH-1 -: WIDTH];
+          assign gnt_bus[(j+1)*WIDTH-1 -: WIDTH] = en ? tmp_gnts[(j+1)*WIDTH-1 -: WIDTH] : 0;
         else
-          assign gnt_bus[(j+1)*WIDTH-1 -: WIDTH] = tmp_gnts_rev[(j+1)*WIDTH-1 -: WIDTH];
+          assign gnt_bus[(j+1)*WIDTH-1 -: WIDTH] = en ? tmp_gnts_rev[(j+1)*WIDTH-1 -: WIDTH] : 0;
 
       end
 

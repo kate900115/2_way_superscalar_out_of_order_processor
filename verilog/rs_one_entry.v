@@ -118,6 +118,8 @@ module rs_one_entry(
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb2_valid;
 
 	always_comb begin
+		if (rs1_free_enable_fu)
+			next_InUse	= 1'b0;
 		if (rs1_free) begin
 			OPa			= 0;
        		OPaValid	= 0;
@@ -187,8 +189,6 @@ module rs_one_entry(
     			end
     			// Clear InUse bit once the FU has data
 		end
-		if (rs1_free_enable_fu)
-			next_InUse	= 1'b0;
 	end
 
 	always_ff @(posedge clock)
