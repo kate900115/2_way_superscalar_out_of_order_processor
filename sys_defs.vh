@@ -36,7 +36,7 @@
 // probably not a good idea to change this second one
 	
 //`define MEM_LATENCY_IN_CYCLES (100.0/`VERILOG_CLOCK_PERIOD+0.49999)
-`define MEM_LATENCY_IN_CYCLES 1
+`define MEM_LATENCY_IN_CYCLES 0
 // the 0.49999 is to force ceiling(100/period).  The default behavior for
 // float to integer conversion is rounding to nearest
 
