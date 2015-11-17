@@ -118,9 +118,45 @@ module rs_one_entry(
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb2_valid;
 
 	always_comb begin
-		if (rs1_free_enable_fu)
+		if (rs1_free_enable_fu && inst1_rs1_load_in)
+		begin
+			OPa			= inst1_rs1_opa_in;
+       		OPaValid	= inst1_rs1_opa_valid;
+       		OPb			= inst1_rs1_opb_in;
+       		OPbValid	= inst1_rs1_opb_valid;
+			fu_select	= inst1_rs1_fu_select;
+			DestTag		= inst1_rs1_dest_in;
+			Rob_idx		= inst1_rs1_rob_idx_in;
+			Alu_func	= inst1_rs1_alu_func;
+			op_type		= inst1_rs1_op_type_in;
+			next_InUse	= 1'b1;
+		end
+		else if (rs1_free_enable_fu && inst2_rs1_load_in)
+		begin
+			OPa			= inst2_rs1_opa_in;
+       		OPaValid	= inst2_rs1_opa_valid;
+       		OPb			= inst2_rs1_opb_in;
+       		OPbValid	= inst2_rs1_opb_valid;
+			fu_select	= inst2_rs1_fu_select;
+			DestTag		= inst2_rs1_dest_in;
+			Rob_idx		= inst2_rs1_rob_idx_in;
+			Alu_func	= inst2_rs1_alu_func;
+			op_type		= inst2_rs1_op_type_in;
+			next_InUse	= 1'b1;
+		end
+		else if (rs1_free_enable_fu) begin
+			OPa			= 0;
+       		OPaValid	= 0;
+       		OPb			= 0;
+       		OPbValid	= 0;
+			fu_select	= FU_DEFAULT;
+			DestTag		= 0;
+			Rob_idx		= 0;
+			Alu_func	= ALU_DEFAULT;
+			op_type		= 0;
 			next_InUse	= 1'b0;
-		if (rs1_free) begin
+		end
+		else if (rs1_free) begin
 			OPa			= 0;
        		OPaValid	= 0;
        		OPb			= 0;
