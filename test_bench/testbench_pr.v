@@ -190,8 +190,10 @@ module testbench;
    			ROB_t2_is_full:%h, \
    			PC_inst1_valid:%h, \
    			mem2proc_response:%h, \
+   			PRF_is_full:%h, \
+   			Imem2proc_valid:%h, \
    			RS_full:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.RS_full);
+			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, processor.RS_full);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;

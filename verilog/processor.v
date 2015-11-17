@@ -219,7 +219,7 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 NO_ERROR;
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
-assign Imem2proc_valid = (mem2proc_tag != 0);
+assign Imem2proc_valid = !(mem2proc_tag == 0);
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -236,11 +236,11 @@ if_stage pc(
 	.rs_stall(0),//RS_full		 				// when RS is full, we need to stop PC
 	.rob1_stall(0),//(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(0),//(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
-	.rat_stall(0),//(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
+	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
-	.Imem2proc_valid(1), //(Imem2proc_valid),				// 
+	.Imem2proc_valid(Imem2proc_valid),				// 
 	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
