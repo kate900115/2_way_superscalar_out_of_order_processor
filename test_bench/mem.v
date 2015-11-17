@@ -15,7 +15,7 @@ module mem(
 		input		clock,
 		input [63:0]	proc2mem_addr,
 		input [63:0]	proc2mem_data,
-		input [1:0]		proc2mem_command,
+		BUS_COMMAND	proc2mem_command,
 
 		output logic [3:0]	mem2proc_response, // 0= cannot accept
 		output logic [63:0]	mem2proc_data,

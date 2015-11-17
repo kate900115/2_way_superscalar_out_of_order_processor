@@ -318,6 +318,12 @@ typedef enum logic [1:0] {
   FU_DEFAULT	  = 2'h3
 } FU_SELECT;
 
+typedef enum logic [1:0] {
+  BUS_NONE     = 2'h0,
+  BUS_LOAD     = 2'h1,
+  BUS_STORE    = 2'h2
+} BUS_COMMAND;
+
 /*typedef enum logic [1:0] {
   RS_TWO_OR_MORE_ENTRY_EMPTY = 2'h0,
   RS_ONE_ENTRY_EMPTY	     = 2'h1,
