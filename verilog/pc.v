@@ -73,8 +73,8 @@ module pc(
     		if(reset)			
     		begin
 	      		PC_reg 		  	  <= `SD 0;  
-      			inst1_is_valid 	  <= `SD 1;
-      			inst2_is_valid 	  <= `SD 1;
+      			inst1_is_valid 	  <= `SD 0;
+      			inst2_is_valid 	  <= `SD 0;
 				inst1_out	  	  <= `SD 0;
 				inst2_out	 	  <= `SD 0;
     		end
