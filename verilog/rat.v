@@ -138,12 +138,8 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 			end //else
 		end  //for
 
-		opa_PRF_idx1 	= (opa_valid_in1) ? 0:rat_reg[opa_ARF_idx1];  //opa request prf
-		opb_PRF_idx1 	= (opb_valid_in1) ? 0:rat_reg[opb_ARF_idx1];
 		RAT_allo_halt1 	= 0;
 
-	    opa_PRF_idx2 	= 6'h30;
-	  	opb_PRF_idx2 	= 6'h30;
 	  	RAT_allo_halt2 	= ~PRF_rename_valid2 && dest_rename_sig2;  //if don't need rename, halt=0;
 
 		request1 	= 1;
@@ -165,12 +161,8 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 			end //else
 		end  //for
 
-		opa_PRF_idx2 	= (opa_valid_in2) ? 0:rat_reg[opa_ARF_idx2];  //opa request prf
-		opb_PRF_idx2 	= (opb_valid_in2) ? 0:rat_reg[opb_ARF_idx2];
 		RAT_allo_halt2 	= 0;
 
-	    opa_PRF_idx1 	= 6'h30;
-	  	opb_PRF_idx1 	= 6'h30;
 	  	RAT_allo_halt1 	= 0;  //if inst can be renamed, then inst 1 must not halt
 
 	  	request1 	= 1;
@@ -189,19 +181,21 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 				n_rat_reg[i] = PRF_rename_idx2;
 		end//for
 
-		opa_PRF_idx1 	= (opa_valid_in1) ? 0: rat_reg[opa_ARF_idx1];  //opa request prf
-		opb_PRF_idx1 	= (opb_valid_in1) ? 0: rat_reg[opb_ARF_idx1];
+
 		RAT_allo_halt1 	= 0;
 
-		opa_PRF_idx2 	= (opa_valid_in2) ? 0:
-				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:rat_reg[opa_ARF_idx2];  //opa request prf
-		opb_PRF_idx2 	= (opb_valid_in2) ? 0:
-				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:rat_reg[opb_ARF_idx2];
+
 		RAT_allo_halt2 	= 0;
 	  	request1 	= 1;
 		request2 	= 1;
 
 	  end //else
+	  	opa_PRF_idx2 	= (opa_valid_in2) ? 0:
+				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:(opa_ARF_idx2==5'h1f)?6'h30:rat_reg[opa_ARF_idx2];  //opa request prf
+		opb_PRF_idx2 	= (opb_valid_in2) ? 0:
+				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:(opb_ARF_idx2==5'h1f)?6'h30:rat_reg[opb_ARF_idx2];
+		opa_PRF_idx1 	= (opa_valid_in1) ? 0: (opa_ARF_idx1==5'h1f)? 6'h30:rat_reg[opa_ARF_idx1];  //opa request prf
+		opb_PRF_idx1 	= (opb_valid_in1) ? 0: (opb_ARF_idx1==5'h1f)? 6'h30:rat_reg[opb_ARF_idx1];
 
 	for(int i=0; i<`ARF_SIZE; i++) begin
 		if(PRF_free_sig[i] == 1) begin
