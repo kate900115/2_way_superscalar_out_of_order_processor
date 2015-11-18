@@ -27,11 +27,15 @@ module pc(
 	input					pc_enable,						// when PC_enable = 1, PC can calculate the next address.
  
 	output logic [63:0] 	proc2Imem_addr,    	 			// Address sent to Instruction memory
-	output logic [63:0] 	next_PC_out,        	 		// PC of instruction after fetched (PC+8). for debug
+										        	 		// PC of instruction after fetched (PC+8). for debug
 	output logic [31:0] 	inst1_out,        	 			// fetched instruction out
 	output logic [31:0]		inst2_out, 
 	output logic        	inst1_is_valid,  		 		// when low, instruction is garbage
-	output logic        	inst2_is_valid  		 		// when low, instruction is garbage
+	output logic        	inst2_is_valid,  		 		// when low, instruction is garbage
+	
+	// for debug
+	output logic [63:0] 	next_PC_out,
+	output logic [63:0]		proc2Imem_addr_next
   );
 
 
@@ -49,11 +53,14 @@ module pc(
 
 
 	assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
-	assign current_inst1  = Imem2proc_data[63:32];
-	assign current_inst2  = Imem2proc_data[31:0];
+	assign current_inst1  = Imem2proc_data[31:0];
+	assign current_inst2  = Imem2proc_data[63:32];
 
 	assign PC_stall	      = rs_stall || rob_stall || rat_stall || memory_structure_hazard_stall;
+	
+	// for debug
 	assign next_PC_out    = next_PC;
+	assign proc2Imem_addr_next = proc2Imem_addr + 4;
 
   	// next PC is target_pc if there is a taken branch or
   	// the next sequential PC (PC+8) if no branch
