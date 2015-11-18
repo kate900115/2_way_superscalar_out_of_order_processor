@@ -123,6 +123,112 @@ module prf(
 	always_comb
 	begin
 		case(allocate_new_prf)
+		4'b1000:
+			begin
+				priority_selector1_en      = 1'b1;
+				priority_selector2_en      = 1'b0;
+				rat2_prf1_rename_valid_out = 0;
+				rat2_prf2_rename_valid_out = 0;
+				rat1_prf2_rename_valid_out = 0;		
+				rat2_prf1_rename_idx_out   = 0;
+				rat2_prf2_rename_idx_out   = 0;
+				rat1_prf2_rename_idx_out   = 0;
+
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if (internal_assign_a_free_reg1[i]==1'b1)
+					begin
+						rat1_prf1_rename_valid_out = 1'b1;
+						rat1_prf1_rename_idx_out   = i;
+						break;
+					end
+					else
+					begin
+						rat1_prf1_rename_valid_out = 1'b0;
+						rat1_prf1_rename_idx_out   = 0;
+					end
+				end
+			end
+			
+		4'b0100:
+			begin
+				priority_selector1_en      = 1'b1;
+				priority_selector2_en      = 1'b0;
+				rat2_prf1_rename_valid_out = 0;
+				rat2_prf2_rename_valid_out = 0;
+				rat1_prf1_rename_valid_out = 0;
+				rat2_prf1_rename_idx_out   = 0;
+				rat2_prf2_rename_idx_out   = 0;
+				rat1_prf1_rename_idx_out   = 0;
+
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if (internal_assign_a_free_reg1[i]==1'b1)
+					begin
+						rat1_prf2_rename_valid_out = 1'b1;
+						rat1_prf2_rename_idx_out   = i;
+						break;
+					end
+					else
+					begin
+						rat1_prf2_rename_valid_out = 1'b0;
+						rat1_prf2_rename_idx_out   = 0;
+					end
+				end
+			end
+		
+		4'b0010:
+			begin
+				priority_selector1_en      = 1'b1;
+				priority_selector2_en      = 1'b0;
+				rat2_prf2_rename_valid_out = 0;
+				rat1_prf2_rename_valid_out = 0;
+				rat1_prf1_rename_valid_out = 0;
+				rat2_prf2_rename_idx_out   = 0;
+				rat1_prf2_rename_idx_out   = 0;
+				rat1_prf1_rename_idx_out   = 0;
+
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if (internal_assign_a_free_reg1[i]==1'b1)
+					begin
+						rat2_prf1_rename_valid_out = 1'b1;
+						rat2_prf1_rename_idx_out   = i;
+						break;
+					end
+					else
+					begin
+						rat2_prf1_rename_valid_out = 1'b0;
+						rat2_prf1_rename_idx_out   = 0;
+					end
+				end
+			end
+		4'b0001:
+			begin
+				priority_selector1_en      = 1'b1;
+				priority_selector2_en      = 1'b0;
+				rat2_prf1_rename_valid_out = 0;
+				rat1_prf2_rename_valid_out = 0;
+				rat1_prf1_rename_valid_out = 0;
+				rat2_prf1_rename_idx_out   = 0;
+				rat1_prf2_rename_idx_out   = 0;
+				rat1_prf1_rename_idx_out   = 0;
+
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if (internal_assign_a_free_reg1[i]==1'b1)
+					begin
+						rat2_prf2_rename_valid_out = 1'b1;
+						rat2_prf2_rename_idx_out   = i;
+						break;
+					end
+					else
+					begin
+						rat2_prf2_rename_valid_out = 1'b0;
+						rat2_prf2_rename_idx_out   = 0;
+					end
+				end
+			end
 		4'b1100:
 			begin
 				priority_selector1_en      = 1'b1;
@@ -203,7 +309,7 @@ module prf(
 				end
 			end
 		
-		4'b1010:
+		/*4'b1010:
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b1;
@@ -241,7 +347,7 @@ module prf(
 						rat2_prf1_rename_idx_out   = 0;
 					end
 				end
-			end
+			end */
 		
 		default:
 			begin
@@ -328,6 +434,15 @@ module prf(
 	//load data to the opa and opb of RS
 	always_comb
 	begin	
+			inst1_opa_prf_value = 0;
+			inst1_opb_prf_value = 0;
+			inst2_opa_prf_value = 0;
+			inst2_opb_prf_value = 0;
+			inst1_opa_valid		= 0;
+			inst1_opb_valid	    = 0;
+			inst2_opa_valid		= 0;
+			inst2_opb_valid		= 0;
+	
 			//rat1
 			for(int i=0;i<`PRF_SIZE;i++)
 			begin
