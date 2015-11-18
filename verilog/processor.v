@@ -220,6 +220,8 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
 assign Imem2proc_valid = !(mem2proc_tag == 0);
+
+assign pipeline_completed_insts = ROB_commit1_valid || ROB_commit2_valid;
 //////////////////////////////////
 //								//
 //			  PC				//
