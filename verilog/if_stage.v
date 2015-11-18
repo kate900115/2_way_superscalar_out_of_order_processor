@@ -33,7 +33,10 @@ module if_stage(
 	output logic [31:0] thread2_inst_out,
 	output logic	 	thread1_inst_is_valid,
 	output logic	 	thread2_inst_is_valid,
-	output logic		thread1_is_available
+	output logic		thread1_is_available,
+	
+	//for debug
+	output logic [63:0]	proc2Imem_addr_next
 	);
 	
 	
@@ -52,6 +55,8 @@ module if_stage(
 	logic	 	 		thread1_inst2_is_valid;
 	logic	 	 		thread2_inst1_is_valid;
 	logic	 	 		thread2_inst2_is_valid;
+	logic [63:0]		proc2Imem_addr_next1;
+	logic [63:0]		proc2Imem_addr_next2;
 	
 	CURRENT_THREAD_STATE current_thread_state;
 	CURRENT_THREAD_STATE next_thread_state;
@@ -75,11 +80,14 @@ module if_stage(
 
 		//output
 		.proc2Imem_addr(proc2Imem_addr1),    	 	
-		.next_PC_out(next_PC_out1),        	 				// PC of instruction after fetched (PC+4).
 		.inst1_out(thread1_inst1_out),        	 			// fetched instruction out
 		.inst2_out(thread1_inst2_out), 
 		.inst1_is_valid(thread1_inst1_is_valid),  		 	// when low, instruction is garbage
-		.inst2_is_valid(thread1_inst2_is_valid)  		 	
+		.inst2_is_valid(thread1_inst2_is_valid),  
+		
+		// for debug
+		.proc2Imem_addr_next(proc2Imem_addr_next1),	
+		.next_PC_out(next_PC_out1)        	 				// PC of instruction after fetched (PC+8).	 	
   		);
 
 
@@ -99,12 +107,15 @@ module if_stage(
 		.pc_enable(pc_enable2),			 		
 	
 		//output
-		.proc2Imem_addr(proc2Imem_addr2),    	 	
-		.next_PC_out(next_PC_out2),        	 	
+		.proc2Imem_addr(proc2Imem_addr2),    	 	      	 	
 		.inst1_out(thread2_inst1_out),        	 	
 		.inst2_out(thread2_inst2_out), 
 		.inst1_is_valid(thread2_inst1_is_valid),  		 	
-		.inst2_is_valid(thread2_inst2_is_valid)  		 	
+		.inst2_is_valid(thread2_inst2_is_valid),
+		
+		// for debug
+		.proc2Imem_addr_next(proc2Imem_addr_next2),	
+		.next_PC_out(next_PC_out2)        	 				 	  		 	
   		);	
   	
   	always_ff@(posedge clock)
@@ -131,6 +142,7 @@ module if_stage(
 			thread2_inst_out 	 		  = thread1_inst2_out;
 			thread1_inst_is_valid		  = thread1_inst1_is_valid;
 			thread2_inst_is_valid		  = thread1_inst2_is_valid;
+			proc2Imem_addr_next			  = proc2Imem_addr_next1;
 			next_thread_state			  = THREAD1_IS_EX;
 		end
 		else
@@ -146,6 +158,7 @@ module if_stage(
 					thread2_inst_out 	  = thread1_inst2_out;
 					thread1_inst_is_valid = thread1_inst1_is_valid;
 					thread2_inst_is_valid = thread1_inst2_is_valid;
+					proc2Imem_addr_next   = proc2Imem_addr_next1;
 					next_thread_state     = THREAD2_IS_EX;
 				end
 				THREAD1_IS_EX:
@@ -158,6 +171,7 @@ module if_stage(
 					thread2_inst_out 	  = thread1_inst2_out;
 					thread1_inst_is_valid = thread1_inst1_is_valid;
 					thread2_inst_is_valid = thread1_inst2_is_valid;
+					proc2Imem_addr_next	  = proc2Imem_addr_next1;
 					next_thread_state     = THREAD2_IS_EX;
 				end
 				THREAD2_IS_EX:
@@ -170,6 +184,7 @@ module if_stage(
 					thread2_inst_out 	  = thread2_inst2_out;
 					thread1_inst_is_valid = thread2_inst1_is_valid;
 					thread2_inst_is_valid = thread2_inst2_is_valid;
+					proc2Imem_addr_next   = proc2Imem_addr_next2;
 					next_thread_state 	  = THREAD1_IS_EX;
 				end
 			endcase
