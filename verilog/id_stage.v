@@ -260,9 +260,9 @@ module id_stage(
 	wire    [4:0] rb_idx1 = if_id_IR1[20:16];   // inst1 operand B register index
 	wire    [4:0] rc_idx1 = if_id_IR1[4:0];     // inst1 operand C register index
 	
-	wire    [4:0] ra_idx2 = if_id_IR1[25:21];   // inst2 operand A register index
-	wire    [4:0] rb_idx2 = if_id_IR1[20:16];   // inst2 operand B register index
-	wire    [4:0] rc_idx2 = if_id_IR1[4:0];     // inst2 operand C register index
+	wire    [4:0] ra_idx2 = if_id_IR2[25:21];   // inst2 operand A register index
+	wire    [4:0] rb_idx2 = if_id_IR2[20:16];   // inst2 operand B register index
+	wire    [4:0] rc_idx2 = if_id_IR2[4:0];     // inst2 operand C register index
 	
 	wire [63:0] mem_disp1 = { {48{if_id_IR1[15]}}, if_id_IR1[15:0] };
 	wire [63:0] br_disp1  = { {41{if_id_IR1[20]}}, if_id_IR1[20:0], 2'b00 };
