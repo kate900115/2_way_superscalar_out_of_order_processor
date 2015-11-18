@@ -220,6 +220,8 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
 assign Imem2proc_valid = !(mem2proc_tag == 0);
+
+assign pipeline_completed_insts = ROB_commit1_valid || ROB_commit2_valid;
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -498,7 +500,7 @@ prf prf1(
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	//rat
-	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1
+	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1			***********not
 	.rat1_inst1_opb_prf_idx(RAT1_PRF_opb_idx1),			// opb prf index of instruction1
 	.rat1_inst2_opa_prf_idx(RAT1_PRF_opa_idx2),			// opa prf index of instruction2
 	.rat1_inst2_opb_prf_idx(RAT1_PRF_opb_idx2),			// opb prf index of instruction2
@@ -678,7 +680,7 @@ rs rs1(
 	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index
 	.fu_alu_func_out(RS_EX_alu_func),
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
-	
+	.fu_rs_op_type_out(RS_EX_op_type),
 	.rs_full(RS_full)			// RS is full now
 );
 
