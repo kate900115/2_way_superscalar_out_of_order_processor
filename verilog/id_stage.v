@@ -137,7 +137,12 @@ module decoder(
           alu_func = ALU_ADDQ;
           dest_reg = DEST_IS_REGA;
           case (inst[31:26])
-            `LDA_INST:  /* defaults are OK */;
+            `LDA_INST:  /* defaults are OK */					//************************************************** need to change
+		begin
+		dest_reg = DEST_IS_REGA;					//**********changed
+		opa_select = ALU_OPA_IS_MEM_DISP;
+          	opb_select = ALU_OPB_IS_REGB;
+		end
             `LDQ_INST:
               begin
                 rd_mem = `TRUE;

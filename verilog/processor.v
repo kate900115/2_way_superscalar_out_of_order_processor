@@ -651,8 +651,8 @@ rs rs1(
 	//for instruction1
 	.inst1_rs_opa_in(ID_inst1_opa_valid ? ID_inst1_opa : PRF_RS_inst1_opa),      	// Operand a from Rename  
 	.inst1_rs_opb_in(ID_inst1_opb_valid ? ID_inst1_opb : PRF_RS_inst1_opb),      	// Operand a from Rename
-	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid || ID_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid || ID_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
 	.inst1_rs_alu_func(ID_alu_func1),
 	.inst1_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
@@ -661,8 +661,8 @@ rs rs1(
 	//for instruction2
 	.inst2_rs_opa_in(ID_inst2_opa_valid ? ID_inst2_opa : PRF_RS_inst2_opa),      	// Operand a from Rename  
 	.inst2_rs_opb_in(ID_inst2_opb_valid ? ID_inst2_opb : PRF_RS_inst2_opb),      	// Operand a from Rename 
-	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid || ID_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
+	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid || ID_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 	.inst2_rs_alu_func(ID_alu_func2),
 	.inst2_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
