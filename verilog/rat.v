@@ -138,8 +138,8 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 			end //else
 		end  //for
 
-		opa_PRF_idx1 	= (opa_valid_in1) ? 0:(2'h1f)?2'h30:rat_reg[opa_ARF_idx1];  //opa request prf
-		opb_PRF_idx1 	= (opb_valid_in1) ? 0:(2'h1f)?2'h30:rat_reg[opb_ARF_idx1];
+		opa_PRF_idx1 	= (opa_valid_in1) ? 0:(opa_ARF_idx1==2'h1f)?2'h30:rat_reg[opa_ARF_idx1];  //opa request prf
+		opb_PRF_idx1 	= (opb_valid_in1) ? 0:(opb_ARF_idx1==2'h1f)?2'h30:rat_reg[opb_ARF_idx1];
 		RAT_allo_halt1 	= 0;
 
 	    	opa_PRF_idx2 	= 0;
@@ -165,8 +165,8 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 			end //else
 		end  //for
 
-		opa_PRF_idx2 	= (opa_valid_in2) ? 0:(2'h1f)?2'h30:rat_reg[opa_ARF_idx2];  //opa request prf
-		opb_PRF_idx2 	= (opb_valid_in2) ? 0:(2'h1f)?2'h30:rat_reg[opb_ARF_idx2];
+		opa_PRF_idx2 	= (opa_valid_in2) ? 0:(opa_ARF_idx2==2'h1f)?2'h30:rat_reg[opa_ARF_idx2];  //opa request prf
+		opb_PRF_idx2 	= (opb_valid_in2) ? 0:(opb_ARF_idx2==2'h1f)?2'h30:rat_reg[opb_ARF_idx2];
 		RAT_allo_halt2 	= 0;
 
 	    	opa_PRF_idx1 	= 0;
@@ -189,14 +189,14 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 				n_rat_reg[i] = PRF_rename_idx2;
 		end//for
 
-		opa_PRF_idx1 	= (opa_valid_in1) ? 0:(2'h1f)?2'h30:rat_reg[opa_ARF_idx1];  //opa request prf
-		opb_PRF_idx1 	= (opb_valid_in1) ? 0:(2'h1f)?2'h30:rat_reg[opb_ARF_idx1];
+		opa_PRF_idx1 	= (opa_valid_in1) ? 0:(opa_ARF_idx1==2'h1f)?2'h30:rat_reg[opa_ARF_idx1];  //opa request prf
+		opb_PRF_idx1 	= (opb_valid_in1) ? 0:(opb_ARF_idx1==2'h1f)?2'h30:rat_reg[opb_ARF_idx1];
 		RAT_allo_halt1 	= 0;
 
 		opa_PRF_idx2 	= (opa_valid_in2) ? 0:
-				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:(2'h1f)?2'h30:rat_reg[opa_ARF_idx2];  //opa request prf
+				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:(opa_ARF_idx2==2'h1f)?2'h30:rat_reg[opa_ARF_idx2];  //opa request prf
 		opb_PRF_idx2 	= (opb_valid_in2) ? 0:
-				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:(2'h1f)?2'h30:rat_reg[opb_ARF_idx2];
+				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:(opb_ARF_idx2==2'h1f)?2'h30:rat_reg[opb_ARF_idx2];
 		RAT_allo_halt2 	= 0;
 	  	request1 	= 1;
 		request2 	= 1;
