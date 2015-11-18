@@ -169,8 +169,8 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 		opb_PRF_idx2 	= (opb_valid_in2) ? 0:(opb_ARF_idx2==5'h1f)?6'h30:rat_reg[opb_ARF_idx2];
 		RAT_allo_halt2 	= 0;
 
-	    	opa_PRF_idx1 	= 0;
-	  	opb_PRF_idx1 	= 0;
+	    	opa_PRF_idx1 	= 6'h30;
+	  	opb_PRF_idx1 	= 6'h30;
 	  	RAT_allo_halt1 	= 0;  //if inst can be renamed, then inst 1 must not halt
 
 	  	request1 	= 1;
