@@ -45,16 +45,16 @@ module rat(
 
 
 	//output 1
-	output	logic	[$clog2(`PRF_SIZE):0]	opa_PRF_idx1,
-	output	logic	[$clog2(`PRF_SIZE):0]	opb_PRF_idx1,
+	output	logic	[$clog2(`PRF_SIZE)-1:0]	opa_PRF_idx1,
+	output	logic	[$clog2(`PRF_SIZE)-1:0]	opb_PRF_idx1,
 	output	logic	request1,  //send to PRF indicate weather it need data
 	output	logic	RAT_allo_halt1,
 	//output	logic	opa_valid_out1,	//if high opa_valid is immediate
 	//output	logic	opb_valid_out1,
 
 	//output 2
-	output	logic	[$clog2(`PRF_SIZE):0]	opa_PRF_idx2,
-	output	logic	[$clog2(`PRF_SIZE):0]	opb_PRF_idx2,
+	output	logic	[$clog2(`PRF_SIZE)-1:0]	opa_PRF_idx2,
+	output	logic	[$clog2(`PRF_SIZE)-1:0]	opb_PRF_idx2,
 	output	logic	request2,  //send to PRF indicate weather it need data
 	output	logic	RAT_allo_halt2,
 	//output	logic	opa_valid_out2,	//if high opa_valid is immediate
