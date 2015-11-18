@@ -328,13 +328,25 @@ module prf(
 	//load data to the opa and opb of RS
 	always_comb
 	begin	
-		if ((rat1_inst1_opa_prf_idx==48)||(rat1_inst1_opb_prf_idx==48)||
-		    (rat1_inst2_opa_prf_idx==48)||(rat1_inst2_opb_prf_idx==48)||
-		    (rat2_inst1_opa_prf_idx==48)||(rat2_inst1_opb_prf_idx==48)||
-		    (rat2_inst2_opa_prf_idx==48)||(rat2_inst2_opb_prf_idx==48))
+		if ((rat1_inst1_opa_prf_idx==48)||(rat2_inst1_opa_prf_idx==48))
 		begin
 			inst1_opa_prf_value = 0;
 			inst1_opa_valid	    = 1'b1;
+		end
+		else if((rat1_inst1_opb_prf_idx==48)||(rat2_inst1_opb_prf_idx==48))
+		begin
+			inst1_opb_prf_value = 0;
+			inst1_opb_valid	    = 1'b1;
+		end
+		else if((rat1_inst2_opa_prf_idx==48)||(rat2_inst2_opa_prf_idx==48))
+		begin
+			inst2_opa_prf_value = 0;
+			inst2_opa_valid	    = 1'b1;
+		end
+		else if((rat1_inst2_opb_prf_idx==48)||(rat2_inst2_opb_prf_idx==48))
+		begin
+			inst2_opb_prf_value = 0;
+			inst2_opb_valid	    = 1'b1;
 		end
 		else
 		begin
