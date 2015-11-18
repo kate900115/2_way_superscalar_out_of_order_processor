@@ -97,13 +97,13 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 	  	end //for
 	  	request1 		= 0;
 	  	RAT_allo_halt1 		= 0;
-	  	opa_PRF_idx1 		= 6'h30;
-	  	opb_PRF_idx1 		= 6'h30;
+	  	opa_PRF_idx1 		= 0;
+	  	opb_PRF_idx1 		= 0;
 
 	  	request2 		= 0;
 	  	RAT_allo_halt2 		= 0;
-	  	opa_PRF_idx2 		= 6'h30;
-	  	opb_PRF_idx2 		= 6'h30;
+	  	opa_PRF_idx2 		= 0;
+	  	opb_PRF_idx2 		= 0;
 
 	  end //else
 	  else if(~inst1_rename && ~inst2_rename) begin
@@ -111,12 +111,12 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 	  	PRF_free_list 		= 0;
 	  	n_rat_reg 		= rat_reg;
 
-    	opa_PRF_idx1 		= 0;
-	  	opb_PRF_idx1 		= 0;
+    	opa_PRF_idx1 		= 6'h30;
+	  	opb_PRF_idx1 		= 6'h30;
 	  	RAT_allo_halt1 		= ~PRF_rename_valid1 && dest_rename_sig1;  //if don't need rename, halt=0;
 
-	    opa_PRF_idx2 		= 0;
-	  	opb_PRF_idx2 		= 0;
+	    opa_PRF_idx2 		= 6'h30;
+	  	opb_PRF_idx2 		= 6'h30;
 	  	RAT_allo_halt2 		= ~PRF_rename_valid2 && dest_rename_sig2;  //if don't need rename, halt=0;
 
 	  	request1 			= 0;
@@ -169,7 +169,7 @@ assign inst2_rename = (PRF_rename_valid2 & dest_rename_sig2) | (PRF_rename_valid
 		opb_PRF_idx2 	= (opb_valid_in2) ? 0:(opb_ARF_idx2==5'h1f)?6'h30:rat_reg[opb_ARF_idx2];
 		RAT_allo_halt2 	= 0;
 
-	    	opa_PRF_idx1 	= 6'h30;
+	    opa_PRF_idx1 	= 6'h30;
 	  	opb_PRF_idx1 	= 6'h30;
 	  	RAT_allo_halt1 	= 0;  //if inst can be renamed, then inst 1 must not halt
 
