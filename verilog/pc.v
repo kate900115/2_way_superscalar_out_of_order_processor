@@ -49,8 +49,8 @@ module pc(
 
 
 	assign proc2Imem_addr = {PC_reg[63:3], 3'b0};
-	assign current_inst1  = Imem2proc_data[63:32];
-	assign current_inst2  = Imem2proc_data[31:0];
+	assign current_inst1  = Imem2proc_data[31:0];
+	assign current_inst2  = Imem2proc_data[63:32];
 
 	assign PC_stall	      = rs_stall || rob_stall || rat_stall || memory_structure_hazard_stall;
 	assign next_PC_out    = next_PC;
