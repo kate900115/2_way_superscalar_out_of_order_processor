@@ -187,6 +187,19 @@ module if_stage(
 					proc2Imem_addr_next   = proc2Imem_addr_next2;
 					next_thread_state 	  = THREAD1_IS_EX;
 				end
+				default:
+				begin
+					pc_enable1			  = 1'b0;
+					pc_enable2			  = 1'b0;
+					proc2Imem_addr		  = 0;
+					next_PC_out 		  = 0;
+					thread1_inst_out 	  = 0;
+					thread2_inst_out 	  = 0;
+					thread1_inst_is_valid = 0;
+					thread2_inst_is_valid = 0;
+					proc2Imem_addr_next   = 0;
+					next_thread_state     = NO_ONE_IS_EX;
+				end
 			endcase
 		end
 			$display("Imem2proc_data:%h", Imem2proc_data);

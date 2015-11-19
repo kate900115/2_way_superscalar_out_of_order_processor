@@ -327,7 +327,8 @@ typedef enum logic [1:0] {
 typedef enum logic[1:0] {
 	PROGRAM_START  = 2'b00,
 	THREAD1_IS_EX  = 2'b01,			
-  	THREAD2_IS_EX  = 2'b10			
+  	THREAD2_IS_EX  = 2'b10,
+  	NO_ONE_IS_EX   = 2'b11			
 } CURRENT_THREAD_STATE;
 
 `endif

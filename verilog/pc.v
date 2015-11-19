@@ -124,8 +124,5 @@ module pc(
 				inst2_out_reg 		= current_inst2;
 			end
 		end
-			//$display("next_PC:%h", next_PC);
-			//$display("Imem2proc_data:%h", Imem2proc_data);
 	end
-
 endmodule
