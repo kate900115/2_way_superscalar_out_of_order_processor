@@ -675,9 +675,6 @@ rs rs1(
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 	.thread1_branch_is_taken(thread1_branch_is_taken),
 	.thread2_branch_is_taken(thread2_branch_is_taken),
-	.inst1_is_halt(ID_inst1_is_halt),
-	.inst2_is_halt(ID_inst2_is_halt),
-	
 //output
 	.fu_rs_opa_out(RS_EX_opa),       	// This RS' opa 
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 

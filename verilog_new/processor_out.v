@@ -28,28 +28,53 @@ module processor(
 
 //output
     //Output from rob
-    output logic							ROB_commit1_valid,
-    output logic [63:0]						ROB_commit1_pc,
+    output logic							ROB_commit1_valid,   
 	output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest,
 	output logic 							ROB_commit1_wr_en,
-    output logic [63:0]						PRF_writeback_value1,
     output logic							ROB_commit2_valid,
-    output logic [63:0]						ROB_commit2_pc,
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
+	
+	//for writeback.out
+	output logic [63:0]						PRF_writeback_value1,
     output logic [63:0]						PRF_writeback_value2,
-    output ERROR_CODE   pipeline_error_status
+    output ERROR_CODE   pipeline_error_status,
+    
+    // testing hooks (these must be exported so we can test
+    // the synthesized version) data is tested by looking at
+    // the final values in memory
+    
+    // Outputs from IF-Stage 
+    output logic [63:0]						PC_proc2Imem_addr,
+    output logic [63:0]						PC_proc2Imem_addr_next,
+    output logic [31:0]						PC_inst1,
+    output logic [31:0]						PC_inst2,
+    output logic							PC_inst1_valid,
+    output logic							PC_inst2_valid,
+    
+    // Outputs from RS
+	output logic [5:0][63:0]				fu_next_inst_pc_out,
+	output logic [5:0][5:0]					RS_EX_op_type,
+	output ALU_FUNC [5:0]					RS_EX_alu_func,
+	
+	// Outputs from EX-stage
+	output logic [5:0][63:0]				fu_inst_pc_out,	
+	output ALU_FUNC [5:0]					EX_alu_func_out,
+    output logic [5:0][5:0]					EX_rs_op_type_out,
+	
+	// Outputs from ROB
+	output logic [63:0]						ROB_commit1_pc,
+	output logic [63:0]						ROB_commit2_pc,
+	output logic [31:0]						ROB_commit1_inst_out,
+	output logic [31:0]						ROB_commit2_inst_out
+	
 );
 
 logic	thread1_branch_is_taken;
 logic	thread2_branch_is_taken;
 //pc output
-logic [31:0]	PC_inst1;
-logic [31:0]	PC_inst2;
-logic			PC_inst1_valid;
-logic			PC_inst2_valid;
-logic [63:0]	PC_proc2Imem_addr;
 logic			PC_thread1_is_available;
+
 //decoder
 logic [63:0]	ID_inst1_opa;
 logic [63:0]	ID_inst1_opb;
@@ -161,14 +186,12 @@ logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
 
 //rs output
-logic [5:0][63:0]		RS_EX_opa;
+logic [5:0][63:0]				RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
 logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
-logic [5:0][5:0]			RS_EX_op_type;
-logic [5:0]					RS_EX_out_valid;
-ALU_FUNC [5:0]				RS_EX_alu_func;
-logic						RS_full;
+logic [5:0]						RS_EX_out_valid;
+logic							RS_full;
 
 //ex output
 logic [5:0]							EX_RS_fu_is_available;
@@ -200,6 +223,7 @@ logic [63:0]	thread2_target_pc;
 
 
 logic Imem2proc_valid;
+
 assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
 assign proc2mem_addr = PC_proc2Imem_addr;
@@ -219,6 +243,7 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 NO_ERROR;
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
+
 assign Imem2proc_valid = !(mem2proc_tag == 0);
 
 assign pipeline_completed_insts = ROB_commit1_valid || ROB_commit2_valid;
@@ -251,7 +276,9 @@ if_stage pc(
 	.thread2_inst_out(PC_inst2),
 	.thread1_inst_is_valid(PC_inst1_valid),
 	.thread2_inst_is_valid(PC_inst2_valid),
-	.thread1_is_available(PC_thread1_is_available)
+	.thread1_is_available(PC_thread1_is_available),
+	//for debug
+	.proc2Imem_addr_next(proc2Imem_addr_next)
 	);
 //////////////////////////////////
 //								//
@@ -268,7 +295,7 @@ id_stage id(
 	.if_id_valid_inst1(PC_inst1_valid),
 	.if_id_valid_inst2(PC_inst2_valid),
 	.if_id_NPC_inst1(PC_proc2Imem_addr),           // incoming instruction1 PC
-	.if_id_NPC_inst2(PC_proc2Imem_addr+4),           // incoming instruction PC+4
+	.if_id_NPC_inst2(PC_proc2Imem_addr_next),           // incoming instruction PC+4
 //output
 	.opa_mux_out1(ID_inst1_opa),               //instr1 opa and opb value or tag
 	.opb_mux_out1(ID_inst1_opb),
@@ -500,7 +527,7 @@ prf prf1(
 	.cdb2_tag(cdb2_tag),
 	.cdb2_out(cdb2_value),
 	//rat
-	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1			***********not
+	.rat1_inst1_opa_prf_idx(RAT1_PRF_opa_idx1),			// opa prf index of instruction1
 	.rat1_inst1_opb_prf_idx(RAT1_PRF_opb_idx1),			// opb prf index of instruction1
 	.rat1_inst2_opa_prf_idx(RAT1_PRF_opa_idx2),			// opa prf index of instruction2
 	.rat1_inst2_opb_prf_idx(RAT1_PRF_opb_idx2),			// opb prf index of instruction2
@@ -533,7 +560,6 @@ prf prf1(
 	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
 	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
 	.rat1_read_enable(PC_thread1_is_available),
-
 
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -629,7 +655,13 @@ rob rob1(
 	.commit2_is_illegal_out(ROB_commit2_is_illegal),
 	.commit2_is_thread1(ROB_commit2_is_thread1),
 	.t1_is_full(ROB_t1_is_full),
-	.t2_is_full(ROB_t2_is_full)
+	.t2_is_full(ROB_t2_is_full),
+	
+	//for debug
+	.rob_inst1_in(PC_inst1),
+	.rob_inst2_in(PC_inst2),
+	.commit1_inst_out(ROB_commit1_inst_out),
+	.commit2_inst_out(ROB_commit2_inst_out)
 );
 
 
@@ -675,9 +707,6 @@ rs rs1(
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 	.thread1_branch_is_taken(thread1_branch_is_taken),
 	.thread2_branch_is_taken(thread2_branch_is_taken),
-	.inst1_is_halt(ID_inst1_is_halt),
-	.inst2_is_halt(ID_inst2_is_halt),
-	
 //output
 	.fu_rs_opa_out(RS_EX_opa),       	// This RS' opa 
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
@@ -686,7 +715,12 @@ rs rs1(
 	.fu_alu_func_out(RS_EX_alu_func),
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
 	.fu_rs_op_type_out(RS_EX_op_type),
-	.rs_full(RS_full)			// RS is full now
+	.rs_full(RS_full),			// RS is full now
+	
+	//for debug
+	.inst1_rs_pc_in(PC_inst1),
+	.inst2_rs_pc_in(PC_inst2),
+	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 
 //////////////////////////////////
@@ -713,6 +747,7 @@ ex_stage ex(
     .mult2_send_in_success(mult2_send_in_success),
     .memory1_send_in_success(memory1_send_in_success),
     .memory2_send_in_success(memory2_send_in_success),
+    
 //output
 //ex_take_branch_out,  // is this a taken branch?
     .fu_rs_dest_tag_out(EX_CDB_dest_tag),
@@ -720,7 +755,14 @@ ex_stage ex(
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
     .fu_rs_rob_idx_out(EX_CDB_rob_idx),
-    .fu_mispredict_sig(EX_CDB_mispredict_sig)
+    .fu_mispredict_sig(EX_CDB_mispredict_sig),
+    
+    
+    // for debug
+    .fu_alu_func_out(EX_alu_func_out),
+    .fu_rs_op_type_out(EX_rs_op_type_out),
+    .rs_pc_in(fu_next_inst_pc_out),
+    .fu_inst_pc_out(fu_inst_pc_out)
   );
 //////////////////////////////////
 //								//
