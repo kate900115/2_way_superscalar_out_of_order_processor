@@ -31,6 +31,8 @@ module prf(
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opb_prf_idx,				// opb prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opb_prf_idx,				// opb prf index of instruction2
+	
+	input 									rat1_read_enable,					//if rat1 read_enable=1, rat1 idx is valid, else rat2 idx is valid
 
 	input									rat1_allocate_new_prf1,				// the request from rat1 for allocating a new prf entry
 	input									rat1_allocate_new_prf2,				// the request from rat1 for allocating a new prf entry
@@ -56,6 +58,8 @@ module prf(
 	//for writeback
 	input	[$clog2(`PRF_SIZE)-1:0]			rob1_retire_idx,					// when rob1 retires an instruction, prf gives out the corresponding value.
 	input	[$clog2(`PRF_SIZE)-1:0]			rob2_retire_idx,					// when rob2 retires an instruction, prf gives out the corresponding value.
+	
+
 	
 	//output
 	output	logic							rat1_prf1_rename_valid_out,			// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
@@ -444,145 +448,150 @@ module prf(
 			inst2_opb_valid		= 0;
 	
 			//rat1
-			for(int i=0;i<`PRF_SIZE;i++)
+			if (rat1_read_enabe)
 			begin
-				if ((rat1_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst1_opa_prf_value = internal_data_out[i];
-					inst1_opa_valid	    = 1'b1;
-					break;
+					if ((rat1_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opa_prf_value = internal_data_out[i];
+						inst1_opa_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						// if the value in prf is invalid, we need to return the index of this entry
+						inst1_opa_prf_value = {58'b0,rat1_inst1_opa_prf_idx};
+						inst1_opa_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					// if the value in prf is invalid, we need to return the index of this entry
-					inst1_opa_prf_value = {58'b0,rat1_inst1_opa_prf_idx};
-					inst1_opa_valid	    = 1'b0;
-				end
-			end
 
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if ((rat1_inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst1_opb_prf_value = internal_data_out[i];
-					inst1_opb_valid	    = 1'b1;
-					break;
+					if ((rat1_inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opb_prf_value = internal_data_out[i];
+						inst1_opb_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst1_opb_prf_value = {58'b0,rat1_inst1_opb_prf_idx};
+						inst1_opb_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					inst1_opb_prf_value = {58'b0,rat1_inst1_opb_prf_idx};
-					inst1_opb_valid	    = 1'b0;
-				end
-			end
 	
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin			
-				if ((rat1_inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
-				begin
-					inst2_opa_prf_value = internal_data_out[i];
-					inst2_opa_valid	    = 1'b1;
-					break;
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin			
+					if ((rat1_inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opa_prf_value = internal_data_out[i];
+						inst2_opa_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opa_prf_value = {58'b0,rat1_inst2_opa_prf_idx};
+						inst2_opa_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					inst2_opa_prf_value = {58'b0,rat1_inst2_opa_prf_idx};
-					inst2_opa_valid	    = 1'b0;
-				end
-			end
 			
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if ((rat1_inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst2_opb_prf_value = internal_data_out[i];
-					inst2_opb_valid	    = 1'b1;
-					break;
+					if ((rat1_inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opb_prf_value = internal_data_out[i];
+						inst2_opb_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opb_prf_value = {58'b0,rat1_inst2_opb_prf_idx};
+						inst2_opb_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					inst2_opb_prf_value = {58'b0,rat1_inst2_opb_prf_idx};
-					inst2_opb_valid	    = 1'b0;
-				end
-			end
 			
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if (rat1_inst1_opa_prf_idx==i)
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst1_opa_prf_value = internal_data_out[i];
-					inst1_opa_valid	    = internal_prf_ready[i] && (!internal_prf_available[i]);
-					break;
+					if (rat1_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i])
+					begin
+						inst1_opa_prf_value = internal_data_out[i];
+						inst1_opa_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						// if the value in prf is invalid, we need to return the index of this entry
+						inst1_opa_prf_value = {58'b0,rat1_inst1_opa_prf_idx};
+						inst1_opa_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					// if the value in prf is invalid, we need to return the index of this entry
-					inst1_opa_prf_value = {58'b0,rat1_inst1_opa_prf_idx};
-					inst1_opa_valid	    = 1'b0;
-				end
-			end
 
+			else
+			begin
 			//rat2
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if ((rat2_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst1_opa_prf_value = internal_data_out[i];
-					inst1_opa_valid	    = 1'b1;
-					break;
+					if ((rat2_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opa_prf_value = internal_data_out[i];
+						inst1_opa_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+					// if the value in prf is invalid, we need to return the index of this entry
+						inst1_opa_prf_value = {58'b0,rat2_inst1_opa_prf_idx};
+						inst1_opa_valid	    = 1'b0;
+					end
 				end
-				else
+			
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-				// if the value in prf is invalid, we need to return the index of this entry
-					inst1_opa_prf_value = {58'b0,rat2_inst1_opa_prf_idx};
-					inst1_opa_valid	    = 1'b0;
+					if ((rat2_inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opb_prf_value = internal_data_out[i];
+						inst1_opb_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst1_opb_prf_value = {58'b0,rat2_inst1_opb_prf_idx};
+						inst1_opb_valid	    = 1'b0;
+					end
 				end
-			end
 		
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if ((rat2_inst1_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
-				begin
-					inst1_opb_prf_value = internal_data_out[i];
-					inst1_opb_valid	    = 1'b1;
-					break;
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin			
+					if ((rat2_inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opa_prf_value = internal_data_out[i];
+						inst2_opa_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opa_prf_value = {58'b0,rat2_inst2_opa_prf_idx};
+						inst2_opa_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					inst1_opb_prf_value = {58'b0,rat2_inst1_opb_prf_idx};
-					inst1_opb_valid	    = 1'b0;
-				end
-			end
-	
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin			
-				if ((rat2_inst2_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
-				begin
-					inst2_opa_prf_value = internal_data_out[i];
-					inst2_opa_valid	    = 1'b1;
-					break;
-				end
-				else
-				begin
-					inst2_opa_prf_value = {58'b0,rat2_inst2_opa_prf_idx};
-					inst2_opa_valid	    = 1'b0;
-				end
-			end
 		
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if ((rat2_inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					inst2_opb_prf_value = internal_data_out[i];
-					inst2_opb_valid	    = 1'b1;
-					break;
+					if ((rat2_inst2_opb_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opb_prf_value = internal_data_out[i];
+						inst2_opb_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opb_prf_value = {58'b0,rat2_inst2_opb_prf_idx};
+						inst2_opb_valid	    = 1'b0;
+					end
 				end
-				else
-				begin
-					inst2_opb_prf_value = {58'b0,rat2_inst2_opb_prf_idx};
-					inst2_opb_valid	    = 1'b0;
-				end
-			end
-		
+			end	
+			
 			// for writeback
 			for(int i=0;i<`PRF_SIZE;i++)
 			begin
@@ -596,7 +605,7 @@ module prf(
 					writeback_value1 = 0;
 				end
 			end
-		
+			
 			for(int i=0;i<`PRF_SIZE;i++)
 			begin
 				if ((rob2_retire_idx == i) && internal_prf_ready[i] && (!internal_prf_available[i]))
@@ -609,11 +618,11 @@ module prf(
 					writeback_value2 = 0;
 				end
 			end
-		if ((rat1_inst1_opa_prf_idx==48)||(rat2_inst1_opa_prf_idx==48))
-		begin
-			inst1_opa_prf_value = 0;
-			inst1_opa_valid	    = 1'b1;
-		end
+			if ((rat1_inst1_opa_prf_idx==48)||(rat2_inst1_opa_prf_idx==48))
+			begin	
+				inst1_opa_prf_value = 0;
+				inst1_opa_valid	    = 1'b1;
+			end	
 
 		if((rat1_inst1_opb_prf_idx==48)||(rat2_inst1_opb_prf_idx==48))
 		begin
@@ -630,7 +639,6 @@ module prf(
 			inst2_opb_prf_value = 0;
 			inst2_opb_valid	    = 1'b1;
 		end	
-		
 	end
 
 	//free prf	
