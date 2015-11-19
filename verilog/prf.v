@@ -448,7 +448,7 @@ module prf(
 			inst2_opb_valid		= 0;
 	
 			//rat1
-			if (rat1_read_enabe)
+			if (rat1_read_enable)
 			begin
 				for(int i=0;i<`PRF_SIZE;i++)
 				begin

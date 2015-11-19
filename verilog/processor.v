@@ -336,7 +336,7 @@ rat rat1(
 	.opa_ARF_idx2(ID_inst2_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
 	.opb_ARF_idx2(ID_inst2_opb[4:0]),	//to find PRF_idx
 	.dest_ARF_idx2(ID_dest_ARF_idx2),	//the ARF index of dest reg
-	.dest_rename_sig2(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
+	.dest_rename_sig2(ID_dest_ARF_idx2 != `ZERO_REG),	//if high, dest_reg need rename
 
 
 	.opa_valid_in1(ID_inst1_opa_valid),	//if high opa_valid is immediate
@@ -390,7 +390,7 @@ rat rat2(
 	.opa_ARF_idx2(ID_inst2_opa[4:0]),	//we will use opa_ARF_idx to find PRF_idx
 	.opb_ARF_idx2(ID_inst2_opb[4:0]),	//to find PRF_idx
 	.dest_ARF_idx2(ID_dest_ARF_idx2),	//the ARF index of dest reg
-	.dest_rename_sig2(ID_dest_ARF_idx1 != `ZERO_REG),	//if high, dest_reg need rename
+	.dest_rename_sig2(ID_dest_ARF_idx2 != `ZERO_REG),	//if high, dest_reg need rename
 
 
 	.opa_valid_in1(ID_inst1_opa_valid),	//if high opa_valid is immediate
@@ -532,6 +532,8 @@ prf prf1(
 	
 	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
 	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
+	.rat1_read_enable(PC_thread1_is_available),
+
 
 	//output
 	.rat1_prf1_rename_valid_out(PRF_RAT1_rename_valid1),		// when RAT1 asks the PRF to allocate a new entry, PRF should make sure the returned index is valid.
