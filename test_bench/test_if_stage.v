@@ -23,6 +23,9 @@ module test_if_stage;
 	logic [31:0] 		thread2_inst_out;
 	logic	 			thread1_inst_is_valid;
 	logic	 			thread2_inst_is_valid;
+	
+	// for debug
+	logic [63:0]		proc2Imem_addr_next;
 
 	if_stage(
 		//input
@@ -48,7 +51,10 @@ module test_if_stage;
 		.thread1_inst_out(thread1_inst_out),
 		.thread2_inst_out(thread2_inst_out),
 		.thread1_inst_is_valid(thread1_inst_is_valid),
-	 	.thread2_inst_is_valid(thread2_inst_is_valid)
+	 	.thread2_inst_is_valid(thread2_inst_is_valid),
+	 	
+	 	// for debug
+	 	.proc2Imem_addr_next(proc2Imem_addr_next)
 	);
 	
 	always #5 clock = ~clock;
@@ -69,9 +75,10 @@ module test_if_stage;
 						thread1_inst_out:%h, \n\
 						thread1_inst_is_valid:%b,\n\
 						thread2_inst_out:%h, \n\
-						thread2_inst_is_valid:%b",//for debug
+						thread2_inst_is_valid:%b.\n\
+						proc2Imem_addr_next:%d",//for debug
 				$time, clock, 
-				proc2Imem_addr,next_PC_out,thread1_inst_out,thread1_inst_is_valid,thread2_inst_out,thread2_inst_is_valid);
+				proc2Imem_addr,next_PC_out,thread1_inst_out,thread1_inst_is_valid,thread2_inst_out,thread2_inst_is_valid,proc2Imem_addr_next);
 
 
 		clock = 0;
@@ -136,6 +143,22 @@ module test_if_stage;
 		thread1_target_pc 				= 0;
 		thread2_target_pc				= 0;	
 		rs_stall 						= 0;		 			
+		rob1_stall 						= 0;
+		rob2_stall 						= 0;
+		rat_stall						= 0;	
+		thread1_structure_hazard_stall	= 0;	
+		thread2_structure_hazard_stall	= 0;	
+		Imem2proc_data					= 64'h1001_8901_1093_9707;					
+		Imem2proc_valid					= 1;				
+		is_two_threads					= 0;
+		@(negedge clock);
+		$display("@@@ RS_STALL@!!!!!");
+		reset = 0;						
+		thread1_branch_is_taken 		= 0;
+		thread2_branch_is_taken 		= 0;
+		thread1_target_pc 				= 0;
+		thread2_target_pc				= 0;	
+		rs_stall 						= 1;		 			
 		rob1_stall 						= 0;
 		rob2_stall 						= 0;
 		rat_stall						= 0;	

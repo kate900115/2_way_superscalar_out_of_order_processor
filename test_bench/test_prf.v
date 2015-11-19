@@ -216,7 +216,7 @@ module test_prf;
 
 		//A new request from RAT1 to allocate a new PRF 
 		//and return the index of this PRF entry.
-		$display("@@@ RAT1 allocate prf1 and RAT2 allocate prf2!!");
+		$display("@@@ RAT1 allocate prf1 !!");
 		reset = 0;	
 		cdb1_valid			 			= 0;
 		cdb1_tag			 			= 0;
@@ -234,7 +234,7 @@ module test_prf;
 		rat2_inst2_opb_prf_idx			= 0;
 		rat1_allocate_new_prf1			= 1;			
 		rat1_allocate_new_prf2  		= 0;
-		rat2_allocate_new_prf1  		= 1;			
+		rat2_allocate_new_prf1  		= 0;			
 		rat2_allocate_new_prf2		 	= 0;			
 		rrat1_prf_free_list		 		= 0;			
 		rrat2_prf_free_list		 		= 0;			
@@ -253,7 +253,7 @@ module test_prf;
 		rob1_retire_idx					= 0;
 		rob2_retire_idx					= 0;			
 
-		@(posedge clock);
+		@(negedge clock);
 		$display("@@@ RAT1 and RAT2 stop sending allocate_a_new_register_signal!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
@@ -327,7 +327,7 @@ module test_prf;
 		rob1_retire_idx					= 0;
 		rob2_retire_idx					= 0;
 
-		@(posedge clock);
+		@(negedge clock);
 		$display("@@@ RAT1 stop sending allocate_new_register_signal!!");
 		cdb1_valid			 = 0;
 		cdb1_tag			 = 0;
