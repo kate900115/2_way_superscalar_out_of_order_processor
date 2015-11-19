@@ -292,13 +292,13 @@ module rob(
 	begin
 	commit1_is_branch_out	= 0;
 	commit1_mispredict_out	= 0;
-	commit1_arn_dest_out	= 0;
+	commit1_arn_dest_out	= `ZERO_REG;
 	commit1_prn_dest_out	= 0;
 	commit1_if_rename_out	= 0;
 	commit1_is_thread1		= 0;
 	commit2_is_branch_out	= 0;
 	commit2_mispredict_out	= 0;
-	commit2_arn_dest_out	= 0;
+	commit2_arn_dest_out	= `ZERO_REG;
 	commit2_prn_dest_out	= 0;
 	commit2_if_rename_out	= 0;
 	commit2_is_thread1		= 0;

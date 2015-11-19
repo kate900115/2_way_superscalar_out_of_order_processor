@@ -98,7 +98,7 @@ module testbench;
     		.ROB_commit2_valid(ROB_commit2_valid),
     		.ROB_commit2_pc(ROB_commit2_pc),
     		.ROB_commit2_arn_dest(ROB_commit2_arn_dest),
-    		.ROB_commit1_wr_en(ROB_commit1_wr_en),
+    		.ROB_commit2_wr_en(ROB_commit2_wr_en),
     		.PRF_writeback_value2(PRF_writeback_value2)
 	);
 
