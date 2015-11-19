@@ -510,22 +510,7 @@ module prf(
 						inst2_opb_valid	    = 1'b0;
 					end
 				end
-			
-				for(int i=0;i<`PRF_SIZE;i++)
-				begin
-					if (rat1_inst1_opa_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i])
-					begin
-						inst1_opa_prf_value = internal_data_out[i];
-						inst1_opa_valid	    = 1'b1;
-						break;
-					end
-					else
-					begin
-						// if the value in prf is invalid, we need to return the index of this entry
-						inst1_opa_prf_value = {58'b0,rat1_inst1_opa_prf_idx};
-						inst1_opa_valid	    = 1'b0;
-					end
-				end
+			end //if
 
 			else
 			begin
@@ -590,7 +575,7 @@ module prf(
 						inst2_opb_valid	    = 1'b0;
 					end
 				end
-			end	
+			end	//if
 			
 			// for writeback
 			for(int i=0;i<`PRF_SIZE;i++)
