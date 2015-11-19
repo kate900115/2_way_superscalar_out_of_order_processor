@@ -57,12 +57,7 @@ module rob_one_entry(
 	output	[$clog2(`PRF_SIZE)-1:0]	prn_dest_out,                       //the prf number of the destination of this instruction
 	output				if_rename_out,				       	//if this entry is committed at this moment(tell RRAT)
 	output				halt_out,
-	output				illegal_out,
-	
-	//for debug
-	input	[31:0]		rob_inst1_in,
-	input	[31:0]		rob_inst2_in,
-	output	[31:0]		rob_inst_out
+	output				illegal_out
 );
 
 
@@ -90,25 +85,20 @@ module rob_one_entry(
 	logic	[63:0]		next_target_pc;
 	logic				next_halt;
 	logic				next_illegal;
-	
-	//for debug
-	logic	[31:0]		next_rob_inst;
-	logic	[31:0]		rob_inst;
 
 //describe the output function
 	assign is_thread1_out = if_committed ? thread : 0;
-	assign is_branch_out  = if_committed ? is_branch : 0;
+	assign is_branch_out = if_committed ? is_branch : 0;
 	assign mispredict_out = if_committed ? mispredict : 0;
-	assign arn_dest_out   = if_committed ? arn_dest : 0;
-	assign prn_dest_out   = if_committed ? prn_dest : 0;
-	assign target_pc_out  = if_committed ? target_pc : 0;
-	assign if_rename_out  = if_committed;						//if this entry is committed the output information is important
-	assign is_ex_out      = is_executed;
-	assign available_out  = ~inuse;			//if this entry is not in use, it is available
-	assign halt_out       = if_committed? halt : 0;
-	assign illegal_out    = if_committed? illegal : 0;
-	assign pc_out	      = if_committed? pc : 0;
-	assign rob_inst_out   = if_committed? rob_inst : 0;
+	assign arn_dest_out = if_committed ? arn_dest : 0;
+	assign prn_dest_out = if_committed ? prn_dest : 0;
+	assign target_pc_out = if_committed ? target_pc : 0;
+	assign if_rename_out = if_committed;						//if this entry is committed the output information is important
+	assign is_ex_out = is_executed;
+	assign available_out = ~inuse;			//if this entry is not in use, it is available
+	assign halt_out = if_committed? halt : 0;
+	assign illegal_out = if_committed? illegal : 0;
+	assign pc_out	= if_committed? pc : 0;
 
 	always_comb
 	begin
@@ -123,7 +113,6 @@ module rob_one_entry(
 		next_target_pc		= target_pc;
 		next_halt			= halt;
 		next_illegal		= illegal;
-		next_rob_inst		= rob_inst;
 		if (inst1_rob_load_in)
 		begin
 			next_thread			= is_thread1;
@@ -136,7 +125,6 @@ module rob_one_entry(
 			next_inuse			= 1'b1;
 			next_halt			= inst1_halt_in;
 			next_illegal		= inst1_illegal_in;
-			next_rob_inst		= rob_inst1_in;
 		end
 		else if (inst2_rob_load_in)
 		begin
@@ -150,7 +138,6 @@ module rob_one_entry(
 			next_inuse			= 1'b1;
 			next_halt			= inst2_halt_in;
 			next_illegal		= inst2_illegal_in;
-			next_rob_inst		= rob_inst2_in;
 		end
 		else if (inuse && is_ex_in) begin
 			next_is_executed 	= is_ex_in;
@@ -178,7 +165,6 @@ module rob_one_entry(
 			target_pc	<=	`SD 0;
 			halt		<=	`SD 0;
 			illegal		<=	`SD 0;
-			rob_inst	<=  `SD 0;
 		end
 		//if we want to load an instruction, the behavior is as follows:
 		else if (enable)
@@ -194,7 +180,6 @@ module rob_one_entry(
 			target_pc	<=	`SD next_target_pc;
 			halt		<=	`SD next_halt;
 			illegal		<=	`SD next_illegal;
-			rob_inst	<=	`SD next_rob_inst;
 		end
 	end//end always_ff                            
 endmodule

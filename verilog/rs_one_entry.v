@@ -42,7 +42,7 @@ module rs_one_entry(
 	input  FU_SELECT						inst2_rs1_fu_select,
 	input  [5:0]							inst2_rs1_op_type_in,			// Instruction type of rs1
 
-	input  		        					inst1_rs1_load_in,				// rs1 need two loads for each Signal from rename to flop opa/b/or signal to tell RS to load instruction in
+	input  		        					inst1_rs1_load_in,				// *****rs1 need two loads for each      Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	input  		        					inst2_rs1_load_in,
 
 	input   	        					rs1_free_enable_fu,				// Signal to send data to Func units AND to free this RS
@@ -50,8 +50,6 @@ module rs_one_entry(
 
 	input  [$clog2(`ROB_SIZE):0]       		inst1_rs1_rob_idx_in,   		// 
 	input  [$clog2(`ROB_SIZE):0]       		inst2_rs1_rob_idx_in,  			// 
-	
-
 
  	//output
 	output logic							rs1_ready_out,    				// This RS is in use and ready to go to EX 
@@ -62,12 +60,7 @@ module rs_one_entry(
 	output ALU_FUNC							rs1_alu_func_out,
 	output logic [$clog2(`ROB_SIZE):0]    	rs1_rob_idx_out,	 		  	// 
 	output FU_SELECT						fu_select_reg_out,
-	output [5:0]							rs1_op_type_out,
-	
-	// for debug
-	input  [63:0]  							inst1_pc_in,
-	input  [63:0]							inst2_pc_in,
-	output logic [63:0]						rs1_inst_pc_out
+	output [5:0]							rs1_op_type_out
 );
 
 
@@ -97,10 +90,6 @@ module rs_one_entry(
 	ALU_FUNC								Alu_func_reg;
 	FU_SELECT								fu_select;
 	FU_SELECT								fu_select_reg;
-	
-	//for debug
-	logic [63:0]							inst_pc_reg;
-	logic [63:0]							inst_pc;
 
 	assign rs1_available_out= rs1_ready_out ? rs1_free_enable_fu : ~InUse;
  
@@ -119,8 +108,6 @@ module rs_one_entry(
 	assign rs1_alu_func_out = rs1_free_enable_fu ? Alu_func_reg : ALU_DEFAULT;
 	
 	assign rs1_op_type_out	= rs1_free_enable_fu ? op_type_reg : 0;
-	
-	assign rs1_inst_pc_out	= rs1_free_enable_fu ? inst_pc_reg : 0 ;
 
 	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa_reg[$clog2(`PRF_SIZE)-1:0]) && !OPaValid_reg && InUse && rs1_cdb1_valid; 
 
@@ -131,20 +118,7 @@ module rs_one_entry(
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb2_valid;
 
 	always_comb begin
-		if (rs1_free) begin
-			OPa			= 0;
-       		OPaValid	= 0;
-       		OPb			= 0;
-       		OPbValid	= 0;
-			fu_select	= FU_DEFAULT;
-			DestTag		= 0;
-			Rob_idx		= 0;
-			Alu_func	= ALU_DEFAULT;
-			op_type		= 0;
-			next_InUse	= 1'b0;
-			inst_pc		= 0;
-		end
-		else if (rs1_free_enable_fu && inst1_rs1_load_in)
+		if (rs1_free_enable_fu && inst1_rs1_load_in)
 		begin
 			OPa			= inst1_rs1_opa_in;
        		OPaValid	= inst1_rs1_opa_valid;
@@ -156,7 +130,6 @@ module rs_one_entry(
 			Alu_func	= inst1_rs1_alu_func;
 			op_type		= inst1_rs1_op_type_in;
 			next_InUse	= 1'b1;
-			inst_pc		= inst1_pc_in;
 		end
 		else if (rs1_free_enable_fu && inst2_rs1_load_in)
 		begin
@@ -170,7 +143,6 @@ module rs_one_entry(
 			Alu_func	= inst2_rs1_alu_func;
 			op_type		= inst2_rs1_op_type_in;
 			next_InUse	= 1'b1;
-			inst_pc		= inst2_pc_in;
 		end
 		else if (rs1_free_enable_fu) begin
 			OPa			= 0;
@@ -183,7 +155,18 @@ module rs_one_entry(
 			Alu_func	= ALU_DEFAULT;
 			op_type		= 0;
 			next_InUse	= 1'b0;
-			inst_pc		= 0;
+		end
+		else if (rs1_free) begin
+			OPa			= 0;
+       		OPaValid	= 0;
+       		OPb			= 0;
+       		OPbValid	= 0;
+			fu_select	= FU_DEFAULT;
+			DestTag		= 0;
+			Rob_idx		= 0;
+			Alu_func	= ALU_DEFAULT;
+			op_type		= 0;
+			next_InUse	= 1'b0;
 		end
 		else if (inst1_rs1_load_in) begin
 			OPa			= inst1_rs1_opa_in;
@@ -196,7 +179,6 @@ module rs_one_entry(
 			Alu_func	= inst1_rs1_alu_func;
 			op_type		= inst1_rs1_op_type_in;
 			next_InUse	= 1'b1;
-			inst_pc		= inst1_pc_in;
 		end
 		else if (inst2_rs1_load_in) begin
 			OPa			= inst2_rs1_opa_in;
@@ -209,7 +191,6 @@ module rs_one_entry(
 			Alu_func	= inst2_rs1_alu_func;
 			op_type		= inst2_rs1_op_type_in;
 			next_InUse	= 1'b1;
-			inst_pc		= inst2_pc_in;
 		end
 		else begin
 			OPa			= OPa_reg;
@@ -222,7 +203,6 @@ module rs_one_entry(
 			Alu_func	= Alu_func_reg;
 			op_type		= op_type_reg;
 			next_InUse	= InUse;
-			inst_pc		= inst_pc_reg;
     			if (LoadAFromCDB1)
     			begin
         			OPa	 = rs1_cdb1_in;
@@ -260,7 +240,6 @@ module rs_one_entry(
           		DestTag_reg		<= `SD 0;
 				Rob_idx_reg		<= `SD 0;
 				Alu_func_reg 	<= `SD ALU_DEFAULT;
-				inst_pc_reg     <= `SD 0;
     		end
 		else
     		begin
@@ -274,7 +253,6 @@ module rs_one_entry(
        			Rob_idx_reg		<= `SD Rob_idx;
        			Alu_func_reg 	<= `SD Alu_func;
        			op_type_reg		<= `SD op_type;
-       			inst_pc_reg     <= `SD inst_pc;
     		end // else !reset
 	end // always @
 endmodule
