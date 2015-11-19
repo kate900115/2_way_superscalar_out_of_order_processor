@@ -10,7 +10,7 @@
 
 `timescale 1ns/100ps
 
-extern void print_header(string str);
+/*extern void print_header(string str);
 extern void print_cycles();
 extern void print_stage(string div, int inst, int npc, int valid_inst);
 extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
@@ -18,7 +18,7 @@ extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
 extern void print_membus(int proc2mem_command, int mem2proc_response,
                          int proc2mem_addr_hi, int proc2mem_addr_lo,
                          int proc2mem_data_hi, int proc2mem_data_lo);
-extern void print_close();
+extern void print_close();*/
 
 `include "sys_defs.vh"
 
@@ -211,11 +211,18 @@ module testbench;
 		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
    
     		wb_fileno = $fopen("writeback_t1.out");
+
+		#600;
+		$display("@@@\n@@");
+		show_clk_count;
+		//print_close(); // close the pipe_print output file
+		$fclose(wb_fileno);
+		$finish;
     	
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
-    print_header("                                                                            D-MEM Bus &\n");
-    print_header("Cycle:    PC   |    decoder   |   rat   |   prf   |   rrat   |  rob   |   RS |	EX	|	CDB	");
-  	end
+    		//print_header("                                                                            D-MEM Bus &\n");
+    		//print_header("Cycle:    PC   |    decoder   |   rat   |   prf   |   rrat   |  rob   |   RS |	EX	|	CDB	");
+  		end
 
 
   // Count the number of posedges and number of instructions completed
@@ -283,9 +290,11 @@ module testbench;
         			else
         				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
       			end
-      			
+      			//$display("@@@\n@@");
+			//show_clk_count;
+			//$fclose(wb_fileno);
       			//Here only for debug!!!!!!!!!!!!!!!!!
-      			#500 $finish;
+      			//#500 $finish;
 
       // deal with any halting conditions
       /*if(pipeline_error_status != NO_ERROR) begin
