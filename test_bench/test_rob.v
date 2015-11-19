@@ -64,6 +64,11 @@ module test_rob;
 	logic							commit2_is_thread1;
 	logic							t1_is_full;
 	logic							t2_is_full;
+	
+	logic	[31:0]					rob_inst1_in;
+	logic	[31:0]					rob_inst2_in;
+	logic	[31:0]					commit1_inst_out;
+	logic	[31:0]					commit2_inst_out;
 
 	rob r1(
 		//input
@@ -126,7 +131,14 @@ module test_rob;
 		.commit2_valid(commit2_valid),
 		.commit2_is_thread1(commit2_is_thread1),
 		.t1_is_full(t1_is_full),
-		.t2_is_full(t2_is_full)
+		.t2_is_full(t2_is_full),
+		
+		//for debug
+		.rob_inst1_in(rob_inst1_in),
+		.rob_inst2_in(rob_inst2_in),
+		.commit1_inst_out(commit1_inst_out),
+		.commit2_inst_out(commit2_inst_out)
+		
 );
 	
 	always #5 clock = ~clock;
@@ -155,6 +167,7 @@ module test_rob;
 		commit1_is_thread1:%h, \n\
 		commit1_is_halt_out:%b,\n\
 		commit1_is_illegal_out:%b,\n\
+		commit1_inst_out:%h,\n\
 		t1_is_full:%h,\n\
 		inst2_pc_in:%d\n\
 		commit2_pc_out:%d,\n\
@@ -169,10 +182,11 @@ module test_rob;
 		commit2_is_thread1:%h, \n\
 		commit2_is_halt_out:%b,\n\
 		commit2_is_illegal_out:%b,\n\
+		commit2_inst_out:%h,\n\
 		t2_is_full:%h",
 			$time, clock, 
-			inst1_pc_in, commit1_pc_out, inst1_load_in, inst1_rs_rob_idx_in, commit1_is_branch_out, commit1_mispredict_out, commit1_arn_dest_out, commit1_prn_dest_out, commit1_if_rename_out, commit1_valid, commit1_is_thread1,commit1_is_halt_out,commit1_is_illegal_out, t1_is_full,
-			inst2_pc_in, commit2_pc_out, inst2_load_in, inst2_rs_rob_idx_in, commit2_is_branch_out, commit2_mispredict_out, commit2_arn_dest_out, commit2_prn_dest_out, commit2_if_rename_out, commit2_valid, commit2_is_thread1, commit2_is_halt_out,commit2_is_illegal_out,t2_is_full);
+			inst1_pc_in, commit1_pc_out, inst1_load_in, inst1_rs_rob_idx_in, commit1_is_branch_out, commit1_mispredict_out, commit1_arn_dest_out, commit1_prn_dest_out, commit1_if_rename_out, commit1_valid, commit1_is_thread1,commit1_is_halt_out,commit1_is_illegal_out, commit1_inst_out, t1_is_full,
+			inst2_pc_in, commit2_pc_out, inst2_load_in, inst2_rs_rob_idx_in, commit2_is_branch_out, commit2_mispredict_out, commit2_arn_dest_out, commit2_prn_dest_out, commit2_if_rename_out, commit2_valid, commit2_is_thread1, commit2_is_halt_out,commit2_is_illegal_out, commit2_inst_out, t2_is_full);
 
 		clock = 0;
 		//RESET
@@ -207,6 +221,9 @@ module test_rob;
 		fu_rob_idx2	=0;		
 		mispredict_in2=0;
 		target_pc_in2=0;
+		
+		rob_inst1_in =0;
+		rob_inst2_in =0;
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(12 & 16) in, the second one is a branch");
 		reset = 0;
@@ -235,6 +252,8 @@ module test_rob;
 		mispredict_in2=0;
 		target_pc_in2=0;
 		
+		rob_inst1_in =32'h1234_4567;
+		rob_inst2_in =32'h0000_0192;
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(20 & 24) in");
 		$display(" @@@ CDB send two result idx(2 & 3) in");
@@ -263,6 +282,9 @@ module test_rob;
 		fu_rob_idx2	=2;		
 		mispredict_in2=0;
 		target_pc_in2=0;
+		
+		rob_inst1_in =32'h1234_4567;
+		rob_inst2_in =32'h4572_9387;
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(28 & 32) in");
 		$display(" @@@ CDB send two result idx(0 & 1)in");
@@ -292,7 +314,8 @@ module test_rob;
 		mispredict_in2=0;
 		target_pc_in2=0;
 		
-		
+		rob_inst1_in =32'h0034_4507;
+		rob_inst2_in =32'h4500_9387;
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(36 & 40) in");
 		$display("\n @@@ instruction 36 is a branch");
@@ -322,6 +345,9 @@ module test_rob;
 		fu_rob_idx2	=4;		
 		mispredict_in2=0;
 		target_pc_in2=0;
+		
+		rob_inst1_in =32'h1234_4000;
+		rob_inst2_in =32'h0002_9387;
 		
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(44 & 48) in");
@@ -353,6 +379,9 @@ module test_rob;
 		mispredict_in2=0;
 		target_pc_in2=0;
 		
+		rob_inst1_in =32'h7774_4567;
+		rob_inst2_in =32'h4572_9357;
+		
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(52 & 56) in");
 		
@@ -383,6 +412,9 @@ module test_rob;
 		mispredict_in2=0;
 		target_pc_in2=0;
 		
+		rob_inst1_in =32'h1356_4567;
+		rob_inst2_in =32'h4462_2437;
+		
 		@(negedge clock);
 		$display("\n @@@ load next two instructions(60 & 64) in");
 		$display(" @@@ CDB send two result idx(0a & 0b)in");
@@ -412,7 +444,39 @@ module test_rob;
 		mispredict_in2=0;
 		target_pc_in2=0;
 		
-		/*for(int i=1;i<8;i++)
+		rob_inst1_in =32'h1000_4567;
+		rob_inst2_in =32'h4572_9300;
+		@(negedge clock);
+		$display("\n @@@ load next two instructions(68 & 72) in");
+		$display(" @@@ CDB send two result idx(0a & 0b)in");
+		reset = 0;
+		is_thread1 = 1;
+		inst1_load_in = 1;
+		inst2_load_in = 1;
+		inst1_pc_in = 68;
+		inst1_arn_dest_in = 6;
+		inst1_prn_dest_in = 8;
+		inst1_is_branch_in = 0;
+		inst2_pc_in = 72;
+		inst2_arn_dest_in = 7;
+		inst2_prn_dest_in = 3;
+		inst2_is_branch_in = 0;
+		
+		inst1_is_halt_in = 0;
+		inst1_is_illegal_in	=0;
+		inst2_is_halt_in =0;
+		inst2_is_illegal_in =0;		       
+		if_fu_executed1	=1;	
+		fu_rob_idx1	=10;		
+		mispredict_in1=0;
+		target_pc_in1=0;
+		if_fu_executed2	=1;
+		fu_rob_idx2	=11;		
+		mispredict_in2=0;
+		target_pc_in2=0;
+		rob_inst1_in =32'h0329_4567;
+		rob_inst2_in =32'h4572_0031;
+		for(int i=1;i<9;i++)
 		begin
 		@(negedge clock);
 		is_thread1 = 1;
@@ -439,7 +503,10 @@ module test_rob;
 		fu_rob_idx2	=0;		
 		mispredict_in2=0;
 		target_pc_in2=0;
-		end */
+		
+		rob_inst1_in =32'h0000_0000;
+		rob_inst2_in =32'h4572_0087;
+		end 
 		@(negedge clock);
 		@(negedge clock);
 		
