@@ -95,23 +95,23 @@ endmodule // brcond
 
 
 module ex_stage(
-    input          			clock,			// system clock
-    input          			reset,			// system reset
+    input          								clock,			// system clock
+    input          								reset,			// system reset
 
-    input [5:0][63:0]			fu_rs_opa_in,		// register A value from reg file
-    input [5:0][63:0]			fu_rs_opb_in,		// register B value from reg file
-    input [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_in,
-    input [5:0][$clog2(`ROB_SIZE):0]	fu_rs_rob_idx_in,
-    input [5:0][5:0]  			fu_rs_op_type_in,	// incoming instruction
-    input [5:0]					fu_rs_valid_in,
-    input ALU_FUNC [5:0]     	fu_alu_func_in,	// ALU function select from decoder
+    input [5:0][63:0]							fu_rs_opa_in,		// register A value from reg file
+    input [5:0][63:0]							fu_rs_opb_in,		// register B value from reg file
+    input [5:0][$clog2(`PRF_SIZE)-1:0]			fu_rs_dest_tag_in,
+    input [5:0][$clog2(`ROB_SIZE):0]			fu_rs_rob_idx_in,
+    input [5:0][5:0]  							fu_rs_op_type_in,	// incoming instruction
+    input [5:0]									fu_rs_valid_in,
+    input ALU_FUNC [5:0]     					fu_alu_func_in,	// ALU function select from decoder
 
-    input	adder1_send_in_success,
-    input	adder2_send_in_success,
-    input	mult1_send_in_success,
-    input	mult2_send_in_success,
-	input	memory1_send_in_success,
-	input	memory2_send_in_success,
+    input										adder1_send_in_success,
+    input										adder2_send_in_success,
+    input										mult1_send_in_success,
+    input										mult2_send_in_success,
+	input										memory1_send_in_success,
+	input										memory2_send_in_success,
 
     output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,
     output logic [5:0][$clog2(`ROB_SIZE):0]		fu_rs_rob_idx_out,
@@ -120,21 +120,25 @@ module ex_stage(
     output logic [5:0][63:0]					fu_result_out,
     output logic [5:0]							fu_result_is_valid,	// 0,2: mult1,2; 1,3: adder1,2
     output logic [5:0]							fu_is_available,
-    output logic [1:0]                          fu_mispredict_sig   //mispredict signal generate
+    output logic [1:0]                          fu_mispredict_sig,   //mispredict signal generate
+    
+    //for debug
+    input  [5:0][63:0] 							rs_pc_in,
+    output logic[5:0][63:0]						fu_inst_pc_out
   );
 
-	logic [1:0]		brcond_result;
-	logic [63:0]	mult_result1;
-	logic [63:0]	mult_result2;
-	logic			mult_done1;
-	logic			mult_done2;
-	logic [63:0]	alu_result1;
-	logic [63:0]	alu_result2;
-	logic [63:0]	mem_result1;
-	logic [63:0]	mem_result2;
-	logic [5:0]		fu_is_in_use;
+	logic [1:0]									brcond_result;
+	logic [63:0]								mult_result1;
+	logic [63:0]								mult_result2;
+	logic										mult_done1;
+	logic										mult_done2;
+	logic [63:0]								alu_result1;
+	logic [63:0]								alu_result2;
+	logic [63:0]								mem_result1;
+	logic [63:0]								mem_result2;
+	logic [5:0]									fu_is_in_use;
 
-	logic [1:0]     fu_take_branch_out;
+	logic [1:0]     							fu_take_branch_out;
 
 	//assign ex_take_branch_out = id_ex_uncond_branch | (id_ex_cond_branch & brcond_result);
 
@@ -229,6 +233,7 @@ module ex_stage(
 			fu_result_is_valid[0]	<= `SD 1'b0;
 			fu_result_out[0]		<= `SD 0;
 			fu_is_in_use[0]			<= `SD 1'b0;
+			fu_inst_pc_out[0]		<= `SD 0;
 			
 			fu_rs_dest_tag_out[1]	<= `SD 0;
 			fu_rs_rob_idx_out[1]	<= `SD 0;
@@ -238,6 +243,7 @@ module ex_stage(
 			fu_result_out[1]		<= `SD 0;
 			fu_is_in_use[1]			<= `SD 1'b0;
 			fu_mispredict_sig[0]	<= `SD 1'b0;
+			fu_inst_pc_out[1]		<= `SD 0;
 
 			fu_rs_dest_tag_out[2]	<= `SD 0;
 			fu_rs_rob_idx_out[2]	<= `SD 0;
@@ -246,6 +252,7 @@ module ex_stage(
 			fu_result_is_valid[2]	<= `SD 1'b0;
 			fu_result_out[2]		<= `SD 0;
 			fu_is_in_use[2]			<= `SD 1'b0;
+			fu_inst_pc_out[2]		<= `SD 0;
 
 			fu_rs_dest_tag_out[3]	<= `SD 0;
 			fu_rs_rob_idx_out[3]	<= `SD 0;
@@ -255,6 +262,7 @@ module ex_stage(
 			fu_result_out[3]		<= `SD 0;
 			fu_is_in_use[3]			<= `SD 1'b0;
 			fu_mispredict_sig[1]	<= `SD 1'b0;
+			fu_inst_pc_out[3]		<= `SD 0;
 			
 			fu_rs_dest_tag_out[4]	<= `SD 0;
 			fu_rs_rob_idx_out[4]	<= `SD 0;
@@ -263,6 +271,7 @@ module ex_stage(
 			fu_result_is_valid[4]	<= `SD 1'b0;
 			fu_result_out[4]		<= `SD 0;
 			fu_is_in_use[4]			<= `SD 1'b0;
+			fu_inst_pc_out[4]		<= `SD 0;
 			
 			fu_rs_dest_tag_out[5]	<= `SD 0;
 			fu_rs_rob_idx_out[5]	<= `SD 0;
@@ -271,6 +280,7 @@ module ex_stage(
 			fu_result_is_valid[5]	<= `SD 1'b0;
 			fu_result_out[5]		<= `SD 0;
 			fu_is_in_use[5]			<= `SD 1'b0;
+			fu_inst_pc_out[0]		<= `SD 0;
 		end
 		else begin
 			if (fu_rs_valid_in[0])
@@ -281,6 +291,7 @@ module ex_stage(
 				fu_alu_func_out[0]		<= `SD fu_alu_func_in[0];
 				fu_result_is_valid[0]	<= `SD 1'b0;
 				fu_is_in_use[0]			<= `SD 1'b1;
+				fu_inst_pc_out[0]		<= `SD rs_pc_in[0];
 			end
 			else if (mult_done1) begin
 				fu_result_out[0]		<= `SD mult_result1;
@@ -300,6 +311,7 @@ module ex_stage(
 				fu_result_out[1]		<= `SD alu_result1;
 				fu_result_is_valid[1]	<= `SD 1'b1;
 				fu_mispredict_sig[0]	<= `SD fu_take_branch_out[0];
+				fu_inst_pc_out[1]		<= `SD rs_pc_in[1];
 			end
 			else if (adder1_send_in_success)
 			begin
@@ -314,6 +326,7 @@ module ex_stage(
 				fu_alu_func_out[2]		<= `SD fu_alu_func_in[2];
 				fu_result_is_valid[2]	<= `SD 1'b0;
 				fu_is_in_use[2]			<= `SD 1'b1;
+				fu_inst_pc_out[2]		<= `SD rs_pc_in[2];
 			end
 			else if (mult_done2) begin
 				fu_result_out[2]		<= `SD mult_result2;
@@ -333,6 +346,7 @@ module ex_stage(
 				fu_result_out[3]		<= `SD alu_result2;
 				fu_result_is_valid[3]	<= `SD 1'b1;
 				fu_mispredict_sig[1]	<= `SD fu_take_branch_out[1];
+				fu_inst_pc_out[3]		<= `SD rs_pc_in[3];
 			end
 			else if (adder2_send_in_success)
 			begin
@@ -347,6 +361,7 @@ module ex_stage(
 				fu_alu_func_out[4]		<= `SD fu_alu_func_in[4];
 				fu_result_out[4]		<= `SD mem_result1;
 				fu_result_is_valid[4]	<= `SD 1'b1;
+				fu_inst_pc_out[4]		<= `SD rs_pc_in[4];
 			end
 			else if (memory1_send_in_success)
 			begin
@@ -361,6 +376,7 @@ module ex_stage(
 				fu_alu_func_out[5]		<= `SD fu_alu_func_in[5];
 				fu_result_out[5]		<= `SD mem_result2;
 				fu_result_is_valid[5]	<= `SD 1'b1;
+				fu_inst_pc_out[5]		<= `SD rs_pc_in[5];
 			end
 			else if (memory2_send_in_success)
 			begin
