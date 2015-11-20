@@ -318,7 +318,7 @@ module rob(
 	commit2_is_illegal_out 	= 0;
 	commit1_inst_out		= 0;
 	commit2_inst_out		= 0;
-		if (rob1_internal_is_ex_out[t1_head] && t1_head != t1_tail)
+		if (rob1_internal_is_ex_out[t1_head] && (t1_head != t1_tail || (t1_head == t1_tail && !rob1_internal_available_out[t1_tail])))
 		begin
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
 			commit1_target_pc_out	= rob1_internal_target_pc_out[t1_head];
@@ -350,7 +350,7 @@ module rob(
 				commit1_valid = 1;
 				commit2_valid = 1;
 			end
-			else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
+			else if (rob2_internal_is_ex_out[t2_head] && (t2_head != t2_tail || (t2_head == t2_tail && !rob2_internal_available_out[t2_tail])))
 			begin
 				commit2_pc_out			= rob2_internal_pc_out[t2_head];
 				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head];
@@ -374,7 +374,7 @@ module rob(
 				commit1_valid = 1;
 			end
 		end
-		else if (rob2_internal_is_ex_out[t2_head] && t2_head != t2_tail)
+		else if (rob2_internal_is_ex_out[t2_head] && (t2_head != t2_tail || (t2_head == t2_tail && !rob2_internal_available_out[t2_tail])))
 		begin
 			commit1_pc_out			= rob2_internal_pc_out[t2_head];
 			commit1_target_pc_out	= rob2_internal_target_pc_out[t2_head];
@@ -476,11 +476,11 @@ module rob(
 			end
 		end
 		
-		if ((t1_tail + 4 == t1_head) ||  (t1_tail + 3 == t1_head) ||  (t1_tail + 2 == t1_head) || (t1_tail + 1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))				//**************************** 
+		if ((t1_tail + 2 == t1_head) || (t1_tail + 1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))				//**************************** 
 		begin
 			t1_is_full = 1;
 		end
-		if ( (t2_tail + 4 == t2_head) ||  (t2_tail + 3 == t2_head) ||  (t2_tail + 2 == t2_head) || (t2_tail + 1 == t2_head) || (t2_tail == t2_head && !rob2_internal_available_out[t2_tail]))
+		if ((t2_tail + 2 == t2_head) || (t2_tail + 1 == t2_head) || (t2_tail == t2_head && !rob2_internal_available_out[t2_tail]))
 		begin
 			t2_is_full = 1;
 		end
