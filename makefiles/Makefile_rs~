@@ -21,14 +21,15 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-				test_bench/test_id_stage.v
-SIMFILES = 	verilog/id_stage.v
-
-SYNFILES = id_stage.vg 
+		test_bench/test_rs.v
+SIMFILES = 	verilog/rs.v		\
+		verilog/rs_one_entry.v 	\
+		verilog/priority_selector.v
+SYNFILES = rs.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-id_stage.vg:	$(SIMFILES) tcl_files/id_stage.tcl 
-	dc_shell-t -f tcl_files/id_stage.tcl | tee synth.out
+rs.vg:	$(SIMFILES) rs.tcl 
+	dc_shell-t -f rs.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
@@ -55,4 +56,4 @@ clean:
           dve *.vpd *.vcd *.dump ucli.key 
 
 nuke:	clean
-	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.syn *.mr *.pvl
+	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.mr *.pvl *.syn *.txt

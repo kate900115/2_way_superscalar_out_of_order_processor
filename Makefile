@@ -11,7 +11,7 @@
 # similar to the information in those scripts but that seems hard to avoid.
 #
 
-VCS = SW_VCS=2015.09 vcs -sverilog +vc -Mupdate -line -full64 +define+ -xzcheck
+VCS = SW_VCS=2015.09 vcs -sverilog +vc -Mupdate -line -full64 +define+
 
 all:    simv
 	./simv | tee program.out
@@ -46,8 +46,8 @@ SIMFILES = 	verilog/cdb.v	\
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-processor.vg:	$(SIMFILES) processor.tcl 
-	dc_shell-t -f processor.tcl | tee synth.out
+processor.vg:	$(SIMFILES) tcl_files/processor.tcl 
+	dc_shell-t -f tcl_files/processor.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
