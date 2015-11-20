@@ -15,10 +15,6 @@ set design_name mult_stage
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 4.25
-#8 stage: 4.25
-#4 stage: 6.64
-#2 stage: 11
-
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */

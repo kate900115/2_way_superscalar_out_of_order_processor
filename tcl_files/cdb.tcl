@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : mult.tcl                                */
+#/*   FILE        : cdb.tcl                                 */
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
 #/*   You'll need to minimally set design_name & read files */
@@ -10,17 +10,12 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-<<<<<<< HEAD
 analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb_one_entry.v" "./verilog/cdb.v" "./verilog/priority_selector.v" ]
-=======
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v"]
->>>>>>> 48a7c630bbb6300c47ae5bd46f3727a1c15394f6
 elaborate cdb
 set design_name cdb
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 10
-
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */

@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : mult.tcl                                */
+#/*   FILE        : rob.tcl                                 */
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
 #/*   You'll need to minimally set design_name & read files */

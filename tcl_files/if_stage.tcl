@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : if_stage.tcl                                */
+#/*   FILE        : if_stage.tcl                            */
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f mult.scr          */
 #/*   You'll need to minimally set design_name & read files */
@@ -16,7 +16,6 @@ set design_name if_stage
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 10
-
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */
