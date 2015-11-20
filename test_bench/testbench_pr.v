@@ -85,17 +85,17 @@ module testbench;
     	
 
 	processor processor_0(
-		//input
-    		.clock(clock),                    // System clock
-    		.reset(reset),                    // System reset
-    		.mem2proc_response(mem2proc_response),        // Tag from memory about current request
-    		.mem2proc_data(mem2proc_data),            // Data coming back from memory
-    		.mem2proc_tag(mem2proc_tag),              // Tag from memory about current reply
+			//input
+    		.clock(clock),                    					// System clock
+    		.reset(reset),                    					// System reset
+    		.mem2proc_response(mem2proc_response),        		// Tag from memory about current request
+    		.mem2proc_data(mem2proc_data),            			// Data coming back from memory
+    		.mem2proc_tag(mem2proc_tag),              			// Tag from memory about current reply
 
-		//output
-    		.proc2mem_command(proc2mem_command),    // command sent to memory
-    		.proc2mem_addr(proc2mem_addr),      // Address sent to memory
-    		.proc2mem_data(proc2mem_data),      // Data sent to memory
+			//output
+    		.proc2mem_command(proc2mem_command),    			// command sent to memory
+    		.proc2mem_addr(proc2mem_addr),      				// Address sent to memory
+    		.proc2mem_data(proc2mem_data),      				// Data sent to memory
 
     		.pipeline_completed_insts(pipeline_completed_insts),
     
@@ -145,7 +145,7 @@ module testbench;
 			.ROB_commit2_inst_out(ROB_commit2_inst_out)
 	);
 
-// Instantiate the Data Memory
+	// Instantiate the Data Memory
 	mem memory(
 			// Inputs
 			.clock               (clock),
@@ -154,7 +154,6 @@ module testbench;
 			.proc2mem_data     (proc2mem_data),
 
 			 // Outputs
-
 			.mem2proc_response (mem2proc_response),
 			.mem2proc_data     (mem2proc_data),
 			.mem2proc_tag      (mem2proc_tag)
@@ -216,29 +215,6 @@ module testbench;
 	
 		//#10
    		// Pulse the reset signal
-	$monitor (" @@@ time:%d, \
-			reset:%h, \
-			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\n\
-			ROB_commit1_pc:%h, \n\
-			clock:%h,\n\
-			mem2proc_tag:%h, \n\
-			PC_inst1:%h, \n\
-    		PC_inst2:%h,\n\
-    		ID_inst1_opa:%h,\n\
-    		ID_inst2_opa:%h,\n\
-    		RAT1_PRF_opa_idx1:%h,\n\
-   			RAT1_PRF_opa_idx2:%h, \n\
-   			ROB_t1_is_full: %h, \n\
-   			ROB_t2_is_full:%h, \n\
-   			PC_inst1_valid:%h, \n\
-   			mem2proc_response:%h, \n\
-   			PRF_is_full:%h, \n\
-   			Imem2proc_valid:%h, \n\
-   			fu_next_inst_pc_out0:%h\n\
-   			RS_full:%h\n\
-   			RS_EX_op_type[0]:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
@@ -273,11 +249,11 @@ module testbench;
   		end
 
 
-  // Count the number of posedges and number of instructions completed
-  // till simulation ends
+  		// Count the number of posedges and number of instructions completed
+  		// till simulation ends
 	
-	// Count the number of posedges and number of instructions completed
-	// till simulation ends
+		// Count the number of posedges and number of instructions completed
+		// till simulation ends
 	always @(posedge clock or posedge reset)
 	begin
 		if(reset)
@@ -306,9 +282,7 @@ module testbench;
        //IF
        print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0], {31'b0,PC_inst1_valid});
        print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]+4, {31'b0,PC_inst2_valid});
-       //ROB
-       print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);
-       print_stage(" ", ROB_commit2_inst_out, ROB_commit2_pc, ROB_commit2_valid);
+       
        //RS
        print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0]);
        print_stage_fu(" ", fu_next_inst_pc_out[1][63:0],RS_EX_op_type[1]);
@@ -323,18 +297,20 @@ module testbench;
        print_stage_fu(" ", fu_inst_pc_out[3][63:0],EX_rs_op_type_out[3]);
        print_stage_fu(" ", fu_inst_pc_out[4][63:0],EX_rs_op_type_out[4]);
        print_stage_fu(" ", fu_inst_pc_out[5][63:0],EX_rs_op_type_out[5]);
-       //prf, rrat, rob
+       
+       //ROB
+       print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);
+       print_stage(" ", ROB_commit2_inst_out, ROB_commit2_pc, ROB_commit2_valid);
 
+	   // for writeback
        print_reg(PRF_writeback_value1[63:32], PRF_writeback_value1[31:0],{27'b0,ROB_commit1_arn_dest}, {31'b0,ROB_commit1_wr_en});
        print_reg(PRF_writeback_value2[63:32], PRF_writeback_value2[31:0],{27'b0,ROB_commit2_arn_dest}, {31'b0,ROB_commit2_wr_en});
-       print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
-                 proc2mem_addr[63:32], proc2mem_addr[31:0],
-                 proc2mem_data[63:32], proc2mem_data[31:0]);
+       print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},proc2mem_addr[63:32], proc2mem_addr[31:0],proc2mem_data[63:32], proc2mem_data[31:0]);
                     
                     
-    // print the writeback information to writeback.out
-	//for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
-	//pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
+    	// print the writeback information to writeback.out
+		// for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
+		// pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
        			if(pipeline_completed_insts>0) begin
          			if(ROB_commit1_valid&&ROB_commit1_wr_en)
            				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
@@ -358,19 +334,16 @@ module testbench;
 				end
       		end
       		
-     
-      			//$display("@@@\n@@");
+
 			//show_clk_count;
 			//$fclose(wb_fileno);
-      			//Here only for debug!!!!!!!!!!!!!!!!!
-      			//#500 $finish;
 
-      // deal with any halting conditions
-      /*if(pipeline_error_status != NO_ERROR) begin
-        print_close(); // close the pipe_print output file
-        $fclose(wb_fileno);
-        #100 $finish;
-      end*/
+      		// deal with any halting conditions
+     		/*if(pipeline_error_status != NO_ERROR) begin
+        	print_close(); // close the pipe_print output file
+        	$fclose(wb_fileno);
+        	#100 $finish;
+      		end*/
 			// deal with any halting conditions
 			if(pipeline_error_status!=NO_ERROR)
 			begin
@@ -406,4 +379,26 @@ module testbench;
 
 endmodule  // module testbench
 
-
+/*$monitor (" @@@ time:%d, \
+			reset:%h, \
+			pipeline_error_status:%h, \
+			ROB_commit1_valid:%h,\n\
+			ROB_commit1_pc:%h, \n\
+			clock:%h,\n\
+			mem2proc_tag:%h, \n\
+			PC_inst1:%h, \n\
+    		PC_inst2:%h,\n\
+    		ID_inst1_opa:%h,\n\
+    		ID_inst2_opa:%h,\n\
+    		RAT1_PRF_opa_idx1:%h,\n\
+   			RAT1_PRF_opa_idx2:%h, \n\
+   			ROB_t1_is_full: %h, \n\
+   			ROB_t2_is_full:%h, \n\
+   			PC_inst1_valid:%h, \n\
+   			mem2proc_response:%h, \n\
+   			PRF_is_full:%h, \n\
+   			Imem2proc_valid:%h, \n\
+   			fu_next_inst_pc_out0:%h\n\
+   			RS_full:%h\n\
+   			RS_EX_op_type[0]:%h",
+			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);*/
