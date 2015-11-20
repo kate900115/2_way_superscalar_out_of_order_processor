@@ -36,7 +36,7 @@ module if_stage(
 	output logic		thread1_is_available,
 	
 	//for debug
-	output logic [63:0]	proc2Imem_addr_next
+	output logic [63:0]	proc2Imem_addr_previous
 	);
 	
 	
@@ -55,8 +55,8 @@ module if_stage(
 	logic	 	 		thread1_inst2_is_valid;
 	logic	 	 		thread2_inst1_is_valid;
 	logic	 	 		thread2_inst2_is_valid;
-	logic [63:0]		proc2Imem_addr_next1;
-	logic [63:0]		proc2Imem_addr_next2;
+	logic [63:0]		proc2Imem_addr_previous1;
+	logic [63:0]		proc2Imem_addr_previous2;
 	
 	CURRENT_THREAD_STATE current_thread_state;
 	CURRENT_THREAD_STATE next_thread_state;
@@ -86,7 +86,7 @@ module if_stage(
 		.inst2_is_valid(thread1_inst2_is_valid),  
 		
 		// for debug
-		.proc2Imem_addr_next(proc2Imem_addr_next1),	
+		.proc2Imem_addr_previous(proc2Imem_addr_previous1),	
 		.next_PC_out(next_PC_out1)        	 				// PC of instruction after fetched (PC+8).	 	
   		);
 
@@ -114,7 +114,7 @@ module if_stage(
 		.inst2_is_valid(thread2_inst2_is_valid),
 		
 		// for debug
-		.proc2Imem_addr_next(proc2Imem_addr_next2),	
+		.proc2Imem_addr_previous(proc2Imem_addr_previous2),	
 		.next_PC_out(next_PC_out2)        	 				 	  		 	
   		);	
   	
@@ -134,71 +134,71 @@ module if_stage(
 	begin
 		if (!is_two_threads)
 		begin
-			pc_enable1			  		  = 1'b1;
-			pc_enable2			  		  = 1'b0;
-			proc2Imem_addr				  = proc2Imem_addr1;
-			next_PC_out 		 		  = next_PC_out1;
-			thread1_inst_out 	 		  = thread1_inst1_out;
-			thread2_inst_out 	 		  = thread1_inst2_out;
-			thread1_inst_is_valid		  = thread1_inst1_is_valid;
-			thread2_inst_is_valid		  = thread1_inst2_is_valid;
-			proc2Imem_addr_next			  = proc2Imem_addr_next1;
-			next_thread_state			  = THREAD1_IS_EX;
+			pc_enable1			  		    = 1'b1;
+			pc_enable2			  		    = 1'b0;
+			proc2Imem_addr				    = proc2Imem_addr1;
+			next_PC_out 		 		    = next_PC_out1;
+			thread1_inst_out 	 		    = thread1_inst1_out;
+			thread2_inst_out 	 		    = thread1_inst2_out;
+			thread1_inst_is_valid		    = thread1_inst1_is_valid;
+			thread2_inst_is_valid		    = thread1_inst2_is_valid;
+			proc2Imem_addr_previous		    = proc2Imem_addr_previous1;
+			next_thread_state			    = THREAD1_IS_EX;
 		end
 		else
 		begin
 			case (current_thread_state)
 				PROGRAM_START:
 				begin
-					pc_enable1			  = 1'b0;
-					pc_enable2			  = 1'b0;
-					proc2Imem_addr		  = proc2Imem_addr1;
-					next_PC_out 		  = next_PC_out2;
-					thread1_inst_out 	  = thread1_inst1_out;
-					thread2_inst_out 	  = thread1_inst2_out;
-					thread1_inst_is_valid = thread1_inst1_is_valid;
-					thread2_inst_is_valid = thread1_inst2_is_valid;
-					proc2Imem_addr_next   = proc2Imem_addr_next1;
-					next_thread_state     = THREAD2_IS_EX;
+					pc_enable1			    = 1'b0;
+					pc_enable2			    = 1'b0;
+					proc2Imem_addr		    = proc2Imem_addr1;
+					next_PC_out 		    = next_PC_out2;
+					thread1_inst_out 	    = thread1_inst1_out;
+					thread2_inst_out 	    = thread1_inst2_out;
+					thread1_inst_is_valid   = thread1_inst1_is_valid;
+					thread2_inst_is_valid   = thread1_inst2_is_valid;
+					proc2Imem_addr_previous = proc2Imem_addr_previous1;
+					next_thread_state       = THREAD2_IS_EX;
 				end
 				THREAD1_IS_EX:
 				begin
-					pc_enable1			  = 1'b0;
-					pc_enable2			  = 1'b1;
-					proc2Imem_addr		  = proc2Imem_addr1;
-					next_PC_out 		  = next_PC_out2;
-					thread1_inst_out 	  = thread1_inst1_out;
-					thread2_inst_out 	  = thread1_inst2_out;
-					thread1_inst_is_valid = thread1_inst1_is_valid;
-					thread2_inst_is_valid = thread1_inst2_is_valid;
-					proc2Imem_addr_next	  = proc2Imem_addr_next1;
-					next_thread_state     = THREAD2_IS_EX;
+					pc_enable1			    = 1'b0;
+					pc_enable2			    = 1'b1;
+					proc2Imem_addr		    = proc2Imem_addr1;
+					next_PC_out 		    = next_PC_out2;
+					thread1_inst_out 	    = thread1_inst1_out;
+					thread2_inst_out 	    = thread1_inst2_out;
+					thread1_inst_is_valid   = thread1_inst1_is_valid;
+					thread2_inst_is_valid   = thread1_inst2_is_valid;
+					proc2Imem_addr_previous	= proc2Imem_addr_previous1;
+					next_thread_state       = THREAD2_IS_EX;
 				end
 				THREAD2_IS_EX:
 				begin
-					pc_enable1			  = 1'b1;
-					pc_enable2			  = 1'b0;
-					proc2Imem_addr		  = proc2Imem_addr2;
-					next_PC_out 		  = next_PC_out1;
-					thread1_inst_out 	  = thread2_inst1_out;
-					thread2_inst_out 	  = thread2_inst2_out;
-					thread1_inst_is_valid = thread2_inst1_is_valid;
-					thread2_inst_is_valid = thread2_inst2_is_valid;
-					proc2Imem_addr_next   = proc2Imem_addr_next2;
-					next_thread_state 	  = THREAD1_IS_EX;
+					pc_enable1			    = 1'b1;
+					pc_enable2			    = 1'b0;
+					proc2Imem_addr		    = proc2Imem_addr2;
+					next_PC_out 		    = next_PC_out1;
+					thread1_inst_out 	    = thread2_inst1_out;
+					thread2_inst_out 	    = thread2_inst2_out;
+					thread1_inst_is_valid   = thread2_inst1_is_valid;
+					thread2_inst_is_valid   = thread2_inst2_is_valid;
+					proc2Imem_addr_previous = proc2Imem_addr_previous2;
+					next_thread_state 	    = THREAD1_IS_EX;
 				end
 				default:
 				begin
-					pc_enable1			  = 1'b0;
-					pc_enable2			  = 1'b0;
-					proc2Imem_addr		  = 0;
-					next_PC_out 		  = 0;
-					thread1_inst_out 	  = 0;
-					thread2_inst_out 	  = 0;
-					thread1_inst_is_valid = 0;
-					thread2_inst_is_valid = 0;
-					proc2Imem_addr_next   = 0;
-					next_thread_state     = NO_ONE_IS_EX;
+					pc_enable1			    = 1'b0;
+					pc_enable2			    = 1'b0;
+					proc2Imem_addr		    = 0;
+					next_PC_out 		    = 0;
+					thread1_inst_out 	    = 0;
+					thread2_inst_out 	    = 0;
+					thread1_inst_is_valid   = 0;
+					thread2_inst_is_valid   = 0;
+					proc2Imem_addr_previous = 0;
+					next_thread_state       = NO_ONE_IS_EX;
 				end
 			endcase
 		end

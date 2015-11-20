@@ -61,7 +61,7 @@ module testbench;
 
     	//output from IF-stage
 		logic [63:0]					PC_proc2Imem_addr;
-		logic [63:0]					PC_proc2Imem_addr_next;
+		logic [63:0]					PC_proc2Imem_addr_previous;
 		logic [31:0]					PC_inst1;
 		logic [31:0]					PC_inst2;
 		logic							PC_inst1_valid;
@@ -122,7 +122,7 @@ module testbench;
     		.PRF_writeback_value2(PRF_writeback_value2),
     		
     		.PC_proc2Imem_addr(PC_proc2Imem_addr),
-			.PC_proc2Imem_addr_next(PC_proc2Imem_addr_next),
+			.PC_proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
 			.PC_inst1(PC_inst1),
 			.PC_inst2(PC_inst2),
 			.PC_inst1_valid(PC_inst1_valid),

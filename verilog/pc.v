@@ -35,7 +35,7 @@ module pc(
 	
 	// for debug
 	output logic [63:0] 	next_PC_out,
-	output logic [63:0]		proc2Imem_addr_next
+	output logic [63:0]		proc2Imem_addr_previous
   );
 
 
@@ -60,7 +60,7 @@ module pc(
 	
 	// for debug
 	assign next_PC_out    = next_PC;
-	assign proc2Imem_addr_next = proc2Imem_addr + 4;
+	assign proc2Imem_addr_previous = (proc2Imem_addr==0)? 0 : proc2Imem_addr - 8;
 
   	// next PC is target_pc if there is a taken branch or
   	// the next sequential PC (PC+8) if no branch
