@@ -574,7 +574,7 @@ rob rob1(
 	
 	.is_thread1(PC_thread1_is_available),					//if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
-	.inst1_pc_in(PC_proc2Imem_addr),				//the pc of the instruction
+	.inst1_pc_in(PC_proc2Imem_addr-8),				//the pc of the instruction
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
 	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
@@ -583,7 +583,7 @@ rob rob1(
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
-	.inst2_pc_in(PC_proc2Imem_addr+4),				//the pc of the instruction
+	.inst2_pc_in(PC_proc2Imem_addr-4),				//the pc of the instruction
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
