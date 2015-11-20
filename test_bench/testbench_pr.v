@@ -112,15 +112,36 @@ module testbench;
     		//output
     		//Output from rob
     		.ROB_commit1_valid(ROB_commit1_valid),
-    		.ROB_commit1_pc(ROB_commit1_pc),
     		.ROB_commit1_arn_dest(ROB_commit1_arn_dest),
     		.ROB_commit1_wr_en(ROB_commit1_wr_en),
     		.PRF_writeback_value1(PRF_writeback_value1),
     		.ROB_commit2_valid(ROB_commit2_valid),
-    		.ROB_commit2_pc(ROB_commit2_pc),
     		.ROB_commit2_arn_dest(ROB_commit2_arn_dest),
     		.ROB_commit2_wr_en(ROB_commit2_wr_en),
-    		.PRF_writeback_value2(PRF_writeback_value2)
+    		.PRF_writeback_value2(PRF_writeback_value2),
+    		
+    		.PC_proc2Imem_addr(PC_proc2Imem_addr),
+			.PC_proc2Imem_addr_next(PC_proc2Imem_addr_next),
+			.PC_inst1(PC_inst1),
+			.PC_inst2(PC_inst2),
+			.PC_inst1_valid(PC_inst1_valid),
+			.PC_inst2_valid(PC_inst2_valid),
+    
+    		// Outputs from RS
+			.fu_next_inst_pc_out(fu_next_inst_pc_out),
+			.RS_EX_op_type(RS_EX_op_type),
+			.RS_EX_alu_func(RS_EX_alu_func),
+	
+			// Outputs from EX-stage
+			.fu_inst_pc_out(fu_inst_pc_out),	
+			.EX_alu_func_out(EX_alu_func_out),
+    		.EX_rs_op_type_out(EX_rs_op_type_out),
+	
+			// Outputs from ROB
+			.ROB_commit1_pc(ROB_commit1_pc),
+			.ROB_commit2_pc(ROB_commit2_pc),
+			.ROB_commit1_inst_out(ROB_commit1_inst_out),
+			.ROB_commit2_inst_out(ROB_commit2_inst_out)
 	);
 
 // Instantiate the Data Memory
