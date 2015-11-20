@@ -46,20 +46,41 @@ module testbench;
     	// the synthesized version) data is tested by looking at
     	// the final values in memory
 
-    	//output
+ 		//output
     	// Outputs from IF-Stage 
     	//Output from rob
     	logic							ROB_commit1_valid;
     	logic [63:0]					PRF_writeback_value1;
-    	logic [63:0]					ROB_commit1_pc;
     	logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
     	logic							ROB_commit1_wr_en;
     	logic							ROB_commit2_valid;
     	logic [63:0]					PRF_writeback_value2;
-    	logic [63:0]					ROB_commit2_pc;
    		logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
     	logic							ROB_commit2_wr_en;
-    	
+
+    	//output from IF-stage
+		logic [63:0]					PC_proc2Imem_addr;
+		logic [63:0]					PC_proc2Imem_addr_next;
+		logic [31:0]					PC_inst1;
+		logic [31:0]					PC_inst2;
+		logic							PC_inst1_valid;
+		logic							PC_inst2_valid;
+    
+    	// Outputs from RS
+		logic [5:0][63:0]				fu_next_inst_pc_out;
+		logic [5:0][5:0]				RS_EX_op_type;
+		ALU_FUNC [5:0]					RS_EX_alu_func;
+	
+		// Outputs from EX-stage
+		logic [5:0][63:0]				fu_inst_pc_out;	
+		ALU_FUNC [5:0]					EX_alu_func_out;
+    	logic [5:0][5:0]				EX_rs_op_type_out;
+	
+		// Outputs from ROB
+		logic [63:0]					ROB_commit1_pc;
+		logic [63:0]					ROB_commit2_pc;
+		logic [31:0]					ROB_commit1_inst_out;
+		logic [31:0]					ROB_commit2_inst_out;
     	
 
 	processor processor_0(
