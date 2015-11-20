@@ -332,7 +332,7 @@ module testbench;
        //             proc2mem_data[63:32], proc2mem_data[31:0]);
                     
                     
-                           	// print the writeback information to writeback.out
+    // print the writeback information to writeback.out
 	//for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
 	//pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
        			if(pipeline_completed_insts>0) begin
