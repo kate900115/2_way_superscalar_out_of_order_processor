@@ -270,7 +270,7 @@ if_stage pc(
 	.thread2_inst_is_valid(PC_inst2_valid),
 	.thread1_is_available(PC_thread1_is_available),
 	//for debug
-	.proc2Imem_addr_next(proc2Imem_addr_next)
+	.proc2Imem_addr_next(PC_proc2Imem_addr_next)
 	);
 //////////////////////////////////
 //								//
