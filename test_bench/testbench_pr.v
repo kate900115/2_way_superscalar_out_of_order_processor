@@ -260,7 +260,7 @@ module testbench;
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            D-MEM Bus &\n");
-    		print_header("Cycle: PC inst1  |  PC inst2  |    RoB1    |    RoB2   |    RS1    |     RS2    |     RS3     |     RS4    |    RS5    |     RS6     |     EX1     |    EX2    |    EX3     |     EX4    |     EX5    |     EX6    ");
+    		print_header("Cycle: PC inst1 | PC inst2 |   RoB1   |   RoB2   |   RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |    EX6   ");
     		
     		#600;
 		$display("@@@\n@@");
