@@ -202,7 +202,7 @@ void print_stage_fu(char* div, int inst_pc,int optype)
     opcode = optype;
     switch(opcode)
     {
-      case 0x00: str = "halt or callpal"; break;
+      case 0x00: str = "-"; break;
       case 0x08: str = "lda"; break;
       case 0x09: str = "ldah"; break;
       case 0x0a: str = "ldbu"; break;
