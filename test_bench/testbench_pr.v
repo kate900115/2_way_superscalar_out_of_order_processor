@@ -10,15 +10,15 @@
 
 `timescale 1ns/100ps
 
-/*extern void print_header(string str);
+extern void print_header(string str);
 extern void print_cycles();
 extern void print_stage(string div, int inst, int npc, int valid_inst);
-extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
+/*extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
 extern void print_membus(int proc2mem_command, int mem2proc_response,
                          int proc2mem_addr_hi, int proc2mem_addr_lo,
-                         int proc2mem_data_hi, int proc2mem_data_lo);
-extern void print_close();*/
+                         int proc2mem_data_hi, int proc2mem_data_lo);*/
+extern void print_close();
 
 `include "sys_defs.vh"
 
@@ -46,20 +46,41 @@ module testbench;
     	// the synthesized version) data is tested by looking at
     	// the final values in memory
 
-    	//output
+ 		//output
     	// Outputs from IF-Stage 
     	//Output from rob
     	logic							ROB_commit1_valid;
     	logic [63:0]					PRF_writeback_value1;
-    	logic [63:0]					ROB_commit1_pc;
     	logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
     	logic							ROB_commit1_wr_en;
     	logic							ROB_commit2_valid;
     	logic [63:0]					PRF_writeback_value2;
-    	logic [63:0]					ROB_commit2_pc;
    		logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest;
     	logic							ROB_commit2_wr_en;
-    	
+
+    	//output from IF-stage
+		logic [63:0]					PC_proc2Imem_addr;
+		logic [63:0]					PC_proc2Imem_addr_next;
+		logic [31:0]					PC_inst1;
+		logic [31:0]					PC_inst2;
+		logic							PC_inst1_valid;
+		logic							PC_inst2_valid;
+    
+    	// Outputs from RS
+		logic [5:0][63:0]				fu_next_inst_pc_out;
+		logic [5:0][5:0]				RS_EX_op_type;
+		ALU_FUNC [5:0]					RS_EX_alu_func;
+	
+		// Outputs from EX-stage
+		logic [5:0][63:0]				fu_inst_pc_out;	
+		ALU_FUNC [5:0]					EX_alu_func_out;
+    	logic [5:0][5:0]				EX_rs_op_type_out;
+	
+		// Outputs from ROB
+		logic [63:0]					ROB_commit1_pc;
+		logic [63:0]					ROB_commit2_pc;
+		logic [31:0]					ROB_commit1_inst_out;
+		logic [31:0]					ROB_commit2_inst_out;
     	
 
 	processor processor_0(
@@ -91,15 +112,36 @@ module testbench;
     		//output
     		//Output from rob
     		.ROB_commit1_valid(ROB_commit1_valid),
-    		.ROB_commit1_pc(ROB_commit1_pc),
     		.ROB_commit1_arn_dest(ROB_commit1_arn_dest),
     		.ROB_commit1_wr_en(ROB_commit1_wr_en),
     		.PRF_writeback_value1(PRF_writeback_value1),
     		.ROB_commit2_valid(ROB_commit2_valid),
-    		.ROB_commit2_pc(ROB_commit2_pc),
     		.ROB_commit2_arn_dest(ROB_commit2_arn_dest),
     		.ROB_commit2_wr_en(ROB_commit2_wr_en),
-    		.PRF_writeback_value2(PRF_writeback_value2)
+    		.PRF_writeback_value2(PRF_writeback_value2),
+    		
+    		.PC_proc2Imem_addr(PC_proc2Imem_addr),
+			.PC_proc2Imem_addr_next(PC_proc2Imem_addr_next),
+			.PC_inst1(PC_inst1),
+			.PC_inst2(PC_inst2),
+			.PC_inst1_valid(PC_inst1_valid),
+			.PC_inst2_valid(PC_inst2_valid),
+    
+    		// Outputs from RS
+			.fu_next_inst_pc_out(fu_next_inst_pc_out),
+			.RS_EX_op_type(RS_EX_op_type),
+			.RS_EX_alu_func(RS_EX_alu_func),
+	
+			// Outputs from EX-stage
+			.fu_inst_pc_out(fu_inst_pc_out),	
+			.EX_alu_func_out(EX_alu_func_out),
+    		.EX_rs_op_type_out(EX_rs_op_type_out),
+	
+			// Outputs from ROB
+			.ROB_commit1_pc(ROB_commit1_pc),
+			.ROB_commit2_pc(ROB_commit2_pc),
+			.ROB_commit1_inst_out(ROB_commit1_inst_out),
+			.ROB_commit2_inst_out(ROB_commit2_inst_out)
 	);
 
 // Instantiate the Data Memory
@@ -203,25 +245,28 @@ module testbench;
 		$readmemh("program.mem", memory.unified_memory);
 	
 		@(posedge clock);
-    		@(posedge clock);
-    		`SD;
-    		// This reset is at an odd time to avoid the pos & neg clock edges
+    	@(posedge clock);
+    	`SD;
+    	// This reset is at an odd time to avoid the pos & neg clock edges
 	
-    		reset = 1'b0;
+    	reset = 1'b0;
 		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
    
-    		wb_fileno = $fopen("writeback_t1.out");
+    	wb_fileno = $fopen("writeback_t1.out");
 
-		#600;
+		
+    		//Open header AFTER throwing the reset otherwise the reset state is displayed
+    		print_header("                                                                            D-MEM Bus &\n");
+    		print_header("Cycle:   PC inst1   |   PC inst2   |         EX        |         rob        |         RS       ");
+    		
+    		#600;
 		$display("@@@\n@@");
 		show_clk_count;
 		//print_close(); // close the pipe_print output file
-		$fclose(wb_fileno);
-		$finish;
+		
     	
-    		//Open header AFTER throwing the reset otherwise the reset state is displayed
-    		//print_header("                                                                            D-MEM Bus &\n");
-    		//print_header("Cycle:    PC   |    decoder   |   rat   |   prf   |   rrat   |  rob   |   RS |	EX	|	CDB	");
+    		$fclose(wb_fileno);
+			$finish;
   		end
 
 
@@ -253,22 +298,20 @@ module testbench;
 		  `SD;
 		  `SD;
 
-      /* // print the piepline stuff via c code to the pipeline.out
+       // print the piepline stuff via c code to the pipeline.out
        print_cycles();
        //pc, decoder, rat
-       print_stage(" ", PC_inst1, PC_inst2, PC_inst1_valid, PC_inst2_valid);
-       print_stage("|", ID_dest_ARF_idx1, ID_dest_ARF_idx2);
-       print_stage("|", PRF_RS_inst2_opa, RAT1_PRF_allocate_req2);
+       //print_stage(" ", if_IR_out, if_NPC_out[31:0], {31'b0,if_valid_inst_out});
+       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0]-8, {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]-4, {31'b0,PC_inst2_valid});
+       
        //prf, rrat, rob
-       print_stage("|", PRF_RS_inst1_opa, PRF_RS_inst2_opa);
-       print_stage("|", RRAT1_PRF_free_valid1,RRAT1_PRF_free_idx1, RRAT1_PRF_free_valid2, RRAT1_PRF_free_idx2);
-              print_stage("|", PRF_RS_inst1_opa, PRF_RS_inst2_opa);
-       print_stage("|", RRAT1_PRF_free_valid1,RRAT1_PRF_free_idx1, RRAT1_PRF_free_valid2, RRAT1_PRF_free_idx2);
-       print_reg(pipeline_commit_wr_data[63:32], pipeline_commit_wr_data[31:0],
-                 {27'b0,pipeline_commit_wr_idx}, {31'b0,pipeline_commit_wr_en});
-       print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
-                    proc2mem_addr[63:32], proc2mem_addr[31:0],
-                    proc2mem_data[63:32], proc2mem_data[31:0]);*/
+
+       //print_reg(pipeline_commit_wr_data[63:32], pipeline_commit_wr_data[31:0],
+        //         {27'b0,pipeline_commit_wr_idx}, {31'b0,pipeline_commit_wr_en});
+      // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
+       //             proc2mem_addr[63:32], proc2mem_addr[31:0],
+       //             proc2mem_data[63:32], proc2mem_data[31:0]);
                     
                     
                            	// print the writeback information to writeback.out
@@ -295,7 +338,9 @@ module testbench;
         				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
 
 				end
-      			end
+      		end
+      		
+     
       			//$display("@@@\n@@");
 			//show_clk_count;
 			//$fclose(wb_fileno);
@@ -334,9 +379,9 @@ module testbench;
 				endcase
 				$display("@@@\n@@");
 				show_clk_count;
-				//print_close(); // close the pipe_print output file
-				$fclose(wb_fileno);
-				#100 $finish;
+				print_close(); // close the pipe_print output file
+				//$fclose(wb_fileno);
+				//#100 $finish;
 			end
 		end// if(reset) 
     	end  
