@@ -275,20 +275,20 @@ module testbench;
 	//for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
 	//pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
        			if(pipeline_completed_insts>0) begin
-         			if(ROB_commit1_wr_en)
+         			if(ROB_commit1_valid&&ROB_commit1_wr_en)
            				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                      				ROB_commit1_pc,
                      				ROB_commit1_arn_dest,
                      				PRF_writeback_value1);
-        			else
-          				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);
-				if(ROB_commit2_wr_en)
+        			/*else
+          				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);*/
+				if(ROB_commit2_valid&&ROB_commit2_wr_en)
            				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                      				ROB_commit2_pc,
                      				ROB_commit2_arn_dest,
                      				PRF_writeback_value2);
-        			else
-        				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
+        			//else
+        				//$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc); 
       			end
       			//$display("@@@\n@@");
 			//show_clk_count;
