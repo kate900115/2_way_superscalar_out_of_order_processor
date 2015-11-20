@@ -278,7 +278,7 @@ void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
   if(wb_reg_wr_en_out)
     if((wb_reg_wr_data_out_hi==0)||
        ((wb_reg_wr_data_out_hi==-1)&&(wb_reg_wr_data_out_lo<0)))
-      fprintf(ppfile, "r%d=%d  ",wb_reg_wr_idx_out,wb_reg_wr_data_out_lo);
+      fprintf(ppfile, "r%d=0x%x ",wb_reg_wr_idx_out,wb_reg_wr_data_out_lo);
     else 
       fprintf(ppfile, "r%d=0x%x%x  ",wb_reg_wr_idx_out,
               wb_reg_wr_data_out_hi,wb_reg_wr_data_out_lo);

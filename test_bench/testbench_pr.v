@@ -326,6 +326,7 @@ module testbench;
        //prf, rrat, rob
 
        print_reg(PRF_writeback_value1[63:32], PRF_writeback_value1[31:0],{27'b0,ROB_commit1_arn_dest}, {31'b0,ROB_commit1_wr_en});
+       print_reg(PRF_writeback_value2[63:32], PRF_writeback_value2[31:0],{27'b0,ROB_commit2_arn_dest}, {31'b0,ROB_commit2_wr_en});
       // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
        //             proc2mem_addr[63:32], proc2mem_addr[31:0],
        //             proc2mem_data[63:32], proc2mem_data[31:0]);
