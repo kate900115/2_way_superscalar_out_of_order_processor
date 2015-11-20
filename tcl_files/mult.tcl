@@ -18,7 +18,6 @@ set clock_name clock
 set reset_name reset
 set CLK_PERIOD 4.5
 
-
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */
 #/* to moderate sized designs.  You may need to alter it    */

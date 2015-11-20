@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : rrat.tcl                          */
+#/*   FILE        : rrat.tcl                                */
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f default.tcl       */
 #/*   You'll need to minimally set design_name & read files */
@@ -15,10 +15,6 @@ set design_name rrat
 set clock_name clock
 set reset_name reset
 set CLK_PERIOD 4.25
-#8 stage: 4.25
-#4 stage: 6.64
-#2 stage: 11
-
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */

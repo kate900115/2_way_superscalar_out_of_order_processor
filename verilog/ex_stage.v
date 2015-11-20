@@ -312,10 +312,12 @@ module ex_stage(
 				fu_result_is_valid[1]	<= `SD 1'b1;
 				fu_mispredict_sig[0]	<= `SD fu_take_branch_out[0];
 				fu_inst_pc_out[1]		<= `SD rs_pc_in[1];
+				
 			end
 			else if (adder1_send_in_success)
 			begin
 				fu_result_is_valid[1]	<= `SD 1'b0;
+			
 			end
 
 			if (fu_rs_valid_in[2])
@@ -347,10 +349,12 @@ module ex_stage(
 				fu_result_is_valid[3]	<= `SD 1'b1;
 				fu_mispredict_sig[1]	<= `SD fu_take_branch_out[1];
 				fu_inst_pc_out[3]		<= `SD rs_pc_in[3];
+				
 			end
 			else if (adder2_send_in_success)
 			begin
 				fu_result_is_valid[3]	<= `SD 1'b0;
+				
 			end
 			
 			if (fu_rs_valid_in[4])
@@ -362,10 +366,12 @@ module ex_stage(
 				fu_result_out[4]		<= `SD mem_result1;
 				fu_result_is_valid[4]	<= `SD 1'b1;
 				fu_inst_pc_out[4]		<= `SD rs_pc_in[4];
+				
 			end
 			else if (memory1_send_in_success)
 			begin
 				fu_result_is_valid[4]	<= `SD 1'b0;
+				
 			end
 			
 			if (fu_rs_valid_in[5])
@@ -377,10 +383,12 @@ module ex_stage(
 				fu_result_out[5]		<= `SD mem_result2;
 				fu_result_is_valid[5]	<= `SD 1'b1;
 				fu_inst_pc_out[5]		<= `SD rs_pc_in[5];
+				
 			end
 			else if (memory2_send_in_success)
 			begin
 				fu_result_is_valid[5]	<= `SD 1'b0;
+				
 			end
 		end
 	end
