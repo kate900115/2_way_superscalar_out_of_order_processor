@@ -13,6 +13,7 @@
 extern void print_header(string str);
 extern void print_cycles();
 extern void print_stage(string div, int inst, int npc, int valid_inst);
+extern void print_stage_fu(string div, int inst_pc,int optype);
 /*extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
 extern void print_membus(int proc2mem_command, int mem2proc_response,
@@ -218,24 +219,26 @@ module testbench;
 	$monitor (" @@@ time:%d, \
 			reset:%h, \
 			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\
-			ROB_commit1_pc:%h, \
-			clock:%h,\
-			mem2proc_tag:%h, \
-			PC_inst1:%h, \
-    		PC_inst2:%h,\
-    		ID_inst1_opa:%h,\
-    		ID_inst2_opa:%h,\
-    		RAT1_PRF_opa_idx1:%h,\
-   			RAT1_PRF_opa_idx2:%h, \
-   			ROB_t1_is_full: %h, \
-   			ROB_t2_is_full:%h, \
-   			PC_inst1_valid:%h, \
-   			mem2proc_response:%h, \
-   			PRF_is_full:%h, \
-   			Imem2proc_valid:%h, \
-   			RS_full:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, processor.RS_full);
+			ROB_commit1_valid:%h,\n\
+			ROB_commit1_pc:%h, \n\
+			clock:%h,\n\
+			mem2proc_tag:%h, \n\
+			PC_inst1:%h, \n\
+    		PC_inst2:%h,\n\
+    		ID_inst1_opa:%h,\n\
+    		ID_inst2_opa:%h,\n\
+    		RAT1_PRF_opa_idx1:%h,\n\
+   			RAT1_PRF_opa_idx2:%h, \n\
+   			ROB_t1_is_full: %h, \n\
+   			ROB_t2_is_full:%h, \n\
+   			PC_inst1_valid:%h, \n\
+   			mem2proc_response:%h, \n\
+   			PRF_is_full:%h, \n\
+   			Imem2proc_valid:%h, \n\
+   			fu_next_inst_pc_out0:%h\n\
+   			RS_full:%h\n\
+   			RS_EX_op_type[0]:%h",
+			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);
 			
 		$display("@@\n@@\n@@  %t  Asserting System reset......", $realtime);
    		reset = 1'b1;
@@ -257,7 +260,7 @@ module testbench;
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            D-MEM Bus &\n");
-    		print_header("Cycle:   PC inst1   |   PC inst2   |         EX        |         rob        |         RS       ");
+    		print_header("Cycle:   PC inst1  |  PC inst2  |     RoB1    |     RoB2     |         EX1      |      EX2      |      EX3      |     EX4      |    EX5     |     EX6     ");
     		
     		#600;
 		$display("@@@\n@@");
@@ -304,6 +307,14 @@ module testbench;
        //print_stage(" ", if_IR_out, if_NPC_out[31:0], {31'b0,if_valid_inst_out});
        print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0]-8, {31'b0,PC_inst1_valid});
        print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]-4, {31'b0,PC_inst2_valid});
+       print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);
+       print_stage(" ", ROB_commit2_inst_out, ROB_commit2_pc, ROB_commit2_valid);
+       print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0]);
+       print_stage_fu(" ", fu_next_inst_pc_out[1][63:0],RS_EX_op_type[1]);
+       print_stage_fu(" ", fu_next_inst_pc_out[2][63:0],RS_EX_op_type[2]);
+       print_stage_fu(" ", fu_next_inst_pc_out[3][63:0],RS_EX_op_type[3]);
+       print_stage_fu(" ", fu_next_inst_pc_out[4][63:0],RS_EX_op_type[4]);
+       print_stage_fu(" ", fu_next_inst_pc_out[5][63:0],RS_EX_op_type[5]);
        
        //prf, rrat, rob
 
