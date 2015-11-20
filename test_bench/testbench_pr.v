@@ -280,15 +280,21 @@ module testbench;
                      				ROB_commit1_pc,
                      				ROB_commit1_arn_dest,
                      				PRF_writeback_value1);
-        			/*else
-          				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);*/
+        			else begin
+					if(ROB_commit1_valid)
+          				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);
+
+				end
 				if(ROB_commit2_valid&&ROB_commit2_wr_en)
            				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
                      				ROB_commit2_pc,
                      				ROB_commit2_arn_dest,
                      				PRF_writeback_value2);
-        			//else
-        				//$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc); 
+        			else begin
+					if(ROB_commit2_valid)
+        				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
+
+				end
       			end
       			//$display("@@@\n@@");
 			//show_clk_count;
