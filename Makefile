@@ -42,6 +42,13 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/rrat.v	\
 			verilog/rs.v	\
 			verilog/rs_one_entry.v	\
+			
+# For visual debugger
+VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench_pr.v) \
+		test_bench/visual_c_hooks.c
+
+synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl
+	cd synth && dc_shell-t -f ./pipeline.tcl | tee synth.out 
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
@@ -67,6 +74,12 @@ syn_simv:	$(SYNFILES) $(TESTBENCH)
 
 syn:	syn_simv
 	./syn_simv | tee syn_program.out
+	
+# For visual debugger
+vis_simv:	$(SIMFILES) $(VISTESTBENCH)
+	$(VCS) $(VISFLAGS) $(VISTESTBENCH) $(SIMFILES) -o vis_simv 
+	./vis_simv
+
 
 clean:
 	rm -rvf simv *.daidir csrc vcs.key program.out \
