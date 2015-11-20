@@ -189,7 +189,7 @@ void print_stage(char* div, int inst, int npc, int valid_inst)
   }
 
   if (ppfile != NULL)
-    fprintf(ppfile, "%s%3d:%-8s", div, npc, str);
+    fprintf(ppfile, "%s%3d:%-6s", div, npc, str);
 }
 
 
@@ -211,10 +211,10 @@ void print_stage_fu(char* div, int inst_pc,int optype)
       case 0x0d: str = "stw"; break;
       case 0x0e: str = "stb"; break;
       case 0x0f: str = "stqu"; break;
-      case 0x10: str = "use alu"; break;// INTA_GRP
-      case 0x11: str = "use alu"; break;
-      case 0x12: str = "use alu"; break;
-      case 0x13: str = "use mult"; break;// INTM_GRP
+      case 0x10: str = "ALU"; break;// INTA_GRP
+      case 0x11: str = "ALU"; break;
+      case 0x12: str = "ALU"; break;
+      case 0x13: str = "MULT"; break;// INTM_GRP
       case 0x14: str = "itfp"; break; // unimplemented
       case 0x15: str = "fltv"; break; // unimplemented
       case 0x16: str = "flti"; break; // unimplemented
@@ -257,7 +257,7 @@ void print_stage_fu(char* div, int inst_pc,int optype)
     }
 
   if (ppfile != NULL)
-    fprintf(ppfile, "%s%3d:%-8s", div, inst_pc, str);
+    fprintf(ppfile, "%s%3d:%-6s", div, inst_pc, str);
 }
 
 /**************************************************/
@@ -278,9 +278,9 @@ void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
   if(wb_reg_wr_en_out)
     if((wb_reg_wr_data_out_hi==0)||
        ((wb_reg_wr_data_out_hi==-1)&&(wb_reg_wr_data_out_lo<0)))
-      fprintf(ppfile, "r%d=0x%x ",wb_reg_wr_idx_out,wb_reg_wr_data_out_lo);
+      fprintf(ppfile, "r%d=0x%-8x ",wb_reg_wr_idx_out,wb_reg_wr_data_out_lo);
     else 
-      fprintf(ppfile, "r%d=0x%x%x  ",wb_reg_wr_idx_out,
+      fprintf(ppfile, "r%d=0x%x%-8x  ",wb_reg_wr_idx_out,
               wb_reg_wr_data_out_hi,wb_reg_wr_data_out_lo);
 
 }

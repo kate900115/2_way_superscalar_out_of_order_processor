@@ -16,9 +16,9 @@ extern void print_stage(string div, int inst, int npc, int valid_inst);
 extern void print_stage_fu(string div, int inst_pc,int optype);
 extern void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo,
                       int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
-/*extern void print_membus(int proc2mem_command, int mem2proc_response,
+extern void print_membus(int proc2mem_command, int mem2proc_response,
                          int proc2mem_addr_hi, int proc2mem_addr_lo,
-                         int proc2mem_data_hi, int proc2mem_data_lo);*/
+                         int proc2mem_data_hi, int proc2mem_data_lo);
 extern void print_close();
 
 `include "sys_defs.vh"
@@ -327,9 +327,9 @@ module testbench;
 
        print_reg(PRF_writeback_value1[63:32], PRF_writeback_value1[31:0],{27'b0,ROB_commit1_arn_dest}, {31'b0,ROB_commit1_wr_en});
        print_reg(PRF_writeback_value2[63:32], PRF_writeback_value2[31:0],{27'b0,ROB_commit2_arn_dest}, {31'b0,ROB_commit2_wr_en});
-      // print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
-       //             proc2mem_addr[63:32], proc2mem_addr[31:0],
-       //             proc2mem_data[63:32], proc2mem_data[31:0]);
+       print_membus({30'b0,proc2mem_command}, {28'b0,mem2proc_response},
+                 proc2mem_addr[63:32], proc2mem_addr[31:0],
+                 proc2mem_data[63:32], proc2mem_data[31:0]);
                     
                     
     // print the writeback information to writeback.out
