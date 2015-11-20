@@ -192,6 +192,76 @@ void print_stage(char* div, int inst, int npc, int valid_inst)
     fprintf(ppfile, "%s%4d:%-8s", div, npc, str);
 }
 
+
+/**********************************************************************/
+void print_stage_fu(char* div, int inst_pc,int optype)
+{
+  int opcode;
+  char *str;
+  
+    opcode = optype;
+    switch(opcode)
+    {
+      case 0x00: str = "halt or callpal"; break;
+      case 0x08: str = "lda"; break;
+      case 0x09: str = "ldah"; break;
+      case 0x0a: str = "ldbu"; break;
+      case 0x0b: str = "ldqu"; break;
+      case 0x0c: str = "ldwu"; break;
+      case 0x0d: str = "stw"; break;
+      case 0x0e: str = "stb"; break;
+      case 0x0f: str = "stqu"; break;
+      case 0x10: str = "use alu"; break;// INTA_GRP
+      case 0x11: str = "use alu"; break;
+      case 0x12: str = "use alu"; break;
+      case 0x13: str = "use mult"; break;// INTM_GRP
+      case 0x14: str = "itfp"; break; // unimplemented
+      case 0x15: str = "fltv"; break; // unimplemented
+      case 0x16: str = "flti"; break; // unimplemented
+      case 0x17: str = "fltl"; break; // unimplemented
+      case 0x1a: str = "jsr"; break;
+      case 0x1c: str = "ftpi"; break;
+      case 0x20: str = "ldf"; break;
+      case 0x21: str = "ldg"; break;
+      case 0x22: str = "lds"; break;
+      case 0x23: str = "ldt"; break;
+      case 0x24: str = "stf"; break;
+      case 0x25: str = "stg"; break;
+      case 0x26: str = "sts"; break;
+      case 0x27: str = "stt"; break;
+      case 0x28: str = "ldl"; break;
+      case 0x29: str = "ldq"; break;
+      case 0x2a: str = "ldll"; break;
+      case 0x2b: str = "ldql"; break;
+      case 0x2c: str = "stl"; break;
+      case 0x2d: str = "stq"; break;
+      case 0x2e: str = "stlc"; break;
+      case 0x2f: str = "stqc"; break;
+      case 0x30: str = "br"; break;
+      case 0x31: str = "fbeq"; break;
+      case 0x32: str = "fblt"; break;
+      case 0x33: str = "fble"; break;
+      case 0x34: str = "bsr"; break;
+      case 0x35: str = "fbne"; break;
+      case 0x36: str = "fbge"; break;
+      case 0x37: str = "fbgt"; break;
+      case 0x38: str = "blbc"; break;
+      case 0x39: str = "beq"; break;
+      case 0x3a: str = "blt"; break;
+      case 0x3b: str = "ble"; break;
+      case 0x3c: str = "blbs"; break;
+      case 0x3d: str = "bne"; break;
+      case 0x3e: str = "bge"; break;
+      case 0x3f: str = "bgt"; break;
+      default: str = "invalid"; break;
+    }
+
+  if (ppfile != NULL)
+    fprintf(ppfile, "%s%4d:%-8s", div, inst_pc, str);
+}
+
+/**************************************************/
+
 void print_close()
 {
   fprintf(ppfile, "\n");
