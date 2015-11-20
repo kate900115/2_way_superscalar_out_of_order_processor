@@ -29,26 +29,44 @@ module processor(
 //output
     //Output from rob
     output logic							ROB_commit1_valid,
-    output logic [63:0]						ROB_commit1_pc,
 	output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest,
 	output logic 							ROB_commit1_wr_en,
     output logic [63:0]						PRF_writeback_value1,
     output logic							ROB_commit2_valid,
-    output logic [63:0]						ROB_commit2_pc,
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
     output logic [63:0]						PRF_writeback_value2,
-    output ERROR_CODE   pipeline_error_status
+    output ERROR_CODE   pipeline_error_status,
+    
+    // Outputs from IF-Stage 
+    output logic [63:0]						PC_proc2Imem_addr,
+    output logic [63:0]						PC_proc2Imem_addr_next,
+    output logic [31:0]						PC_inst1,
+    output logic [31:0]						PC_inst2,
+    output logic							PC_inst1_valid,
+    output logic							PC_inst2_valid,
+    
+    // Outputs from RS
+	output logic [5:0][63:0]				fu_next_inst_pc_out,
+	output logic [5:0][5:0]					RS_EX_op_type,
+	output ALU_FUNC [5:0]					RS_EX_alu_func,
+	
+	// Outputs from EX-stage
+	output logic [5:0][63:0]				fu_inst_pc_out,	
+	output ALU_FUNC [5:0]					EX_alu_func_out,
+    output logic [5:0][5:0]					EX_rs_op_type_out,
+	
+	// Outputs from ROB
+	output logic [63:0]						ROB_commit1_pc,
+	output logic [63:0]						ROB_commit2_pc,
+	output logic [31:0]						ROB_commit1_inst_out,
+	output logic [31:0]						ROB_commit2_inst_out
+	
 );
 
 logic	thread1_branch_is_taken;
 logic	thread2_branch_is_taken;
 //pc output
-logic [31:0]	PC_inst1;
-logic [31:0]	PC_inst2;
-logic			PC_inst1_valid;
-logic			PC_inst2_valid;
-logic [63:0]	PC_proc2Imem_addr;
 logic			PC_thread1_is_available;
 //decoder
 logic [63:0]	ID_inst1_opa;
@@ -165,9 +183,8 @@ logic [5:0][63:0]		RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
 logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
-logic [5:0][5:0]			RS_EX_op_type;
 logic [5:0]					RS_EX_out_valid;
-ALU_FUNC [5:0]				RS_EX_alu_func;
+
 logic						RS_full;
 
 //ex output
@@ -251,7 +268,9 @@ if_stage pc(
 	.thread2_inst_out(PC_inst2),
 	.thread1_inst_is_valid(PC_inst1_valid),
 	.thread2_inst_is_valid(PC_inst2_valid),
-	.thread1_is_available(PC_thread1_is_available)
+	.thread1_is_available(PC_thread1_is_available),
+	//for debug
+	.proc2Imem_addr_next(proc2Imem_addr_next)
 	);
 //////////////////////////////////
 //								//
@@ -629,7 +648,12 @@ rob rob1(
 	.commit2_is_illegal_out(ROB_commit2_is_illegal),
 	.commit2_is_thread1(ROB_commit2_is_thread1),
 	.t1_is_full(ROB_t1_is_full),
-	.t2_is_full(ROB_t2_is_full)
+	.t2_is_full(ROB_t2_is_full),
+	//for debug
+	.rob_inst1_in(PC_inst1),
+	.rob_inst2_in(PC_inst2),
+	.commit1_inst_out(ROB_commit1_inst_out),
+	.commit2_inst_out(ROB_commit2_inst_out)
 );
 
 
@@ -686,7 +710,12 @@ rs rs1(
 	.fu_alu_func_out(RS_EX_alu_func),
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
 	.fu_rs_op_type_out(RS_EX_op_type),
-	.rs_full(RS_full)			// RS is full now
+	.rs_full(RS_full),			// RS is full now
+	
+	//for debug
+	.inst1_rs_pc_in(PC_inst1),
+	.inst2_rs_pc_in(PC_inst2),
+	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 
 //////////////////////////////////
@@ -720,7 +749,12 @@ ex_stage ex(
     .fu_result_is_valid(EX_CDB_fu_result_is_valid),	// 0,2: mult1,2; 1,3: adder1,2
     .fu_is_available(EX_RS_fu_is_available),	//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs
     .fu_rs_rob_idx_out(EX_CDB_rob_idx),
-    .fu_mispredict_sig(EX_CDB_mispredict_sig)
+    .fu_mispredict_sig(EX_CDB_mispredict_sig),
+        // for debug
+    .fu_alu_func_out(EX_alu_func_out),
+    .fu_rs_op_type_out(EX_rs_op_type_out),
+    .rs_pc_in(fu_next_inst_pc_out),
+    .fu_inst_pc_out(fu_inst_pc_out)
   );
 //////////////////////////////////
 //								//
