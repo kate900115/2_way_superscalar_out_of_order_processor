@@ -257,7 +257,7 @@ module testbench;
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            D-MEM Bus &\n");
-    		print_header("Cycle:    PC   |   EX   |   rob   |   RS  ");
+    		print_header("Cycle:   PC inst1   |   PC inst2   |         EX        |         rob        |         RS       ");
     		
     		#600;
 		$display("@@@\n@@");
@@ -302,7 +302,8 @@ module testbench;
        print_cycles();
        //pc, decoder, rat
        //print_stage(" ", if_IR_out, if_NPC_out[31:0], {31'b0,if_valid_inst_out});
-       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0], {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0]-8, {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]-4, {31'b0,PC_inst2_valid});
        
        //prf, rrat, rob
 
