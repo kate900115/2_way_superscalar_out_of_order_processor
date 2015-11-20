@@ -713,8 +713,8 @@ rs rs1(
 	.rs_full(RS_full),			// RS is full now
 	
 	//for debug
-	.inst1_rs_pc_in(PC_inst1),
-	.inst2_rs_pc_in(PC_inst2),
+	.inst1_rs_pc_in(PC_proc2Imem_addr),
+	.inst2_rs_pc_in(PC_proc2Imem_addr_next),
 	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 

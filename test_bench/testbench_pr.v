@@ -260,7 +260,7 @@ module testbench;
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            D-MEM Bus &\n");
-    		print_header("Cycle:   PC inst1  |  PC inst2  |     RoB1    |     RoB2     |         EX1      |      EX2      |      EX3      |     EX4      |    EX5     |     EX6     ");
+    		print_header("Cycle: PC inst1  |  PC inst2  |    RoB1    |    RoB2   |    RS1    |     RS2    |     RS3     |     RS4    |    RS5    |     RS6     |     EX1     |    EX2    |    EX3     |     EX4    |     EX5    |     EX6    ");
     		
     		#600;
 		$display("@@@\n@@");
@@ -303,19 +303,26 @@ module testbench;
 
        // print the piepline stuff via c code to the pipeline.out
        print_cycles();
-       //pc, decoder, rat
-       //print_stage(" ", if_IR_out, if_NPC_out[31:0], {31'b0,if_valid_inst_out});
-       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0]-8, {31'b0,PC_inst1_valid});
-       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]-4, {31'b0,PC_inst2_valid});
+       //IF
+       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0], {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]+4, {31'b0,PC_inst2_valid});
+       //ROB
        print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);
        print_stage(" ", ROB_commit2_inst_out, ROB_commit2_pc, ROB_commit2_valid);
+       //RS
        print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0]);
        print_stage_fu(" ", fu_next_inst_pc_out[1][63:0],RS_EX_op_type[1]);
        print_stage_fu(" ", fu_next_inst_pc_out[2][63:0],RS_EX_op_type[2]);
        print_stage_fu(" ", fu_next_inst_pc_out[3][63:0],RS_EX_op_type[3]);
        print_stage_fu(" ", fu_next_inst_pc_out[4][63:0],RS_EX_op_type[4]);
        print_stage_fu(" ", fu_next_inst_pc_out[5][63:0],RS_EX_op_type[5]);
-       
+       //EX
+       print_stage_fu(" ", fu_inst_pc_out[0][63:0],EX_rs_op_type_out[0]);
+       print_stage_fu(" ", fu_inst_pc_out[1][63:0],EX_rs_op_type_out[1]);
+       print_stage_fu(" ", fu_inst_pc_out[2][63:0],EX_rs_op_type_out[2]);
+       print_stage_fu(" ", fu_inst_pc_out[3][63:0],EX_rs_op_type_out[3]);
+       print_stage_fu(" ", fu_inst_pc_out[4][63:0],EX_rs_op_type_out[4]);
+       print_stage_fu(" ", fu_inst_pc_out[5][63:0],EX_rs_op_type_out[5]);
        //prf, rrat, rob
 
        //print_reg(pipeline_commit_wr_data[63:32], pipeline_commit_wr_data[31:0],
