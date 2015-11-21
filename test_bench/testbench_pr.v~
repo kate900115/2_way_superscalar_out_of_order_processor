@@ -295,12 +295,12 @@ module testbench;
        print_stage_fu(" ", fu_next_inst_pc_out[4][63:0],RS_EX_op_type[4],1);
        print_stage_fu(" ", fu_next_inst_pc_out[5][63:0],RS_EX_op_type[5],1);
        //EX
-       print_stage_fu(" ", fu_inst_pc_out[0][63:0],EX_rs_op_type_out[0],~EX_RS_fu_is_available[0] || EX_CDB_fu_result_is_valid[0]);
-       print_stage_fu(" ", fu_inst_pc_out[1][63:0],EX_rs_op_type_out[1],~EX_RS_fu_is_available[1] || EX_CDB_fu_result_is_valid[1]);
-       print_stage_fu(" ", fu_inst_pc_out[2][63:0],EX_rs_op_type_out[2],~EX_RS_fu_is_available[2] || EX_CDB_fu_result_is_valid[2]);
-       print_stage_fu(" ", fu_inst_pc_out[3][63:0],EX_rs_op_type_out[3],~EX_RS_fu_is_available[3] || EX_CDB_fu_result_is_valid[3]);
-       print_stage_fu(" ", fu_inst_pc_out[4][63:0],EX_rs_op_type_out[4],~EX_RS_fu_is_available[4] || EX_CDB_fu_result_is_valid[4]);
-       print_stage_fu(" ", fu_inst_pc_out[5][63:0],EX_rs_op_type_out[5],~EX_RS_fu_is_available[5] || EX_CDB_fu_result_is_valid[5]);
+       print_stage_fu(" ", fu_inst_pc_out[0][63:0],EX_rs_op_type_out[0],~EX_RS_fu_is_available[0] && EX_CDB_fu_result_is_valid[0]);
+       print_stage_fu(" ", fu_inst_pc_out[1][63:0],EX_rs_op_type_out[1],~EX_RS_fu_is_available[1] && EX_CDB_fu_result_is_valid[1]);
+       print_stage_fu(" ", fu_inst_pc_out[2][63:0],EX_rs_op_type_out[2],~EX_RS_fu_is_available[2] && EX_CDB_fu_result_is_valid[2]);
+       print_stage_fu(" ", fu_inst_pc_out[3][63:0],EX_rs_op_type_out[3],~EX_RS_fu_is_available[3] && EX_CDB_fu_result_is_valid[3]);
+       print_stage_fu(" ", fu_inst_pc_out[4][63:0],EX_rs_op_type_out[4],~EX_RS_fu_is_available[4] && EX_CDB_fu_result_is_valid[4]);
+       print_stage_fu(" ", fu_inst_pc_out[5][63:0],EX_rs_op_type_out[5],~EX_RS_fu_is_available[5] && EX_CDB_fu_result_is_valid[5]);
        
        //ROB
        print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);

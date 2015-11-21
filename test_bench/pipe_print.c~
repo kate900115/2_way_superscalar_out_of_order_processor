@@ -198,7 +198,7 @@ void print_stage_fu(char* div, int inst_pc,int optype, int valid)
 {
   int opcode;
   char *str;
-  if (valid)
+  if (!valid)
   {
     opcode = optype;
     switch(opcode)
