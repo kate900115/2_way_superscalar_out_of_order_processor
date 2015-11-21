@@ -25,7 +25,7 @@ module test_if_stage;
 	logic	 			thread2_inst_is_valid;
 	
 	// for debug
-	logic [63:0]		proc2Imem_addr_next;
+	logic [63:0]		proc2Imem_addr_previous;
 
 	if_stage(
 		//input
@@ -54,7 +54,7 @@ module test_if_stage;
 	 	.thread2_inst_is_valid(thread2_inst_is_valid),
 	 	
 	 	// for debug
-	 	.proc2Imem_addr_next(proc2Imem_addr_next)
+	 	.proc2Imem_addr_previous(proc2Imem_addr_previous)
 	);
 	
 	always #5 clock = ~clock;
@@ -76,9 +76,9 @@ module test_if_stage;
 						thread1_inst_is_valid:%b,\n\
 						thread2_inst_out:%h, \n\
 						thread2_inst_is_valid:%b.\n\
-						proc2Imem_addr_next:%d",//for debug
+						proc2Imem_addr_previous:%d",//for debug
 				$time, clock, 
-				proc2Imem_addr,next_PC_out,thread1_inst_out,thread1_inst_is_valid,thread2_inst_out,thread2_inst_is_valid,proc2Imem_addr_next);
+				proc2Imem_addr,next_PC_out,thread1_inst_out,thread1_inst_is_valid,thread2_inst_out,thread2_inst_is_valid,proc2Imem_addr_previous);
 
 
 		clock = 0;

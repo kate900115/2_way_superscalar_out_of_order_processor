@@ -80,16 +80,12 @@ module pc(
     		if(reset)			
     		begin
 	      		PC_reg 		  	  <= `SD 0;  
-      			inst1_is_valid 	  <= `SD 0;
-      			inst2_is_valid 	  <= `SD 0;
 				inst1_out	  	  <= `SD 0;
 				inst2_out	 	  <= `SD 0;
     		end
     		else
     		begin
     			PC_reg 		  	  <= `SD next_PC;  
-      			inst1_is_valid 	  <= `SD inst1_is_valid_reg;
-      			inst2_is_valid 	  <= `SD inst2_is_valid_reg;
 				inst1_out	  	  <= `SD inst1_out_reg;
 				inst2_out	 	  <= `SD inst2_out_reg;
     		end
@@ -100,8 +96,8 @@ module pc(
 		if (branch_is_taken)
 		begin
 			next_PC 			= fu_target_pc;
-			inst1_is_valid_reg  = 1'b1;
-			inst2_is_valid_reg  = 1'b1;
+			inst1_is_valid		= 1'b1;
+			inst2_is_valid		= 1'b1;
 			inst1_out_reg 		= current_inst1;
 			inst2_out_reg 		= current_inst2;
 		end
@@ -109,19 +105,19 @@ module pc(
 		begin
 			if (PC_stall || (!pc_enable) || (!Imem2proc_valid))
 			begin
-				next_PC = PC_reg; 
-				inst1_is_valid_reg  = 1'b0;
-				inst2_is_valid_reg  = 1'b0;
-				inst1_out_reg 		= 0;
-				inst2_out_reg 		= 0;
+				next_PC			= PC_reg; 
+				inst1_is_valid  = 1'b0;
+				inst2_is_valid  = 1'b0;
+				inst1_out_reg 	= inst1_out;
+				inst2_out_reg 	= inst2_out;
 			end
 			else
 			begin
-				next_PC = PC_reg + 8;
-				inst1_is_valid_reg  = 1'b1;
-				inst2_is_valid_reg  = 1'b1;
-				inst1_out_reg 		= current_inst1;
-				inst2_out_reg 		= current_inst2;
+				next_PC 		= PC_reg + 8;
+				inst1_is_valid  = 1'b1;
+				inst2_is_valid  = 1'b1;
+				inst1_out_reg 	= current_inst1;
+				inst2_out_reg 	= current_inst2;
 			end
 		end
 	end
