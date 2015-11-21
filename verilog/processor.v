@@ -184,7 +184,7 @@ logic [5:0][63:0]		RS_EX_opb;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
 logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
 logic [5:0]					RS_EX_out_valid;
-
+logic [5:0] [1:0]			RS_EX_branch_out;
 logic						RS_full;
 
 //ex output
@@ -686,6 +686,7 @@ rs rs1(
 	.inst1_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
 	.inst1_rs_fu_select_in(ID_fu_select1),
 	.inst1_rs_load_in(ID_inst1_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	.inst1_rs_branch_in({ID_inst1_is_cond_branch,ID_inst1_is_uncond_branch}),
 	//for instruction2
 	.inst2_rs_opa_in(ID_inst2_opa_valid ? ID_inst2_opa : PRF_RS_inst2_opa),      	// Operand a from Rename  
 	.inst2_rs_opb_in(ID_inst2_opb_valid ? ID_inst2_opb : PRF_RS_inst2_opb),      	// Operand a from Rename 
@@ -696,6 +697,8 @@ rs rs1(
 	.inst2_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
 	.inst2_rs_fu_select_in(ID_fu_select2),
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
+	.inst2_rs_branch_in({ID_inst2_is_cond_branch,ID_inst2_is_uncond_branch}),
+
 	.fu_is_available(EX_RS_fu_is_available),			//0,2:mult1,2 1,3:ALU1,2 4:MEM1; from fu to rs, bugs lifan
 	.thread1_branch_is_taken(thread1_branch_is_taken),
 	.thread2_branch_is_taken(thread2_branch_is_taken),
@@ -710,6 +713,7 @@ rs rs1(
 	.fu_alu_func_out(RS_EX_alu_func),
 	.fu_rs_out_valid(RS_EX_out_valid),	// RS output is valid
 	.fu_rs_op_type_out(RS_EX_op_type),
+	.fu_rs_branch_out(RS_EX_branch_out),
 	.rs_full(RS_full),			// RS is full now
 	
 	//for debug
@@ -735,6 +739,7 @@ ex_stage ex(
     .fu_rs_op_type_in(RS_EX_op_type),
     .fu_rs_valid_in(RS_EX_out_valid),
 	.fu_alu_func_in(RS_EX_alu_func),
+	.fu_rs_branch_out(RS_EX_branch_out),
 
     .adder1_send_in_success(adder1_send_in_success),
     .adder2_send_in_success(adder2_send_in_success),

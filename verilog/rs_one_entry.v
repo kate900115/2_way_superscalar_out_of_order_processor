@@ -33,6 +33,7 @@ module rs_one_entry(
 	input  ALU_FUNC							inst1_rs1_alu_func,
 	input  FU_SELECT						inst1_rs1_fu_select,
 	input  [5:0]							inst1_rs1_op_type_in,			// Instruction type of rs1
+	input  [1:0]                          				inst1_rs_branch_in,
 
 	input  [63:0] 							inst2_rs1_opa_in,				// Operand a from Rename  
 	input  [63:0] 							inst2_rs1_opb_in,				// Operand a from Rename 
@@ -41,6 +42,7 @@ module rs_one_entry(
 	input  ALU_FUNC							inst2_rs1_alu_func,
 	input  FU_SELECT						inst2_rs1_fu_select,
 	input  [5:0]							inst2_rs1_op_type_in,			// Instruction type of rs1
+	input  [1:0]                          				inst2_rs_branch_in,
 
 	input  		        					inst1_rs1_load_in,				// rs1 need two loads for each Signal from rename to flop opa/b/or signal to tell RS to load instruction in
 	input  		        					inst2_rs1_load_in,
@@ -63,6 +65,7 @@ module rs_one_entry(
 	output logic [$clog2(`ROB_SIZE):0]    	rs1_rob_idx_out,	 		  	// 
 	output FU_SELECT						fu_select_reg_out,
 	output [5:0]							rs1_op_type_out,
+	output [1:0]  							rs1_branch_sig,
 	
 	// for debug
 	input  [63:0]  							inst1_pc_in,
@@ -97,6 +100,9 @@ module rs_one_entry(
 	ALU_FUNC								Alu_func_reg;
 	FU_SELECT								fu_select;
 	FU_SELECT								fu_select_reg;
+
+	logic [1:0]                           					branch_reg;
+	logic [1:0] 								branch_sig;
 	
 	//for debug
 	logic [63:0]							inst_pc_reg;
@@ -122,6 +128,9 @@ module rs_one_entry(
 	
 	assign rs1_inst_pc_out	= rs1_free_enable_fu ? inst_pc_reg : 0 ;
 
+	assign rs1_branch_sig	= rs1_free_enable_fu ? branch_reg : 0 ;
+
+
 	assign LoadAFromCDB1 	= (rs1_cdb1_tag == OPa_reg[$clog2(`PRF_SIZE)-1:0]) && !OPaValid_reg && InUse && rs1_cdb1_valid; 
 
 	assign LoadBFromCDB1 	= (rs1_cdb1_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb1_valid; 
@@ -131,6 +140,7 @@ module rs_one_entry(
 	assign LoadBFromCDB2 	= (rs1_cdb2_tag == OPb_reg[$clog2(`PRF_SIZE)-1:0]) && !OPbValid_reg && InUse && rs1_cdb2_valid;
 
 	always_comb begin
+
 		if (rs1_free) begin
 			OPa			= 0;
        		OPaValid	= 0;
@@ -143,7 +153,9 @@ module rs_one_entry(
 			op_type		= 0;
 			next_InUse	= 1'b0;
 			inst_pc		= 0;
+			branch_sig      = 0;
 		end
+
 		else if (rs1_free_enable_fu && inst1_rs1_load_in)
 		begin
 			OPa			= inst1_rs1_opa_in;
@@ -157,7 +169,9 @@ module rs_one_entry(
 			op_type		= inst1_rs1_op_type_in;
 			next_InUse	= 1'b1;
 			inst_pc		= inst1_pc_in;
+			branch_sig      = inst1_rs_branch_in;
 		end
+
 		else if (rs1_free_enable_fu && inst2_rs1_load_in)
 		begin
 			OPa			= inst2_rs1_opa_in;
@@ -171,7 +185,9 @@ module rs_one_entry(
 			op_type		= inst2_rs1_op_type_in;
 			next_InUse	= 1'b1;
 			inst_pc		= inst2_pc_in;
+			branch_sig      = inst2_rs_branch_in;
 		end
+
 		else if (rs1_free_enable_fu) begin
 			OPa			= 0;
        		OPaValid	= 0;
@@ -184,7 +200,9 @@ module rs_one_entry(
 			op_type		= 0;
 			next_InUse	= 1'b0;
 			inst_pc		= 0;
+			branch_sig      = 0;
 		end
+
 		else if (inst1_rs1_load_in) begin
 			OPa			= inst1_rs1_opa_in;
        		OPaValid	= inst1_rs1_opa_valid;
@@ -197,6 +215,7 @@ module rs_one_entry(
 			op_type		= inst1_rs1_op_type_in;
 			next_InUse	= 1'b1;
 			inst_pc		= inst1_pc_in;
+			branch_sig      = inst1_rs_branch_in;
 		end
 		else if (inst2_rs1_load_in) begin
 			OPa			= inst2_rs1_opa_in;
@@ -210,6 +229,7 @@ module rs_one_entry(
 			op_type		= inst2_rs1_op_type_in;
 			next_InUse	= 1'b1;
 			inst_pc		= inst2_pc_in;
+			branch_sig      = inst2_rs_branch_in;
 		end
 		else begin
 			OPa			= OPa_reg;
@@ -223,6 +243,7 @@ module rs_one_entry(
 			op_type		= op_type_reg;
 			next_InUse	= InUse;
 			inst_pc		= inst_pc_reg;
+			branch_sig      = branch_reg;
     			if (LoadAFromCDB1)
     			begin
         			OPa	 = rs1_cdb1_in;
@@ -261,6 +282,7 @@ module rs_one_entry(
 				Rob_idx_reg		<= `SD 0;
 				Alu_func_reg 	<= `SD ALU_DEFAULT;
 				inst_pc_reg     <= `SD 0;
+			branch_reg              <= `SD 0;
     		end
 		else
     		begin
@@ -275,6 +297,8 @@ module rs_one_entry(
        			Alu_func_reg 	<= `SD Alu_func;
        			op_type_reg		<= `SD op_type;
        			inst_pc_reg     <= `SD inst_pc;
+			branch_reg      <= `SD branch_sig;
+
     		end // else !reset
 	end // always @
 endmodule
