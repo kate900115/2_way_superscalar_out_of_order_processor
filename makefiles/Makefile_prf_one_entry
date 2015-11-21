@@ -27,8 +27,8 @@ SIMFILES = 	verilog/prf_one_entry.v		\
 SYNFILES = prf_one_entry.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-prf_one_entry.vg:	$(SIMFILES) prf_one_entry.tcl 
-			dc_shell-t -f prf_one_entry.tcl | tee synth.out
+prf_one_entry.vg:	$(SIMFILES) tcl_files/prf_one_entry.tcl 
+			dc_shell-t -f tcl_files/prf_one_entry.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here

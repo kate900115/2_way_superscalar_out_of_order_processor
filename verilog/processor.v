@@ -40,7 +40,7 @@ module processor(
     
     // Outputs from IF-Stage 
     output logic [63:0]						PC_proc2Imem_addr,
-    output logic [63:0]						PC_proc2Imem_addr_next,
+    output logic [63:0]						PC_proc2Imem_addr_previous,
     output logic [31:0]						PC_inst1,
     output logic [31:0]						PC_inst2,
     output logic							PC_inst1_valid,
@@ -270,7 +270,7 @@ if_stage pc(
 	.thread2_inst_is_valid(PC_inst2_valid),
 	.thread1_is_available(PC_thread1_is_available),
 	//for debug
-	.proc2Imem_addr_next(proc2Imem_addr_next)
+	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous)
 	);
 //////////////////////////////////
 //								//
@@ -718,7 +718,7 @@ rs rs1(
 	
 	//for debug
 	.inst1_rs_pc_in(PC_proc2Imem_addr),
-	.inst2_rs_pc_in(PC_proc2Imem_addr_next),
+	.inst2_rs_pc_in(PC_proc2Imem_addr+4),
 	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 

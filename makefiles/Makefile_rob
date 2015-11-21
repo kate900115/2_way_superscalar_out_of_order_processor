@@ -28,8 +28,8 @@ SIMFILES = 	verilog/rob_one_entry.v		\
 SYNFILES = rob.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-rob.vg:	$(SIMFILES) rob.tcl 
-			dc_shell-t -f rob.tcl | tee synth.out
+rob.vg:	$(SIMFILES) tcl_files/rob.tcl 
+			dc_shell-t -f tcl_files/rob.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
