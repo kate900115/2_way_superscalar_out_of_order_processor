@@ -61,11 +61,11 @@ typedef enum logic [3:0] {
 // LSQ dependent codes
 //
 typedef enum logic [1:0] {
-  NO_DEP_ORDER			=2'h0;
-  NO_DEP_ADDR			=2'h1;
-  DEP					=2'h2;
-  NO_IDEA				=2'h3;
-}
+  NO_DEP_ORDER			=2'h0,
+  NO_DEP_ADDR			=2'h1,
+  DEP					=2'h2,
+  NO_IDEA				=2'h3
+} LSQ_DEP_CODE;
 
 //
 // ALU opA input mux selects

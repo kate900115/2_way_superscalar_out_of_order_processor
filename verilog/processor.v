@@ -193,7 +193,7 @@ logic						RS_full;
 //logic [5:0]							EX_RS_fu_is_available;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
 logic [5:0][63:0]					EX_CDB_fu_result_out;
-logic [5:0]							EX_CDB_fu_result_is_valid;
+//logic [5:0]							EX_CDB_fu_result_is_valid;
 logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
 logic [1:0]							EX_CDB_mispredict_sig;
 //ex success send to cdb
