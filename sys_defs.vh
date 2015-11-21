@@ -312,6 +312,7 @@ typedef enum logic [4:0] {
 `define PRF_SIZE 	48
 `define ROB_SIZE	16
 `define ARF_SIZE    32
+`define MEM_SIZE	64
 
 
 typedef enum logic [1:0] {
