@@ -280,8 +280,8 @@ module testbench;
        // print the piepline stuff via c code to the pipeline.out
        print_cycles();
        //IF
-       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0], {31'b0,PC_inst1_valid});
-       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]+4, {31'b0,PC_inst2_valid});
+       print_stage(" ", PC_inst1, PC_proc2Imem_addr_previous[31:0], {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, PC_proc2Imem_addr_previous[31:0]+4, {31'b0,PC_inst2_valid});
        
        //RS
        print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0]);
