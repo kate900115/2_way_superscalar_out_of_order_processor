@@ -276,7 +276,6 @@ module testbench;
 			.proc2mem_data     (proc2mem_data),
 
 			 // Outputs
-
 			.mem2proc_response (mem2proc_response),
 			.mem2proc_data     (mem2proc_data),
 			.mem2proc_tag      (mem2proc_tag)
@@ -340,7 +339,7 @@ module testbench;
     // *Note that after this, all stdout output goes to visual debugger*
     // each argument is number of registers/signals for the group
     // (IF, IF/ID, ID, ID/EX, EX, EX/MEM, MEM, MEM/WB, WB, Misc)
-    // p: PC 6  g: ID 26  r: RAT 16  f: PRF  17  e:RRAT 10  i:ROB  22 s:RS 5 x:EX 9  d:CDB 10 w: WB 10 v: misc. reg 2
+    // p: PC 6  g: ID 13  
     initcurses(6,13,26,22,9,16,10,10,10,2);
 
     // Pulse the reset signal
@@ -369,10 +368,54 @@ module testbench;
 
     // dump PRF contents
     $write("a");
-    for(int i = 0; i < 48; i=i+1)
-    begin
-      $write("%h", processor_0.prf1.internal_data_in[i]);
-    end
+    $write("%h", processor_0.prf1.prf2[0].value);
+    $write("%h", processor_0.prf1.prf2[1].value);
+    $write("%h", processor_0.prf1.prf2[2].value);
+    $write("%h", processor_0.prf1.prf2[3].value);
+    $write("%h", processor_0.prf1.prf2[4].value);
+    $write("%h", processor_0.prf1.prf2[5].value);
+    $write("%h", processor_0.prf1.prf2[6].value);
+    $write("%h", processor_0.prf1.prf2[7].value);
+    $write("%h", processor_0.prf1.prf2[8].value);
+    $write("%h", processor_0.prf1.prf2[9].value);
+    $write("%h", processor_0.prf1.prf2[10].value);
+    $write("%h", processor_0.prf1.prf2[11].value);
+    $write("%h", processor_0.prf1.prf2[12].value);
+    $write("%h", processor_0.prf1.prf2[13].value);
+    $write("%h", processor_0.prf1.prf2[14].value);
+    $write("%h", processor_0.prf1.prf2[15].value);
+    $write("%h", processor_0.prf1.prf2[16].value);
+    $write("%h", processor_0.prf1.prf2[17].value);
+    $write("%h", processor_0.prf1.prf2[18].value);
+    $write("%h", processor_0.prf1.prf2[19].value);
+    $write("%h", processor_0.prf1.prf2[20].value);
+    $write("%h", processor_0.prf1.prf2[21].value);
+    $write("%h", processor_0.prf1.prf2[22].value);
+    $write("%h", processor_0.prf1.prf2[23].value);
+    $write("%h", processor_0.prf1.prf2[24].value);
+    $write("%h", processor_0.prf1.prf2[25].value);
+    $write("%h", processor_0.prf1.prf2[26].value);
+    $write("%h", processor_0.prf1.prf2[27].value);
+    $write("%h", processor_0.prf1.prf2[28].value);
+    $write("%h", processor_0.prf1.prf2[29].value);
+    $write("%h", processor_0.prf1.prf2[30].value);
+    $write("%h", processor_0.prf1.prf2[31].value);
+    $write("%h", processor_0.prf1.prf2[32].value);
+    $write("%h", processor_0.prf1.prf2[33].value);
+    $write("%h", processor_0.prf1.prf2[34].value);
+    $write("%h", processor_0.prf1.prf2[35].value);
+    $write("%h", processor_0.prf1.prf2[36].value);
+    $write("%h", processor_0.prf1.prf2[37].value);
+    $write("%h", processor_0.prf1.prf2[38].value);
+    $write("%h", processor_0.prf1.prf2[39].value);
+    $write("%h", processor_0.prf1.prf2[40].value);
+    $write("%h", processor_0.prf1.prf2[41].value);
+    $write("%h", processor_0.prf1.prf2[42].value);
+    $write("%h", processor_0.prf1.prf2[43].value);
+    $write("%h", processor_0.prf1.prf2[44].value);
+    $write("%h", processor_0.prf1.prf2[45].value);
+    $write("%h", processor_0.prf1.prf2[46].value);
+    $write("%h", processor_0.prf1.prf2[47].value);
     $display("");
 
     // dump IR information so we can see which instruction
@@ -405,7 +448,7 @@ module testbench;
     $display("dID_inst1_opb 16:%h",        		processor_0.ID_inst1_opb);
     $display("dID_inst1_opa_valid 1:%h",   		processor_0.ID_inst1_opa_valid);
     $display("dID_inst1_opb_valid 1:%h",   		processor_0.ID_inst1_opb_valid);
-    $display("dID_dest_ARF_idx1 5:%h",			processor_0.ID_dest_ARF_idx1);
+    $display("dID_dest_ARF_idx1 5:%d",			processor_0.ID_dest_ARF_idx1);
     $display("dID_alu_func1 16:%h",     		processor_0.ID_alu_func1);
     $display("dID_fu_select1 16:%h",        	processor_0.ID_fu_select1);
     $display("dID_op_type1 5:%h",   			processor_0.ID_op_type1);
@@ -419,15 +462,15 @@ module testbench;
     $display("dID_inst2_opb 16:%h",        		processor_0.ID_inst2_opb);
     $display("dID_inst2_opa_valid 1:%h",   		processor_0.ID_inst2_opa_valid);
     $display("dID_inst2_opb_valid 1:%h",   		processor_0.ID_inst2_opb_valid); 
-    $display("dID_dest_ARF_idx2 5:%h",			processor_0.ID_dest_ARF_idx2);
+    $display("dID_dest_ARF_idx2 5:%d",			processor_0.ID_dest_ARF_idx2);
     $display("dID_alu_func2 16:%h",     		processor_0.ID_alu_func1);
     $display("dID_fu_select2 16:%h",        	processor_0.ID_fu_select1);
     $display("dID_op_type2 5:%h",   			processor_0.ID_op_type1);
-    $display("dID_inst2_is_cond_branch 1:%h",   processor_0.ID_inst1_is_cond_branch);
-    $display("dID_inst2_is_uncond_branch 1:%h",	processor_0.ID_inst1_is_uncond_branch);
-    $display("dID_inst2_is_valid 1:%h",   		processor_0.ID_inst1_is_valid);
-    $display("dID_inst2_is_halt 1:%h",   		processor_0.ID_inst1_is_halt);
-    $display("dID_inst2_is_illegal 1:%h",		processor_0.ID_inst1_is_illegal);
+    $display("dID_inst2_is_cond_branch 1:%b",   processor_0.ID_inst1_is_cond_branch);
+    $display("dID_inst2_is_uncond_branch 1:%b",	processor_0.ID_inst1_is_uncond_branch);
+    $display("dID_inst2_is_valid 1:%b",   		processor_0.ID_inst1_is_valid);
+    $display("dID_inst2_is_halt 1:%b",   		processor_0.ID_inst1_is_halt);
+    $display("dID_inst2_is_illegal 1:%b",		processor_0.ID_inst1_is_illegal);
     
 
 
@@ -477,15 +520,15 @@ module testbench;
 */
 
     // RRAT signals (10) - prefix 'j'
-    $display("jRRAT1_PRF_free_valid1 1:%h",     processor_0.RRAT1_PRF_free_valid1);
-    $display("jRRAT1_PRF_free_valid2 1:%h",     processor_0.RRAT1_PRF_free_valid2);
-    $display("jRRAT2_PRF_free_valid1 1:%h",     processor_0.RRAT2_PRF_free_valid1);
-    $display("jRRAT2_PRF_free_valid2 1:%h",     processor_0.RRAT2_PRF_free_valid2);//4
+    $display("jRRAT1_PRF_free_valid1 1:%h",     	processor_0.RRAT1_PRF_free_valid1);
+    $display("jRRAT1_PRF_free_valid2 1:%h",     	processor_0.RRAT1_PRF_free_valid2);
+    $display("jRRAT2_PRF_free_valid1 1:%h",     	processor_0.RRAT2_PRF_free_valid1);
+    $display("jRRAT2_PRF_free_valid2 1:%h",     	processor_0.RRAT2_PRF_free_valid2);//4
     
-    $display("jRRAT1_PRF_free_idx1 16:%h",      processor_0.RRAT1_PRF_free_idx1); 
-    $display("jRRAT1_PRF_free_idx2 16:%h",      processor_0.RRAT1_PRF_free_idx2); 
-    $display("jRRAT2_PRF_free_idx1 16:%h",      processor_0.RRAT2_PRF_free_idx1); 
-    $display("jRRAT2_PRF_free_idx2 16:%h",      processor_0.RRAT2_PRF_free_idx2);  
+    $display("jRRAT1_PRF_free_idx1 16:%h",      	processor_0.RRAT1_PRF_free_idx1); 
+    $display("jRRAT1_PRF_free_idx2 16:%h",      	processor_0.RRAT1_PRF_free_idx2); 
+    $display("jRRAT2_PRF_free_idx1 16:%h",      	processor_0.RRAT2_PRF_free_idx1); 
+    $display("jRRAT2_PRF_free_idx2 16:%h",      	processor_0.RRAT2_PRF_free_idx2);  
     $display("jRRAT1_PRF_free_enable_list 16:%h",   processor_0.RRAT1_PRF_free_enable_list); 
     $display("jRRAT2_PRF_free_enable_list 16:%h",   processor_0.RRAT2_PRF_free_enable_list);     //10
 //logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx1;
@@ -501,37 +544,37 @@ module testbench;
     $display("hcdb1_branch_taken 1:%h",       		processor_0.cdb1_branch_taken);
     $display("hcdb2_branch_taken 1:%h",       		processor_0.cdb2_branch_taken);//4
     $display("hROB_commit1_is_thread1 1:%h",        processor_0.ROB_commit1_is_thread1);
-    $display("hROB_commit1_is_branch 1:%h",        processor_0.ROB_commit1_is_branch);
-    $display("hROB_commit2_is_thread1 1:%h",       processor_0.ROB_commit2_is_thread1);
-    $display("hROB_commit2_is_branch 1:%h",       processor_0.ROB_commit2_is_branch);//4
-    $display("hROB_commit1_is_halt 1:%h",        processor_0.ROB_commit1_is_halt);
+    $display("hROB_commit1_is_branch 1:%h",         processor_0.ROB_commit1_is_branch);
+    $display("hROB_commit2_is_thread1 1:%h",        processor_0.ROB_commit2_is_thread1);
+    $display("hROB_commit2_is_branch 1:%h",         processor_0.ROB_commit2_is_branch);//4
+    $display("hROB_commit1_is_halt 1:%h",           processor_0.ROB_commit1_is_halt);
     $display("hROB_commit1_is_illegal 1:%h",        processor_0.ROB_commit1_is_illegal);
-    $display("hROB_commit2_is_halt 1:%h",       processor_0.ROB_commit2_is_halt);
-    $display("hROB_commit2_is_illegal 1:%h",       processor_0.ROB_commit2_is_illegal);//16
+    $display("hROB_commit2_is_halt 1:%h",           processor_0.ROB_commit2_is_halt);
+    $display("hROB_commit2_is_illegal 1:%h",        processor_0.ROB_commit2_is_illegal);//16
     
-    $display("hROB_inst1_rob_idx 16:%h",         processor_0.ROB_inst1_rob_idx); 
-    $display("hROB_inst2_rob_idx 16:%h",         processor_0.ROB_inst2_rob_idx); 
-    $display("hROB_commit1_target_pc 16:%h",         processor_0.ROB_commit1_target_pc); 
-    $display("hROB_commit2_target_pc 16:%h",         processor_0.ROB_commit2_target_pc);  
+    $display("hROB_inst1_rob_idx 16:%h",            processor_0.ROB_inst1_rob_idx); 
+    $display("hROB_inst2_rob_idx 16:%h",            processor_0.ROB_inst2_rob_idx); 
+    $display("hROB_commit1_target_pc 16:%h",        processor_0.ROB_commit1_target_pc); 
+    $display("hROB_commit2_target_pc 16:%h",        processor_0.ROB_commit2_target_pc);  
     $display("hROB_commit1_prn_dest 16:%h",         processor_0.ROB_commit1_prn_dest); 
     $display("hROB_commit2_prn_dest 16:%h",         processor_0.ROB_commit2_prn_dest);     //22
    
 
 
     // RS signals (13) - prefix 'g'
-    $display("gRS_EX_out_valid1 6:%h",     processor_0.RS_EX_out_valid[0]);
-    $display("gRS_EX_out_valid2 6:%h",     processor_0.RS_EX_out_valid[1]);
-    $display("gRS_EX_out_valid3 6:%h",     processor_0.RS_EX_out_valid[2]);
-    $display("gRS_EX_out_valid4 6:%h",     processor_0.RS_EX_out_valid[3]);
-    $display("gRS_EX_out_valid5 6:%h",     processor_0.RS_EX_out_valid[4]);
-    $display("gRS_EX_out_valid6 6:%h",     processor_0.RS_EX_out_valid[5]);
-    $display("gRS_EX_alu_func1 6:%h",   processor_0.RS_EX_alu_func[0]);
-    $display("gRS_EX_alu_func2 6:%h",   processor_0.RS_EX_alu_func[1]);
-    $display("gRS_EX_alu_func3 6:%h",   processor_0.RS_EX_alu_func[2]);
-    $display("gRS_EX_alu_func4 6:%h",   processor_0.RS_EX_alu_func[3]);
-    $display("gRS_EX_alu_func5 6:%h",   processor_0.RS_EX_alu_func[4]);
-    $display("gRS_EX_alu_func6 6:%h",   processor_0.RS_EX_alu_func[5]);
-    $display("gRS_full 1:%h",   processor_0.RS_full);
+    $display("gRS_EX_out_valid1 6:%b",     			processor_0.RS_EX_out_valid[0]);
+    $display("gRS_EX_out_valid2 6:%b",     			processor_0.RS_EX_out_valid[1]);
+    $display("gRS_EX_out_valid3 6:%b",     			processor_0.RS_EX_out_valid[2]);
+    $display("gRS_EX_out_valid4 6:%b",     			processor_0.RS_EX_out_valid[3]);
+    $display("gRS_EX_out_valid5 6:%b",     			processor_0.RS_EX_out_valid[4]);
+    $display("gRS_EX_out_valid6 6:%b",     			processor_0.RS_EX_out_valid[5]);
+    $display("gRS_EX_alu_func1 6:%b",   			processor_0.RS_EX_alu_func[0]);
+    $display("gRS_EX_alu_func2 6:%b",   			processor_0.RS_EX_alu_func[1]);
+    $display("gRS_EX_alu_func3 6:%b",   			processor_0.RS_EX_alu_func[2]);
+    $display("gRS_EX_alu_func4 6:%b",   			processor_0.RS_EX_alu_func[3]);
+    $display("gRS_EX_alu_func5 6:%b",   			processor_0.RS_EX_alu_func[4]);
+    $display("gRS_EX_alu_func6 6:%b",   			processor_0.RS_EX_alu_func[5]);
+    $display("gRS_full 1:%b",   					processor_0.RS_full);
     
     //rs output
 //logic [5:0][63:0]		RS_EX_opa;
@@ -541,44 +584,44 @@ module testbench;
 //logic [5:0][5:0]			RS_EX_op_type;
 
     // EX signals (9) - prefix 'e'
-    $display("eEX_RS_fu_is_available 6:%h",        processor_0.EX_RS_fu_is_available);
-    $display("eEX_CDB_fu_result_is_valid 6:%h",          processor_0.EX_CDB_fu_result_is_valid);
-    $display("eEX_CDB_mispredict_sig 2:%h",            processor_0.EX_CDB_mispredict_sig);
+    $display("eEX_RS_fu_is_available 6:%h",         processor_0.EX_RS_fu_is_available);
+    $display("eEX_CDB_fu_result_is_valid 6:%h",     processor_0.EX_CDB_fu_result_is_valid);
+    $display("eEX_CDB_mispredict_sig 2:%h",         processor_0.EX_CDB_mispredict_sig);
     $display("eadder1_send_in_success 1:%h",        processor_0.adder1_send_in_success);
     $display("eadder2_send_in_success 1:%h",        processor_0.adder2_send_in_success);
-    $display("emult1_send_in_success 1:%h",       processor_0.mult1_send_in_success);
-    $display("emult2_send_in_success 1:%h",       mult2_send_in_success);
-    $display("ememory1_send_in_success 1:%h",        processor_0.memory1_send_in_success);
-    $display("ememory2_send_in_success 1:%h",        processor_0.memory2_send_in_success);//9
+    $display("emult1_send_in_success 1:%h",     	processor_0.mult1_send_in_success);
+    $display("emult2_send_in_success 1:%h",     	mult2_send_in_success);
+    $display("ememory1_send_in_success 1:%h",       processor_0.memory1_send_in_success);
+    $display("ememory2_send_in_success 1:%h",       processor_0.memory2_send_in_success);//9
     
     //CDB signals(10) --prefix 'd'
-    $display("wcdb1_valid 1:%h",        processor_0.cdb1_valid);
-    $display("wcdb1_value 16:%h",         processor_0.cdb1_value); 
-    $display("wcdb1_tag 16:%h",         processor_0.cdb1_tag); 
-    $display("wcdb1_rob_idx 16:%h",         processor_0.cdb1_rob_idx); 
-    $display("wthread1_target_pc 16:%h",         processor_0.thread1_target_pc); 
-    $display("wcdb2_valid 1:%h",        processor_0.cdb2_valid); 
-    $display("wcdb2_value 16:%h",         processor_0.cdb2_value); 
-    $display("wcdb2_tag 16:%h",         processor_0.cdb2_tag);
-    $display("wcdb2_rob_idx 16:%h",         processor_0.cdb2_rob_idx); 
-    $display("wthread2_target_pc 16:%h",         processor_0.thread2_target_pc); //10
+    $display("wcdb1_valid 1:%h",        			processor_0.cdb1_valid);
+    $display("wcdb1_value 16:%h",         			processor_0.cdb1_value); 
+    $display("wcdb1_tag 16:%h",         			processor_0.cdb1_tag); 
+    $display("wcdb1_rob_idx 16:%h",         		processor_0.cdb1_rob_idx); 
+    $display("wthread1_target_pc 16:%h",         	processor_0.thread1_target_pc); 
+    $display("wcdb2_valid 1:%h",        			processor_0.cdb2_valid); 
+    $display("wcdb2_value 16:%h",         			processor_0.cdb2_value); 
+    $display("wcdb2_tag 16:%h",         			processor_0.cdb2_tag);
+    $display("wcdb2_rob_idx 16:%h",         		processor_0.cdb2_rob_idx); 
+    $display("wthread2_target_pc 16:%h",         	processor_0.thread2_target_pc); //10
     
     // MEM signals (10) - prefix 'm'*****Writeback
       
-    $display("mwr_data1 16:%h",     			processor_0.PRF_writeback_value1);
-    $display("mROB_commit1_pc 16:%h",     		processor_0.ROB_commit1_pc);
-    $display("mROB_commit1_arn_dest 16:%h",     processor_0.ROB_commit1_arn_dest);
-    $display("mROB_commit1_wr_en 1:%h",     	processor_0.ROB_commit1_wr_en);
-    $display("mROB_commit1_valid 1:%h",     	processor_0.ROB_commit1_valid);
-    $display("mwr_data1 16:%h",     			processor_0.PRF_writeback_value2);
-    $display("mROB_commit2_pc 16:%h",     processor_0.ROB_commit2_pc);
-    $display("mROB_commit2_arn_dest 16:%h",     processor_0.ROB_commit2_arn_dest);
-    $display("mROB_commit2_wr_en 1:%h",     processor_0.ROB_commit2_wr_en);
-    $display("mROB_commit2_valid 1:%h",     processor_0.ROB_commit2_valid);//10
+    $display("mwr_data1 16:%h",     				processor_0.PRF_writeback_value1);
+    $display("mROB_commit1_pc 16:%h",     			processor_0.ROB_commit1_pc);
+    $display("mROB_commit1_arn_dest 16:%h",     	processor_0.ROB_commit1_arn_dest);
+    $display("mROB_commit1_wr_en 1:%h",     		processor_0.ROB_commit1_wr_en);
+    $display("mROB_commit1_valid 1:%h",     		processor_0.ROB_commit1_valid);
+    $display("mwr_data1 16:%h",     				processor_0.PRF_writeback_value2);
+    $display("mROB_commit2_pc 16:%h",     			processor_0.ROB_commit2_pc);
+    $display("mROB_commit2_arn_dest 16:%h",     	processor_0.ROB_commit2_arn_dest);
+    $display("mROB_commit2_wr_en 1:%h",     		processor_0.ROB_commit2_wr_en);
+    $display("mROB_commit2_valid 1:%h",     		processor_0.ROB_commit2_valid);//10
     
     // Misc signals(2) - prefix 'v'
-    $display("vcompleted 1:%h",     processor_0.pipeline_completed_insts);
-    $display("vpipe_err 1:%h",      pipeline_error_status);
+    $display("vcompleted 1:%h",     				processor_0.pipeline_completed_insts);
+    $display("vpipe_err 1:%h",      				pipeline_error_status);
 //ex output
 //logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
 //logic [5:0][63:0]					EX_CDB_fu_result_out;

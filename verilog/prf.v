@@ -372,7 +372,7 @@ module prf(
 	end
 
 
-	prf_one_entry prf1[`PRF_SIZE-1:0](
+	prf_one_entry prf2[`PRF_SIZE-1:0](
 		//input
 		.clock(clock),
 		.reset(reset),
@@ -702,7 +702,7 @@ module prf(
 				end
 			end
 		end
-			$display("inst1_opa_prf_value:%h", inst1_opa_prf_value);	
-			$display("inst2_opa_prf_value:%h", inst2_opa_prf_value);	
+			//$display("inst1_opa_prf_value:%h", inst1_opa_prf_value);	
+			//$display("inst2_opa_prf_value:%h", inst2_opa_prf_value);	
 	end
 endmodule

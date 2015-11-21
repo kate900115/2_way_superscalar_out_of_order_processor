@@ -265,7 +265,7 @@ module rs(
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
 	always_comb begin
-	$display("internal_rs_available_out:%b", internal_rs_available_out);
+	//$display("internal_rs_available_out:%b", internal_rs_available_out);
 		for (int i = 0; i < `RS_SIZE; i++) begin
 			internal_rs_free_enable_fu[i]		= 0;
 		end

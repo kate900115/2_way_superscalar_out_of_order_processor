@@ -15,9 +15,9 @@
 #define PARENT_WRITE    writepipe[1]
 #define NUM_HISTORY     256
 #define NUM_PRF         48
-#define NUM_STAGES      5
+#define NUM_STAGES      4
 #define NOOP_INST       0x47ff041f
-#define NUM_REG_GROUPS  8
+#define NUM_REG_GROUPS  10
 
 // random variables/stuff
 int fd[2], writepipe[2], readpipe[2];
@@ -64,7 +64,7 @@ WINDOW *rs_win;
 WINDOW *id_win;
 WINDOW *rob_win;
 WINDOW *ex_win;
-WINDOW *rat_win;
+WINDOW *rat1_win;
 WINDOW *mem_win;
 WINDOW *rrat_win;
 WINDOW *cdb_win;
@@ -79,7 +79,7 @@ int num_rs_regs = 0;
 int num_id_regs = 0;
 int num_rob_regs = 0;
 int num_ex_regs = 0;
-int num_rat_regs = 0;
+int num_rat1_regs = 0;
 int num_mem_regs = 0;
 int num_rrat_regs = 0;
 int num_cdb_regs = 0;
@@ -94,7 +94,7 @@ char ***rs_contents;
 char ***id_contents;
 char ***rob_contents;
 char ***ex_contents;
-char ***rat_contents;
+char ***rat1_contents;
 char ***mem_contents;
 char ***rrat_contents;
 char ***cdb_contents;
@@ -105,7 +105,7 @@ char **rs_reg_names;
 char **id_reg_names;
 char **rob_reg_names;
 char **ex_reg_names;
-char **rat_reg_names;
+char **rat1_reg_names;
 char **mem_reg_names;
 char **rrat_reg_names;
 char **cdb_reg_names;
@@ -270,48 +270,48 @@ void setup_gui(FILE *fp){
   wrefresh(pipe_win);
 
   //instantiate window to visualize IF stage (including IF/ID)
-  if_win = create_newwin((num_if_regs+2),30,8,0,5);
+  if_win = create_newwin((num_if_regs+2),45,8,0,5);
   mvwprintw(if_win,0,10,"IF STAGE");
   wrefresh(if_win);
 
   //instantiate window to visualize IF/ID signals
-  rs_win = create_newwin((num_rs_regs+2),30,8,60,5);
+  rs_win = create_newwin((num_rs_regs+2),45,8,100,5);
   mvwprintw(rs_win,0,12,"RS");
   wrefresh(rs_win);
 
   //instantiate a window to visualize ID stage
-  id_win = create_newwin((num_id_regs+2),30,8,30,5);
+  id_win = create_newwin((num_id_regs+2),45,8,50,5);
   mvwprintw(id_win,0,10,"ID STAGE");
   wrefresh(id_win);
 
   //instantiate a window to visualize ID/EX signals
-  rob_win = create_newwin((num_rob_regs+2),30,8,120,5);
+  rob_win = create_newwin((num_rob_regs+2),45,8,200,5);
   mvwprintw(rob_win,0,12,"ROB");
   wrefresh(rob_win);
 
   //instantiate a window to visualize EX stage
-  ex_win = create_newwin((num_ex_regs+2),30,8,90,5);
+  ex_win = create_newwin((num_ex_regs+2),45,8,150,5);
   mvwprintw(ex_win,0,10,"EX STAGE");
   wrefresh(ex_win);
 
   //instantiate a window to visualize EX/MEM
-  rat_win = create_newwin((num_rat_regs+2),30,LINES-7-(num_rat_regs+2),0,5);
-  mvwprintw(rat_win,0,12,"RAT");
-  wrefresh(rat_win);
+  rat1_win = create_newwin((num_rat1_regs+60),45,LINES-7-(num_rat1_regs+2),0,5);
+  mvwprintw(rat1_win,0,12,"RAT");
+  wrefresh(rat1_win);
 
   //instantiate a window to visualize MEM stage
-  mem_win = create_newwin((num_mem_regs+2),30,LINES-7-(num_mem_regs+2),30,5);
+  mem_win = create_newwin((num_mem_regs+4),45,LINES-7-(num_mem_regs+2),50,5);
   mvwprintw(mem_win,0,10,"MEM");
   wrefresh(mem_win);
 
   //instantiate a window to visualize MEM/WB
-  rrat_win = create_newwin((num_rrat_regs+2),30,LINES-7-(num_rrat_regs+2),60,5);
+  rrat_win = create_newwin((num_rrat_regs+4),45,LINES-7-(num_rrat_regs+2),100,5);
   mvwprintw(rrat_win,0,12,"RRAT");
   wrefresh(rrat_win);
 
 
   //instantiate a window to visualize WB stage
-  cdb_win = create_newwin((num_cdb_regs+2),30,LINES-7-(num_cdb_regs+2),90,5);
+  cdb_win = create_newwin((num_cdb_regs+4),45,LINES-7-(num_cdb_regs+2),150,5);
   mvwprintw(cdb_win,0,10,"CDB");
   wrefresh(cdb_win);
 
@@ -456,15 +456,15 @@ void parsedata(int history_num_in){
   wrefresh(ex_win);
 
   // Handle updating the rat window
-  for(i=0;i<num_rat_regs;i++){
-    if (strcmp(rat_contents[history_num_in][i],
-                rat_contents[old_history_num_in][i]))
-      wattron(rat_win, A_REVERSE);
+  for(i=0;i<num_rat1_regs;i++){
+    if (strcmp(rat1_contents[history_num_in][i],
+                rat1_contents[old_history_num_in][i]))
+      wattron(rat1_win, A_REVERSE);
     else
-      wattroff(rat_win, A_REVERSE);
-    mvwaddstr(rat_win,i+1,strlen(rat_reg_names[i])+3,rat_contents[history_num_in][i]);
+      wattroff(rat1_win, A_REVERSE);
+    mvwaddstr(rat1_win,i+1,strlen(rat1_reg_names[i])+3,rat1_contents[history_num_in][i]);
   }
-  wrefresh(rat_win);
+  wrefresh(rat1_win);
 
   // Handle updating the MEM window
   for(i=0;i<num_mem_regs;i++){
@@ -537,7 +537,7 @@ int processinput(){
   static int id_reg_num = 0;
   static int rob_reg_num = 0;
   static int ex_reg_num = 0;
-  static int rat_reg_num = 0;
+  static int rat1_reg_num = 0;
   static int mem_reg_num = 0;
   static int rrat_reg_num = 0;
   static int cdb_reg_num = 0;
@@ -669,16 +669,16 @@ int processinput(){
     // If this is the first time we've seen the register,
     // add name and data to arrays
     if (!setup_registers) {
-      parse_register(readbuffer, rat_reg_num, rat_contents, rat_reg_names);
-      mvwaddstr(rat_win,rat_reg_num+1,1,rat_reg_names[rat_reg_num]);
-      waddstr(rat_win, ": ");
-      wrefresh(rat_win);
+      parse_register(readbuffer, rat1_reg_num, rat1_contents, rat1_reg_names);
+      mvwaddstr(rat1_win,rat1_reg_num+1,1,rat1_reg_names[rat1_reg_num]);
+      waddstr(rat1_win, ": ");
+      wrefresh(rat1_win);
     } else {
       sscanf(readbuffer,"%*c%s %d:%s",name_buf,&tmp_len,val_buf);
-      strcpy(rat_contents[history_num][rat_reg_num],val_buf);
+      strcpy(rat1_contents[history_num][rat1_reg_num],val_buf);
     }
 
-    rat_reg_num++;
+    rat1_reg_num++;
   }else if(strncmp(readbuffer,"m",1) == 0){
     // We are getting a MEM register
 
@@ -755,7 +755,7 @@ int processinput(){
     id_reg_num = 0;
     rob_reg_num = 0;
     ex_reg_num = 0;
-    rat_reg_num = 0;
+    rat1_reg_num = 0;
     mem_reg_num = 0;
     rrat_reg_num = 0;
     cdb_reg_num = 0;
@@ -773,7 +773,7 @@ int processinput(){
 
 //this initializes a ncurses window and sets up the arrays for exchanging reg information
 void initcurses(int if_regs, int rs_regs, int id_regs, int rob_regs, int ex_regs,
-                int rat_regs, int mem_regs, int rrat_regs, int cdb_regs,
+                int rat1_regs, int mem_regs, int rrat_regs, int cdb_regs,
                 int misc_regs){
   int nbytes;
   int ready_val;
@@ -786,7 +786,7 @@ void initcurses(int if_regs, int rs_regs, int id_regs, int rob_regs, int ex_regs
   num_id_regs = id_regs;
   num_rob_regs = rob_regs;
   num_ex_regs = ex_regs;
-  num_rat_regs = rat_regs;
+  num_rat1_regs = rat1_regs;
   num_mem_regs = mem_regs;
   num_rrat_regs = rrat_regs;
   num_cdb_regs = cdb_regs;
@@ -806,14 +806,14 @@ void initcurses(int if_regs, int rs_regs, int id_regs, int rob_regs, int ex_regs
     prf_contents      = (char**) malloc(NUM_HISTORY*sizeof(char*));
     int i=0;
     if_contents       = (char***) malloc(NUM_HISTORY*sizeof(char**));
-    rs_contents    = (char***) malloc(NUM_HISTORY*sizeof(char**));
+    rs_contents    	  = (char***) malloc(NUM_HISTORY*sizeof(char**));
     id_contents       = (char***) malloc(NUM_HISTORY*sizeof(char**));
-    rob_contents    = (char***) malloc(NUM_HISTORY*sizeof(char**));
+    rob_contents      = (char***) malloc(NUM_HISTORY*sizeof(char**));
     ex_contents       = (char***) malloc(NUM_HISTORY*sizeof(char**));
-    rat_contents   = (char***) malloc(NUM_HISTORY*sizeof(char**));
+    rat1_contents      = (char***) malloc(NUM_HISTORY*sizeof(char**));
     mem_contents      = (char***) malloc(NUM_HISTORY*sizeof(char**));
-    rrat_contents   = (char***) malloc(NUM_HISTORY*sizeof(char**));
-    cdb_contents       = (char***) malloc(NUM_HISTORY*sizeof(char**));
+    rrat_contents     = (char***) malloc(NUM_HISTORY*sizeof(char**));
+    cdb_contents      = (char***) malloc(NUM_HISTORY*sizeof(char**));
     misc_contents     = (char***) malloc(NUM_HISTORY*sizeof(char**));
     timebuffer        = (char**) malloc(NUM_HISTORY*sizeof(char*));
     cycles            = (char**) malloc(NUM_HISTORY*sizeof(char*));
@@ -822,32 +822,32 @@ void initcurses(int if_regs, int rs_regs, int id_regs, int rob_regs, int ex_regs
 
     // allocate room for the register names (what is displayed)
     if_reg_names      = (char**) malloc(num_if_regs*sizeof(char*));
-    rs_reg_names   = (char**) malloc(num_rs_regs*sizeof(char*));
+    rs_reg_names      = (char**) malloc(num_rs_regs*sizeof(char*));
     id_reg_names      = (char**) malloc(num_id_regs*sizeof(char*));
-    rob_reg_names   = (char**) malloc(num_rob_regs*sizeof(char*));
+    rob_reg_names     = (char**) malloc(num_rob_regs*sizeof(char*));
     ex_reg_names      = (char**) malloc(num_ex_regs*sizeof(char*));
-    rat_reg_names  = (char**) malloc(num_rat_regs*sizeof(char*));
+    rat1_reg_names     = (char**) malloc(num_rat1_regs*sizeof(char*));
     mem_reg_names     = (char**) malloc(num_mem_regs*sizeof(char*));
-    rrat_reg_names  = (char**) malloc(num_rrat_regs*sizeof(char*));
-    cdb_reg_names      = (char**) malloc(num_cdb_regs*sizeof(char*));
+    rrat_reg_names    = (char**) malloc(num_rrat_regs*sizeof(char*));
+    cdb_reg_names     = (char**) malloc(num_cdb_regs*sizeof(char*));
     misc_reg_names    = (char**) malloc(num_misc_regs*sizeof(char*));
 
     int j=0;
     for(;i<NUM_HISTORY;i++){
-      timebuffer[i]       = (char*) malloc(8);
-      cycles[i]           = (char*) malloc(7);
-      inst_contents[i]    = (char*) malloc(NUM_STAGES*10);
-      prf_contents[i]     = (char*) malloc(NUM_PRF*20);
-      if_contents[i]      = (char**) malloc(num_if_regs*sizeof(char*));
-      rs_contents[i]   = (char**) malloc(num_rs_regs*sizeof(char*));
-      id_contents[i]      = (char**) malloc(num_id_regs*sizeof(char*));
-      rob_contents[i]   = (char**) malloc(num_rob_regs*sizeof(char*));
-      ex_contents[i]      = (char**) malloc(num_ex_regs*sizeof(char*));
-      rat_contents[i]  = (char**) malloc(num_rat_regs*sizeof(char*));
-      mem_contents[i]     = (char**) malloc(num_mem_regs*sizeof(char*));
-      rrat_contents[i]  = (char**) malloc(num_rrat_regs*sizeof(char*));
-      cdb_contents[i]      = (char**) malloc(num_cdb_regs*sizeof(char*));
-      misc_contents[i]    = (char**) malloc(num_misc_regs*sizeof(char*));
+      timebuffer[i]   = (char*) malloc(8);
+      cycles[i]       = (char*) malloc(7);
+      inst_contents[i]= (char*) malloc(NUM_STAGES*10);
+      prf_contents[i] = (char*) malloc(NUM_PRF*20);
+      if_contents[i]  = (char**) malloc(num_if_regs*sizeof(char*));
+      rs_contents[i]  = (char**) malloc(num_rs_regs*sizeof(char*));
+      id_contents[i]  = (char**) malloc(num_id_regs*sizeof(char*));
+      rob_contents[i] = (char**) malloc(num_rob_regs*sizeof(char*));
+      ex_contents[i]  = (char**) malloc(num_ex_regs*sizeof(char*));
+      rat1_contents[i] = (char**) malloc(num_rat1_regs*sizeof(char*));
+      mem_contents[i] = (char**) malloc(num_mem_regs*sizeof(char*));
+      rrat_contents[i]= (char**) malloc(num_rrat_regs*sizeof(char*));
+      cdb_contents[i] = (char**) malloc(num_cdb_regs*sizeof(char*));
+      misc_contents[i]= (char**) malloc(num_misc_regs*sizeof(char*));
     }
     setup_gui(fp);
 
