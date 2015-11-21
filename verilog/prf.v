@@ -32,7 +32,8 @@ module prf(
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opb_prf_idx,				// opb prf index of instruction2
 	
-	input 									rat1_read_enable,					//if rat1 read_enable=1, rat1 idx is valid, else rat2 idx is valid
+	input 									rat1_read_enable,					// if rat1 read_enable=1, rat1 idx is valid, else rat2 idx is valid
+ 	input									is_one_thread,						// if is_one_thread =1, there is one thread running, if is_one_thread = 0, there is two thread running
 
 	input									rat1_allocate_new_prf1,				// the request from rat1 for allocating a new prf entry
 	input									rat1_allocate_new_prf2,				// the request from rat1 for allocating a new prf entry
@@ -653,35 +654,55 @@ module prf(
 		//because we have two RRAT updating the PRF, 
 		//when RRAT1 frees the registers, we must check RAT2
 		//when RRAT2 frees the registers, we must check RAT1
-		if (rrat1_branch_mistaken_free_valid)
+		if (!is_one_thread)
 		begin
-			for(int i=0;i<`PRF_SIZE;i++)
+			if (rrat1_branch_mistaken_free_valid)
 			begin
-				if(rrat1_prf_free_list[i]&&rat2_prf_free_list[i])
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					internal_free_this_entry[i] = 1'b1;
+					if(rrat1_prf_free_list[i]&&rat2_prf_free_list[i])
+					begin
+						internal_free_this_entry[i] = 1'b1;
+					end
+					else
+					begin
+						internal_free_this_entry[i] = 1'b0;
+					end
 				end
-				else
+			end
+			if (rrat2_branch_mistaken_free_valid)
+			begin
+				for(int i=0;i<`PRF_SIZE;i++)
 				begin
-					internal_free_this_entry[i] = 1'b0;
+					if(rrat2_prf_free_list[i]&&rat1_prf_free_list[i])
+					begin
+						internal_free_this_entry[i] = 1'b1;
+					end
+					else
+					begin
+						internal_free_this_entry[i] = 1'b0;
+					end
+				end
+			end		
+		end
+		else
+		begin
+			if(rrat1_branch_mistaken_free_valid)
+			begin
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if(rrat1_prf_free_list[i])
+					begin
+						internal_free_this_entry[i] = 1'b1;
+					end
+					else
+					begin
+						internal_free_this_entry[i] = 1'b0;
+					end
 				end
 			end
 		end
-		if (rrat2_branch_mistaken_free_valid)
-		begin
-			for(int i=0;i<`PRF_SIZE;i++)
-			begin
-				if(rrat2_prf_free_list[i]&&rat1_prf_free_list[i])
-				begin
-					internal_free_this_entry[i] = 1'b1;
-				end
-				else
-				begin
-					internal_free_this_entry[i] = 1'b0;
-				end
-			end
-		end		
-		$display("inst1_opa_prf_value:%h", inst1_opa_prf_value);	
-		$display("inst2_opa_prf_value:%h", inst2_opa_prf_value);	
+			$display("inst1_opa_prf_value:%h", inst1_opa_prf_value);	
+			$display("inst2_opa_prf_value:%h", inst2_opa_prf_value);	
 	end
 endmodule
