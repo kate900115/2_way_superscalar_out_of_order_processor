@@ -34,11 +34,11 @@ module testbench;
 	
     	logic [3:0]   mem2proc_response;        // Tag from memory about current request
     	logic [63:0]  mem2proc_data;            // Data coming back from memory
-    	logic [3:0]   mem2proc_tag;              // Tag from memory about current reply
+    	logic [3:0]   mem2proc_tag;             // Tag from memory about current reply
 
-    	BUS_COMMAND   proc2mem_command;    // command sent to memory
-    	logic [63:0]  proc2mem_addr;      // Address sent to memory
-  	 	logic [63:0]  proc2mem_data;      // Data sent to memory
+    	BUS_COMMAND   proc2mem_command;    		// command sent to memory
+    	logic [63:0]  proc2mem_addr;      		// Address sent to memory
+  	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
     	logic [3:0]   pipeline_completed_insts;
     	logic [3:0]   pipeline_error_status;
