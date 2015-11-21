@@ -224,10 +224,10 @@ assign proc2mem_command = BUS_LOAD;
 assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
-assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
-assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
+assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
