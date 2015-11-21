@@ -44,7 +44,7 @@ void print_stage(char* div, int inst, int npc, int valid_inst)
     check = (inst>>5) & 0x0000007f;
     switch(opcode)
     {
-      case 0x00: str = (inst == 0x555) ? "halt" : "call_pal"; break;
+      case 0x00: str = (inst == 0x555) ? "halt" : "calpal"; break;
       case 0x08: str = "lda"; break;
       case 0x09: str = "ldah"; break;
       case 0x0a: str = "ldbu"; break;

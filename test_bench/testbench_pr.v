@@ -34,11 +34,11 @@ module testbench;
 	
     	logic [3:0]   mem2proc_response;        // Tag from memory about current request
     	logic [63:0]  mem2proc_data;            // Data coming back from memory
-    	logic [3:0]   mem2proc_tag;              // Tag from memory about current reply
+    	logic [3:0]   mem2proc_tag;             // Tag from memory about current reply
 
-    	BUS_COMMAND   proc2mem_command;    // command sent to memory
-    	logic [63:0]  proc2mem_addr;      // Address sent to memory
-  	 	logic [63:0]  proc2mem_data;      // Data sent to memory
+    	BUS_COMMAND   proc2mem_command;    		// command sent to memory
+    	logic [63:0]  proc2mem_addr;      		// Address sent to memory
+  	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
     	logic [3:0]   pipeline_completed_insts;
     	logic [3:0]   pipeline_error_status;
@@ -284,8 +284,8 @@ module testbench;
        // print the piepline stuff via c code to the pipeline.out
        print_cycles();
        //IF
-       print_stage(" ", PC_inst1, PC_proc2Imem_addr[31:0], {31'b0,PC_inst1_valid});
-       print_stage(" ", PC_inst2, PC_proc2Imem_addr[31:0]+4, {31'b0,PC_inst2_valid});
+       print_stage(" ", PC_inst1, PC_proc2Imem_addr_previous[31:0], {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, PC_proc2Imem_addr_previous[31:0]+4, {31'b0,PC_inst2_valid});
        
        //RS
        print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0],1);

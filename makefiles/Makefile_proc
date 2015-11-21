@@ -12,7 +12,7 @@
 #
 
 VCS = SW_VCS=2015.09 vcs -sverilog +vc -Mupdate -line -full64 +define+
-
+VISFLAGS = -lncurses
 all:    simv
 	./simv | tee program.out
 
@@ -42,16 +42,14 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/rrat.v	\
 			verilog/rs.v	\
 			verilog/rs_one_entry.v	\
-			
-# For visual debugger
-VISTESTBENCH = $(TESTBENCH:testbench.v=visual_testbench_pr.v) \
-		test_bench/visual_c_hooks.c
-
-synth/pipeline.vg:        $(SIMFILES) synth/pipeline.tcl
-	cd synth && dc_shell-t -f ./pipeline.tcl | tee synth.out 
+			 
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
+
+# For visual debugger
+VISTESTBENCH = $(TESTBENCH:testbench_pr.v=visual_testbench_pr.v) \
+		test_bench/visual_c_hooks.c
 
 processor.vg:	$(SIMFILES) tcl_files/processor.tcl 
 	dc_shell-t -f tcl_files/processor.tcl | tee synth.out
@@ -65,20 +63,22 @@ dve:	$(SIMFILES) $(TESTBENCH)
 	
 dve_syn:	$(SYNFILES) $(TESTBENCH)
 	$(VCS) $(TESTBENCH) $(SYNFILES) $(LIB) +define+SYNTH_TEST -o syn_simv -R -gui
+	
+# For visual debugger
+vis_simv:	$(SIMFILES) $(VISTESTBENCH)
+	$(VCS) $(VISFLAGS) $(VISTESTBENCH) $(SIMFILES) +define+SYNTH_TEST -o  vis_simv 
+	./vis_simv
 
 simv:	$(SIMFILES) $(TESTBENCH)
 	$(VCS) $(TESTBENCH) $(SIMFILES)	-o simv
 
 syn_simv:	$(SYNFILES) $(TESTBENCH)
-	$(VCS) $(TESTBENCH) $(SYNFILES) $(LIB) +define+SYNTH_TEST -o syn_simv
+	$(VCS) $(TESTBENCH) $(SYNFILES) $(LIB) +define+SYNTH_TEST -o  syn_simv
 
 syn:	syn_simv
 	./syn_simv | tee syn_program.out
 	
-# For visual debugger
-vis_simv:	$(SIMFILES) $(VISTESTBENCH)
-	$(VCS) $(VISFLAGS) $(VISTESTBENCH) $(SIMFILES) -o vis_simv 
-	./vis_simv
+
 
 
 clean:
