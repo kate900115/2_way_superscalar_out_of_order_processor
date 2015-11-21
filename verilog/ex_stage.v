@@ -105,6 +105,7 @@ module ex_stage(
     input [5:0][5:0]  							fu_rs_op_type_in,	// incoming instruction
     input [5:0]									fu_rs_valid_in,
     input ALU_FUNC [5:0]     					fu_alu_func_in,	// ALU function select from decoder
+    input [5:0][1:0]					fu_rs_branch_out,
 
     input										adder1_send_in_success,
     input										adder2_send_in_success,
@@ -195,8 +196,9 @@ module ex_stage(
 				// Output
 			.cond(brcond_result[1])
 	);
-	assign fu_take_branch_out[0] =	brcond_result[0];  //calculate branch correct take or not take
-	assign fu_take_branch_out[1] =	brcond_result[1];
+	
+	/*assign fu_take_branch_out[0] =	brcond_result[0];  //calculate branch correct take or not take
+	assign fu_take_branch_out[1] =	brcond_result[1];*/
 	
 	// fu5: memory1
 	alu alu5 (// Inputs
@@ -216,6 +218,16 @@ module ex_stage(
 		.result(mem_result2)
 	);
   
+	/*assign fu_take_branch_out[0] =	fu_rs_branch[1][0] |(fu_rs_branch[1][1] & brcond_result[1]);  //calculate branch correct take or not take
+	assign fu_take_branch_out[1] =	fu_rs_branch[3][0] |(fu_rs_branch[3][1] & brcond_result[3]);
+	
+	assign fu_mispredict_sig[0] = fu_take_branch_out[0] ^ fu_rs_predict[1];
+	assign fu_mispredict_sig[1] = fu_take_branch_out[1] ^ fu_rs_predict[3];*/
+	
+	assign fu_take_branch_out[0] =	fu_rs_branch_out[1][0] | (fu_rs_branch_out[1][1] & brcond_result[0]);  //calculate branch correct take or not take
+	assign fu_take_branch_out[1] =	fu_rs_branch_out[3][0] | (fu_rs_branch_out[3][1] & brcond_result[1]);
+	
+
 	assign fu_is_available[0] = fu_result_is_valid[0] ? mult1_send_in_success  : ~fu_is_in_use[0];
 	assign fu_is_available[1] = fu_result_is_valid[1] ? adder1_send_in_success : ~fu_is_in_use[1];
 	assign fu_is_available[2] = fu_result_is_valid[2] ? mult2_send_in_success  : ~fu_is_in_use[2];
@@ -280,7 +292,7 @@ module ex_stage(
 			fu_result_is_valid[5]	<= `SD 1'b0;
 			fu_result_out[5]		<= `SD 0;
 			fu_is_in_use[5]			<= `SD 1'b0;
-			fu_inst_pc_out[0]		<= `SD 0;
+			fu_inst_pc_out[5]		<= `SD 0;
 		end
 		else begin
 			if (fu_rs_valid_in[0])
