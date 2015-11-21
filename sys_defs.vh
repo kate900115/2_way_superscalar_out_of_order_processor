@@ -57,6 +57,15 @@ typedef enum logic [3:0] {
   HALTED_ON_ILLEGAL_I2      = 4'h5
 } ERROR_CODE;
 
+//
+// LSQ dependent codes
+//
+typedef enum logic [1:0] {
+  NO_DEP_ORDER			=2'h0,
+  NO_DEP_ADDR			=2'h1,
+  DEP					=2'h2,
+  NO_IDEA				=2'h3
+} LSQ_DEP_CODE;
 
 //
 // ALU opA input mux selects
@@ -303,6 +312,7 @@ typedef enum logic [4:0] {
 `define PRF_SIZE 	48
 `define ROB_SIZE	16
 `define ARF_SIZE    32
+`define MEM_SIZE	64
 
 
 typedef enum logic [1:0] {
