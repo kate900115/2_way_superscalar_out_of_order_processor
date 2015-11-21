@@ -56,7 +56,6 @@ module processor(
 	output ALU_FUNC [5:0]					EX_alu_func_out,
     output logic [5:0][5:0]					EX_rs_op_type_out,
     output logic [5:0]						EX_RS_fu_is_available,
-    output logic [5:0]						EX_CDB_fu_result_is_valid,
 	
 	// Outputs from ROB
 	output logic [63:0]						ROB_commit1_pc,
@@ -288,8 +287,8 @@ id_stage id(
 
 	.if_id_valid_inst1(PC_inst1_valid),
 	.if_id_valid_inst2(PC_inst2_valid),
-	.if_id_NPC_inst1(PC_proc2Imem_addr_previous),           // incoming instruction1 PC
-	.if_id_NPC_inst2(PC_proc2Imem_addr_previous+4),           // incoming instruction PC+4
+	.if_id_NPC_inst1(PC_proc2Imem_addr),           // incoming instruction1 PC
+	.if_id_NPC_inst2(PC_proc2Imem_addr+4),           // incoming instruction PC+4
 //output
 	.opa_mux_out1(ID_inst1_opa),               //instr1 opa and opb value or tag
 	.opb_mux_out1(ID_inst1_opb),
@@ -595,7 +594,7 @@ rob rob1(
 	
 	.is_thread1(PC_thread1_is_available),					//if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
-	.inst1_pc_in(PC_proc2Imem_addr_previous),				//the pc of the instruction
+	.inst1_pc_in(PC_proc2Imem_addr-8),				//the pc of the instruction
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
 	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
@@ -604,7 +603,7 @@ rob rob1(
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
-	.inst2_pc_in(PC_proc2Imem_addr_previous+4),				//the pc of the instruction
+	.inst2_pc_in(PC_proc2Imem_addr-4),				//the pc of the instruction
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
@@ -719,8 +718,8 @@ rs rs1(
 	.rs_full(RS_full),			// RS is full now
 	
 	//for debug
-	.inst1_rs_pc_in(PC_proc2Imem_addr_previous),
-	.inst2_rs_pc_in(PC_proc2Imem_addr_previous+4),
+	.inst1_rs_pc_in(PC_proc2Imem_addr),
+	.inst2_rs_pc_in(PC_proc2Imem_addr+4),
 	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 
