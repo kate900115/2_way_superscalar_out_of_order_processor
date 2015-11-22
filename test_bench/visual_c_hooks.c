@@ -270,48 +270,48 @@ void setup_gui(FILE *fp){
   wrefresh(pipe_win);
 
   //instantiate window to visualize IF stage (including IF/ID)
-  if_win = create_newwin((num_if_regs+2),45,8,0,5);
+  if_win = create_newwin((num_if_regs+2),40,8,0,5);
   mvwprintw(if_win,0,10,"IF STAGE");
   wrefresh(if_win);
 
   //instantiate window to visualize IF/ID signals
-  rs_win = create_newwin((num_rs_regs+2),45,8,100,5);
+  rs_win = create_newwin((num_rs_regs+2),30,8,75,5);
   mvwprintw(rs_win,0,12,"RS");
   wrefresh(rs_win);
 
   //instantiate a window to visualize ID stage
-  id_win = create_newwin((num_id_regs+2),45,8,50,5);
+  id_win = create_newwin((num_id_regs+2),35,8,40,5);
   mvwprintw(id_win,0,10,"ID STAGE");
   wrefresh(id_win);
 
   //instantiate a window to visualize ID/EX signals
-  rob_win = create_newwin((num_rob_regs+2),45,8,200,5);
+  rob_win = create_newwin((num_rob_regs+2),43,8,105,5);
   mvwprintw(rob_win,0,12,"ROB");
   wrefresh(rob_win);
 
   //instantiate a window to visualize EX stage
-  ex_win = create_newwin((num_ex_regs+2),45,8,150,5);
+  ex_win = create_newwin((num_ex_regs+2),40,LINES-7-(num_ex_regs+2),40,5);
   mvwprintw(ex_win,0,10,"EX STAGE");
   wrefresh(ex_win);
 
   //instantiate a window to visualize EX/MEM
-  rat1_win = create_newwin((num_rat1_regs+60),45,LINES-7-(num_rat1_regs+2),0,5);
+  rat1_win = create_newwin((num_rat1_regs+4),35,LINES-7-(num_rat1_regs+2),0,5);
   mvwprintw(rat1_win,0,12,"RAT");
   wrefresh(rat1_win);
 
   //instantiate a window to visualize MEM stage
-  mem_win = create_newwin((num_mem_regs+4),45,LINES-7-(num_mem_regs+2),50,5);
+  mem_win = create_newwin((num_mem_regs+4),35,LINES-7-(num_mem_regs+2),90,5);
   mvwprintw(mem_win,0,10,"MEM");
   wrefresh(mem_win);
 
   //instantiate a window to visualize MEM/WB
-  rrat_win = create_newwin((num_rrat_regs+4),45,LINES-7-(num_rrat_regs+2),100,5);
+  rrat_win = create_newwin((num_rrat_regs+4),45,LINES-7-(num_rrat_regs+2),150,5);
   mvwprintw(rrat_win,0,12,"RRAT");
   wrefresh(rrat_win);
 
 
   //instantiate a window to visualize WB stage
-  cdb_win = create_newwin((num_cdb_regs+4),45,LINES-7-(num_cdb_regs+2),150,5);
+  cdb_win = create_newwin((num_cdb_regs+4),40,37,40,5);
   mvwprintw(cdb_win,0,10,"CDB");
   wrefresh(cdb_win);
 

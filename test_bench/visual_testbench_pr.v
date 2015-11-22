@@ -338,9 +338,9 @@ module testbench;
     // Call to initialize visual debugger
     // *Note that after this, all stdout output goes to visual debugger*
     // each argument is number of registers/signals for the group
-    // (IF, IF/ID, ID, ID/EX, EX, EX/MEM, MEM, MEM/WB, WB, Misc)
+    // (IF, RS, ID, ROB, EX, EX/MEM, MEM, RAT, WB, Misc)
     // p: PC 6  g: ID 13  
-    initcurses(6,13,26,22,9,16,10,10,10,2);
+    initcurses(6,13,26,26,9,48,10,42,10,2);
 
     // Pulse the reset signal
     reset = 1'b1;
@@ -494,8 +494,38 @@ module testbench;
     $display("iRAT2_PRF_allocate_req2 1:%h",    processor_0.RAT2_PRF_allocate_req2);
     $display("irat2_prf_free_valid 1:%h",       processor_0.rat2_prf_free_valid);  //6
     
-   
-
+    $display("ir0 6:%d",processor_0.rat1.rat_reg[0]);
+    $display("ir1 6:%d",processor_0.rat1.rat_reg[1]);
+    $display("ir2 6:%d",processor_0.rat1.rat_reg[2]);
+    $display("ir3 6:%d",processor_0.rat1.rat_reg[3]);
+    $display("ir4 6:%d",processor_0.rat1.rat_reg[4]);
+    $display("ir5 6:%d",processor_0.rat1.rat_reg[5]);
+    $display("ir6 6:%d",processor_0.rat1.rat_reg[6]);
+ 	$display("ir7 6:%d",processor_0.rat1.rat_reg[7]);
+  	$display("ir8 6:%d",processor_0.rat1.rat_reg[8]);
+  	$display("ir9 6:%d",processor_0.rat1.rat_reg[9]);
+  	$display("ir10 6:%d",processor_0.rat1.rat_reg[10]);
+	$display("ir11 6:%d",processor_0.rat1.rat_reg[11]);
+    $display("ir12 6:%d",processor_0.rat1.rat_reg[12]);
+    $display("ir13 6:%d",processor_0.rat1.rat_reg[13]);
+    $display("ir14 6:%d",processor_0.rat1.rat_reg[14]);
+    $display("ir15 6:%d",processor_0.rat1.rat_reg[15]);
+    $display("ir16 6:%d",processor_0.rat1.rat_reg[16]);
+ 	$display("ir17 6:%d",processor_0.rat1.rat_reg[17]);
+  	$display("ir18 6:%d",processor_0.rat1.rat_reg[18]);
+  	$display("ir19 6:%d",processor_0.rat1.rat_reg[19]);
+  	$display("ir20 6:%d",processor_0.rat1.rat_reg[20]);
+  	$display("ir21 6:%d",processor_0.rat1.rat_reg[21]);
+    $display("ir22 6:%d",processor_0.rat1.rat_reg[22]);
+    $display("ir23 6:%d",processor_0.rat1.rat_reg[23]);
+    $display("ir24 6:%d",processor_0.rat1.rat_reg[24]);
+    $display("ir25 6:%d",processor_0.rat1.rat_reg[25]);
+    $display("ir26 6:%d",processor_0.rat1.rat_reg[26]);
+ 	$display("ir27 6:%d",processor_0.rat1.rat_reg[27]);
+  	$display("ir28 6:%d",processor_0.rat1.rat_reg[28]);
+  	$display("ir29 6:%d",processor_0.rat1.rat_reg[29]);
+  	$display("ir30 6:%d",processor_0.rat1.rat_reg[30]);
+  	$display("ir31 6:%d",processor_0.rat1.rat_reg[31]);
     // PRF signals (17) - prefix 'f'
    /* $display("fPRF_RAT1_rename_valid1 1:%h",    processor_0.PRF_RAT1_rename_valid1);
     $display("fPRF_RAT1_rename_valid2 1:%h",    processor_0.PRF_RAT1_rename_valid2);
@@ -533,7 +563,38 @@ module testbench;
     $display("jRRAT2_PRF_free_enable_list 16:%h",   processor_0.RRAT2_PRF_free_enable_list);     //10
 //logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx1;
 //logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx2;
-
+    $display("jr0 6:%d",   processor_0.rrat1.rrat_reg[0]);
+    $display("jr1 6:%d",   processor_0.rrat1.rrat_reg[1]);
+    $display("jr2 6:%d",   processor_0.rrat1.rrat_reg[2]);
+    $display("jr3 6:%d",   processor_0.rrat1.rrat_reg[3]);
+    $display("jr4 6:%d",   processor_0.rrat1.rrat_reg[4]);
+    $display("jr5 6:%d",   processor_0.rrat1.rrat_reg[5]);
+    $display("jr6 6:%d",   processor_0.rrat1.rrat_reg[6]);
+    $display("jr7 6:%d",   processor_0.rrat1.rrat_reg[7]);
+    $display("jr8 6:%d",   processor_0.rrat1.rrat_reg[8]);
+    $display("jr9 6:%d",   processor_0.rrat1.rrat_reg[9]);
+    $display("jr10 6:%d",   processor_0.rrat1.rrat_reg[10]);
+    $display("jr11 6:%d",   processor_0.rrat1.rrat_reg[11]);
+    $display("jr12 6:%d",   processor_0.rrat1.rrat_reg[12]);
+    $display("jr13 6:%d",   processor_0.rrat1.rrat_reg[13]);
+    $display("jr14 6:%d",   processor_0.rrat1.rrat_reg[14]);
+    $display("jr15 6:%d",   processor_0.rrat1.rrat_reg[15]);
+    $display("jr16 6:%d",   processor_0.rrat1.rrat_reg[16]);
+    $display("jr17 6:%d",   processor_0.rrat1.rrat_reg[17]);
+    $display("jr18 6:%d",   processor_0.rrat1.rrat_reg[18]);
+    $display("jr19 6:%d",   processor_0.rrat1.rrat_reg[19]);
+    $display("jr20 6:%d",   processor_0.rrat1.rrat_reg[20]);
+    $display("jr21 6:%d",   processor_0.rrat1.rrat_reg[21]);
+    $display("jr22 6:%d",   processor_0.rrat1.rrat_reg[22]);
+    $display("jr23 6:%d",   processor_0.rrat1.rrat_reg[23]);
+    $display("jr24 6:%d",   processor_0.rrat1.rrat_reg[24]);
+    $display("jr25 6:%d",   processor_0.rrat1.rrat_reg[25]);
+    $display("jr26 6:%d",   processor_0.rrat1.rrat_reg[26]);
+    $display("jr27 6:%d",   processor_0.rrat1.rrat_reg[27]);
+    $display("jr28 6:%d",   processor_0.rrat1.rrat_reg[28]);
+    $display("jr29 6:%d",   processor_0.rrat1.rrat_reg[29]);
+    $display("jr30 6:%d",   processor_0.rrat1.rrat_reg[30]);
+    $display("jr31 6:%d",   processor_0.rrat1.rrat_reg[31]);
     // rob signals (22) - prefix 'i'
     $display("hROB_commit1_if_rename_out 1:%h",     processor_0.ROB_commit1_if_rename_out);
     $display("hROB_commit1_mispredict 1:%h",        processor_0.ROB_commit1_mispredict);
@@ -558,6 +619,11 @@ module testbench;
     $display("hROB_commit2_target_pc 16:%h",        processor_0.ROB_commit2_target_pc);  
     $display("hROB_commit1_prn_dest 16:%h",         processor_0.ROB_commit1_prn_dest); 
     $display("hROB_commit2_prn_dest 16:%h",         processor_0.ROB_commit2_prn_dest);     //22
+    
+    $display("hRob_t1_head 1:%h",         processor_0.rob1.t1_head);  
+    $display("hRob_t1_tail 1:%h",         processor_0.rob1.t1_tail);  
+    $display("hRob_t2_head 1:%h",         processor_0.rob1.t2_head);  
+    $display("hRob_t2_tail 1:%h",         processor_0.rob1.t2_tail);  
    
 
 
