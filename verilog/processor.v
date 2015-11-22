@@ -193,7 +193,7 @@ logic						RS_full;
 //logic [5:0]							EX_RS_fu_is_available;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
 logic [5:0][63:0]					EX_CDB_fu_result_out;
-logic [5:0]							EX_CDB_fu_result_is_valid;
+//logic [5:0]							EX_CDB_fu_result_is_valid;
 logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
 logic [1:0]							EX_CDB_mispredict_sig;
 //ex success send to cdb
@@ -224,10 +224,10 @@ assign proc2mem_command = BUS_LOAD;
 assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
-assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
-assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? ROB_commit1_pc : 
-							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? ROB_commit2_pc : 0;
+assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
@@ -554,6 +554,7 @@ prf prf1(
 	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
 	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
 	.rat1_read_enable(PC_thread1_is_available),
+	.is_one_thread(1'b1),
 
 
 	//output

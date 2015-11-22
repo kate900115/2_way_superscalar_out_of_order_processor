@@ -95,7 +95,7 @@ module pc(
 	begin
 		if (branch_is_taken)
 		begin
-			next_PC 			= fu_target_pc;
+			next_PC 			= fu_target_pc + 8;
 			inst1_is_valid		= 1'b1;
 			inst2_is_valid		= 1'b1;
 			inst1_out_reg 		= current_inst1;

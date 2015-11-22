@@ -198,9 +198,9 @@ void print_stage_fu(char* div, int inst_pc,int optype, int valid)
 {
   int opcode;
   char *str;
+  opcode = optype;
   if (valid)
   {
-    opcode = optype;
     switch(opcode)
     {
       case 0x00: str = "-"; break;
