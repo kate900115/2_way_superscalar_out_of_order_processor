@@ -456,10 +456,10 @@ rrat rrat1(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-	.inst1_enable(PC_thread1_is_available && PC_inst1_valid),
-	.inst2_enable(PC_thread1_is_available && PC_inst2_valid),
+	.inst1_enable(ROB_commit1_valid && ROB_commit1_is_thread1),						//*************
+	.inst2_enable(ROB_commit2_valid && ROB_commit2_is_thread1),						//**********
 
-	.RoB_PRF_idx1(ROB_commit1_prn_dest),
+	.RoB_PRF_idx1(ROB_commit1_prn_dest),									
 	.RoB_ARF_idx1(ROB_commit1_arn_dest),
 	.RoB_retire_in1(ROB_commit1_valid && ROB_commit1_is_thread1),	//high when instruction retires
 	.mispredict_sig1(ROB_commit1_mispredict),
@@ -483,8 +483,8 @@ rrat rrat2(
 	.clock(clock),				// system clock
 	.reset(reset),          	// system reset 
 
-	.inst1_enable(~PC_thread1_is_available && PC_inst1_valid),
-	.inst2_enable(~PC_thread1_is_available && PC_inst1_valid),
+	.inst1_enable(ROB_commit1_valid && ~ROB_commit1_is_thread1),							//******************
+	.inst2_enable(ROB_commit2_valid && ~ROB_commit2_is_thread1),							//****************
 
 	.RoB_PRF_idx1(ROB_commit1_prn_dest),
 	.RoB_ARF_idx1(ROB_commit1_arn_dest),
