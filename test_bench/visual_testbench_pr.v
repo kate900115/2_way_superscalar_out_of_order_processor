@@ -436,8 +436,8 @@ module testbench;
     // g: IF/ID   h: ID/EX  i: EX/MEM  j: MEM/WB
 
     // PC signals (6) - prefix 'f'
-    $display("fPC1 16:%h",          			processor_0.PC_inst1);
-    $display("fPC2 16:%h",          			processor_0.PC_inst2);
+    $display("fPC1 16:%h",          			processor_0.PC_proc2Imem_addr);
+    $display("fPC2 16:%h",          			processor_0.PC_proc2Imem_addr+4);
     $display("fPC_inst1_valid 1:%h",    		processor_0.PC_inst1_valid);
     $display("fPC_inst2_valid 1:%h",         	processor_0.PC_inst2_valid);
     $display("fPC_proc2Imem_addr 16:%h",       	processor_0.PC_proc2Imem_addr);
