@@ -24,13 +24,17 @@ module prf(
 
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opa_prf_idx,				// opa prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opb_prf_idx,				// opb prf index of instruction1
+	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opc_prf_idx,				// opb prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opb_prf_idx,				// opb prf index of instruction2
+	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opc_prf_idx,				// opb prf index of instruction2
 	
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opa_prf_idx,				// opa prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opb_prf_idx,				// opb prf index of instruction1
+	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opc_prf_idx,				// opb prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opb_prf_idx,				// opb prf index of instruction2
+	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opc_prf_idx,				// opb prf index of instruction2
 	
 	input 									rat1_read_enable,					// if rat1 read_enable=1, rat1 idx is valid, else rat2 idx is valid
  	input									is_one_thread,						// if is_one_thread =1, there is one thread running, if is_one_thread = 0, there is two thread running
@@ -74,8 +78,10 @@ module prf(
 
 	output  logic	[63:0]					inst1_opa_prf_value,				// opa prf value of instruction1
 	output	logic	[63:0]					inst1_opb_prf_value,				// opb prf value of instruction1
+	output	logic	[63:0]					inst1_opc_prf_value,				// opb prf value of instruction1
 	output  logic	[63:0]					inst2_opa_prf_value,				// opa prf value of instruction2
 	output	logic	[63:0]					inst2_opb_prf_value,				// opb prf value of instruction2
+	output	logic	[63:0]					inst2_opc_prf_value,				// opb prf value of instruction2
 	
 	output  logic							inst1_opa_valid,					// whether opa load from prf of instruction1 is valid
 	output	logic							inst1_opb_valid,					// whether opb load from prf of instruction1 is valid
@@ -481,6 +487,22 @@ module prf(
 						inst1_opb_valid	    = 1'b0;
 					end
 				end
+				
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if ((rat1_inst1_opc_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opc_prf_value = internal_data_out[i];
+						inst1_opc_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst1_opc_prf_value = {58'b0,rat1_inst1_opc_prf_idx};
+						inst1_opc_valid	    = 1'b0;
+					end
+				end
+	
 	
 				for(int i=0;i<`PRF_SIZE;i++)
 				begin			
@@ -509,6 +531,21 @@ module prf(
 					begin
 						inst2_opb_prf_value = {58'b0,rat1_inst2_opb_prf_idx};
 						inst2_opb_valid	    = 1'b0;
+					end
+				end
+				
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if ((rat1_inst2_opc_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opc_prf_value = internal_data_out[i];
+						inst2_opc_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opc_prf_value = {58'b0,rat1_inst2_opc_prf_idx};
+						inst2_opc_valid	    = 1'b0;
 					end
 				end
 			end //if
@@ -546,6 +583,22 @@ module prf(
 						inst1_opb_valid	    = 1'b0;
 					end
 				end
+				
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if ((rat2_inst1_opc_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst1_opc_prf_value = internal_data_out[i];
+						inst1_opc_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst1_opc_prf_value = {58'b0,rat2_inst1_opc_prf_idx};
+						inst1_opc_valid	    = 1'b0;
+					end
+				end
+				
 		
 				for(int i=0;i<`PRF_SIZE;i++)
 				begin			
@@ -574,6 +627,21 @@ module prf(
 					begin
 						inst2_opb_prf_value = {58'b0,rat2_inst2_opb_prf_idx};
 						inst2_opb_valid	    = 1'b0;
+					end
+				end
+				
+				for(int i=0;i<`PRF_SIZE;i++)
+				begin
+					if ((rat2_inst2_opc_prf_idx==i) && internal_prf_ready[i] && (!internal_prf_available[i]))
+					begin
+						inst2_opc_prf_value = internal_data_out[i];
+						inst2_opc_valid	    = 1'b1;
+						break;
+					end
+					else
+					begin
+						inst2_opc_prf_value = {58'b0,rat2_inst2_opc_prf_idx};
+						inst2_opc_valid	    = 1'b0;
 					end
 				end
 			end	//if
