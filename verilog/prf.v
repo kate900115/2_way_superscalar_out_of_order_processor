@@ -24,17 +24,17 @@ module prf(
 
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opa_prf_idx,				// opa prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opb_prf_idx,				// opb prf index of instruction1
-	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opc_prf_idx,				// opb prf index of instruction1
+	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst1_opc_prf_idx,				// branch prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opb_prf_idx,				// opb prf index of instruction2
-	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opc_prf_idx,				// opb prf index of instruction2
+	input	[$clog2(`PRF_SIZE)-1:0]			rat1_inst2_opc_prf_idx,				// branch prf index of instruction2
 	
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opa_prf_idx,				// opa prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opb_prf_idx,				// opb prf index of instruction1
-	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opc_prf_idx,				// opb prf index of instruction1
+	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst1_opc_prf_idx,				// branch prf index of instruction1
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opa_prf_idx,				// opa prf index of instruction2
 	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opb_prf_idx,				// opb prf index of instruction2
-	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opc_prf_idx,				// opb prf index of instruction2
+	input	[$clog2(`PRF_SIZE)-1:0]			rat2_inst2_opc_prf_idx,				// branch prf index of instruction2
 	
 	input 									rat1_read_enable,					// if rat1 read_enable=1, rat1 idx is valid, else rat2 idx is valid
  	input									is_one_thread,						// if is_one_thread =1, there is one thread running, if is_one_thread = 0, there is two thread running
@@ -78,15 +78,17 @@ module prf(
 
 	output  logic	[63:0]					inst1_opa_prf_value,				// opa prf value of instruction1
 	output	logic	[63:0]					inst1_opb_prf_value,				// opb prf value of instruction1
-	output	logic	[63:0]					inst1_opc_prf_value,				// opb prf value of instruction1
+	output	logic	[63:0]					inst1_opc_prf_value,				// branch operand prf value of instruction1
 	output  logic	[63:0]					inst2_opa_prf_value,				// opa prf value of instruction2
 	output	logic	[63:0]					inst2_opb_prf_value,				// opb prf value of instruction2
-	output	logic	[63:0]					inst2_opc_prf_value,				// opb prf value of instruction2
+	output	logic	[63:0]					inst2_opc_prf_value,				// branch operand prf value of instruction2
 	
 	output  logic							inst1_opa_valid,					// whether opa load from prf of instruction1 is valid
 	output	logic							inst1_opb_valid,					// whether opb load from prf of instruction1 is valid
+	output  logic                                                   inst1_opc_valid,						//whether branch load1 is valid 
 	output  logic							inst2_opa_valid,					// whether opa load from prf of instruction2 is valid
 	output	logic							inst2_opb_valid,					// whether opa load from prf of instruction2 is valid
+	output  logic                                                   inst2_opc_valid,						//whether branch load2 is valid
 	output  logic							prf_is_full,						// if the freelist of prf is empty, prf should give out this signal
 	
 	// for writeback
@@ -693,6 +695,19 @@ module prf(
 			inst2_opb_prf_value = 0;
 			inst2_opb_valid	    = 1'b1;
 		end	
+
+			
+		if((rat1_inst1_opc_prf_idx==48)||(rat2_inst1_opc_prf_idx==48))
+		begin
+			inst1_opc_prf_value = 0;
+			inst1_opc_valid	    = 1'b1;
+		end
+		if((rat1_inst2_opc_prf_idx==48)||(rat2_inst2_opc_prf_idx==48))
+		begin
+			inst2_opc_prf_value = 0;
+			inst2_opc_valid	    = 1'b1;
+		end
+
 	end
 
 	//free prf	

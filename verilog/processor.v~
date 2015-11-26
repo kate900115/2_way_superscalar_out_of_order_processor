@@ -761,7 +761,7 @@ rs rs1(
 	.fu_rs_opa_out(RS_EX_opa),       	// This RS' opa 
 	.fu_rs_opb_out(RS_EX_opb),       	// This RS' opb 
 
-	.fu_rs_opc_out(RS_EX_opc),     //for branch										*********************
+	.fu_rs_opc_out(RS_EX_opc),     //for branch
 
 	.fu_rs_dest_tag_out(RS_EX_dest_tag),  	// This RS' destination tag  
 	.fu_rs_rob_idx_out(RS_EX_rob_idx),   	// This RS' corresponding ROB index

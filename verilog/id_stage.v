@@ -245,7 +245,9 @@ module id_stage(
 				output logic        id_halt_out2,
 				//output logic        id_cpuid_out2,         // get CPUID inst?
 				output logic        id_illegal_out2,
-				output logic        id_valid_inst_out2     // is inst a valid instruction to be 
+				output logic        id_valid_inst_out2,     // is inst a valid instruction to be
+				output logic [4:0]  id_rega_inst1, 
+				output logic [4:0]  id_rega_inst2
 );
    
 	DEST_REG_SEL dest_reg_select1;
@@ -256,13 +258,13 @@ module id_stage(
 	ALU_OPB_SELECT id_opb_select_out2;
 
 	// instruction fields read from IF/ID pipeline register
-	wire    [4:0] ra_idx1 = if_id_IR1[25:21];   // inst1 operand A register index
-	wire    [4:0] rb_idx1 = if_id_IR1[20:16];   // inst1 operand B register index
-	wire    [4:0] rc_idx1 = if_id_IR1[4:0];     // inst1 operand C register index
+	//wire    [4:0] ra_idx1 = if_id_IR1[25:21];   // inst1 operand A register index
+	wire    [4:0] id_regb_inst1 = if_id_IR1[20:16];   // inst1 operand B register index
+	wire    [4:0] id_regc_inst1 = if_id_IR1[4:0];     // inst1 operand C register index
 	
-	wire    [4:0] ra_idx2 = if_id_IR2[25:21];   // inst2 operand A register index
-	wire    [4:0] rb_idx2 = if_id_IR2[20:16];   // inst2 operand B register index
-	wire    [4:0] rc_idx2 = if_id_IR2[4:0];     // inst2 operand C register index
+	//wire    [4:0] ra_idx2 = if_id_IR2[25:21];   // inst2 operand A register index
+	wire    [4:0] id_regb_inst2 = if_id_IR2[20:16];   // inst2 operand B register index
+	wire    [4:0] id_regc_inst2 = if_id_IR2[4:0];     // inst2 operand C register index
 	
 	wire [63:0] mem_disp1 = { {48{if_id_IR1[15]}}, if_id_IR1[15:0] };
 	wire [63:0] br_disp1  = { {41{if_id_IR1[20]}}, if_id_IR1[20:0], 2'b00 };
@@ -275,6 +277,9 @@ module id_stage(
 	assign id_op_type_inst1 = if_id_IR1[31:26];   //inst op type generate
 	assign id_op_type_inst2 = if_id_IR2[31:26];
 
+	assign id_rega_inst1 = if_id_IR1[25:21];
+	assign id_rega_inst2 = if_id_IR2[25:21];
+
 	//
 	// ALU opA mux
 	//
@@ -282,7 +287,7 @@ module id_stage(
 	begin
 		case (id_opa_select_out1)
 			ALU_OPA_IS_REGA: begin     
-				opa_mux_out1 = {{59{1'b0}},ra_idx1};
+				opa_mux_out1 = {{59{1'b0}},id_rega_inst1};
 				opa_mux_tag1 = `FALSE;
 				end
 			ALU_OPA_IS_MEM_DISP: begin
@@ -300,7 +305,7 @@ module id_stage(
 		endcase
 		case (id_opa_select_out2)
 			ALU_OPA_IS_REGA: begin
-				opa_mux_out2 = {{59{1'b0}},ra_idx2};
+				opa_mux_out2 = {{59{1'b0}},id_rega_inst2};
 				opa_mux_tag2 = `FALSE;
 				end
 			ALU_OPA_IS_MEM_DISP: begin
@@ -329,7 +334,7 @@ module id_stage(
 		opb_mux_out2 = 64'hbaadbeefdeadbeef;
 		case (id_opb_select_out1)
 			ALU_OPB_IS_REGB: begin
-				opb_mux_out1 = {{59{1'b0}},rb_idx1};
+				opb_mux_out1 = {{59{1'b0}},id_regb_inst1};
 				opb_mux_tag1 = `FALSE;
 				end
 			ALU_OPB_IS_ALU_IMM: begin
@@ -346,7 +351,7 @@ module id_stage(
 		endcase
 		case (id_opb_select_out2)
 			ALU_OPB_IS_REGB: begin
-				opb_mux_out2 = {{59{1'b0}},rb_idx2};
+				opb_mux_out2 = {{59{1'b0}},id_regb_inst2};
 				opb_mux_tag2 = `FALSE;
 				end
 			ALU_OPB_IS_ALU_IMM: begin
@@ -411,14 +416,14 @@ module id_stage(
 	always_comb
 	begin
 		case (dest_reg_select1)
-			DEST_IS_REGC: id_dest_reg_idx_out1 = rc_idx1;
-			DEST_IS_REGA: id_dest_reg_idx_out1 = ra_idx1;
+			DEST_IS_REGC: id_dest_reg_idx_out1 = id_regc_inst1;
+			DEST_IS_REGA: id_dest_reg_idx_out1 = id_rega_inst1;
 			DEST_NONE:    id_dest_reg_idx_out1 = `ZERO_REG;
 			default:       id_dest_reg_idx_out1 = `ZERO_REG; 
 		endcase
 		case (dest_reg_select2)
-			DEST_IS_REGC: id_dest_reg_idx_out2 = rc_idx2;
-			DEST_IS_REGA: id_dest_reg_idx_out2 = ra_idx2;
+			DEST_IS_REGC: id_dest_reg_idx_out2 = id_regc_inst2;
+			DEST_IS_REGA: id_dest_reg_idx_out2 = id_rega_inst2;
 			DEST_NONE:    id_dest_reg_idx_out2 = `ZERO_REG;
 			default:       id_dest_reg_idx_out2 = `ZERO_REG; 
 		endcase

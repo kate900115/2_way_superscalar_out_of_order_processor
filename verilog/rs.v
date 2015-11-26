@@ -30,7 +30,11 @@ module rs(
 	input  [63:0] 								inst1_rs_opa_in,      	// Operand a from Rename  
 	input  [63:0] 								inst1_rs_opb_in,      	// Operand a from Rename 
 	input  	     								inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
-	input         								inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	input         								inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT)
+
+	input  [63:0]                                                           inst1_rs_opc_in,
+	input 									inst1_rs_opc_valid,
+	
 	input  [$clog2(`ROB_SIZE):0]				inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  ALU_FUNC								inst1_rs_alu_func,    	// ALU function type from decoder
 	input  [5:0]	      						inst1_rs_op_type_in,  	// Instruction type from decoder
@@ -43,6 +47,10 @@ module rs(
 	input  [63:0] 								inst2_rs_opb_in,      	// Operand a from Rename 
 	input  	     								inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         								inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+
+	input  [63:0]                                                           inst2_rs_opc_in,
+	input 									inst2_rs_opc_valid,
+
 	input  [$clog2(`ROB_SIZE):0]				inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  ALU_FUNC								inst2_rs_alu_func,    	// ALU function type from decoder
 	input  [5:0]	      						inst2_rs_op_type_in,  	// Instruction type from decoder
@@ -63,6 +71,8 @@ module rs(
  	//output
 	output logic [5:0][63:0]					fu_rs_opa_out,       	// This RS' opa 
 	output logic [5:0][63:0]					fu_rs_opb_out,       	// This RS' opb 
+
+	output logic [5:0][63:0]					fu_rs_opc_out,
 	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag
 	output logic [5:0][$clog2(`ROB_SIZE):0]		fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
 	output logic [5:0][5:0]						fu_rs_op_type_out,     	// This RS' operation type
@@ -92,6 +102,8 @@ module rs(
 	logic [`RS_SIZE-1:0]						internal_rs_available_out;	
 	logic [`RS_SIZE-1:0][63:0]					internal_rs_opa_out;
 	logic [`RS_SIZE-1:0][63:0]					internal_rs_opb_out;
+	
+	logic [`RS_SIZE-1:0][63:0]					internal_rs_opc_out;
 	logic [`RS_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	internal_rs_dest_tag_out;
 	logic [`RS_SIZE-1:0][$clog2(`ROB_SIZE):0] 	internal_rs_rob_idx_out;
 	logic [`RS_SIZE-1:0][5:0]					internal_rs_op_type_out;
@@ -121,6 +133,11 @@ module rs(
 	logic	[63:0]								inst2_OPb;
 	logic										inst2_OPbValid;
 
+	logic	[63:0]								inst1_OPc;
+	logic										inst1_OPcValid;
+	logic	[63:0]								inst2_OPc;
+	logic										inst2_OPcValid;
+
 	logic	[`RS_SIZE-1:0]						is_full1, is_full2;
 	
 	logic 	[`RS_SIZE-1:0]						inst1_internal_rs_load_in_temp;
@@ -140,6 +157,11 @@ module rs(
 		inst2_OPaValid	= inst2_rs_opa_valid;
 		inst2_OPb		= inst2_rs_opb_in;
 		inst2_OPbValid	= inst2_rs_opb_valid;
+		
+		inst1_OPc		= inst1_rs_opc_in;
+		inst1_OPcValid	= inst1_rs_opc_valid;
+		inst2_OPc		= inst2_rs_opc_in;
+		inst2_OPcValid	= inst2_rs_opc_valid;
 
 		if ((rs_cdb1_tag == inst1_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opa_valid && rs_cdb1_valid)
 		begin
@@ -161,6 +183,17 @@ module rs(
 		begin
 			inst1_OPb		= rs_cdb2_in;
 			inst1_OPbValid	= 1'b1;
+		end
+
+		if ((rs_cdb1_tag == inst1_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opc_valid && rs_cdb1_valid)
+		begin
+			inst1_OPc		= rs_cdb1_in;
+			inst1_OPcValid	= 1'b1;
+		end
+		else if ((rs_cdb2_tag == inst1_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opc_valid && rs_cdb2_valid)
+		begin
+			inst1_OPc		= rs_cdb2_in;
+			inst1_OPcValid	= 1'b1;
 		end
 
 		if ((rs_cdb1_tag == inst2_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opa_valid && rs_cdb1_valid)
@@ -185,6 +218,17 @@ module rs(
 			inst2_OPbValid	= 1'b1;
 		end  
 
+		if ((rs_cdb1_tag == inst2_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opc_valid && rs_cdb1_valid)
+		begin
+			inst2_OPc		= rs_cdb1_in;
+			inst2_OPcValid	= 1'b1;
+		end
+		else if ((rs_cdb2_tag == inst2_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opc_valid && rs_cdb2_valid)
+		begin
+			inst2_OPc		= rs_cdb2_in;
+			inst2_OPcValid	= 1'b1;
+		end
+
 	end
 
 	rs_one_entry rs1[`RS_SIZE-1:0](
@@ -206,6 +250,8 @@ module rs(
 	.inst1_rs1_opb_in(inst1_OPb),		
 	.inst1_rs1_opa_valid(inst1_OPaValid),
 	.inst1_rs1_opb_valid(inst1_OPbValid),
+	.inst1_rs1_opc_in(inst1_OPc),   						//for branch
+	.inst1_rs1_opc_valid(inst1_OPcValid),
 	.inst1_rs1_alu_func(inst1_rs_alu_func),
 	.inst1_rs1_op_type_in(inst1_rs_op_type_in),
 	.inst1_rs1_fu_select(inst1_rs_fu_select_in),
@@ -214,6 +260,8 @@ module rs(
 	.inst2_rs1_opb_in(inst2_OPb),		
 	.inst2_rs1_opa_valid(inst2_OPaValid),
 	.inst2_rs1_opb_valid(inst2_OPbValid),
+	.inst2_rs1_opc_in(inst2_OPc),   						//for branch
+	.inst2_rs1_opc_valid(inst2_OPcValid),
 	.inst2_rs1_alu_func(inst2_rs_alu_func),
 	.inst2_rs1_op_type_in(inst2_rs_op_type_in),
 	.inst2_rs1_fu_select(inst2_rs_fu_select_in),
@@ -231,6 +279,8 @@ module rs(
 	.rs1_ready_out(internal_rs_ready_out),
 	.rs1_opa_out(internal_rs_opa_out),       
 	.rs1_opb_out(internal_rs_opb_out),
+
+	.rs1_opc_out(internal_rs_opc_out),
 	.rs1_dest_tag_out(internal_rs_dest_tag_out),  	 
 	.rs1_available_out(internal_rs_available_out),
 	.rs1_alu_func_out(internal_rs_alu_func_out),
@@ -274,6 +324,7 @@ module rs(
 			fu_rs_out_valid[i]		= 0;
 			fu_rs_opa_out[i]		= 0;
 			fu_rs_opb_out[i]		= 0;
+			fu_rs_opc_out[i]                = 0;
 			fu_rs_dest_tag_out[i]	= 0;
 			fu_rs_rob_idx_out[i]	= 0;
 			fu_rs_op_type_out[i]	= 0;
@@ -289,6 +340,7 @@ module rs(
 						internal_rs_free_enable_fu[i] 	= 1;
 						fu_rs_opa_out[0]		= internal_rs_opa_out[i];
 						fu_rs_opb_out[0]		= internal_rs_opb_out[i];
+						fu_rs_opc_out[0]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[0]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[0]	= internal_rs_op_type_out[i];
@@ -309,6 +361,7 @@ module rs(
 						internal_rs_free_enable_fu[i]		= 1;
 						fu_rs_opa_out[1]		= internal_rs_opa_out[i];
 						fu_rs_opb_out[1]		= internal_rs_opb_out[i];
+						fu_rs_opc_out[1]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[1]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[1]	= internal_rs_op_type_out[i];
@@ -329,6 +382,7 @@ module rs(
 						internal_rs_free_enable_fu[i]	= 1;
 						fu_rs_opa_out[2]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[2]	= internal_rs_opb_out[i];
+						fu_rs_opc_out[2]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[2]	= internal_rs_op_type_out[i];
@@ -349,6 +403,7 @@ module rs(
 						internal_rs_free_enable_fu[i]	= 1;
 						fu_rs_opa_out[3]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[3]	= internal_rs_opb_out[i];
+						fu_rs_opc_out[3]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[3]	= internal_rs_op_type_out[i];
@@ -369,6 +424,7 @@ module rs(
 						internal_rs_free_enable_fu[i]	= 1;
 						fu_rs_opa_out[4]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[4]	= internal_rs_opb_out[i];
+						fu_rs_opc_out[4]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[4]	= internal_rs_op_type_out[i];
@@ -389,6 +445,7 @@ module rs(
 						internal_rs_free_enable_fu[i]	= 1;
 						fu_rs_opa_out[5]	= internal_rs_opa_out[i];
 						fu_rs_opb_out[5]	= internal_rs_opb_out[i];
+						fu_rs_opc_out[5]                = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[5]	= internal_rs_op_type_out[i];
