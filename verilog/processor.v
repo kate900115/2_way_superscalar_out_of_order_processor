@@ -248,7 +248,7 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
                                 ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
-                                //(mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
+                                (mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
                                 NO_ERROR;
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
@@ -746,7 +746,7 @@ rs rs1(
  
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 	.inst2_rs_alu_func(ID_alu_func2),
-	.inst2_rs_op_type_in(ID_op_type1),  					// Instruction type from decoder
+	.inst2_rs_op_type_in(ID_op_type2),  					// Instruction type from decoder
 	.inst2_rs_fu_select_in(ID_fu_select2),
 	.inst2_rs_load_in(ID_inst2_is_valid),     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
 	.inst2_rs_branch_in({ID_inst2_is_cond_branch,ID_inst2_is_uncond_branch}),

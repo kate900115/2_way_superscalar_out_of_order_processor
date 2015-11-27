@@ -56,7 +56,7 @@ module alu(
       ALU_CMPULE:   result = { 63'd0, (opa <= opb) };
       ALU_CMPLT:    result = { 63'd0, signed_lt(opa, opb) };
       ALU_CMPLE:    result = { 63'd0, (signed_lt(opa, opb) || (opa == opb)) };
-      default:      result = 64'hXXXX_XXXX_XXXX_XXXX;  // here only to force
+      default:      result = 64'hdeadbeefbaadbeef;  // here only to force
                               // a combinational solution
                               // a casex would be better
     endcase
@@ -74,23 +74,23 @@ endmodule // alu
 //
 module brcond(// Inputs
     input [63:0] opa,    // Value to check against condition
-    input  [1:0] func,  // Specifies which condition to check
+    input  [2:0] func,  // Specifies which condition to check
 
     output logic cond    // 0/1 condition result (False/True)
   );
 
-  always_comb begin
-  case (func[1:0])                              // 'full-case'  All cases covered, no need for a default
-    2'b00: cond = (opa[0] == 0);                // LBC: (lsb(opa) == 0) ?
-    2'b01: cond = (opa != 0);                    // EQ: (opa == 0) ?
-    2'b10: cond = (opa[63] == 1);                // LT: (signed(opa) < 0) : check sign bit
-    2'b11: cond = (opa[63] == 1) || (opa == 0);  // LE: (signed(opa) <= 0)
-  endcase
+  	always_comb begin
+  	case (func[1:0])                              // 'full-case'  All cases covered, no need for a default
+   		2'b00: cond = (opa[0] == 0);                // LBC: (lsb(opa) == 0) ?
+    		2'b01: cond = (opa == 0);                    // EQ: (opa == 0) ?
+    		2'b10: cond = (opa[63] == 1);                // LT: (signed(opa) < 0) : check sign bit
+    		2'b11: cond = (opa[63] == 1) || (opa == 0);  // LE: (signed(opa) <= 0)
+  	endcase
   
-     // negate cond if func[2] is set
-    if (func[2])
-    cond = ~cond;
-  end
+     	// negate cond if func[2] is set
+    	if (func[2])
+    		cond = ~cond;
+  	end
 endmodule // brcond
 
 
@@ -168,7 +168,7 @@ module ex_stage(
 	);
 	brcond b2(// Inputs
 			.opa(fu_rs_opc_in[1]),       // always check regA value
-			.func(fu_rs_op_type_in[1][5:4]), // inst bits to determine check
+			.func(fu_rs_op_type_in[1][2:0]), // inst bits to determine check
 				// Output
 			.cond(brcond_result[0])
 	);
@@ -195,7 +195,7 @@ module ex_stage(
 	);
 	brcond b4(// Inputs
 			.opa(fu_rs_opc_in[3]),       // always check regA value
-			.func(fu_rs_op_type_in[3][5:4]), // inst bits to determine check
+			.func(fu_rs_op_type_in[3][2:0]), // inst bits to determine check
 				// Output
 			.cond(brcond_result[1])
 	);
