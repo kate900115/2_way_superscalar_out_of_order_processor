@@ -37,13 +37,13 @@ typedef struct VeriC_Descriptor *vc_handle;
 
 #endif /* _VC_TYPES_ */
 
-void initcurses(int , int , int , int , int , int , int , int , int , int 
-);
-void flushpipe();
-void waitforresponse();
-void initmem();
-int get_instr_at_pc(int );
-int not_valid_pc(int );
+void print_header(const char* str);
+void print_cycles();
+void print_stage(const char* div, int inst, int npc, int valid_inst);
+void print_stage_fu(const char* div, int inst_pc, int optype, int valid);
+void print_reg(int wb_reg_wr_data_out_hi, int wb_reg_wr_data_out_lo, int wb_reg_wr_idx_out, int wb_reg_wr_en_out);
+void print_membus(int proc2mem_command, int mem2proc_response, int proc2mem_addr_hi, int proc2mem_addr_lo, int proc2mem_data_hi, int proc2mem_data_lo);
+void print_close();
 
 #ifdef __cplusplus
 }
