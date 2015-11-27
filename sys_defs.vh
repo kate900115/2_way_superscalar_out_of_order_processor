@@ -328,12 +328,6 @@ typedef enum logic [1:0] {
   BUS_STORE    = 2'h2
 } BUS_COMMAND;
 
-/*typedef enum logic [1:0] {
-  RS_TWO_OR_MORE_ENTRY_EMPTY = 2'h0,
-  RS_ONE_ENTRY_EMPTY	     = 2'h1,
-  RS_NO_ENTRY_EMPTY	     = 2'h2
-} RS_FULL;*/
-
 typedef enum logic[1:0] {
 	PROGRAM_START  = 2'b00,
 	THREAD1_IS_EX  = 2'b01,			
@@ -341,7 +335,14 @@ typedef enum logic[1:0] {
   	NO_ONE_IS_EX   = 2'b11			
 } CURRENT_THREAD_STATE;
 
+//for loadl_link and store_cond
+`define LLSC_SIZE	8
+
+typedef enum logic[2:0] {
+	NO_INST			= 3'b000,
+	IS_LDL_INST		= 3'b001,
+	IS_STQ_C_INST	= 3'b010,			
+  	IS_LD_INST		= 3'b011,
+  	IS_STQ_INST		= 3'b100
+} MEM_INST_TYPE;
 `endif
-
-
-
