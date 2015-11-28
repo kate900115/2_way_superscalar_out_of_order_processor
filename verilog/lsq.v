@@ -96,23 +96,23 @@ module lsq(
 	//store instructions are output when instruction retires and store write to memory
 	//output to prf -- L1 cache (prf48)
 
-	output logic [$clog2(`PRF_SIZE)-1:0]	lsq_CDB_dest_tag1;
-	output logic [63:0]						lsq_CDB_result_out1;
-	output logic 							lsq_CDB_result_is_valid1;
+	output logic [$clog2(`PRF_SIZE)-1:0]	lsq_CDB_dest_tag1,
+	output logic [63:0]						lsq_CDB_result_out1,
+	output logic 							lsq_CDB_result_is_valid1,
 
-	output logic [$clog2(`PRF_SIZE)-1:0]	lsq_CDB_dest_tag2;
-	output logic [63:0]						lsq_CDB_result_out2;
-	output logic 							lsq_CDB_result_is_valid2;
+	output logic [$clog2(`PRF_SIZE)-1:0]	lsq_CDB_dest_tag2,
+	output logic [63:0]						lsq_CDB_result_out2,
+	output logic 							lsq_CDB_result_is_valid2,
 
 	//sedn idx to prf to get value
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx1;
-	output	logic							lsq_opb_request1;
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx2;
-	output	logic							lsq_opb_request2;
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1;
-	output	logic							lsq_ra_request1;	//request = 0 if load
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1;
-	output	logic							lsq_ra_request1;
+	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx1,
+	output	logic							lsq_opb_request1,
+	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx2,
+	output	logic							lsq_opb_request2,
+	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
+	output	logic							lsq_ra_request1,	//request = 0 if load
+	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
+	output	logic							lsq_ra_request1,
 
 
 	//if sq has storeA @pc=0x100 if loadA @pc=0x120 will load from the sq
@@ -132,7 +132,7 @@ module lsq(
 	
 	//when new store came in and find a instr following him in program order has been excuted, the LSQ must report a violation
 	//Here we only forward the independent loads!!!!!
-	)
+	);
 	
 	//LQ
 	//the relative ages of two instructions can be determined by examing the physical locations they occupied in LSQ
@@ -299,7 +299,7 @@ module lsq(
 			lsq_opb_new_valid2	= 1'b1;
 		end  
 
-	end
+
 	
 		
 		//store the data from sq or mem
