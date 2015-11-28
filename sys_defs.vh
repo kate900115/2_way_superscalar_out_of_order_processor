@@ -335,6 +335,20 @@ typedef enum logic[1:0] {
   	NO_ONE_IS_EX   = 2'b11			
 } CURRENT_THREAD_STATE;
 
+`define ICACHE_SIZE			2048 									//bit
+`define ICACHE_BLOCK_SIZE	64	 									//bit
+`define	ICACHE_INDEX_SIZE	$clog2(`ICACHE_SIZE/`ICACHE_BLOCK_SIZE)	//bit
+`define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE) 				//bit
+`define ICACHE_TAG_SIZE		64-`DCACHE_BLOCK_SIZE-`INDEX_SIZE		//bit
+
+`define DCACHE_SIZE			2048 //bits size
+`define DCACHE_BLOCK_SIZE	64	 //bits size
+`define DCACHE_WAY			2	
+`define	INDEX_SIZE			$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//bit
+`define BLOCK_OFFSET		$clog2(`DCACHE_BLOCK_SIZE) 								//bit
+`define TAG_SIZE			64-`DCACHE_BLOCK_SIZE-`INDEX_SIZE						//bit
+
+
 //for loadl_link and store_cond
 `define LLSC_SIZE	8
 
