@@ -4,23 +4,18 @@ module dcache_mem(
 	// input from dcache_controller.v
 	input [`INDEX_SIZE-1:0]							index_in,
 	input [`TAG_SIZE-1:0]     						tag_in,
-	
 	input											read_enable,
 	input											write_enable,
 	input [`DCACHE_BLOCK_SIZE-1:0] 					write_data_in,
 	input [3:0]										mem_response,
 	input [3:0]										mem_tag,
-	// signal to invalid cache
-	input 											invalid_cache_block,
-	input [`INDEX_SIZE-1:0]							invalid_index_in,
-	input [`TAG_SIZE-1:0]     						invalid_tag_in,
-											
+	input 											store_to_memory_enable,							
 	
 	// input from mem.v
 	input [`DCACHE_BLOCK_SIZE-1:0]  				load_data_in,
 	
 	// output to mem.v
-	output [`DCACHE_BLOCK_SIZE-1:0] 				store_data_out,
+	output logic[`DCACHE_BLOCK_SIZE-1:0] 			store_data_out,
 	
 	// output to dcache_controller.v
 	output logic									data_is_valid,

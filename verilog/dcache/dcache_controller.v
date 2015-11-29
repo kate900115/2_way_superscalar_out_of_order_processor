@@ -1,10 +1,6 @@
 module dcache_controller(
-	input							clock,
-	input							reset,
-	
 	// input from Mem.v
 	input  [3:0] 					Dmem2proc_response,
-	input  [63:0] 					Dmem2proc_data,
 	input  [3:0] 					Dmem2proc_tag,
 	
 	// input from Dcache.v
@@ -36,14 +32,8 @@ module dcache_controller(
 	output logic [63:0]				write_data_to_Dcache,	// data that send to dcache.v
 	output logic [3:0]				mem_response,
 	output logic [3:0]				mem_tag,
-	output logic					invalid_cache_block,
-	output logic					invalid_index,
-	output logic					invalid_tag
+	output logic					store_to_mem_enable,
 );
-
-	logic							invalid_cache_block_next;
-	logic							invalid_index_next;
-	logic							invalid_tag_next;
 		
 	// output to dcache.v
 	assign {tag, index} 				= proc2Dcache_addr[63:`BLOCK_OFFSET];
@@ -51,22 +41,6 @@ module dcache_controller(
 	
 	// output to mem.v
 	assign proc2Dmem_addr 	 			= {proc2Dcache_addr[63:0],3'b0};
-	
-	always_ff@(posedge clock)
-	begin
-		if (reset)
-		begin
-			invalid_cache_block 		<= `SD 1'b0;
-			invalid_index				<= `SD 0;
-			invalid_tag					<= `SD 0;
-		end
-		else
-		begin
-			invalid_cache_block 		<= `SD invalid_cache_block_next;
-			invalid_index				<= `SD index;
-			invalid_tag					<= `SD tag;
-		end
-	end
 	
 	always_comb
 	begin
@@ -84,7 +58,7 @@ module dcache_controller(
 						// to dcache.v
 						// for present inst
 						mem_response	  		 = Dmem2proc_response;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// for previous inst
 						mem_tag			  	 	 = Dmem2proc_tag;
 						// to proc.v
@@ -92,7 +66,7 @@ module dcache_controller(
 						Dcache2proc_response 	 = Dmem2proc_response;
 						Dcache_data_hit		 	 = 0;
 						// for previous instruction
-						Dcache_data_out  		 = Dmem2proc_data;
+						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
 					else if (cachemem_is_miss && cache_is_dirty)
@@ -103,13 +77,13 @@ module dcache_controller(
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b1;
+						store_to_mem_enable		 = 1'b1;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response	 = Dmem2proc_response;
 						Dcache_data_hit			 = 0;
 						// for previous instruction
-						Dcache_data_out  	 	 = Dmem2proc_data;
+						Dcache_data_out  	 	 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
 					else if ((cachemem_is_miss==0) && (Dmem2proc_tag!=0))
@@ -120,13 +94,13 @@ module dcache_controller(
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response	 = Dmem2proc_response;
 						Dcache_data_hit			 = 0;
 						// for previous instruction
-						Dcache_data_out  		 = Dmem2proc_data;
+						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = mem_tag;
 					end
 					else
@@ -137,7 +111,7 @@ module dcache_controller(
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response	 = Dmem2proc_response;
@@ -159,13 +133,13 @@ module dcache_controller(
 						// to dcache.v
 						mem_response	  		 = Dmem2proc_response;
 						mem_tag			  	 	 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response 	 = Dmem2proc_response;
 						Dcache_data_hit		 	 = 0;
 						// for previous instruction
-						Dcache_data_out  		 = Dmem2proc_data;
+						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
 					else if (cachemem_is_miss && cache_is_dirty)
@@ -176,7 +150,7 @@ module dcache_controller(
 						// to dcache.v
 						mem_response	  		 = Dmem2proc_response;
 						mem_tag			  	 	 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b1;
+						store_to_mem_enable		 = 1'b1;
 						// to proc.v
 						// for current instruction
 						// when Dcache2proc_response=0 and Dcache_data_hit are both 0, 
@@ -184,7 +158,7 @@ module dcache_controller(
 						Dcache2proc_response 	 = Dmem2proc_response;
 						Dcache_data_hit		 	 = 0;
 						// for previous instruction
-						Dcache_data_out  		 = Dmem2proc_data;
+						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
 					else 
@@ -195,7 +169,7 @@ module dcache_controller(
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response	 = Dmem2proc_response;
@@ -213,7 +187,7 @@ module dcache_controller(
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
-						invalid_cache_block_next = 1'b0;
+						store_to_mem_enable		 = 1'b0;
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response	 = Dmem2proc_response;
