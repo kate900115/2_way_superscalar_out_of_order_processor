@@ -83,7 +83,7 @@ module dcache_mem(
 		begin
 			for (int j; j<`DCACHE_WAY; j++)
 			begin
-				if (mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_load_inst[i][j])
+				if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_load_inst[i][j]))
 				begin
 					internal_data_in[i][j] 			= load_data_in;
 					internal_valid_in[i][j]			= 1'b1;
@@ -91,7 +91,7 @@ module dcache_mem(
 					read_data_out					= load_data_in;
 					break;
 				end
-				else if (mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_store_inst[i][j])
+				else if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_store_inst[i][j]))
 				begin
 					internal_data_in[i][j] 			= write_data_in;
 					internal_valid_in[i][j]			= 1'b1;
@@ -145,11 +145,11 @@ module dcache_mem(
 			// is data miss?
 			for (int i; i<`INDEX_SIZE; i++)
 			begin
-				if (read_index==i) 
+				if (index_in==i) 
 				begin
 					for (int j; j<`DCACHE_WAY; j++)
 					begin
-						if (tag_in==internal_tag[i][j]) && (internal_valid[i][j])
+						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
 						begin
 							read_data_out 		  	= internal_data[i][j];
 							internal_way_next[i]	= ~internal_way[i];
@@ -171,7 +171,7 @@ module dcache_mem(
 				begin
 					read_data_out			  	  	= 0;
 					internal_way_next				= internal_way;
-					read_data_valid			  	  	= 1'b0;
+					data_is_valid			  	  	= 1'b0;
 					data_is_miss  		  		  	= 1'b1;
 				end
 			end //if (read_index==i) 
@@ -181,9 +181,9 @@ module dcache_mem(
 			begin
 				for (int i; i<`INDEX_SIZE; i++)
 				begin
-					if (read_index == i) 
+					if (index_in == i) 
 					begin
-						if (internal_way[i]==0)&&(internal_dirty[i][0])
+						if ((internal_way[i]==0)&&(internal_dirty[i][0]))
 						begin
 							internal_response_in[i][0]	= 0; //?
 							internal_tag_in[i][0]		= internal_tag[i][0];
@@ -192,7 +192,7 @@ module dcache_mem(
 							internal_store_inst_in[i][0]= 1'b0;
 							break;
 						end
-						else if (internal_way[i]==1)&&(internal_dirty[i][1])
+						else if ((internal_way[i]==1)&&(internal_dirty[i][1]))
 						begin
 							internal_response_in[i][1]	= 0; //?
 							internal_tag_in[i][1]		= internal_tag[i][1];
@@ -201,7 +201,7 @@ module dcache_mem(
 							internal_store_inst_in[i][1]= 1'b0;
 							break;
 						end
-						else if (internal_way[i]==0)&&(!internal_dirty[i][0])
+						else if ((internal_way[i]==0)&&(!internal_dirty[i][0]))
 						begin
 							internal_response_in[i][0]	= mem_response;
 							internal_tag_in[i][1]		= tag_in;
@@ -245,11 +245,11 @@ module dcache_mem(
 		begin
 			for (int i; i<`INDEX_SIZE; i++)
 			begin
-				if (write_index==i)
+				if (index_in==i)
 				begin
 					for (int j; j<`DCACHE_WAY; j++)
 					begin
-						if (tag_in==internal_tag[i][j]) && (internal_valid[i][j])
+						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
 						begin
 							internal_data_in[i][j] 	= write_data_in;
 							internal_tag_in[i][j]	= tag_in;
@@ -286,7 +286,7 @@ module dcache_mem(
 			begin
 				for (int i; i<`INDEX_SIZE; i++)
 				begin
-					if (write_index == i) 
+					if (index_in == i) 
 					begin
 						if ((internal_way==0) && (internal_dirty[i][0])) 
 						begin
