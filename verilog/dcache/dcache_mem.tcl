@@ -10,7 +10,7 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-analyze -f sverilog [list "sys_defs.vh" "./verilog/dcache/dcache_mem.v"]
+analyze -f sverilog [list "sys_defs.vh" "dcache_mem.v"]
 elaborate dcache_mem
 set design_name dcache_mem
 set clock_name clock

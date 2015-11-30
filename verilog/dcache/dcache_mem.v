@@ -53,31 +53,44 @@ module dcache_mem(
 	begin
 		if (reset)
 		begin
-			internal_data 		<= `SD 0;
-			internal_tag  		<= `SD 0;
-			internal_valid		<= `SD 0;
-			internal_dirty  	<= `SD 0;
-			internal_response	<= `SD 0;
-			internal_way		<= `SD 0;
-			internal_load_inst	<= `SD 0;
-			internal_store_inst <= `SD 0;
+			internal_data 							<= `SD 0;
+			internal_tag  							<= `SD 0;
+			internal_valid							<= `SD 0;
+			internal_dirty  						<= `SD 0;
+			internal_response						<= `SD 0;
+			internal_way							<= `SD 0;
+			internal_load_inst						<= `SD 0;
+			internal_store_inst 					<= `SD 0;
 		end
 		else
 		begin
-			internal_data 		<= `SD internal_data_in;
-			internal_tag  		<= `SD internal_tag_in;
-			internal_valid		<= `SD internal_valid_in;
-			internal_dirty 	 	<= `SD internal_dirty_in;
-			internal_response	<= `SD internal_response_in;
-			internal_way		<= `SD internal_way_next;
-			internal_load_inst	<= `SD internal_load_inst_in;
-			internal_store_inst <= `SD internal_store_inst_in;
+			internal_data 							<= `SD internal_data_in;
+			internal_tag  							<= `SD internal_tag_in;
+			internal_valid							<= `SD internal_valid_in;
+			internal_dirty 	 						<= `SD internal_dirty_in;
+			internal_response						<= `SD internal_response_in;
+			internal_way							<= `SD internal_way_next;
+			internal_load_inst						<= `SD internal_load_inst_in;
+			internal_store_inst 					<= `SD internal_store_inst_in;
 		end
 	end
 	
 	
 	always_comb
 	begin	
+			internal_data_in 						= internal_data;
+			internal_tag_in  						= internal_tag;
+			internal_valid_in						= internal_valid;
+			internal_dirty_in 						= internal_dirty;
+			internal_response_in					= internal_response;
+			internal_way_next						= internal_way;
+			internal_load_inst_in					= internal_load_inst;
+			internal_store_inst_in 					= internal_store_inst;
+			data_is_valid							= 0;
+			data_is_miss							= 0;
+			data_is_dirty 							= 0;
+			store_data_out							= 0;
+			
 		// load from memory
 		for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 		begin
