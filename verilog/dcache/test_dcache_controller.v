@@ -16,7 +16,7 @@ module test_dcache_controller;
 	
 	// output to mem.v
 	BUS_COMMAND						proc2Dmem_command;
-	logic logic [63:0]				proc2Dmem_addr;
+	logic [63:0]					proc2Dmem_addr;
 	
 	// output to processor.v
 	logic [63:0]					Dcache_data_out;	 
@@ -33,7 +33,7 @@ module test_dcache_controller;
 	logic [3:0]						mem_response;
 	logic [3:0]						mem_tag;
 	logic							store_to_mem_enable;
-	
+
 	dcache_controller(
 		// input 
 		.Dmem2proc_response(Dmem2proc_response),

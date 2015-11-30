@@ -32,15 +32,13 @@ module dcache_controller(
 	output logic [63:0]				write_data_to_Dcache,	// data that send to dcache.v
 	output logic [3:0]				mem_response,
 	output logic [3:0]				mem_tag,
-	output logic					store_to_mem_enable,
+	output logic					store_to_mem_enable
 );
 		
 	// output to dcache.v
 	assign {tag, index} 				= proc2Dcache_addr[63:`BLOCK_OFFSET];
 	assign data_to_Dcache 	 			= proc2Dcache_data;
-	
-	// output to mem.v
-	assign proc2Dmem_addr 	 			= {proc2Dcache_addr[63:0],3'b0};
+
 	
 	always_comb
 	begin
@@ -50,7 +48,7 @@ module dcache_controller(
 					// to dcache.v
 					read_enable 		    	 = 1'b1;
 					write_enable			 	 = 0;    
-					if (cachemem_is_miss && (!cache_is_dirty))
+					if (cachemem_is_miss && (!cachemem_is_dirty))
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_LOAD;
@@ -69,7 +67,7 @@ module dcache_controller(
 						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
-					else if (cachemem_is_miss && cache_is_dirty)
+					else if (cachemem_is_miss && cachemem_is_dirty)
 					begin
 						// to mem.v
 						proc2Dmem_command		 = BUS_STORE;
@@ -125,7 +123,7 @@ module dcache_controller(
 				begin
 					read_enable 		    	 = 0;
 					write_enable			 	 = 1'b1;    
-					if (cachemem_is_miss && (!cache_is_dirty))
+					if (cachemem_is_miss && (!cachemem_is_dirty))
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_LOAD;
@@ -142,7 +140,7 @@ module dcache_controller(
 						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
 					end
-					else if (cachemem_is_miss && cache_is_dirty)
+					else if (cachemem_is_miss && cachemem_is_dirty)
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_STORE;
