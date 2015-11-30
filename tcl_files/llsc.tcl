@@ -1,5 +1,5 @@
 #/***********************************************************/
-#/*   FILE        : ;llsc.tcl                          */
+#/*   FILE        : llsc.tcl                         		*/
 #/*   Description : Default Synopsys Design Compiler Script */
 #/*   Usage       : dc_shell -tcl_mode -f default.tcl       */
 #/*   You'll need to minimally set design_name & read files */
@@ -10,7 +10,7 @@
 #/* new design                                              */
 #/***********************************************************/
 
-read_file -f sverilog [list "llsc.v"]
+read_file -f sverilog [list "sys_defs.vh" "./verilog/llsc.v"]
 set design_name llsc
 set clock_name clock
 set reset_name reset
