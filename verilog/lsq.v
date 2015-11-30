@@ -139,14 +139,14 @@ module lsq(
 	//for example, instruction at slot 5 is older than instruction at slot 8
 	//lq_reg stores address
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_addr, n_lq_reg_addr;
-	//logic	[`LQ_SIZE-1:0][63:0]	lq_reg_data, n_lq_reg_data;
+	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_data, n_lq_reg_data;
 	logic	[`LQ_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] lq_rob_idx, n_lq_rob_idx;
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_opa, n_lq_reg_opa;
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_opb, n_lq_reg_opb;
 	logic	[`LQ_SIZE-1:0][4:0]		lq_reg_dest_tag, n_lq_reg_dest_tag;
 	logic	[`LQ_SIZE-1:0]			lq_reg_addr_valid, n_lq_reg_addr_valid;
 	logic	[`LQ_SIZE-1:0]			lq_reg_inst_valid, n_lq_reg_inst_valid;
-	//logic							lq_reg_data_valid, n_lq_reg_data_valid;
+	logic							lq_reg_data_valid, n_lq_reg_data_valid;
 
 	//SQ
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_addr, n_sq_reg_addr;
@@ -193,11 +193,11 @@ module lsq(
 			lq_rob_idx 			<= #1 0;
 			lq_reg_opa 			<= #1 0;
 			lq_reg_opb 			<= #1 0;
-			//lq_reg_data 		<= #1 0;
+			lq_reg_data 		<= #1 0;
 			lq_reg_dest_tag 	<= #1 0;
 			lq_reg_addr_valid 	<= #1 0;
 			lq_reg_inst_valid 	<= #1 0;
-			//lq_reg_data_valid	<= #1 0;
+			lq_reg_data_valid	<= #1 0;
 
 
 			sq_head 			<= #1 0;
@@ -221,11 +221,11 @@ module lsq(
 			lq_rob_idx 			<= #1 n_lq_rob_idx;
 			lq_reg_opa 			<= #1 n_lq_reg_opa;
 			lq_reg_opb 			<= #1 n_lq_reg_opb;
-			//lq_reg_data 		<= #1 n_lq_reg_data;
+			lq_reg_data 		<= #1 n_lq_reg_data;
 			lq_reg_inst_valid 	<= #1 n_lq_reg_inst_valid;
 			lq_reg_addr_valid 	<= #1 n_lq_reg_addr_valid;
 			lq_reg_dest_tag		<= #1 n_lq_reg_dest_tag;
-			//lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
+			lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
 
 			sq_head 			<= #1 n_sq_head;
 			sq_tail 			<= #1 n_sq_tail;
@@ -320,8 +320,8 @@ module lsq(
 		n_lq_reg_inst_valid = lq_reg_inst_valid;
 		n_lq_reg_addr_valid	= lq_reg_addr_valid;
 		n_lq_reg_dest_tag	= lq_reg_dest_tag;
-		//n_lq_reg_data_valid = lq_reg_data_valid;
-		//n_lq_reg_data 		= lq_reg_data;
+		n_lq_reg_data_valid = lq_reg_data_valid;
+		n_lq_reg_data 		= lq_reg_data;
 
 		n_sq_head 			= sq_head;
 		n_sq_tail 			= sq_tail;
@@ -545,8 +545,8 @@ module lsq(
 						else if(lsq_reg_dep[i][round_j] == DEP) begin
 							lsq_CDB_result_is_valid1 = 1;
 							mem_res = 1;
-							//n_lq_reg_data_valid[i]= 1;
-							//n_lq_reg_data[i] = sq_reg_data[round_j];
+							n_lq_reg_data_valid[i]= 0;
+							n_lq_reg_data[i] = sq_reg_data[round_j];
 							ysq_than_lq1 	= round_j;
 							ld_out_idx1 = i;
 							lsq_CDB_dest_tag1 	= lq_reg_dest_tag[i];
@@ -571,8 +571,8 @@ module lsq(
 							end
 						else if(lsq_reg_dep[i][round_j] == DEP) begin
 							lsq_CDB_result_is_valid2 = 1;
-							//n_lq_reg_data_valid[i] = 1;
-							//n_lq_reg_data[i] = sq_reg_data[round_j];
+							n_lq_reg_data_valid[i] = 0;
+							n_lq_reg_data[i] = sq_reg_data[round_j];
 							ysq_than_lq2 = round_j;
 							ld_out_idx2 = i;
 							lsq_CDB_dest_tag2 	= lq_reg_dest_tag[i];
