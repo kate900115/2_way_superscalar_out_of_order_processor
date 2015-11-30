@@ -7,7 +7,7 @@ module llsc(
 	
 	output	logic			store_success,
 	output	logic			full
-}
+);
 
 	logic	[`LLSC_SIZE-1:0][63:0]	address_tag;
 	logic	[`LLSC_SIZE-1:0]		valid;
@@ -107,4 +107,4 @@ module llsc(
 	//full
 		full = &valid;
 	end
-end module
+endmodule
