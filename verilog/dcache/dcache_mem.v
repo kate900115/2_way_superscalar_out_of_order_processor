@@ -2,8 +2,8 @@ module dcache_mem(
 	input 											clock,
 	input											reset,
 	// input from dcache_controller.v
-	input [`INDEX_SIZE-1:0]							index_in,
-	input [`TAG_SIZE-1:0]     						tag_in,
+	input [`DCACHE_INDEX_SIZE-1:0]					index_in,
+	input [`DCACHE_TAG_SIZE-1:0]     				tag_in,
 	input											read_enable,
 	input											write_enable,
 	input [`DCACHE_BLOCK_SIZE-1:0] 					write_data_in,
@@ -25,28 +25,28 @@ module dcache_mem(
 	);
 	
 	// internal registers
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data_in;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`TAG_SIZE-1:0] 			internal_tag;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`TAG_SIZE-1:0] 			internal_tag_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag_in;
 		
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid_in;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty_in;
 	
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]						internal_response;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]						internal_response_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]					internal_response;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]					internal_response_in;
 	
 	// to record if it is a load or a store instruction
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst_in;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst;
-	logic [`INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst_in;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst;
+	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst_in;
 	
 	// for LRU
-	logic [`INDEX_SIZE-1:0]												internal_way;
-	logic [`INDEX_SIZE-1:0]												internal_way_next;
+	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way;
+	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way_next;
 					
 	
 	always_ff@(posedge clock)
@@ -79,7 +79,7 @@ module dcache_mem(
 	always_comb
 	begin	
 		// load from memory
-		for (int i; i<`INDEX_SIZE; i++)
+		for (int i; i<`DCACHE_INDEX_SIZE; i++)
 		begin
 			for (int j; j<`DCACHE_WAY; j++)
 			begin
@@ -111,7 +111,7 @@ module dcache_mem(
 		// store to memory
 		if (store_to_memory_enable)
 		begin
-			for (int i; i<`INDEX_SIZE; i++)
+			for (int i; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i)
 				begin
@@ -143,7 +143,7 @@ module dcache_mem(
 		if (read_enable)
 		begin
 			// is data miss?
-			for (int i; i<`INDEX_SIZE; i++)
+			for (int i; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i) 
 				begin
@@ -179,7 +179,7 @@ module dcache_mem(
 			// if miss, is it dirty?
 			if (data_is_miss)
 			begin
-				for (int i; i<`INDEX_SIZE; i++)
+				for (int i; i<`DCACHE_INDEX_SIZE; i++)
 				begin
 					if (index_in == i) 
 					begin
@@ -243,7 +243,7 @@ module dcache_mem(
 		// for write
 		else if (write_enable)
 		begin
-			for (int i; i<`INDEX_SIZE; i++)
+			for (int i; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i)
 				begin
@@ -284,7 +284,7 @@ module dcache_mem(
 			
 			if (data_is_miss)
 			begin
-				for (int i; i<`INDEX_SIZE; i++)
+				for (int i; i<`DCACHE_INDEX_SIZE; i++)
 				begin
 					if (index_in == i) 
 					begin

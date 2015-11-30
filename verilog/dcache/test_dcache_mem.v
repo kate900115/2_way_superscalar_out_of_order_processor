@@ -3,8 +3,8 @@ module test_dcache_mem;
 	logic 									clock;
 	logic									reset;
 	// input from dcache_controller.v
-	logic [`INDEX_SIZE-1:0]					index_in;
-	logic [`TAG_SIZE-1:0]     				tag_in;
+	logic [`DCACHE_INDEX_SIZE-1:0]			index_in;
+	logic [`DCACHE_TAG_SIZE-1:0]     		tag_in;
 	logic									read_enable;
 	logic									write_enable;
 	logic [`DCACHE_BLOCK_SIZE-1:0] 			write_data_in;
@@ -16,7 +16,7 @@ module test_dcache_mem;
 	
 	// output
 	// output to mem.v
-	logic[`DCACHE_BLOCK_SIZE-1:0] 			store_data_out;
+	logic [`DCACHE_BLOCK_SIZE-1:0] 			store_data_out;
 	// output to dcache_controller.v
 	logic									data_is_valid;
 	logic									data_is_dirty;

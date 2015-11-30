@@ -25,8 +25,8 @@ module test_dcache_controller;
 	logic 							Dcache_data_hit;
 
 	// output to Dcache.v
-	logic [`INDEX_SIZE-1:0]  		index;
-	logic [`TAG_SIZE-1:0]			tag;
+	logic [`DCACHE_INDEX_SIZE-1:0]  index;
+	logic [`DCACHE_TAG_SIZE-1:0]	tag;
 	logic							read_enable;
 	logic							write_enable;     
 	logic [63:0]					write_data_to_Dcache;	// data that send to dcache.v
