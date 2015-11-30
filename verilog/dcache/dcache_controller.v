@@ -4,7 +4,7 @@ module dcache_controller(
 	input  [3:0] 							Dmem2proc_tag,
 	
 	// input from Dcache.v
-	input  [63:0]							cachemem_data,
+	input  [`DCACHE_BLOCK_SIZE-1:0]			cachemem_data,
 	input 									cachemem_valid,
 	input									cachemem_is_dirty,
 	input									cachemem_is_miss,
@@ -12,14 +12,14 @@ module dcache_controller(
 	// input from processor.v
 	input  [63:0]							proc2Dcache_addr,
 	input  BUS_COMMAND						proc2Dcache_command,
-	input  [63:0] 							proc2Dcache_data,	
+	input  [`DCACHE_BLOCK_SIZE-1:0] 		proc2Dcache_data,	
 	
 	// output to mem.v
 	output BUS_COMMAND						proc2Dmem_command,
 	output logic [63:0]						proc2Dmem_addr,
 	
 	// output to processor.v
-	output logic [63:0]						Dcache_data_out,	 
+	output logic [`DCACHE_BLOCK_SIZE-1:0]	Dcache_data_out,	 
 	output logic [3:0]						Dcache2proc_tag,	 	// to tell processor the tag of the previous load which is finished
 	output logic [3:0]						Dcache2proc_response,	// to tell processor the tag of present load
 	output logic 							Dcache_data_hit,
@@ -29,7 +29,7 @@ module dcache_controller(
 	output logic [`DCACHE_TAG_SIZE-1:0]		tag,  
 	output logic							read_enable,
 	output logic							write_enable,     
-	output logic [63:0]						write_data_to_Dcache,	// data that send to dcache.v
+	output logic [`DCACHE_BLOCK_SIZE-1:0]	write_data_to_Dcache,	// data that send to dcache.v
 	output logic [3:0]						mem_response,
 	output logic [3:0]						mem_tag,
 	output logic							store_to_mem_enable

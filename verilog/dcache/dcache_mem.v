@@ -79,9 +79,9 @@ module dcache_mem(
 	always_comb
 	begin	
 		// load from memory
-		for (int i; i<`DCACHE_INDEX_SIZE; i++)
+		for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 		begin
-			for (int j; j<`DCACHE_WAY; j++)
+			for (int j=0; j<`DCACHE_WAY; j++)
 			begin
 				if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_load_inst[i][j]))
 				begin
@@ -111,11 +111,11 @@ module dcache_mem(
 		// store to memory
 		if (store_to_memory_enable)
 		begin
-			for (int i; i<`DCACHE_INDEX_SIZE; i++)
+			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i)
 				begin
-					for (int j; j<`DCACHE_WAY; j++)
+					for (int j=0; j<`DCACHE_WAY; j++)
 					begin
 						if (internal_way==j)
 						begin
@@ -143,11 +143,11 @@ module dcache_mem(
 		if (read_enable)
 		begin
 			// is data miss?
-			for (int i; i<`DCACHE_INDEX_SIZE; i++)
+			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i) 
 				begin
-					for (int j; j<`DCACHE_WAY; j++)
+					for (int j=0; j<`DCACHE_WAY; j++)
 					begin
 						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
 						begin
@@ -179,7 +179,7 @@ module dcache_mem(
 			// if miss, is it dirty?
 			if (data_is_miss)
 			begin
-				for (int i; i<`DCACHE_INDEX_SIZE; i++)
+				for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 				begin
 					if (index_in == i) 
 					begin
@@ -243,11 +243,11 @@ module dcache_mem(
 		// for write
 		else if (write_enable)
 		begin
-			for (int i; i<`DCACHE_INDEX_SIZE; i++)
+			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 			begin
 				if (index_in==i)
 				begin
-					for (int j; j<`DCACHE_WAY; j++)
+					for (int j=0; j<`DCACHE_WAY; j++)
 					begin
 						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
 						begin
@@ -284,7 +284,7 @@ module dcache_mem(
 			
 			if (data_is_miss)
 			begin
-				for (int i; i<`DCACHE_INDEX_SIZE; i++)
+				for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
 				begin
 					if (index_in == i) 
 					begin
