@@ -44,110 +44,71 @@ module dcache_mem(
 	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst;
 	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst_in;
 	
+	logic [63:0]															read_data;
+	
 	// for LRU
 	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way;
 	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way_next;
+	
 					
 	
 	always_ff@(posedge clock)
 	begin
 		if (reset)
 		begin
-			internal_data 							<= `SD 0;
-			internal_tag  							<= `SD 0;
-			internal_valid							<= `SD 0;
-			internal_dirty  						<= `SD 0;
-			internal_response						<= `SD 0;
-			internal_way							<= `SD 0;
-			internal_load_inst						<= `SD 0;
-			internal_store_inst 					<= `SD 0;
+			internal_data 						<= `SD 0;
+			internal_tag  						<= `SD 0;
+			internal_valid						<= `SD 0;
+			internal_dirty  					<= `SD 0;
+			internal_response					<= `SD 0;
+			internal_way						<= `SD 0;
+			internal_load_inst					<= `SD 0;
+			internal_store_inst 				<= `SD 0;
 		end
 		else
 		begin
-			internal_data 							<= `SD internal_data_in;
-			internal_tag  							<= `SD internal_tag_in;
-			internal_valid							<= `SD internal_valid_in;
-			internal_dirty 	 						<= `SD internal_dirty_in;
-			internal_response						<= `SD internal_response_in;
-			internal_way							<= `SD internal_way_next;
-			internal_load_inst						<= `SD internal_load_inst_in;
-			internal_store_inst 					<= `SD internal_store_inst_in;
+			internal_data 						<= `SD internal_data_in;
+			internal_tag  						<= `SD internal_tag_in;
+			internal_valid						<= `SD internal_valid_in;
+			internal_dirty 	 					<= `SD internal_dirty_in;
+			internal_response					<= `SD internal_response_in;
+			internal_way						<= `SD internal_way_next;
+			internal_load_inst					<= `SD internal_load_inst_in;
+			internal_store_inst 				<= `SD internal_store_inst_in;
 		end
 	end
 	
 	
 	always_comb
 	begin	
-			internal_data_in 						= internal_data;
-			internal_tag_in  						= internal_tag;
-			internal_valid_in						= internal_valid;
-			internal_dirty_in 						= internal_dirty;
-			internal_response_in					= internal_response;
-			internal_way_next						= internal_way;
-			internal_load_inst_in					= internal_load_inst;
-			internal_store_inst_in 					= internal_store_inst;
-			data_is_valid							= 0;
-			data_is_miss							= 0;
-			data_is_dirty 							= 0;
-			store_data_out							= 0;
-			
-		// load from memory
-		for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
-		begin
-			for (int j=0; j<`DCACHE_WAY; j++)
-			begin
-				if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_load_inst[i][j]))
-				begin
-					internal_data_in[i][j] 			= load_data_in;
-					internal_valid_in[i][j]			= 1'b1;
-					internal_dirty_in[i][j]			= 1'b0;
-					read_data_out					= load_data_in;
-					break;
-				end
-				else if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_store_inst[i][j]))
-				begin
-					internal_data_in[i][j] 			= write_data_in;
-					internal_valid_in[i][j]			= 1'b1;
-					internal_dirty_in[i][j]			= 1'b1;
-					read_data_out					= 0;
-				end
-				else
-				begin
-					internal_data_in[i][j] 			= internal_data[i][j];
-					internal_valid_in[i][j]			= internal_valid[i][j];
-					internal_dirty_in[i][j]			= internal_dirty[i][j];
-					read_data_out					= 0;
-				end
-			end
-		end
-		
+		internal_data_in 						= internal_data;
+		internal_tag_in  						= internal_tag;
+		internal_valid_in						= internal_valid;
+		internal_dirty_in 						= internal_dirty;
+		internal_response_in					= internal_response;
+		internal_way_next						= internal_way;
+		internal_load_inst_in					= internal_load_inst;
+		internal_store_inst_in 					= internal_store_inst;
+		data_is_valid							= 0;
+		data_is_miss							= 0;
+		data_is_dirty 							= 0;
+		store_data_out							= 0;
+		read_data_out							= 0;
 		// store to memory
 		if (store_to_memory_enable)
 		begin
-			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+			for (int j=0; j<`DCACHE_WAY; j++)
 			begin
-				if (index_in==i)
+				if (internal_way==j)
 				begin
-					for (int j=0; j<`DCACHE_WAY; j++)
-					begin
-						if (internal_way==j)
-						begin
-							store_data_out 			= internal_data[i][j];
-							internal_valid_in[i][j] = 1'b0;
-							break;
-						end
-						else
-						begin
-							store_data_out 			= 0;
-							internal_valid_in[i][j] = internal_valid[i][j];
-						end
-					end
+					store_data_out 				   = internal_data[index_in][j];
+					internal_valid_in[index_in][j] = 1'b0;
 					break;
 				end
 				else
 				begin
-					store_data_out 					= 0;
-					internal_valid_in[i]			= internal_valid[i];
+					store_data_out 				   = 0;
+					internal_valid_in[index_in][j] = internal_valid[index_in][j];
 				end
 			end
 		end	 
@@ -156,91 +117,63 @@ module dcache_mem(
 		if (read_enable)
 		begin
 			// is data miss?
-			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+			for (int j=0; j<`DCACHE_WAY; j++)
 			begin
-				if (index_in==i) 
+				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
 				begin
-					for (int j=0; j<`DCACHE_WAY; j++)
-					begin
-						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
-						begin
-							read_data_out 		  	= internal_data[i][j];
-							internal_way_next[i]	= ~internal_way[i];
-							data_is_valid 		  	= 1'b1;
-							data_is_miss  		  	= 1'b0;
-							break;
-						end
-						else
-						begin
-							read_data_out 		  	= 0;
-							internal_way_next[i]	= internal_way[i];
-							data_is_valid 		  	= 1'b0;
-							data_is_miss  		  	= 1'b1;
-						end
-					end
+					read_data	 		  		= internal_data[index_in][j];
+					internal_way_next[index_in]	= ~internal_way[index_in];
+					data_is_valid 		  		= 1'b1;
+					data_is_miss  		  		= 1'b0;
 					break;
-				end //((read_index==i) && (tag_in==internal_tag[i]))
+				end
 				else
 				begin
-					read_data_out			  	  	= 0;
-					internal_way_next				= internal_way;
-					data_is_valid			  	  	= 1'b0;
-					data_is_miss  		  		  	= 1'b1;
+					read_data	 		  		= load_data_in;
+					internal_way_next[index_in]	= internal_way[index_in];
+					data_is_valid 		  		= 1'b0;
+					data_is_miss  		  		= 1'b1;
 				end
-			end //if (read_index==i) 
+			end 
 			
 			// if miss, is it dirty?
 			if (data_is_miss)
 			begin
-				for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+				if ((internal_way[index_in]==0)&&(internal_dirty[index_in][0]))
 				begin
-					if (index_in == i) 
-					begin
-						if ((internal_way[i]==0)&&(internal_dirty[i][0]))
-						begin
-							internal_response_in[i][0]	= 0; //?
-							internal_tag_in[i][0]		= internal_tag[i][0];
-							data_is_dirty			  	= 1'b1;
-							internal_load_inst_in[i][0]	= 1'b1;
-							internal_store_inst_in[i][0]= 1'b0;
-							break;
-						end
-						else if ((internal_way[i]==1)&&(internal_dirty[i][1]))
-						begin
-							internal_response_in[i][1]	= 0; //?
-							internal_tag_in[i][1]		= internal_tag[i][1];
-							data_is_dirty			  	= 1'b1;
-							internal_load_inst_in[i][1]	= 1'b1;
-							internal_store_inst_in[i][1]= 1'b0;
-							break;
-						end
-						else if ((internal_way[i]==0)&&(!internal_dirty[i][0]))
-						begin
-							internal_response_in[i][0]	= mem_response;
-							internal_tag_in[i][1]		= tag_in;
-							data_is_dirty			  	= 1'b0;
-							internal_load_inst_in[i][0]	= 1'b1;
-							internal_store_inst_in[i][0]= 1'b0;
-							break;
-						end
-						else
-						begin
-							internal_response_in[i][1]	= mem_response;
-							internal_tag_in[i][1]		= tag_in;
-							data_is_dirty			  	= 1'b0;
-							internal_load_inst_in[i][1]	= 1'b1;
-							internal_store_inst_in[i][1]= 1'b0;
-							break;
-						end
-					end
-					else
-					begin
-						internal_response_in[i]			= internal_response[i];
-						internal_tag_in[i]				= internal_tag[i];
-						data_is_dirty			  	  	= 1'b0;
-						internal_load_inst_in[i]		= internal_load_inst[i];
-						internal_store_inst_in[i]		= internal_store_inst[i];
-					end
+					internal_response_in[index_in][0]	= 0; //?
+					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
+					internal_valid_in[index_in][0]      = internal_valid[index_in][0];
+					data_is_dirty			  			= 1'b1;
+					internal_load_inst_in[index_in][0]	= 1'b1;
+					internal_store_inst_in[index_in][0]	= 1'b0;
+				end
+				else if ((internal_way[index_in]==1)&&(internal_dirty[index_in][1]))
+				begin
+					internal_response_in[index_in][1]	= 0; //?
+					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
+					internal_valid_in[index_in][1] 		= internal_valid[index_in][1];
+					data_is_dirty			  			= 1'b1;
+					internal_load_inst_in[index_in][1]	= 1'b1;
+					internal_store_inst_in[index_in][1]	= 1'b0;
+				end
+				else if ((internal_way[index_in]==0)&&(!internal_dirty[index_in][0]))
+				begin
+					internal_response_in[index_in][0]	= mem_response;
+					internal_tag_in[index_in][0]		= tag_in;
+					internal_valid_in[index_in][0] 		= 1'b0;
+					data_is_dirty			  			= 1'b0;
+					internal_load_inst_in[index_in][0]	= 1'b1;
+					internal_store_inst_in[index_in][0]	= 1'b0;
+				end
+				else
+				begin
+					internal_response_in[index_in][1]	= mem_response;
+					internal_tag_in[index_in][1]		= tag_in;
+					internal_valid_in[index_in][0] 		= 1'b0;
+					data_is_dirty			  			= 1'b0;
+					internal_load_inst_in[index_in][1]	= 1'b1;
+					internal_store_inst_in[index_in][1]	= 1'b0;
 				end
 			end
 			else 
@@ -251,101 +184,135 @@ module dcache_mem(
 				internal_load_inst_in					= internal_load_inst;
 				internal_store_inst_in					= internal_store_inst;
 			end
-		end //for (int i; i<`INDEX_SIZE; i++)
-		
-		// for write
-		else if (write_enable)
+		end
+		else
 		begin
-			for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+				read_data	 		  					= load_data_in;
+		end
+		
+		// load from memory
+		for (int i=0; i<`DCACHE_INDEX_SIZE*`DCACHE_WAY; i++)
+		begin
+			if ((mem_tag == internal_response[i]) && (mem_tag!=0) && (internal_load_inst[i])) 
 			begin
-				if (index_in==i)
+				internal_data_in[i] 			= load_data_in;
+				internal_valid_in[i]			= 1'b1;
+				internal_dirty_in[i]			= 1'b0;
+				internal_response_in[i]			= 0;
+				read_data_out					= load_data_in;
+				break;
+			end
+			else if ((mem_tag == internal_response[i]) && (mem_tag!=0) && (internal_store_inst[i]))
+			begin
+				internal_data_in[i] 			= write_data_in;
+				internal_valid_in[i]			= 1'b1;
+				internal_dirty_in[i]			= 1'b1;
+				internal_response_in[i]			= 0;
+				read_data_out					= read_data;
+				break;
+			end
+			else
+			begin
+				internal_data_in[i] 			= internal_data[i];
+				internal_valid_in[i]			= internal_valid[i];
+				internal_dirty_in[i]			= internal_dirty[i];
+				read_data_out					= read_data;
+				//internal_response_in[i]			= internal_response[i];
+			end
+		end
+		
+		/*for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+		begin
+			for (int j=0; j<`DCACHE_WAY; j++)
+			begin
+				if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_load_inst[i][j]))
 				begin
-					for (int j=0; j<`DCACHE_WAY; j++)
-					begin
-						if ((tag_in==internal_tag[i][j]) && (internal_valid[i][j]))
-						begin
-							internal_data_in[i][j] 	= write_data_in;
-							internal_tag_in[i][j]	= tag_in;
-							internal_dirty_in[i][j] = 1'b1;
-							internal_way_next[i]	= ~internal_way[i];
-							data_is_valid 		    = 1'b1;
-							data_is_miss  		  	= 1'b0;
-							break;
-						end
-						else
-						begin
-							internal_data_in[i][j]	= internal_data[i][j];
-							internal_tag_in[i][j]	= internal_tag[i][j];
-							internal_dirty_in[i][j] = internal_dirty[i][j];
-							internal_way_next[i]	= internal_way[i];
-							data_is_valid 		 	= 1'b0;
-							data_is_miss  		 	= 1'b1;
-						end
-					end
+					internal_data_in[i][j] 			= load_data_in;
+					internal_valid_in[i][j]			= 1'b1;
+					internal_dirty_in[i][j]			= 1'b0;
+					internal_response_in[i]			= 0;
+					read_data_out					= load_data_in;
+					break;
+				end
+				else if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_store_inst[i][j]))
+				begin
+					internal_data_in[i][j] 			= write_data_in;
+					internal_valid_in[i][j]			= 1'b1;
+					internal_dirty_in[i][j]			= 1'b1;
+					internal_response_in[i]			= 0;
+					read_data_out					= load_data_in;
 					break;
 				end
 				else
 				begin
-					internal_data_in[i]      	    = internal_data[i];
-					internal_tag_in[i]			    = internal_tag[i];
-					internal_way_next[i]			= internal_way[i];
-					internal_dirty_in[i]	 		= internal_dirty[i];
-					data_is_valid 		            = 1'b0;
-					data_is_miss  		  		    = 1'b1;
+					internal_data_in[i][j] 			= internal_data[i][j];
+					internal_valid_in[i][j]			= internal_valid[i][j];
+					internal_dirty_in[i][j]			= internal_dirty[i][j];
+					internal_response_in[i][j]		= internal_response[i][j];
+					read_data_out					= load_data_in;
+				end 
+			end
+		end*/
+		
+		// for write
+		if (write_enable)
+		begin
+			for (int j=0; j<`DCACHE_WAY; j++)
+			begin
+				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
+				begin
+					internal_data_in[index_in][j] 	= write_data_in;
+					internal_tag_in[index_in][j]	= tag_in;
+					internal_dirty_in[index_in][j] 	= 1'b1;
+					internal_way_next[index_in]		= ~internal_way[index_in];
+					data_is_valid 		    		= 1'b1;
+					data_is_miss  		  			= 1'b0;
+					break;
+				end
+				else
+				begin
+					internal_data_in[index_in][j]	= internal_data[index_in][j];
+					internal_tag_in[index_in][j]	= internal_tag[index_in][j];
+					internal_dirty_in[index_in][j] 	= internal_dirty[index_in][j];
+					internal_way_next[index_in]		= internal_way[index_in];
+					data_is_valid 		 			= 1'b0;
+					data_is_miss  		 			= 1'b1;
 				end
 			end
 			
 			if (data_is_miss)
 			begin
-				for (int i=0; i<`DCACHE_INDEX_SIZE; i++)
+				if ((internal_way==0) && (internal_dirty[index_in][0])) 
 				begin
-					if (index_in == i) 
-					begin
-						if ((internal_way==0) && (internal_dirty[i][0])) 
-						begin
-							internal_response_in[i][0]	= 0; //?
-							internal_tag_in[i][0]		= internal_tag[i][0];
-							data_is_dirty			  	= 1'b1;
-							internal_load_inst_in[i][0]	= 1'b0;
-							internal_store_inst_in[i][0]= 1'b1;
-							break;
-						end
-						else if ((internal_way==1) && (internal_dirty[i][1]))
-						begin
-							internal_response_in[i][1]	= 0; //?
-							internal_tag_in[i][1]		= internal_tag[i][1];
-							data_is_dirty			  	= 1'b1;
-							internal_load_inst_in[i][1]	= 1'b0;
-							internal_store_inst_in[i][1]= 1'b1;
-							break;
-						end
-						else if ((internal_way==0) && (!internal_dirty[i][0]))
-						begin
-							internal_response_in[i][0]	= mem_response;
-							internal_tag_in[i][0]		= tag_in;
-							data_is_dirty			  	= 1'b0;
-							internal_load_inst_in[i][0]	= 1'b0;
-							internal_store_inst_in[i][0]= 1'b1;
-							break;
-						end
-						else
-						begin
-							internal_response_in[i][1]	= mem_response;
-							internal_tag_in[i][1]		= tag_in;
-							data_is_dirty			  	= 1'b0;
-							internal_load_inst_in[i][1]	= 1'b0;
-							internal_store_inst_in[i][1]= 1'b1;
-							break;
-						end
-					end
-					else
-					begin
-						internal_response_in[i]			= internal_response[i];
-						internal_tag_in[i]				= internal_tag[i];
-						data_is_dirty			  	  	= 1'b0;
-						internal_load_inst_in[i]		= internal_load_inst[i];
-						internal_store_inst_in[i]		= internal_store_inst[i];
-					end
+					internal_response_in[index_in][0]	= 0; //?
+					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
+					data_is_dirty			  			= 1'b1;
+					internal_load_inst_in[index_in][0]	= 1'b0;
+					internal_store_inst_in[index_in][0]	= 1'b1;
+				end
+				else if ((internal_way==1) && (internal_dirty[index_in][1]))
+				begin
+					internal_response_in[index_in][1]	= 0; //?
+					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
+					data_is_dirty			  			= 1'b1;
+					internal_load_inst_in[index_in][1]	= 1'b0;
+					internal_store_inst_in[index_in][1]	= 1'b1;
+				end
+				else if ((internal_way==0) && (!internal_dirty[index_in][0]))
+				begin
+					internal_response_in[index_in][0]	= mem_response;
+					internal_tag_in[index_in][0]		= tag_in;
+					data_is_dirty			  			= 1'b0;
+					internal_load_inst_in[index_in][0]	= 1'b0;
+					internal_store_inst_in[index_in][0]	= 1'b1;
+				end
+				else
+				begin
+					internal_response_in[index_in][1]	= mem_response;
+					internal_tag_in[index_in][1]		= tag_in;
+					data_is_dirty			  			= 1'b0;
+					internal_load_inst_in[index_in][1]	= 1'b0;
+					internal_store_inst_in[index_in][1] = 1'b1;
 				end
 			end
 			else 
