@@ -9,7 +9,6 @@
 //need to communicate with rob when it hits the head of the rob
 //dispatch at the same time
 //load queue works like a buffer and store queue works in order
-`timescale 1ns/100ps
 
 //QES: 1 which kind of instruction is comming to lsq: load/store
 //QES: 5 when to update/ broadcast
@@ -111,8 +110,8 @@ module lsq(
 	output	logic							lsq_opb_request2,
 	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
 	output	logic							lsq_ra_request1,	//request = 0 if load
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
-	output	logic							lsq_ra_request1,
+	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx2,
+	output	logic							lsq_ra_request2,
 
 
 	//if sq has storeA @pc=0x100 if loadA @pc=0x120 will load from the sq
@@ -157,7 +156,7 @@ module lsq(
 	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid, n_sq_reg_addr_valid;
 	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid, n_sq_reg_inst_valid;
 
-	logic	[`LQ_SIZE-1:0] [`SQ_SIZE-1:0] LSQ_DEP_CODE		lsq_reg_dep;
+	LSQ_DEP_CODE [`LQ_SIZE-1:0][`SQ_SIZE-1:0]lsq_reg_dep;
 
 	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head, n_sq_head;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail, n_sq_tail;
@@ -184,9 +183,11 @@ module lsq(
 	//for load from mem
 	logic 				mem_res;
 	logic	[`LQ_SIZE-1:0][4:0] wait_idx;
+	logic	[`LQ_SIZE-1:0][4:0] n_wait_idx;
 	logic	[4:0]		wait_int;
+	logic	[4:0]		n_wait_int;
 	
-	always_ff(@posedge clock) begin
+	always_ff@(posedge clock) begin
 		if(reset) begin
 
 			lq_reg_addr 		<= #1 0;
@@ -213,33 +214,33 @@ module lsq(
 			
 			wait_int			<= #1 0;
 			wait_idx 			<= #1 0;
+		end
+			else begin
 
-	end
-		else begin
+				lq_reg_addr 		<= #1 n_lq_reg_addr;
+				lq_rob_idx 			<= #1 n_lq_rob_idx;
+				lq_reg_opa 			<= #1 n_lq_reg_opa;
+				lq_reg_opb 			<= #1 n_lq_reg_opb;
+				lq_reg_data 		<= #1 n_lq_reg_data;
+				lq_reg_inst_valid 	<= #1 n_lq_reg_inst_valid;
+				lq_reg_addr_valid 	<= #1 n_lq_reg_addr_valid;
+				lq_reg_dest_tag		<= #1 n_lq_reg_dest_tag;
+				lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
 
-			lq_reg_addr 		<= #1 n_lq_reg_addr;
-			lq_rob_idx 			<= #1 n_lq_rob_idx;
-			lq_reg_opa 			<= #1 n_lq_reg_opa;
-			lq_reg_opb 			<= #1 n_lq_reg_opb;
-			lq_reg_data 		<= #1 n_lq_reg_data;
-			lq_reg_inst_valid 	<= #1 n_lq_reg_inst_valid;
-			lq_reg_addr_valid 	<= #1 n_lq_reg_addr_valid;
-			lq_reg_dest_tag		<= #1 n_lq_reg_dest_tag;
-			lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
-
-			sq_head 			<= #1 n_sq_head;
-			sq_tail 			<= #1 n_sq_tail;
-			sq_reg_addr 		<= #1 n_sq_reg_addr;
-			sq_reg_data 		<= #1 n_sq_reg_data;
-			sq_rob_idx 			<= #1 n_sq_rob_idx;
-			sq_reg_opa 			<= #1 n_sq_reg_opa;
-			sq_reg_opb 			<= #1 n_sq_reg_opb;
-			sq_reg_inst_valid 	<= #1 n_sq_reg_inst_valid;
-			sq_reg_addr_valid 	<= #1 n_sq_reg_addr_valid;
-			sq_reg_data_valid	<= #1 n_sq_reg_data_valid;
+				sq_head 			<= #1 n_sq_head;
+				sq_tail 			<= #1 n_sq_tail;
+				sq_reg_addr 		<= #1 n_sq_reg_addr;
+				sq_reg_data 		<= #1 n_sq_reg_data;
+				sq_rob_idx 			<= #1 n_sq_rob_idx;
+				sq_reg_opa 			<= #1 n_sq_reg_opa;
+				sq_reg_opb 			<= #1 n_sq_reg_opb;
+				sq_reg_inst_valid 	<= #1 n_sq_reg_inst_valid;
+				sq_reg_addr_valid 	<= #1 n_sq_reg_addr_valid;
+				sq_reg_data_valid	<= #1 n_sq_reg_data_valid;
 			
-			wait_int			<= #1 n_wait_int;
-			wait_idx 			<= #1 n_wait_idx;
+				wait_int			<= #1 n_wait_int;
+				wait_idx 			<= #1 n_wait_idx;
+		end
 	end
 
 		//if ((rs_cdb1_tag == inst1_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opa_valid && rs_cdb1_valid)
@@ -310,7 +311,7 @@ module lsq(
 		st_in2 = 0;
 		ld_idx1 = 0;
 		ld_idx2 = 0;
-		st_indx1 = 0;
+		st_idx1 = 0;
 		st_idx2 = 0;
 
 		n_lq_reg_addr 		= lq_reg_addr;
@@ -349,9 +350,9 @@ module lsq(
 					//load from mem
 					//load from sq
 					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (sq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
+						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
 							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (sq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
+						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
 							lsq_reg_dep[i][round_j] = DEP;
 						else if(!sq_reg_inst_valid[round_j])
 							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -375,9 +376,9 @@ module lsq(
 					ld_idx2					= i;
 					ld_in2 					= 1;
 					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (sq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
+						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
 							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (sq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
+						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
 							lsq_reg_dep[i][round_j] = DEP;
 						else if(!sq_reg_inst_valid[round_j])
 							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -404,7 +405,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i] || i== ld_idx1)
 						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -417,7 +418,7 @@ module lsq(
 			end		//else if
 		end 	//if
 
-		if(id_wr_mem_in1)	begin ／／store 
+		if(id_wr_mem_in1)	begin //store 
 			ld_in1 = 0;
 			ld_in2 = 0;
 			st_in1 = 0;
@@ -435,7 +436,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid1;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid1;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i])
 						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -446,7 +447,7 @@ module lsq(
 				end
 			end //for
 
-			if(id_rd_mem_in2) begin    ／／store+load
+			if(id_rd_mem_in2) begin    //store+load
 			for(int i=0; i<`LQ_SIZE; i++) begin		//first find locations
 				if(!lq_reg_addr_valid[i] && !ld_in1) begin
 					n_lq_reg_opa[i] 		= lsq_opa_in2;
@@ -459,11 +460,11 @@ module lsq(
 					ld_idx1					= i; 
 					ld_in1 					= 1;
 					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (sq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)!= (sq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
+						if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
+							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)!= (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
 							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (sq_opa_in1 + lsq_opb_new2) && lsq_opb_new_valid2)
-							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)== (sq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
+						else if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in1 + lsq_opb_new2) && lsq_opb_new_valid2)
+							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)== (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
 							lsq_reg_dep[i][round_j] = DEP;
 						else if(!sq_reg_inst_valid[round_j] && lq_reg_inst_valid[i])
 							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -477,7 +478,7 @@ module lsq(
 
 			else if(id_wr_mem_in2) begin   //store + store
 			for(round_j=sq_head +1 ; round_j!=sq_tail && round_j !=sq_tail+1; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && st_in1 && round_j!=st_indx1 && !st_in2) begin
+				if(!sq_reg_addr_valid[round_j] && st_in1 && round_j!=st_idx1 && !st_in2) begin
 					n_sq_head 					= sq_head;
 					n_sq_tail 					= sq_tail+2;
 					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_new2; 
@@ -489,7 +490,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i])
 						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
@@ -605,43 +606,6 @@ module lsq(
 					rob2_excuted = 1;
 				end
 			end
-
+		end
 	end //comb
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+endmodule 
