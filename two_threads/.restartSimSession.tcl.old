@@ -1,15 +1,15 @@
 # Begin_DVE_Session_Save_Info
 # DVE restart session
-# Saved on Mon Nov 30 22:22:38 2015
+# Saved on Mon Nov 30 23:21:08 2015
 # Designs open: 1
 #   Sim: /home/tianmili/classes/eecs470/projects/project4/two_threads/dve
 # Toplevel windows open: 2
 # 	TopLevel.1
 # 	TopLevel.2
 #   Source.1: _vcs_unit__2649932360
-#   Wave.1: 14 signals
+#   Wave.1: 27 signals
 #   Group count = 1
-#   Group Group1 signal count = 14
+#   Group Group1 signal count = 27
 # End_DVE_Session_Save_Info
 
 # DVE version: K-2015.09_Full64
@@ -86,15 +86,18 @@ gui_set_time_units 100ps
 # Global: Signal Compare
 
 # Global: Signal Groups
+gui_load_child_values {testbench.processor_0.ex}
 gui_load_child_values {testbench.processor_0.rs1}
 gui_load_child_values {testbench.processor_0.rob1}
+gui_load_child_values {testbench.processor_0.cdb1}
+gui_load_child_values {testbench.processor_0}
 
 
-set _session_group_5 Group1
-gui_sg_create "$_session_group_5"
-set Group1 "$_session_group_5"
+set _session_group_12 Group1
+gui_sg_create "$_session_group_12"
+set Group1 "$_session_group_12"
 
-gui_sg_addsignal -group "$_session_group_5" { testbench.processor_0.rs1.inst1_rs_rob_idx_in testbench.processor_0.rs1.inst2_rs_rob_idx_in testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.t2_head testbench.processor_0.rob1.t2_tail testbench.processor_0.rs1.fu_rs_rob_idx_out testbench.processor_0.rob1.rob1_internal_is_ex_out testbench.processor_0.rob1.rob2_internal_is_ex_out testbench.processor_0.rob1.fu_rob_idx1 testbench.processor_0.rob1.fu_rob_idx2 testbench.processor_0.cdb1.cdb1_rob_idx testbench.processor_0.cdb1.cdb2_rob_idx testbench.processor_0.ex.fu_rs_rob_idx_out }
+gui_sg_addsignal -group "$_session_group_12" { testbench.processor_0.rs1.inst1_rs_rob_idx_in testbench.processor_0.rs1.inst2_rs_rob_idx_in testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.t2_head testbench.processor_0.rob1.t2_tail testbench.processor_0.rs1.fu_rs_rob_idx_out testbench.processor_0.rob1.rob1_internal_is_ex_out testbench.processor_0.rob1.rob2_internal_is_ex_out testbench.processor_0.rob1.fu_rob_idx1 testbench.processor_0.rob1.fu_rob_idx2 testbench.processor_0.cdb1.cdb1_rob_idx testbench.processor_0.cdb1.cdb2_rob_idx testbench.processor_0.ex.fu_rs_rob_idx_out testbench.processor_0.PC_inst1 testbench.processor_0.PC_inst2 testbench.processor_0.PC_inst1_valid testbench.processor_0.PC_inst2_valid testbench.processor_0.ROB_t1_is_full testbench.processor_0.ROB_t2_is_full testbench.processor_0.RS_full testbench.processor_0.PC_thread1_is_available testbench.processor_0.PC_proc2Imem_addr_previous testbench.processor_0.pc.proc2Imem_addr1 testbench.processor_0.pc.proc2Imem_addr2 testbench.processor_0.pc.pc1.PC_reg testbench.processor_0.pc.pc2.PC_reg }
 
 # Global: Highlighting
 
@@ -125,16 +128,17 @@ gui_list_set_filter -id ${Hier.1} -text {*}
 gui_change_design -id ${Hier.1} -design Sim
 catch {gui_list_expand -id ${Hier.1} testbench}
 catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
-catch {gui_list_select -id ${Hier.1} {testbench.processor_0.ex}}
+catch {gui_list_expand -id ${Hier.1} testbench.processor_0.pc}
+catch {gui_list_select -id ${Hier.1} {testbench.processor_0.pc.pc2}}
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Data 'Data.1'
 gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
-gui_list_set_filter -id ${Data.1} -text {*}
-gui_list_show_data -id ${Data.1} {testbench.processor_0.ex}
+gui_list_set_filter -id ${Data.1} -reset
+gui_list_show_data -id ${Data.1} {testbench.processor_0.pc.pc2}
 gui_show_window -window ${Data.1}
-catch { gui_list_select -id ${Data.1} {testbench.processor_0.ex.fu_rs_rob_idx_out }}
+catch { gui_list_select -id ${Data.1} {testbench.processor_0.pc.pc2.PC_reg }}
 gui_view_scroll -id ${Data.1} -vertical -set 0
 gui_view_scroll -id ${Data.1} -horizontal -set 0
 gui_view_scroll -id ${Hier.1} -vertical -set 0
@@ -155,11 +159,11 @@ set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
 gui_list_set_height -id Wave -height 25
 set origGroupCreationState [gui_list_create_group_when_add -wave]
 gui_list_create_group_when_add -wave -disable
-gui_wv_zoom_timerange -id ${Wave.1} 3086 3669
+gui_wv_zoom_timerange -id ${Wave.1} 4058 4644
 gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
-gui_list_expand -id ${Wave.1} testbench.processor_0.rob1.rob1_internal_is_ex_out
 gui_list_expand -id ${Wave.1} testbench.processor_0.cdb1.cdb1_rob_idx
 gui_list_expand -id ${Wave.1} testbench.processor_0.cdb1.cdb2_rob_idx
+gui_list_expand -id ${Wave.1} testbench.processor_0.ex.fu_rs_rob_idx_out
 gui_seek_criteria -id ${Wave.1} {Any Edge}
 
 
@@ -175,7 +179,7 @@ if { $groupExD } {
 }
 gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Wave.1} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -item {testbench.processor_0.ex.fu_rs_rob_idx_out[5:0][4:0]} -position below
+gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -item {testbench.processor_0.pc.pc2.PC_reg[63:0]} -position below
 
 gui_view_scroll -id ${Wave.1} -vertical -set 0
 gui_show_grid -id ${Wave.1} -enable false
