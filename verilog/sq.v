@@ -13,6 +13,8 @@ module sq(
 	input	id_wr_mem_in1,
 	input	id_wr_mem_in2,		//stq
 	
+	input	is_thread1;
+	
 	//for instruction1
 	input  [63:0] 								lsq_opa_in1,      	// Operand a from Rename  data
 	input  [63:0] 								lsq_opb_in1,      	// Operand a from Rename  tag or data from prf
@@ -30,8 +32,8 @@ module sq(
 	input										lsq_ra_data_valid2,	//weather data comes form prf is valid, if not, get from cdb
 
 	//we need rob age for store to commit
-	input	[$clog2(`ROB_SIZE)-1:0]		rob_commit_idx1,
-	input	[$clog2(`ROB_SIZE)-1:0]		rob_commit_idx2,
+	input	[$clog2(`ROB_SIZE):0]		rob_commit_idx1,
+	input	[$clog2(`ROB_SIZE):0]		rob_commit_idx2,
 	
 	//we need to know weather the instruction commited is a mispredict
 	input	thread1_mispredict,
@@ -42,20 +44,24 @@ module sq(
 	output	logic	[4:0]						mem_store_idx,
 	
 	output	logic								rob1_excuted,
-	output	logic								rob2_excuted
+	output	logic								rob2_excuted,
+	output	logic								t1_is_full,
+	output	logic								t2_is_full
 );
 
 	//SQ
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_addr, n_sq_reg_addr;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_data, n_sq_reg_data;
-	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] sq_rob_idx, n_sq_rob_idx;
+	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE):0] sq_rob_idx, n_sq_rob_idx;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opa, n_sq_reg_opa;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opb, n_sq_reg_opb;
 	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid, n_sq_reg_addr_valid;
 	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid, n_sq_reg_inst_valid;
 	
-	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head, n_sq_head;
-	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail, n_sq_tail;
+	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_t1_head, n_sq_t1_head;
+	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_t2_head, n_sq_t2_head;
+	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t1_tail, n_sq_t1_tail;
+	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t2_tail, n_sq_t2_tail;
 	logic	[$clog2(`SQ_SIZE)-1:0]					st_idx1, st_idx2;
 	logic											st_in1, st_in2;
 	logic											st_out1, st_out2;
@@ -67,8 +73,10 @@ module sq(
 		if(reset) begin
 
 
-			sq_head 			<= #1 0;
-			sq_tail 			<= #1 0;
+			sq_t1_head 			<= #1 0;
+			sq_t1_tail 			<= #1 0;
+			sq_t2_head 			<= #1 0;
+			sq_t2_tail 			<= #1 0;
 			sq_reg_addr 		<= #1 0;
 			sq_rob_idx 			<= #1 0;
 			sq_reg_opa 			<= #1 0;
@@ -80,8 +88,10 @@ module sq(
 
 		end
 		else begin
-			sq_head 			<= #1 n_sq_head;
-			sq_tail 			<= #1 n_sq_tail;
+			sq_t1_head 			<= #1 n_sq_t1_head;
+			sq_t1_tail 			<= #1 n_sq_t1_tail;
+			sq_t2_head 			<= #1 n_sq_t2_head;
+			sq_t2_tail 			<= #1 n_sq_t2_tail;
 			sq_reg_addr 		<= #1 n_sq_reg_addr;
 			sq_reg_data 		<= #1 n_sq_reg_data;
 			sq_rob_idx 			<= #1 n_sq_rob_idx;
@@ -97,8 +107,10 @@ module sq(
 	always_comb begin	
 		st_in1 = 0;
 		st_idx1 = 0;
-		n_sq_head = sq_head;
-		n_sq_tail = sq_tail+id_wr_mem_in1+id_wr_mem_in2;
+		n_sq_t1_head 		= sq_t1_head;
+		n_sq_t1_tail 		= sq_t1_tail;
+		n_sq_t2_head 		= sq_t2_head;
+		n_sq_t2_tail 		= sq_t2_tail;
 		n_sq_reg_addr		= sq_reg_addr; 
 		n_sq_reg_data 		= sq_reg_data;
 		n_sq_rob_idx 		= sq_rob_idx;
@@ -109,9 +121,10 @@ module sq(
 		n_sq_reg_data_valid	= sq_reg_data_valid;
 		
 		if(id_wr_mem_in1)	begin //store
-			for(round_j=sq_head; round_j!=sq_tail; round_j++) begin		//first find locations
+			for(round_j=sq_t1_head; round_j!=sq_t1_tail; round_j++) begin		//first find locations
 				if(!sq_reg_addr_valid[round_j] && !st_in1) begin
-					n_sq_reg_addr[round_j] 		= lsq_opa_in1 + lsq_opb_in1; 
+					n_sq_reg_addr[round_j] 		= lsq_opa_in1 + lsq_opb_in1;
+					n_sq_t1_tail 				= sq_t1_tail+1;
 					n_sq_reg_data[round_j] 		= lsq_ra_data1;
 					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in1;
 					n_sq_reg_opa[round_j] 		= lsq_opa_in1;
@@ -131,9 +144,34 @@ module sq(
 			end //for
 		end //if
 		
-		if(id_wr_mem_in2) begin   //load+store
-			for(round_j=sq_head; round_j!=sq_tail; round_j++) begin		//first find locations
+		if(id_wr_mem_in2 && is_thread1) begin   //store
+			for(round_j=sq_t1_head; round_j!=sq_t1_tail; round_j++) begin		//first find locations
 				if(!sq_reg_addr_valid[round_j] && (!st_in1 || (st_in1 && round_j!=st_idx1))) begin
+					n_sq_t1_tail 				= n_sq_t1_tail+1;
+					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_in2; 
+					n_sq_reg_data[round_j] 		= lsq_ra_data2;
+					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
+					n_sq_reg_opa[round_j] 		= lsq_opa_in2;
+					n_sq_reg_opb[round_j] 		= lsq_opb_in2;
+					n_sq_reg_inst_valid[round_j]= 1;
+					n_sq_reg_addr_valid[round_j]= lsq_lsq_ra_data2;
+					n_sq_reg_data_valid[round_j]= lsq_ra_data_valid2;
+					for(int i=0; i<`LQ_SIZE; i++) begin
+						if(lq_reg_inst_valid[i] || i== ld_idx1)
+						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
+						else
+						lsq_reg_dep[i][round_j] = NO_IDEA;
+					end //for
+					
+				end
+			end 	//for
+			end		//else if
+		end 	//if
+		
+		if(id_wr_mem_in2 && !is_thread1) begin   //store
+			for(round_j=sq_t2_head; round_j!=sq_t2_tail; round_j++) begin		//first find locations
+				if(!sq_reg_addr_valid[round_j] && (!st_in1 || (st_in1 && round_j!=st_idx1))) begin
+					n_sq_t2_tail 				= n_sq_t2_tail+1;
 					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_in2; 
 					n_sq_reg_data[round_j] 		= lsq_ra_data2;
 					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
@@ -155,13 +193,40 @@ module sq(
 		end 	//if
 		
 		//store to mem 
-		if(sq_rob_idx[sq_head]==rob_commit_idx1 | sq_rob_idx[sq_head]==rob_commit_idx2) begin
-			instr_store_to_mem1 = sq_reg_data[sq_head];
-			n_sq_head = sq_head +1;
+		rob1_excuted = 0;
+		rob2_excuted = 0;
+		if(sq_rob_idx[sq_t1_head]==(rob_commit_idx1 |rob_commit_idx2) begin
+			instr_store_to_mem1 = sq_reg_data[sq_t1_head];
+			n_sq_t1_head = sq_t1_head +1;
 			instr_store_to_mem_valid1 = 1;
-			mem_store_idx = sq_reg_addr[sq_head];
-			rob1_excuted = 1;
-			n_sq_reg_inst_valid[sq_head] = 0;
+			mem_store_idx = sq_reg_addr[sq_t1_head];
+			rob1_excuted = rob_commit_idx1;
+			rob2_excuted = (rob_commit_idx1 && rob_commit_idx2) ? 0:rob_commit_idx2;
+			n_sq_reg_inst_valid[sq_t1_head] = 0;
 		end
-		if(rob_commit_idx1 && rob_commit_idx2) rob2_excuted = 0;
+		if(sq_rob_idx[sq_t2_head]==rob_commit_idx2 & !rob1_excuted)) begin
+			instr_store_to_mem1 = sq_reg_data[sq_t2_head];
+			n_sq_t2_head = sq_t2_head +1;
+			instr_store_to_mem_valid1 = 1;
+			mem_store_idx = sq_reg_addr[sq_t2_head];
+			rob2_excuted = 1;
+			n_sq_reg_inst_valid[sq_t2_head] = 0;
+		end		
+		
+		//mispredict
+		if(thread1_mispredict)begin
+			n_sq_t1_tail = n_sq_t1_head;
+		end
+		if(thread2_mispredict)begin
+			n_sq_t2_tail = n_sq_t2_head;
+		end
+		
+		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head) || (sq_t1_tail == sq_t1_head))				//**************************** 
+		begin
+			t1_is_full = 1;
+		end
+		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head) || (sq_t2_tail == sq_t2_head))
+		begin
+			t2_is_full = 1;
+		end
 	end

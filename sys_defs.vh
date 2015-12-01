@@ -51,10 +51,10 @@
 typedef enum logic [3:0] {
   NO_ERROR               = 4'h0,
   HALTED_ON_MEMORY_ERROR = 4'h1,
-  HALTED_ON_HALT_I1      = 4'h2,
-  HALTED_ON_ILLEGAL_I1   = 4'h3,
-  HALTED_ON_HALT_I2      = 4'h4,
-  HALTED_ON_ILLEGAL_I2   = 4'h5
+  HALTED_ON_HALT_I1         = 4'h2,
+  HALTED_ON_ILLEGAL_I1      = 4'h3,
+  HALTED_ON_HALT_I2         = 4'h4,
+  HALTED_ON_ILLEGAL_I2      = 4'h5
 } ERROR_CODE;
 
 //
@@ -341,18 +341,17 @@ typedef enum logic[1:0] {
 `define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE) 				//bit
 `define ICACHE_TAG_SIZE		64-`ICACHE_BLOCK_OFFSET-`INDEX_SIZE		//bit
 
-`define DCACHE_SIZE			2048 //bits size
-`define DCACHE_BLOCK_SIZE	64	 //bits size
-`define DCACHE_WAY			2	
-`define	DCACHE_INDEX_SIZE	$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//4 bits
-`define DCACHE_BLOCK_OFFSET	$clog2(`DCACHE_BLOCK_SIZE) 								//6 bits
-`define DCACHE_TAG_SIZE		64-`DCACHE_BLOCK_OFFSET-`DCACHE_INDEX_SIZE				//54 bits
+`define DCACHE_SIZE					2048 //bits size
+`define DCACHE_BLOCK_SIZE			64	 //bits size
+`define DCACHE_WAY					2
+`define DCACHE_INDEX_ENTRY_SIZE 	`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY)
+`define	DCACHE_INDEX_SIZE			$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//4 bits
+`define DCACHE_BLOCK_OFFSET			$clog2(`DCACHE_BLOCK_SIZE) 								//6 bits
+`define DCACHE_TAG_SIZE				64-`DCACHE_BLOCK_OFFSET-`DCACHE_INDEX_SIZE				//54 bits
 
 
 //for loadl_link and store_cond
 `define LLSC_SIZE	8
-`define LQ_SIZE		8
-`define SQ_SIZE		8
 
 typedef enum logic[2:0] {
 	NO_INST			= 3'b000,

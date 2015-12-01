@@ -236,7 +236,7 @@ initial begin
 	#1
 	correct1 = (store_success == 0 && full == 0);
 	correct = correct1;// & correct2;
-	assert(correct1) $display("@@@passed12");
+	assert(correct1) $display("@@@passed14");
 		else #1 exit_on_error;
 		
 				
@@ -250,7 +250,7 @@ initial begin
 	#1
 	correct1 = (store_success == 1 && full == 1);
 	correct = correct1;// & correct2;
-	assert(correct1) $display("@@@passed13");
+	assert(correct1) $display("@@@passed15");
 		else #1 exit_on_error;
 		
 	@(negedge clock);
@@ -263,7 +263,7 @@ initial begin
 	#1
 	correct1 = (store_success == 0 && full == 0);
 	correct = correct1;// & correct2;
-	assert(correct1) $display("@@@passed14");
+	assert(correct1) $display("@@@passed16");
 		else #1 exit_on_error;
 		
 	@(negedge clock);
@@ -276,7 +276,7 @@ initial begin
 	#1
 	correct1 = (store_success == 0 && full == 1);
 	correct = correct1;// & correct2;
-	assert(correct1) $display("@@@passed15");
+	assert(correct1) $display("@@@passed17");
 		else #1 exit_on_error;
 
 	$finish;

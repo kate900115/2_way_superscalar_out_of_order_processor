@@ -19,36 +19,36 @@ module dcache_mem(
 	
 	// output to dcache_controller.v
 	output logic									data_is_valid,
-	output logic									data_is_dirty,
+	output logic									data_is_dirty,  // data which need to be replaced is dirty
 	output logic									data_is_miss,
 	output logic [`DCACHE_BLOCK_SIZE-1:0]			read_data_out
 	);
 	
 	// internal registers
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data_in;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_BLOCK_SIZE-1:0]	internal_data_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][`DCACHE_TAG_SIZE-1:0] 	internal_tag_in;
 		
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid_in;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_valid_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_dirty_in;
 	
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]					internal_response;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0][3:0]					internal_response_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][3:0]						internal_response;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0][3:0]						internal_response_in;
 	
 	// to record if it is a load or a store instruction
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst_in;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst;
-	logic [`DCACHE_INDEX_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_load_inst_in;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0][`DCACHE_WAY-1:0]							internal_store_inst_in;
 	
-	logic [63:0]															read_data;
+	logic [63:0]																	read_data;
 	
 	// for LRU
-	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way;
-	logic [`DCACHE_INDEX_SIZE-1:0]											internal_way_next;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way;
+	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way_next;
 	
 					
 	
@@ -94,21 +94,24 @@ module dcache_mem(
 		data_is_dirty 							= 0;
 		store_data_out							= 0;
 		read_data_out							= 0;
+		read_data								= 0;
 		// store to memory
 		if (store_to_memory_enable)
 		begin
 			for (int j=0; j<`DCACHE_WAY; j++)
 			begin
-				if (internal_way==j)
+				if (internal_way[j]==1)
 				begin
 					store_data_out 				   = internal_data[index_in][j];
 					internal_valid_in[index_in][j] = 1'b0;
+					internal_way_next[j]		   = ~j;
 					break;
 				end
 				else
 				begin
 					store_data_out 				   = 0;
 					internal_valid_in[index_in][j] = internal_valid[index_in][j];
+					internal_way_next[j]		   = internal_way[j];
 				end
 			end
 		end	 
@@ -122,7 +125,7 @@ module dcache_mem(
 				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
 				begin
 					read_data	 		  		= internal_data[index_in][j];
-					internal_way_next[index_in]	= ~internal_way[index_in];
+					internal_way_next[index_in]	= ~j;
 					data_is_valid 		  		= 1'b1;
 					data_is_miss  		  		= 1'b0;
 					break;
@@ -176,18 +179,6 @@ module dcache_mem(
 					internal_store_inst_in[index_in][1]	= 1'b0;
 				end
 			end
-			else 
-			begin
-				internal_response_in					= internal_response;
-				internal_tag_in							= internal_tag;
-				data_is_dirty					        = 1'b0;
-				internal_load_inst_in					= internal_load_inst;
-				internal_store_inst_in					= internal_store_inst;
-			end
-		end
-		else
-		begin
-				read_data	 		  					= load_data_in;
 		end
 		
 		// load from memory
@@ -199,6 +190,14 @@ module dcache_mem(
 				internal_valid_in[i]			= 1'b1;
 				internal_dirty_in[i]			= 1'b0;
 				internal_response_in[i]			= 0;
+				if (i%`DCACHE_WAY==0)
+				begin
+					internal_way_next[i/2]		=1'b1;
+				end
+				else
+				begin
+					internal_way_next[i/2]		=1'b0;
+				end
 				read_data_out					= load_data_in;
 				break;
 			end
@@ -209,15 +208,19 @@ module dcache_mem(
 				internal_dirty_in[i]			= 1'b1;
 				internal_response_in[i]			= 0;
 				read_data_out					= read_data;
+				if (i%`DCACHE_WAY==0)
+				begin
+					internal_way_next[i/2]		=1'b1;
+				end
+				else
+				begin
+					internal_way_next[i/2]		=1'b0;
+				end
 				break;
 			end
 			else
 			begin
-				internal_data_in[i] 			= internal_data[i];
-				internal_valid_in[i]			= internal_valid[i];
-				internal_dirty_in[i]			= internal_dirty[i];
 				read_data_out					= read_data;
-				//internal_response_in[i]			= internal_response[i];
 			end
 		end
 		
@@ -264,7 +267,7 @@ module dcache_mem(
 					internal_data_in[index_in][j] 	= write_data_in;
 					internal_tag_in[index_in][j]	= tag_in;
 					internal_dirty_in[index_in][j] 	= 1'b1;
-					internal_way_next[index_in]		= ~internal_way[index_in];
+					internal_way_next[index_in]		= ~j;
 					data_is_valid 		    		= 1'b1;
 					data_is_miss  		  			= 1'b0;
 					break;
@@ -314,14 +317,6 @@ module dcache_mem(
 					internal_load_inst_in[index_in][1]	= 1'b0;
 					internal_store_inst_in[index_in][1] = 1'b1;
 				end
-			end
-			else 
-			begin
-				internal_response_in					= internal_response;
-				internal_tag_in							= internal_tag;
-				data_is_dirty					        = 1'b0;
-				internal_load_inst_in					= internal_load_inst;
-				internal_store_inst_in					= internal_store_inst;
 			end
 		end
 	end

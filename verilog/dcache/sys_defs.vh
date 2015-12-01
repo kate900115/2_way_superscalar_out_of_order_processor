@@ -341,12 +341,13 @@ typedef enum logic[1:0] {
 `define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE) 				//bit
 `define ICACHE_TAG_SIZE		64-`ICACHE_BLOCK_OFFSET-`INDEX_SIZE		//bit
 
-`define DCACHE_SIZE			2048 //bits size
-`define DCACHE_BLOCK_SIZE	64	 //bits size
-`define DCACHE_WAY			2	
-`define	DCACHE_INDEX_SIZE	$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//4 bits
-`define DCACHE_BLOCK_OFFSET	$clog2(`DCACHE_BLOCK_SIZE) 								//6 bits
-`define DCACHE_TAG_SIZE		64-`DCACHE_BLOCK_OFFSET-`DCACHE_INDEX_SIZE				//54 bits
+`define DCACHE_SIZE					2048 //bits size
+`define DCACHE_BLOCK_SIZE			64	 //bits size
+`define DCACHE_WAY					2
+`define DCACHE_INDEX_ENTRY_SIZE 	`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY)
+`define	DCACHE_INDEX_SIZE			$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//4 bits
+`define DCACHE_BLOCK_OFFSET			$clog2(`DCACHE_BLOCK_SIZE) 								//6 bits
+`define DCACHE_TAG_SIZE				64-`DCACHE_BLOCK_OFFSET-`DCACHE_INDEX_SIZE				//54 bits
 
 
 //for loadl_link and store_cond

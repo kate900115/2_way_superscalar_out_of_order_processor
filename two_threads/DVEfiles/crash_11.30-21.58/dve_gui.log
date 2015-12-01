@@ -1,0 +1,154 @@
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Nov 30 21:54 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/two_threads/inter.vpd' was opened successfully.
+---------------------------------------------
+
+The tool has just exited abnormally:
+
+
+Release = 'K-2015.09_Full64'  Architecture = 'amd64'  Program = 'DVE'
+
+'33100577 33137770 33139651 139864273485353'
+
+---------------------------------------------
+=======================DVE Context and Call Stack=========================
+
+An unexpected termination has occurred in /usr/caen/vcs-2015.09/gui/dve/linux64/bin/dve.exeHostname eecs1230p24.engin.umich.edu
+
+Tcl="gui_session_dialog -title Load Session -dir . -ok_btnname Load -mode ExistingFile -filter DVE Session Files (*.tcl);;Virsim Configuration (*.cfg);;All Files (*) " 
+Tcl="gui_dlg_load_session " 
+Command line: /usr/caen/vcs-2015.09/gui/dve/linux64/bin/dve.exe -full64 -ucliplatform=linux64 -toolargs "-ucligui -toolexe dve +vc +define+ +memcbk  -pid 14008" -toolin /tmp/vcs_20151201025443_14007_tianmili..stdin -toolout /tmp/vcs_20151201025443_14007_tianmili..stdout
+
+--- Stack trace follows:
+[New LWP 14039]
+[New LWP 14037]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+
+warning: Cannot parse .gnu_debugdata section; LZMA support was disabled at compile time
+0x00007f34b05ec0e9 in waitpid () from /lib64/libc.so.6
+
+Thread 3 (Thread 0x7f34ae685700 (LWP 14037)):
+#0  0x00007f34b2257ab2 in pthread_cond_timedwait@@GLIBC_2.3.2 () from /lib64/libpthread.so.0
+#1  0x00000000028b36fb in ?? ()
+#2  0x00000000028b3b8e in QThread::msleep(unsigned long) ()
+#3  0x00000000010dcf16 in ag::dveXThread::run() ()
+#4  0x00000000028b388a in QThreadInstance::start(void*) ()
+#5  0x00007f34b2253df5 in start_thread () from /lib64/libpthread.so.0
+#6  0x00007f34b06251ad in clone () from /lib64/libc.so.6
+
+Thread 2 (Thread 0x7f34aa684700 (LWP 14039)):
+#0  0x00007f34b225a9fd in open64 () from /lib64/libpthread.so.0
+#1  0x00000000011f5473 in ag::dveSmlSocket::run() ()
+#2  0x00000000028b388a in QThreadInstance::start(void*) ()
+#3  0x00007f34b2253df5 in start_thread () from /lib64/libpthread.so.0
+#4  0x00007f34b06251ad in clone () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7f34b4086840 (LWP 14022)):
+#0  0x00007f34b05ec0e9 in waitpid () from /lib64/libc.so.6
+#1  0x00007f34b0571072 in do_system () from /lib64/libc.so.6
+#2  0x00007f34b0571421 in system () from /lib64/libc.so.6
+#3  0x00007f34b367ddf8 in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313e639d2928478c79b3f673f99203bcf8be64600612100082236bffb2007f1e0ef9 () from /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+#4  0x00007f34b367e38d in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313e81c34e9ac4c8988ef4a6e067b3aa9271e9f15440f9e8f69ebc77e2fd65860faa () from /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+#5  0x00007f34b367f69b in SNPSle_10ee25eff68cd8461c9146fa1d0b35e87067f3c8015b313efba706aab251478fa49e66610e453774633a6c152e7ef778f2202cda681f3d4e () from /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+#6  0x00007f34b3678465 in SNPSle_d35ca1ff70d465c2b9b1a72eee90a506fdd009d3de3db1de () from /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+#7  0x0000000001f9a415 in ag::logErrorMessage(ag::errorType, QString const&, bool) ()
+#8  0x0000000001f9abc3 in ?? ()
+#9  0x00007f34b0567e29 in __run_exit_handlers () from /lib64/libc.so.6
+#10 0x00007f34b0567e95 in exit () from /lib64/libc.so.6
+#11 0x000000000111f956 in VCS_EXIT ()
+#12 0x00000000011df162 in SigHandler ()
+#13 <signal handler called>
+#14 0x00007f34b061c8f3 in select () from /lib64/libc.so.6
+#15 0x000000000287c80c in QEventLoop::processEvents(unsigned int) ()
+#16 0x000000000111e651 in ag::ovaEventLoop::processEvents(unsigned int) ()
+#17 0x00000000028ca039 in QEventLoop::enterLoop() ()
+#18 0x0000000002a3f273 in QDialog::exec() ()
+#19 0x0000000002249bab in QtclCustomDlgMgr::qtcl_operate_widget(char const*, char const*, int, bool, bool, bool, bool, bool, bool, bool, bool, bool, char const*, char const*) ()
+#20 0x00000000022c3151 in QtclUtils::executeModalDialog(QDialog*) ()
+#21 0x00000000011ea42d in dveSessionDialogImpl::gui_session_dialog(char const*, char const*, char const*, char const*, char const*, QStringList const&, char const*) ()
+#22 0x000000000116752f in ?? ()
+#23 0x000000000267cf8e in cci_check_command ()
+#24 0x00000000027ec26f in TclInvokeStringCommand ()
+#25 0x00000000027ed892 in TclEvalObjvInternal ()
+#26 0x0000000002812319 in ?? ()
+#27 0x0000000002816d76 in TclCompEvalObj ()
+#28 0x000000000283afa0 in TclObjInterpProc ()
+#29 0x00000000027ed892 in TclEvalObjvInternal ()
+#30 0x00000000027ee6db in Tcl_EvalObjv ()
+#31 0x00000000027ee83e in Tcl_EvalObjEx ()
+#32 0x000000000283b597 in Tcl_UplevelObjCmd ()
+#33 0x00000000027ed892 in TclEvalObjvInternal ()
+#34 0x0000000002812319 in ?? ()
+#35 0x0000000002816d76 in TclCompEvalObj ()
+#36 0x00000000027ee894 in Tcl_EvalObjEx ()
+#37 0x00000000027f4e2b in Tcl_CatchObjCmd ()
+#38 0x00000000027ed892 in TclEvalObjvInternal ()
+#39 0x0000000002812319 in ?? ()
+#40 0x0000000002816d76 in TclCompEvalObj ()
+#41 0x000000000283afa0 in TclObjInterpProc ()
+#42 0x00000000027ed892 in TclEvalObjvInternal ()
+#43 0x00000000027ee6db in Tcl_EvalObjv ()
+#44 0x000000000282a8f9 in ?? ()
+#45 0x00000000027ed892 in TclEvalObjvInternal ()
+#46 0x00000000027edbdf in Tcl_EvalEx ()
+#47 0x000000000267a00c in ?? ()
+#48 0x000000000222fdc9 in ek_exec_cci_command_2(EkTclObjHandle&, cci_interp_s*, char const*, int, int, int, int, int, int, int) ()
+#49 0x000000000222a060 in EkTclShellExecImpl::TExecCommandIF::runCommand(QString&) ()
+#50 0x0000000002233550 in EkShellExecutionImpl::TExecCommand::run() ()
+#51 0x0000000002232ead in EkShellExecutionImpl::startRun(EkShellExecutionImpl::TExecCommand*, EkTriState, EkTriState) ()
+#52 0x0000000002233000 in EkShellExecutionImpl::executeSync(QString const&, bool, bool, bool, QString*, EkShellDefs::TCmdSrc, bool, EkTriState, EkTriState, bool) ()
+#53 0x0000000001f9dc00 in utilEkShellImpl::executeSync(QString const&, bool, bool, bool, QString*, EkShellDefs::TCmdSrc, bool, EkTriState, EkTriState, bool) ()
+#54 0x00000000021c958d in EkTclAction::slotExecTcl() ()
+#55 0x00000000021de57d in EkTclAction::qt_invoke(int, QUObject*) ()
+#56 0x00000000029074e2 in QObject::activate_signal(QConnectionList*, QUObject*) ()
+#57 0x00000000029075a2 in QObject::activate_signal(int) ()
+#58 0x0000000002b91975 in QAction::qt_invoke(int, QUObject*) ()
+#59 0x00000000021de464 in EkAction::qt_invoke(int, QUObject*) ()
+#60 0x00000000021de5a0 in EkTclAction::qt_invoke(int, QUObject*) ()
+#61 0x00000000029074e2 in QObject::activate_signal(QConnectionList*, QUObject*) ()
+#62 0x0000000002b7556c in QSignal::signal(QVariant const&) ()
+#63 0x000000000291814f in QSignal::activate() ()
+#64 0x00000000029d7daf in QPopupMenu::mouseReleaseEvent(QMouseEvent*) ()
+#65 0x0000000002931900 in QWidget::event(QEvent*) ()
+#66 0x00000000028b9e45 in QApplication::internalNotify(QObject*, QEvent*) ()
+#67 0x00000000028ba1d5 in QApplication::notify(QObject*, QEvent*) ()
+#68 0x000000000200df06 in EkExtQtApp::notify(QObject*, QEvent*) ()
+#69 0x0000000001fe056d in ag::baseQtApp::notify(QObject*, QEvent*) ()
+#70 0x000000000286fd69 in QETWidget::translateMouseEvent(_XEvent const*) ()
+#71 0x000000000286e540 in QApplication::x11ProcessEvent(_XEvent*) ()
+#72 0x000000000287c6ca in QEventLoop::processEvents(unsigned int) ()
+#73 0x000000000111e651 in ag::ovaEventLoop::processEvents(unsigned int) ()
+#74 0x00000000028ca039 in QEventLoop::enterLoop() ()
+#75 0x00000000028c9f9a in QEventLoop::exec() ()
+#76 0x000000000111dfbf in run_cci_event_loop ()
+#77 0x00000000010ddae4 in ag::ovaAppInst::enterEventLoop(int, char**) ()
+#78 0x0000000000de2c2f in main ()
+Completed context dump data
+==========================================================================
