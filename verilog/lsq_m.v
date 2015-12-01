@@ -333,7 +333,7 @@ module lsq(
 		st_in2 = 0;
 		ld_idx1 = 0;
 		ld_idx2 = 0;
-		st_indx1 = 0;
+		st_idx1 = 0;
 		st_idx2 = 0;
 
 		n_lq_reg_addr 		= lq_reg_addr;
@@ -415,7 +415,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i] || i== ld_idx1)
 						lq_dep[i][round_j] = NO_DEP_ORDER;
@@ -446,7 +446,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid1;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid1;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i])
 						lq_dep[i][round_j] = NO_DEP_ORDER;
@@ -488,7 +488,7 @@ module lsq(
 
 			else if(id_wr_mem_in2) begin   //store + store
 			for(round_j=sq_head +1 ; round_j!=sq_tail && round_j !=sq_tail+1; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && st_in1 && round_j!=st_indx1 && !st_in2) begin
+				if(!sq_reg_addr_valid[round_j] && st_in1 && round_j!=st_idx1 && !st_in2) begin
 					n_sq_head 					= sq_head;
 					n_sq_tail 					= sq_tail+2;
 					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_new2; 
@@ -500,7 +500,7 @@ module lsq(
 					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
 					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
 					st_in1 						= 1;
-					st_indx1					= round_j;
+					st_idx1					= round_j;
 					for(int i=0; i<`LQ_SIZE; i++) begin
 						if(lq_reg_inst_valid[i])
 						lq_dep[i][round_j] = NO_DEP_ORDER;
@@ -595,7 +595,7 @@ module lsq(
 			end //if			
 
 			//store to mem 
-			if(sq_rob_idx[sq_head]==rob_commit_idx1 | rob_commit_idx2) begin
+			if(sq_rob_idx[sq_head]==rob_commit_idx1 | sq_rob_idx[sq_head]==rob_commit_idx2) begin
 				instr_store_to_mem1 = sq_reg_data[sq_head];
 				n_sq_head = sq_head +1;
 				instr_store_to_mem_valid1 = 1;
@@ -603,7 +603,7 @@ module lsq(
 				rob1_excuted = 1;
 				n_sq_reg_inst_valid[sq_head] = 0;
 			end
-			if(sq_rob_idx[sq_head+1]==rob_commit_idx2) rob2_excuted = 0;
+			if(rob_commit_idx1 && rob_commit_idx2) rob2_excuted = 0;
 
 			//load retires
 			for(int i=0; i<`LQ_SIZE; i++) begin	
