@@ -74,6 +74,92 @@ module test_dcache_mem;
 		#5;
 		@(negedge clock);
 		$display("@@@ stop reset!!");
+		$display("@@@ the first data send in, miss, not dirty");
+		$display("@@@ index=2, tag=1");
+		reset 					= 0;						
+		index_in 				= 4'b0010;
+		tag_in					= 54'h0_0000_0000_0001;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0001;
+		mem_tag					= 0;
+		store_to_memory_enable	= 0;
+		load_data_in			= 0;
+		
+		@(negedge clock);
+		$display("@@@ the second data send in, miss, not dirty");
+		$display("@@@ index=3, tag=2");
+		reset 					= 0;						
+		index_in 				= 4'b0011;
+		tag_in					= 54'h0_0000_0000_0002;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0010;
+		mem_tag					= 0;
+		store_to_memory_enable	= 0;
+		load_data_in			= 0;
+		
+		@(negedge clock);
+		$display("@@@ the third data send in, miss, not dirty");
+		$display("@@@ index=4, tag=3");
+		reset 					= 0;						
+		index_in 				= 4'b0100;
+		tag_in					= 54'h0_0000_0000_0003;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0011;
+		mem_tag					= 0;
+		store_to_memory_enable	= 0;
+		load_data_in			= 0;
+		
+		@(negedge clock);
+		$display("@@@ the 4th data send in, miss, not dirty");
+		$display("@@@ index=5, tag=4");
+		$display("@@@ the first result return");
+		reset 					= 0;						
+		index_in 				= 4'b0101;
+		tag_in					= 54'h0_0000_0000_0004;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0100;
+		mem_tag					= 4'b0001;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0000_0000_0000_ffff;
+		
+		@(negedge clock);
+		$display("@@@ the 5th data send in, miss, not dirty");
+		$display("@@@ index=4, tag=1");
+		$display("@@@ the second result return");
+		reset 					= 0;						
+		index_in 				= 4'b0100;
+		tag_in					= 54'h0_0000_0000_0001;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0100;
+		mem_tag					= 4'b0010;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0000_0000_0000_abcd;
+		
+		@(negedge clock);
+		$display("@@@ the 6th data send in, not miss, not dirty");
+		$display("@@@ index=2, tag=1");
+		reset 					= 0;						
+		index_in 				= 4'b0010;
+		tag_in					= 54'h0_0000_0000_0001;
+		read_enable				= 1'b1;
+		write_enable			= 0;
+		write_data_in			= 0;
+		mem_response			= 4'b0100;
+		mem_tag					= 4'b0000;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0000_0000_0000_0000;
+		
+		@(negedge clock);
 		reset 					= 0;						
 		index_in 				= 0;
 		tag_in					= 0;
@@ -84,22 +170,7 @@ module test_dcache_mem;
 		mem_tag					= 0;
 		store_to_memory_enable	= 0;
 		load_data_in			= 0;
-		
 		@(negedge clock);
-		$display("@@@ ");
-		reset 					= 0;						
-		index_in 				= 0;
-		tag_in					= 0;
-		read_enable				= 0;
-		write_enable			= 0;
-		write_data_in			= 0;
-		mem_response			= 0;
-		mem_tag					= 0;
-		store_to_memory_enable	= 0;
-		load_data_in			= 0;
-		
-		@(negedge clock);
-		
 		$finish;
 	end
 		
