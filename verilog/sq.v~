@@ -152,6 +152,7 @@ module sq(
 					n_sq_reg_addr_valid[round_j]= lsq_ra_data2;
 					n_sq_reg_data_valid[round_j]= lsq_ra_data_valid2;
 					if(round_j==sq_t1_tail+st_in1) break;
+					$display("HHH");
 					
 				end
 			end 	//for

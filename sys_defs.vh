@@ -67,6 +67,9 @@ typedef enum logic [1:0] {
   NO_IDEA				=2'h3
 } LSQ_DEP_CODE;
 
+
+`define SQ_SIZE 8
+`define LQ_SIZE 8
 //
 // ALU opA input mux selects
 //
