@@ -332,7 +332,25 @@ module rob(
 			commit1_is_illegal_out	= rob1_internal_is_illegal_out[t1_head];
 			commit1_inst_out		= rob1_internal_inst_out[t1_head];
 			rob1_internal_if_committed[t1_head] = 1;
-			if (rob1_internal_is_ex_out[t1_head+1] && t1_head!=4'hf && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			if (rob1_internal_is_ex_out[t1_head+4'b1] && t1_head+4'b1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			begin
+				commit2_pc_out			= rob1_internal_pc_out[t1_head+4'b1];
+				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+4'b1];
+				commit2_is_branch_out	= rob1_internal_is_branch_out[t1_head+4'b1];
+				commit2_mispredict_out	= rob1_internal_mispredict_out[t1_head+4'b1];
+				commit2_arn_dest_out	= rob1_internal_arn_dest_out[t1_head+4'b1];
+				commit2_prn_dest_out	= rob1_internal_prn_dest_out[t1_head+4'b1];
+				commit2_if_rename_out	= rob1_internal_if_rename_out[t1_head+4'b1];
+				commit2_is_thread1		= rob1_internal_is_thread1_out[t1_head+4'b1];
+				commit2_is_halt_out		= rob1_internal_is_halt_out[t1_head+4'b1];
+				commit2_is_illegal_out	= rob1_internal_is_illegal_out[t1_head+4'b1];
+				commit2_inst_out		= rob1_internal_inst_out[t1_head+4'b1];
+				rob1_internal_if_committed[t1_head+4'b1] = 1;
+				next_t1_head = t1_head + 2;
+				commit1_valid = 1;
+				commit2_valid = 1;
+			end
+			/*if (rob1_internal_is_ex_out[t1_head+1] && t1_head!=4'hf && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
 				commit2_pc_out			= rob1_internal_pc_out[t1_head+1];
 				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+1];
@@ -349,9 +367,9 @@ module rob(
 				next_t1_head = t1_head + 2;
 				commit1_valid = 1;
 				commit2_valid = 1;
-			end
+			end*/
 
-			else if (rob1_internal_is_ex_out[0] && t1_head==4'hf && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			/*else if (rob1_internal_is_ex_out[0] && t1_head==4'hf && t1_head+1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
 				commit2_pc_out			= rob1_internal_pc_out[0];
 				commit2_target_pc_out	= rob1_internal_target_pc_out[0];
@@ -368,7 +386,7 @@ module rob(
 				next_t1_head = t1_head + 2;
 				commit1_valid = 1;
 				commit2_valid = 1;
-			end
+			end*/
 
 
 			else if (rob2_internal_is_ex_out[t2_head] && (t2_head != t2_tail || (t2_head == t2_tail && !rob2_internal_available_out[t2_tail])))
@@ -409,7 +427,25 @@ module rob(
 			commit1_is_illegal_out	= rob2_internal_is_illegal_out[t2_head];
 			commit1_inst_out		= rob2_internal_inst_out[t2_head];
 			rob2_internal_if_committed[t2_head] = 1;
-			if (rob2_internal_is_ex_out[t2_head+1]  && t2_head!=4'hf && t2_head+1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			if (rob2_internal_is_ex_out[t2_head+4'b1] && t2_head+1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			begin
+				commit2_pc_out			= rob2_internal_pc_out[t2_head+4'b1];
+				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head+4'b1];
+				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head+4'b1];
+				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head+4'b1];
+				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head+4'b1];
+				commit2_prn_dest_out	= rob2_internal_prn_dest_out[t2_head+4'b1];
+				commit2_if_rename_out	= rob2_internal_if_rename_out[t2_head+4'b1];
+				commit2_is_thread1		= rob2_internal_is_thread1_out[t2_head+4'b1];
+				commit2_is_halt_out		= rob2_internal_is_halt_out[t2_head+4'b1];
+				commit2_is_illegal_out	= rob2_internal_is_illegal_out[t2_head+4'b1];
+				commit2_inst_out		= rob2_internal_inst_out[t2_head+4'b1];
+				rob2_internal_if_committed[t2_head+4'b1] = 1;
+				next_t2_head = t2_head + 2;
+				commit1_valid = 1;
+				commit2_valid = 1;
+			end
+			/*if (rob2_internal_is_ex_out[t2_head+1]  && t2_head!=4'hf && t2_head+1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
 			begin
 				commit2_pc_out			= rob2_internal_pc_out[t2_head+1];
 				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head+1];
@@ -444,7 +480,7 @@ module rob(
 				next_t2_head = t2_head + 2;
 				commit1_valid = 1;
 				commit2_valid = 1;
-			end
+			end*/
 			else begin
 				next_t2_head = t2_head + 1;
 				commit1_valid = 1;
