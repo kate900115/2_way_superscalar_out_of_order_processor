@@ -234,6 +234,21 @@ module test_dcache_mem;
 		load_data_in			= 64'h0000_0000_7777_7007;
 		
 		@(negedge clock);
+		$display("@@@ send in the write instruction again");
+		$display("@@@ index=14, tag=9, it is write!");
+		$display("@@@ the result is hitted");
+		reset 					= 0;						
+		index_in 				= 4'b1110;
+		tag_in					= 54'h0_0000_0000_0009;
+		read_enable				= 1'b0;
+		write_enable			= 1'b1;
+		write_data_in			= 64'h0000_0000_0010_0111;
+		mem_response			= 4'b0000;
+		mem_tag					= 4'b1110;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0000_0000_cccc_7007;
+		
+		@(negedge clock);
 		reset 					= 0;						
 		index_in 				= 0;
 		tag_in					= 0;
