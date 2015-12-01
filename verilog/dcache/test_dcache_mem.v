@@ -204,6 +204,23 @@ module test_dcache_mem;
 		load_data_in			= 64'h0000_0000_5678_1234;
 		
 		@(negedge clock);
+		$display("@@@ the 10th request send in, miss, not dirty");
+		$display("@@@ index=14, tag=9, it is write!");
+		$display("@@@ the fifth result return");
+		reset 					= 0;						
+		index_in 				= 4'b1110;
+		tag_in					= 54'h0_0000_0000_0009;
+		read_enable				= 1'b0;
+		write_enable			= 1'b1;
+		write_data_in			= 64'h0000_0000_0010_0111;
+		mem_response			= 4'b0000;
+		mem_tag					= 4'b0101;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0000_0000_1234_1234;
+		
+
+		
+		@(negedge clock);
 		reset 					= 0;						
 		index_in 				= 0;
 		tag_in					= 0;

@@ -169,11 +169,11 @@ module dcache_mem(
 					internal_load_inst_in[index_in][0]	= 1'b1;
 					internal_store_inst_in[index_in][0]	= 1'b0;
 				end
-				else
+				else  if ((internal_way[index_in]==1)&&(!internal_dirty[index_in][1]))
 				begin
 					internal_response_in[index_in][1]	= mem_response;
 					internal_tag_in[index_in][1]		= tag_in;
-					internal_valid_in[index_in][0] 		= 1'b0;
+					internal_valid_in[index_in][1] 		= 1'b0;
 					data_is_dirty			  			= 1'b0;
 					internal_load_inst_in[index_in][1]	= 1'b1;
 					internal_store_inst_in[index_in][1]	= 1'b0;
@@ -285,7 +285,7 @@ module dcache_mem(
 			
 			if (data_is_miss)
 			begin
-				if ((internal_way==0) && (internal_dirty[index_in][0])) 
+				if ((internal_way[index_in]==0) && (internal_dirty[index_in][0])) 
 				begin
 					internal_response_in[index_in][0]	= 0; //?
 					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
@@ -293,7 +293,7 @@ module dcache_mem(
 					internal_load_inst_in[index_in][0]	= 1'b0;
 					internal_store_inst_in[index_in][0]	= 1'b1;
 				end
-				else if ((internal_way==1) && (internal_dirty[index_in][1]))
+				else if ((internal_way[index_in]==1) && (internal_dirty[index_in][1]))
 				begin
 					internal_response_in[index_in][1]	= 0; //?
 					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
@@ -301,7 +301,7 @@ module dcache_mem(
 					internal_load_inst_in[index_in][1]	= 1'b0;
 					internal_store_inst_in[index_in][1]	= 1'b1;
 				end
-				else if ((internal_way==0) && (!internal_dirty[index_in][0]))
+				else if ((internal_way[index_in]==0) && (!internal_dirty[index_in][0]))
 				begin
 					internal_response_in[index_in][0]	= mem_response;
 					internal_tag_in[index_in][0]		= tag_in;
@@ -309,7 +309,7 @@ module dcache_mem(
 					internal_load_inst_in[index_in][0]	= 1'b0;
 					internal_store_inst_in[index_in][0]	= 1'b1;
 				end
-				else
+				else if ((internal_way[index_in]==1) && (!internal_dirty[index_in][1]))
 				begin
 					internal_response_in[index_in][1]	= mem_response;
 					internal_tag_in[index_in][1]		= tag_in;
