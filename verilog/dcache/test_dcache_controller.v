@@ -32,7 +32,6 @@ module test_dcache_controller;
 	logic [63:0]					write_data_to_Dcache;	// data that send to dcache.v
 	logic [3:0]						mem_response;
 	logic [3:0]						mem_tag;
-	logic							store_to_mem_enable;
 
 	dcache_controller(
 		// input 
@@ -59,8 +58,7 @@ module test_dcache_controller;
 		.write_enable(write_enable),     
 		.write_data_to_Dcache(write_data_to_Dcache),	
 		.mem_response(mem_response),
-		.mem_tag(mem_tag),
-		.store_to_mem_enable(store_to_mem_enable)
+		.mem_tag(mem_tag)
 );
 
 	task exit_on_error;
@@ -85,10 +83,9 @@ module test_dcache_controller;
 						write_enable:%b\n\
 						write_data_to_Dcache:%h,\n\
 						mem_response:%b,\n\
-						mem_tag:%d,\n\
-						store_to_mem_enable:%b",
+						mem_tag:%d",
 				$time, proc2Dmem_command, proc2Dmem_addr, Dcache_data_out, Dcache2proc_tag, Dcache2proc_response, Dcache_data_hit, index,
-				tag, read_enable, write_enable, write_data_to_Dcache, mem_response, mem_tag, store_to_mem_enable);
+				tag, read_enable, write_enable, write_data_to_Dcache, mem_response, mem_tag);
 
 	#10;
 	$display("@@@ ");
