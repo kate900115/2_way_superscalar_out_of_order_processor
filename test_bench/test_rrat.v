@@ -67,8 +67,8 @@ initial begin
 			PRF_free_idx1:%b, \
 		        PRF_free_valid2:%b, \
 			PRF_free_idx2:%b, \
-			mispredict_up_idx:%b, rrat_reg[RoB_ARF_idx1]:%b, RoB_ARF_idx1:%b",
-			$time, clock, PRF_free_valid1, PRF_free_idx1, PRF_free_valid2, PRF_free_idx2,mispredict_up_idx, rrat1.rrat_reg[RoB_ARF_idx1], RoB_ARF_idx1);
+			mispredict_up_idx:%b,  RoB_ARF_idx1:%b",
+			$time, clock, PRF_free_valid1, PRF_free_idx1, PRF_free_valid2, PRF_free_idx2, mispredict_up_idx, RoB_ARF_idx1);
 
 
 	clock = 0;
