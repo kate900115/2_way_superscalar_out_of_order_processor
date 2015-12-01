@@ -51,10 +51,10 @@
 typedef enum logic [3:0] {
   NO_ERROR               = 4'h0,
   HALTED_ON_MEMORY_ERROR = 4'h1,
-  HALTED_ON_HALT_I1         = 4'h2,
-  HALTED_ON_ILLEGAL_I1      = 4'h3,
-  HALTED_ON_HALT_I2         = 4'h4,
-  HALTED_ON_ILLEGAL_I2      = 4'h5
+  HALTED_ON_HALT_I1      = 4'h2,
+  HALTED_ON_ILLEGAL_I1   = 4'h3,
+  HALTED_ON_HALT_I2      = 4'h4,
+  HALTED_ON_ILLEGAL_I2   = 4'h5
 } ERROR_CODE;
 
 //
@@ -351,6 +351,8 @@ typedef enum logic[1:0] {
 
 //for loadl_link and store_cond
 `define LLSC_SIZE	8
+`define LQ_SIZE		8
+`define SQ_SIZE		8
 
 typedef enum logic[2:0] {
 	NO_INST			= 3'b000,
