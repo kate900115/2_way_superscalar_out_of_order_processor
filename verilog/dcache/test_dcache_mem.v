@@ -22,6 +22,7 @@ module test_dcache_mem;
 	logic									data_is_dirty;
 	logic									data_is_miss;
 	logic [`DCACHE_BLOCK_SIZE-1:0]			read_data_out;
+	logic									cache_is_full;
 	
 	dcache_mem dmem(
 		// input
@@ -42,7 +43,8 @@ module test_dcache_mem;
 		.data_is_valid(data_is_valid),
 		.data_is_dirty(data_is_dirty),
 		.data_is_miss(data_is_miss),
-		.data_out(read_data_out)
+		.data_out(read_data_out),
+		.cache_is_full(cache_is_full)
 	);
 	
 	always #5 clock = ~clock;
@@ -62,9 +64,10 @@ module test_dcache_mem;
 						data_is_valid:%d, \n\
 						data_is_dirty:%d, \n\
 						data_is_miss:%d,\n\
-						read_data_out:%h",//for debug
+						read_data_out:%h,\n\
+						cache_is_full:%b",//for debug
 				$time, clock, 
-				store_data_out,data_is_valid,data_is_dirty,data_is_miss,read_data_out);
+				store_data_out,data_is_valid,data_is_dirty,data_is_miss,read_data_out,cache_is_full);
 
 
 		clock = 0;
@@ -247,6 +250,48 @@ module test_dcache_mem;
 		mem_tag					= 4'b1110;
 		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_cccc_7007;
+		
+		@(negedge clock);
+		$display("@@@ the 11st request send in, miss, not dirty");
+		$display("@@@ index=15, tag=6, it is read!");
+		reset 					= 0;						
+		index_in 				= 4'b1111;
+		tag_in					= 54'h0_0000_0000_0006;
+		read_enable				= 1'b1;
+		write_enable			= 1'b0;
+		write_data_in			= 64'h0;
+		mem_response			= 4'b1001;
+		mem_tag					= 4'b0000;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0;
+		
+		@(negedge clock);
+		$display("@@@ the 12nd request send in, miss, not dirty");
+		$display("@@@ index=15, tag=3, it is read!");
+		reset 					= 0;						
+		index_in 				= 4'b1111;
+		tag_in					= 54'h0_0000_0000_0003;
+		read_enable				= 1'b1;
+		write_enable			= 1'b0;
+		write_data_in			= 64'h0;
+		mem_response			= 4'b1101;
+		mem_tag					= 4'b0000;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0;
+		
+		@(negedge clock);
+		$display("@@@ the 12nd request send in, miss, not dirty");
+		$display("@@@ index=15, tag=2, it is read!");
+		reset 					= 0;						
+		index_in 				= 4'b1111;
+		tag_in					= 54'h0_0000_0000_0002;
+		read_enable				= 1'b1;
+		write_enable			= 1'b0;
+		write_data_in			= 64'h0;
+		mem_response			= 4'b0000;
+		mem_tag					= 4'b0000;
+		store_to_memory_enable	= 0;
+		load_data_in			= 64'h0;
 		
 		@(negedge clock);
 		reset 					= 0;						

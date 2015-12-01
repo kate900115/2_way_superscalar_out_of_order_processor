@@ -21,6 +21,7 @@ module dcache_mem(
 	output logic									data_is_valid,
 	output logic									data_is_dirty,  // data which need to be replaced is dirty
 	output logic									data_is_miss,
+	output logic									cache_is_full,
 	output logic [`DCACHE_BLOCK_SIZE-1:0]			data_out
 	);
 	
@@ -96,6 +97,7 @@ module dcache_mem(
 		data_is_dirty 							= 0;
 		store_data_out							= 0;
 		read_data								= load_data_in;
+		cache_is_full							= 1'b0;
 		
 		// for read
 		if (read_enable)
@@ -123,6 +125,11 @@ module dcache_mem(
 			// if miss, is it dirty?
 			if (data_is_miss)
 			begin
+				if (((internal_way[index_in]==0) && (internal_response[index_in][0]!=0))||
+				   ((internal_way[index_in]==1) && (internal_response[index_in][1]!=0)))
+				begin
+					cache_is_full						= 1'b1;
+				end
 				if ((internal_way[index_in]==0)&&(internal_dirty[index_in][0]))
 				begin
 					internal_way_next[index_in]			= internal_way[index_in];
@@ -191,9 +198,15 @@ module dcache_mem(
 					data_is_miss  		 			= 1'b1;
 				end
 			end
+			
 			if (data_is_miss)
 			begin
-				if ((internal_way[index_in]==0) && (internal_dirty[index_in][0])) 
+				if (((internal_way[index_in]==0) && (internal_response[index_in][0]!=0))||
+				   ((internal_way[index_in]==1) && (internal_response[index_in][1]!=0)))
+				begin
+					cache_is_full						= 1'b1;
+				end
+				else if ((internal_way[index_in]==0) && (internal_dirty[index_in][0])) 
 				begin
 					internal_way_next[index_in]			= internal_way[index_in];
 					internal_response_in[index_in][0]	= 0; 
