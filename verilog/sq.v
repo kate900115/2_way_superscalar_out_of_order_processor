@@ -44,7 +44,9 @@ module sq(
 	output	logic	[4:0]						mem_store_idx,
 	
 	output	logic								rob1_excuted,
-	output	logic								rob2_excuted
+	output	logic								rob2_excuted,
+	output	logic								t1_is_full,
+	output	logic								t2_is_full
 );
 
 	//SQ
@@ -193,23 +195,23 @@ module sq(
 		//store to mem 
 		rob1_excuted = 0;
 		rob2_excuted = 0;
-		if(sq_rob_idx[sq_t1_head]==(rob_commit_idx1 |rob_commit_idx1) begin
+		if(sq_rob_idx[sq_t1_head]==(rob_commit_idx1 |rob_commit_idx2) begin
 			instr_store_to_mem1 = sq_reg_data[sq_t1_head];
 			n_sq_t1_head = sq_t1_head +1;
 			instr_store_to_mem_valid1 = 1;
 			mem_store_idx = sq_reg_addr[sq_t1_head];
-			rob1_excuted = 1;
+			rob1_excuted = rob_commit_idx1;
+			rob2_excuted = (rob_commit_idx1 && rob_commit_idx2) ? 0:rob_commit_idx2;
 			n_sq_reg_inst_valid[sq_t1_head] = 0;
 		end
-		if(sq_rob_idx[sq_t2_head]==rob_commit_idx2)) begin
+		if(sq_rob_idx[sq_t2_head]==rob_commit_idx2 & !rob1_excuted)) begin
 			instr_store_to_mem1 = sq_reg_data[sq_t2_head];
 			n_sq_t2_head = sq_t2_head +1;
 			instr_store_to_mem_valid1 = 1;
 			mem_store_idx = sq_reg_addr[sq_t2_head];
-			rob1_excuted = 1;
+			rob2_excuted = 1;
 			n_sq_reg_inst_valid[sq_t2_head] = 0;
 		end		
-		if(rob_commit_idx1 && rob_commit_idx2) rob2_excuted = 0;
 		
 		//mispredict
 		if(thread1_mispredict)begin
@@ -217,5 +219,14 @@ module sq(
 		end
 		if(thread2_mispredict)begin
 			n_sq_t2_tail = n_sq_t2_head;
+		end
+		
+		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head) || (sq_t1_tail == sq_t1_head))				//**************************** 
+		begin
+			t1_is_full = 1;
+		end
+		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head) || (sq_t2_tail == sq_t2_head))
+		begin
+			t2_is_full = 1;
 		end
 	end
