@@ -52,7 +52,7 @@ module dcache_controller(
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_LOAD;
-						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:0],3'b0};
+						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:3],3'b0};
 						// to dcache.v
 						// for present inst
 						mem_response	  		 = Dmem2proc_response;
@@ -211,6 +211,27 @@ module dcache_controller(
 						// for previous instruction
 						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = 0;
+				end
+			default:
+				begin
+					// to mem.v
+					proc2Dmem_command		 = BUS_NONE;
+					proc2Dmem_addr 	 		 = 0;
+					// to dcache.v
+					mem_response			 = Dmem2proc_response;
+					mem_tag			  		 = Dmem2proc_tag;
+					read_enable 		     = 1'b0;
+					write_enable			 = 1'b0;    
+					// to proc.v
+					// for current instruction
+					if (cachemem_is_full)
+						Dcache2proc_response = 0;
+					else
+						Dcache2proc_response = Dmem2proc_response;
+					Dcache_data_hit			 = 0;
+					// for previous instruction
+					Dcache_data_out  		 = cachemem_data;
+					Dcache2proc_tag  		 = 0;
 				end
 		endcase
 	end	

@@ -72,13 +72,13 @@ module test_dcache_controller;
 	initial begin
 		$monitor(" @@@  time:%d, \n\
 						proc2Dmem_command:%b, \n\
-						proc2Dmem_addr:%h, \n\
+						proc2Dmem_addr:%b, \n\
 						Dcache_data_out:%h, \n\
 						Dcache2proc_tag:%d\n\
 						Dcache2proc_response:%d\n\
 						Dcache_data_hit:%b, \n\
-						index:%h, \n\
-						tag:%h, \n\
+						index:%b, \n\
+						tag:%b, \n\
 						read_enable:%b\n\
 						write_enable:%b\n\
 						write_data_to_Dcache:%h,\n\
@@ -88,27 +88,64 @@ module test_dcache_controller;
 				tag, read_enable, write_enable, write_data_to_Dcache, mem_response, mem_tag);
 
 	#10;
-	$display("@@@ ");
+	$display("@@@ load data and hit!");
 		Dmem2proc_response=0;
 		Dmem2proc_tag=0;
-		cachemem_data=0;
-		cachemem_valid=0;
+		cachemem_data=64'h0000_0000_0000_ffff;
+		cachemem_valid=1;
 		cachemem_is_dirty=0;
 		cachemem_is_miss=0;
-		proc2Dcache_addr=0;
-		proc2Dcache_command=0;
+		proc2Dcache_addr=64'h0000_0000_0000_8888;
+		proc2Dcache_command=BUS_LOAD;
 		proc2Dcache_data=0;
 	#10;
-	$display("@@@ ");
-		Dmem2proc_response=0;
+	$display("@@@ load data and miss, not dirty!");
+		Dmem2proc_response=4'b0001;
 		Dmem2proc_tag=0;
 		cachemem_data=0;
 		cachemem_valid=0;
 		cachemem_is_dirty=0;
-		cachemem_is_miss=0;
-		proc2Dcache_addr=0;
-		proc2Dcache_command=0;
+		cachemem_is_miss=1;
+		proc2Dcache_addr=64'h0000_0000_0000_8008;
+		proc2Dcache_command=BUS_LOAD;
 		proc2Dcache_data=0;
+	#10;
+	$display("@@@ load data and miss, dirty!");
+		Dmem2proc_response=4'b0010;
+		Dmem2proc_tag=0;
+		cachemem_data=0;
+		cachemem_valid=0;
+		cachemem_is_dirty=1;
+		cachemem_is_miss=1;
+		proc2Dcache_addr=64'h0000_0000_0001_9208;
+		proc2Dcache_command=BUS_LOAD;
+		proc2Dcache_data=0;
+	#10;
+	$display("@@@ load data and hit!");
+	$display("@@@ data from memory is returned!");
+	$display("@@@ we will only receive the data from memory!");
+		Dmem2proc_response=4'b0000;
+		Dmem2proc_tag=4'b0001;
+		cachemem_data=15;
+		cachemem_valid=1;
+		cachemem_is_dirty=0;
+		cachemem_is_miss=0;
+		proc2Dcache_addr=64'h0000_0000_0002_7238;
+		proc2Dcache_command=BUS_LOAD;
+		proc2Dcache_data=0;
+	#10;
+	$display("@@@ store data and hit!");
+	$display("@@@ data from memory is returned!");
+		Dmem2proc_response=4'b0000;
+		Dmem2proc_tag=4'b0010;
+		cachemem_data=4;
+		cachemem_valid=1;
+		cachemem_is_dirty=0;
+		cachemem_is_miss=0;
+		proc2Dcache_addr=64'h0000_0000_0000_3746;
+		proc2Dcache_command=BUS_STORE;
+		proc2Dcache_data=0;
+	#10;
 	$finish;
 end
 	
