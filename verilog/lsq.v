@@ -71,7 +71,7 @@ module lsq(
 	input  [63:0] 								lsq_opa_in2,      	// Operand a from Rename  data
 	input  [63:0] 								lsq_opb_in2,     	// Operand b from Rename  tag or data from prf
 	input         								lsq_opb_valid2,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	input  [$clog2(`ROB_SIZE)-1:0]				lsq_rob_idx_in2,  	// The rob index of instruction 2
+	input  [$clog2(`ROB_SIZE):0]				lsq_rob_idx_in2,  	// The rob index of instruction 2
 	input  [63:0]								lsq_ra_data2, 	//comes from prf according to idx request, 0 if load
 	input										lsq_ra_data_valid2,	//weather data comes form prf is valid, if not, get from cdb
 
@@ -83,8 +83,8 @@ module lsq(
 	input	[4:0]						mem_load_tag_in,
 	
 	//we need rob age for store to commit
-	input	[$clog2(`ROB_SIZE)-1:0]		rob_commit_idx1,
-	input	[$clog2(`ROB_SIZE)-1:0]		rob_commit_idx2,
+	input	[$clog2(`ROB_SIZE):0]		rob_commit_idx1,
+	input	[$clog2(`ROB_SIZE):0]		rob_commit_idx2,
 
 	//we need to know weather the instruction commited is a mispredict
 	input	thread1_mispredict,
@@ -129,7 +129,7 @@ module lsq(
 	output	logic								rob1_excuted,
 	output	logic								rob2_excuted
 	
-	//when new store came in and find a instr following him in program order has been excuted, the LSQ must report a violation
+	//when in store came in and find a instr following him in program order has been excuted, the LSQ must report a violation
 	//Here we only forward the independent loads!!!!!
 	);
 	
@@ -139,7 +139,7 @@ module lsq(
 	//lq_reg stores address
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_addr, n_lq_reg_addr;
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_data, n_lq_reg_data;
-	logic	[`LQ_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] lq_rob_idx, n_lq_rob_idx;
+	logic	[`LQ_SIZE-1:0][$clog2(`ROB_SIZE):0] lq_rob_idx, n_lq_rob_idx;
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_opa, n_lq_reg_opa;
 	logic	[`LQ_SIZE-1:0][63:0]	lq_reg_opb, n_lq_reg_opb;
 	logic	[`LQ_SIZE-1:0][4:0]		lq_reg_dest_tag, n_lq_reg_dest_tag;
@@ -150,13 +150,13 @@ module lsq(
 	//SQ
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_addr, n_sq_reg_addr;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_data, n_sq_reg_data;
-	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE)-1:0] sq_rob_idx, n_sq_rob_idx;
+	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE):0] sq_rob_idx, n_sq_rob_idx;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opa, n_sq_reg_opa;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opb, n_sq_reg_opb;
 	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid, n_sq_reg_addr_valid;
 	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid, n_sq_reg_inst_valid;
 
-	LSQ_DEP_CODE [`LQ_SIZE-1:0][`SQ_SIZE-1:0]lsq_reg_dep;
+	LSQ_DEP_CODE [`LQ_SIZE-1:0][`SQ_SIZE-1:0]n_lsq_reg_dep;
 
 	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head, n_sq_head;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail, n_sq_tail;
@@ -171,22 +171,82 @@ module lsq(
 	logic											sq_reg_data_valid, n_sq_reg_data_valid;
 	
 	//for cdb
-	logic	[63:0]		lsq_ra_new1;
-	logic	[63:0]		lsq_ra_new2;
-	logic	[63:0]		lsq_opb_new1;
-	logic	[63:0]		lsq_opb_new2;		
-	logic				lsq_ra_new_valid1;
-	logic				lsq_ra_new_valid2;		
-	logic				lsq_opb_new_valid1;
-	logic				lsq_opb_new_valid2;
+	logic	[63:0]		lsq_ra_in1;
+	logic	[63:0]		lsq_ra_in2;
+	logic	[63:0]		lsq_opb_in1;
+	logic	[63:0]		lsq_opb_in2;		
+	logic				lsq_ra_in_valid1;
+	logic				lsq_ra_in_valid2;		
+	logic				lsq_opb_in_valid1;
+	logic				lsq_opb_in_valid2;
 
 	//for load from mem
-	logic 				mem_res;
+	logic 	[`LQ_SIZE-1:0]		mem_res, mem_load, mem_load_req;
 	logic	[`LQ_SIZE-1:0][4:0] wait_idx;
 	logic	[`LQ_SIZE-1:0][4:0] n_wait_idx;
+	logic	[`LQ_SIZE-1:0] wait_valid, n_wait_valid;
 	logic	[4:0]		wait_int;
 	logic	[4:0]		n_wait_int;
 	
+	//for priority selector
+	logic	[`LQ_SIZE-1:0]							lq_cdb1;
+	logic	[`LQ_SIZE-1:0]							lq_cdb2;
+
+sq sq1(
+	//logic
+	.clock(clock),
+	.reset(reset),
+	.id_wr_mem_in1(id_wr_mem_in1),
+	.id_wr_mem_in2(id_wr_mem_in2),		//stq
+	.is_thread1(is_thread1),
+	.lsq_opa_in1(lsq_opa_in1),      	// Operand a from Rename  data
+	.lsq_opb_in1(lsq_opb_in1),      	// Operand a from Rename  tag or data from prf
+	.lsq_opb_valid1(lsq_opb_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	.lsq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
+	.lsq_ra_data1(lsq_ra_data1),	//comes from prf according to idx request, 0 if load
+	.lsq_ra_data_valid1(lsq_ra_data_valid1), //weather data comes form prf is valid, if not, get from cdb
+	.lsq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
+	.lsq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
+	.lsq_opb_valid2(lsq_opb_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	.lsq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
+	.lsq_ra_data2(lsq_ra_data2), 	//comes from prf according to idx request, 0 if load
+	.lsq_ra_data_valid2(lsq_ra_data_valid2),	//weather data comes form prf is valid, if not, get from cdb
+	
+	//we need rob age for store to commit
+	.rob_commit_idx1(rob_commit_idx1),
+	.rob_commit_idx2(rob_commit_idx2),
+
+	.lsq_cdb1_in(lsq_cdb1_in),     		// CDB bus from functional units 
+	.lsq_cdb1_tag(lsq_cdb1_tag),    		// CDB tag bus from functional units 
+	.lsq_cdb1_valid(lsq_cdb1_valid),  		// The data on the CDB is valid 
+	.lsq_cdb2_in(lsq_cdb2_in),     		// CDB bus from functional units 
+	.lsq_cdb2_tag(lsq_cdb2_tag),    		// CDB tag bus from functional units 
+	.lsq_cdb2_valid(lsq_cdb2_valid),  		// The data on the CDB is valid 	
+	//we need to know weather the instruction commited is a mispredict
+	.thread1_mispredict(thread1_mispredict),
+	.thread2_mispredict(thread2_mispredict),
+
+	//output to lq
+	.sq_reg_addr(sq_reg_addr),
+	.sq_reg_data(sq_reg_data), 	
+	.sq_rob_idx(sq_rob_idx),
+	.sq_reg_addr_valid(sq_reg_addr_valid),
+	.sq_reg_inst_valid(sq_reg_inst_valid),
+	.sq_reg_data_valid(sq_reg_data_valid),
+	.sq_t1_head(sq_t1_head), 
+	.sq_t2_head(sq_t2_head),
+	.sq_t1_tail(sq_t1_tail),
+	.sq_t2_tail(sq_t2_tail),
+		
+	.mem_store_value(mem_store_value),
+	.instr_store_to_mem_valid1(instr_store_to_mem_valid1),
+	.mem_store_addr(mem_store_addr),
+	.rob1_excuted(rob1_excuted),
+	.rob2_excuted(rob2_excuted),
+	.t1_sq_is_full(t1_is_full),
+	.t2_sq_is_full(t2_is_full)
+	);
+		
 	always_ff@(posedge clock) begin
 		if(reset) begin
 
@@ -199,21 +259,11 @@ module lsq(
 			lq_reg_addr_valid 	<= #1 0;
 			lq_reg_inst_valid 	<= #1 0;
 			lq_reg_data_valid	<= #1 0;
-
-
-			sq_head 			<= #1 0;
-			sq_tail 			<= #1 0;
-			sq_reg_addr 		<= #1 0;
-			sq_rob_idx 			<= #1 0;
-			sq_reg_opa 			<= #1 0;
-			sq_reg_opb 			<= #1 0;
-			sq_reg_data 		<= #1 0;
-			sq_reg_addr_valid 	<= #1 0;
-			sq_reg_inst_valid 	<= #1 0;
-			sq_reg_data_valid	<= #1 0;
 			
 			wait_int			<= #1 0;
 			wait_idx 			<= #1 0;
+			wait_valid 			<= #1 0;
+			lsq_reg_dep			<= #1 NO_IDEA;
 		end
 			else begin
 
@@ -226,93 +276,43 @@ module lsq(
 				lq_reg_addr_valid 	<= #1 n_lq_reg_addr_valid;
 				lq_reg_dest_tag		<= #1 n_lq_reg_dest_tag;
 				lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
-
-				sq_head 			<= #1 n_sq_head;
-				sq_tail 			<= #1 n_sq_tail;
-				sq_reg_addr 		<= #1 n_sq_reg_addr;
-				sq_reg_data 		<= #1 n_sq_reg_data;
-				sq_rob_idx 			<= #1 n_sq_rob_idx;
-				sq_reg_opa 			<= #1 n_sq_reg_opa;
-				sq_reg_opb 			<= #1 n_sq_reg_opb;
-				sq_reg_inst_valid 	<= #1 n_sq_reg_inst_valid;
-				sq_reg_addr_valid 	<= #1 n_sq_reg_addr_valid;
-				sq_reg_data_valid	<= #1 n_sq_reg_data_valid;
 			
 				wait_int			<= #1 n_wait_int;
 				wait_idx 			<= #1 n_wait_idx;
+				wait_valid 			<= #1 n_wait_valid;
+				lsq_reg_dep			<= #1 n_lsq_reg_dep;
 		end
 	end
 
 		//if ((rs_cdb1_tag == inst1_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opa_valid && rs_cdb1_valid)
 
 	always_comb begin
-		lsq_ra_new1	 = lsq_ra_data1;
-		lsq_ra_new2	 = lsq_ra_data2;
-		lsq_opb_new1 = lsq_opb_in1;
-		lsq_opb_new2 = lsq_opb_in2;		
-		lsq_ra_new_valid1 = lsq_ra_data_valid1;
-		lsq_ra_new_valid2 = lsq_ra_data_valid2;		
-		lsq_opb_new_valid1= lsq_opb_valid1;
-		lsq_opb_new_valid2= lsq_opb_valid2;
-		
-		//get value from cdb
-		if ((lsq_cdb1_tag == lsq_ra_data1[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_ra_new1			= lsq_cdb1_in;
-			lsq_ra_new_valid1	= 1'b1;
+	//get value from cdb
+	for (int i = 0; i < `LQ_SIZE; i++) begin
+		if (~lq_reg_addr_valid[i] && (lq_reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb1_tag[i]) && lq_inst_valid[i] && lq_cdb1_valid[i]) begin
+					n_lq_reg_opb[i]			= lq_cdb1_in[i];
+					n_lq_reg_addr_valid[i]	= 1;
 		end
-		else if ((lsq_cdb2_tag == lsq_ra_data1[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_ra_new1			= lsq_cdb2_in;
-			lsq_ra_new_valid1	= 1'b1;
+		if (~lq_reg_addr_valid[i] && (lq_reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb2_tag[i]) && lq_inst_valid[i] && lq_cdb2_valid[i]) begin
+					n_lq_reg_opb[i]			= lq_cdb2_in[i];
+					n_lq_reg_addr_valid[i]	= 1;
+		end				
+		if (~lq_reg_data_valid[i] && (lq_reg_dest_tag[i][$clog2(`PRF_SIZE)-1:0] == cdb1_tag[i]) && lq_inst_valid[i] && lq_cdb1_valid[i]) begin
+					n_lq_reg_data[i]		= lq_cdb1_in[i];
+					n_lq_reg_data_valid[i]	= 1;
 		end
-
-		if ((lsq_cdb1_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_opb_new1		= lsq_cdb1_in;
-			lsq_opb_new_valid1	= 1'b1;
-		end   	
-		else if ((lsq_cdb2_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_opb_new1		= lsq_cdb2_in;
-			lsq_opb_new_valid1	= 1'b1;
+		if (~lq_reg_data_valid[i] && (lq_reg_dest_tag[i][$clog2(`PRF_SIZE)-1:0] == cdb2_tag[i]) && lq_inst_valid[i] && lq_cdb2_valid[i]) begin
+					n_lq_reg_data[i]		= lq_cdb2_in[i];
+					n_lq_reg_data_valid[i]	= 1;
 		end
+	end
 
-		if ((lsq_cdb1_tag == lsq_ra_data2[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid2 && lsq_cdb1_valid)
-		begin
-			lsq_ra_new2			= lsq_cdb1_in;
-			lsq_ra_new_valid2	= 1'b1;
-		end
-		else if ((lsq_cdb2_tag == lsq_ra_data2[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid2 && lsq_cdb2_valid)
-		begin
-			lsq_ra_new2			= lsq_cdb2_in;
-			lsq_ra_new_valid2	= 1'b1;
-		end
-
-		if ((lsq_cdb1_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_opb_new2		= lsq_cdb1_in;
-			lsq_opb_new_valid2	= 1'b1;
-		end   	
-		else if ((lsq_cdb2_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_opb_new2		= lsq_cdb2_in;
-			lsq_opb_new_valid2	= 1'b1;
-		end  
-
-
-	
-		
-		//store the data from sq or mem
+	//store the data from sq or mem
 		//lq enters: 1. get the dependency from sq info 2.forward if they can
 		ld_in1 = 0;
 		ld_in2 = 0;
-		st_in1 = 0;
-		st_in2 = 0;
 		ld_idx1 = 0;
 		ld_idx2 = 0;
-		st_idx1 = 0;
-		st_idx2 = 0;
 
 		n_lq_reg_addr 		= lq_reg_addr;
 		n_lq_rob_idx 		= lq_rob_idx ;
@@ -323,289 +323,259 @@ module lsq(
 		n_lq_reg_dest_tag	= lq_reg_dest_tag;
 		n_lq_reg_data_valid = lq_reg_data_valid;
 		n_lq_reg_data 		= lq_reg_data;
-
-		n_sq_head 			= sq_head;
-		n_sq_tail 			= sq_tail;
-		n_sq_reg_addr		= sq_reg_addr; 
-		n_sq_reg_data 		= sq_reg_data;
-		n_sq_rob_idx 		= sq_rob_idx;
-		n_sq_reg_opa 		= sq_reg_opa;
-		n_sq_reg_opb 		= sq_reg_opb;
-		n_sq_reg_inst_valid	= sq_reg_inst_valid;
-		n_sq_reg_addr_valid	= sq_reg_addr_valid;
-		n_sq_reg_data_valid	= sq_reg_data_valid;
+		
+		n_wait_int = wait_int;
+		n_wait_idx = wait_idx;
+		n_wait_valid = wait_valid;
 
 		if(id_rd_mem_in1)	begin 		//ldq allocate two entry for ld
 			for(int i=0; i<`LQ_SIZE; i++) begin		//first find locations
 				if(!lq_reg_addr_valid[i] && !ld_in1) begin
 					n_lq_reg_opa[i] 		= lsq_opa_in1;
-					n_lq_reg_opb[i] 		= lsq_opb_new1;
-					n_lq_reg_addr[i] 		= lsq_opa_in1 + lsq_opb_new1;
+					n_lq_reg_opb[i] 		= lsq_opb_in1;
+					n_lq_reg_addr[i] 		= lsq_opa_in1 + lsq_opb_in1;
 					n_lq_rob_idx[i] 		= lsq_rob_idx_in1;
 					n_lq_reg_inst_valid[i] 	= 1;
-					n_lq_reg_addr_valid[i]	= lsq_opb_new_valid1;
+					n_lq_reg_addr_valid[i]	= lsq_opb_in_valid1;
 					n_lq_reg_dest_tag[i]	= dest_reg_idx1;
+					n_lq_reg_data[i]		= lsq_ra_data1;
+					n_lq_reg_data_valid[i]	= lsq_ra_data_valid1;
 					ld_idx1					= i; 
 					ld_in1 					= 1;
-					//load from mem
-					//load from sq
-					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
-							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in1 + lsq_opb_new1) && lsq_opb_new_valid1)
-							lsq_reg_dep[i][round_j] = DEP;
-						else if(!sq_reg_inst_valid[round_j])
-							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-							lsq_reg_dep[i][round_j] = NO_IDEA;
-					end	//for
 					break;
 				end //if
 			end 	//for
+		end //if
 
-			if(id_rd_mem_in2) begin   //load+load
+		if(id_rd_mem_in2) begin   //load+load
 			for(int i=0; i<`LQ_SIZE; i++) begin		//first find locations
-				if(!lq_reg_addr_valid[i] && i!=ld_idx1 && ld_in1 && !ld_in2) begin
+				if(!lq_reg_addr_valid[i] && ((i!=ld_idx1 && ld_in1)||!ld_in1) && !ld_in2) begin
 					n_lq_reg_opa[i] 		= lsq_opa_in2;
-					n_lq_reg_opb[i] 		= lsq_opb_new2;
-					n_lq_reg_addr[i] 		= lsq_opa_in2 + lsq_opb_new2;
+					n_lq_reg_opb[i] 		= lsq_opb_in2;
+					n_lq_reg_addr[i] 		= lsq_opa_in2 + lsq_opb_in2;
 					n_lq_rob_idx[i] 		= lsq_rob_idx_in2;
 					n_lq_reg_inst_valid[i] 	= 1;
-					n_lq_reg_addr_valid[i]	= lsq_opb_new_valid2;
+					n_lq_reg_addr_valid[i]	= lsq_opb_in_valid2;
 					n_lq_reg_dest_tag[i]	= dest_reg_idx2;
+					n_lq_reg_data[i]		= lsq_ra_data2;
+					n_lq_reg_data_valid[i]	= lsq_ra_data_valid2;
 					ld_idx2					= i;
 					ld_in2 					= 1;
-					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if(sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							lsq_reg_dep[i][round_j] = DEP;
-						else if(!sq_reg_inst_valid[round_j])
-							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-							lsq_reg_dep[i][round_j] = NO_IDEA;
-					end	//for
 					break;
 				end //if
 			end 	//for
-			end		//if
+		end		//if
 
-			//sq enters: 1. compares and update lq dependency, 3. forward to lq and broadcast to rob 
-			else if(id_wr_mem_in2) begin   //load+store
-			for(round_j=sq_head; round_j!=sq_tail; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && !st_in1) begin
-					n_sq_head 					= sq_head;
-					n_sq_tail 					= sq_tail+1;
-					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_new2; 
-					n_sq_reg_data[round_j] 		= lsq_ra_new2;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in2;
-					n_sq_reg_opb[round_j] 		= lsq_opb_new2;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
-					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
-					st_in1 						= 1;
-					st_idx1					= round_j;
-					for(int i=0; i<`LQ_SIZE; i++) begin
-						if(lq_reg_inst_valid[i] || i== ld_idx1)
-						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-						lsq_reg_dep[i][round_j] = NO_IDEA;
-					end //for
-					
-				end
-			end 	//for
-			end		//else if
-		end 	//if
-
-		if(id_wr_mem_in1)	begin //store 
-			ld_in1 = 0;
-			ld_in2 = 0;
-			st_in1 = 0;
-			st_in2 = 0;
-			for(round_j=sq_head; round_j!=sq_tail; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && !st_in1) begin
-					n_sq_head 					= sq_head;
-					n_sq_tail 					= sq_tail+1;
-					n_sq_reg_addr[round_j] 		= lsq_opa_in1 + lsq_opb_new1; 
-					n_sq_reg_data[round_j] 		= lsq_ra_new1;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in1;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in1;
-					n_sq_reg_opb[round_j] 		= lsq_opb_new1;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid1;
-					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid1;
-					st_in1 						= 1;
-					st_idx1					= round_j;
-					for(int i=0; i<`LQ_SIZE; i++) begin
-						if(lq_reg_inst_valid[i])
-						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-						lsq_reg_dep[i][round_j] = NO_IDEA;
-					end //for
-					
-				end
-			end //for
-
-			if(id_rd_mem_in2) begin    //store+load
+		if(id_wr_mem_in1 && id_rd_mem_in2) begin    //store+load
 			for(int i=0; i<`LQ_SIZE; i++) begin		//first find locations
 				if(!lq_reg_addr_valid[i] && !ld_in1) begin
-					n_lq_reg_opa[i] 		= lsq_opa_in2;
-					n_lq_reg_opb[i] 		= lsq_opb_new2;
-					n_lq_reg_addr[i] 		= lsq_opa_in2 + lsq_opb_new2;
-					n_lq_rob_idx[i] 		= lsq_rob_idx_in2;
-					n_lq_reg_inst_valid[i] 	= 1;
-					n_lq_reg_addr_valid[i]	= lsq_opb_new_valid2;
-					n_lq_reg_dest_tag[i]	= dest_reg_idx2;
-					ld_idx1					= i; 
-					ld_in1 					= 1;
-					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
-						if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] != (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)!= (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							lsq_reg_dep[i][round_j] = NO_DEP_ADDR;
-						else if((sq_reg_inst_valid[round_j] && sq_reg_addr_valid[round_j] && sq_reg_addr[round_j] == (lsq_opa_in1 + lsq_opb_new2) && lsq_opb_new_valid2)
-							| lsq_opb_new_valid1 && (lsq_opa_in1 + lsq_opb_new1)== (lsq_opa_in2 + lsq_opb_new2) && lsq_opb_new_valid2)
-							lsq_reg_dep[i][round_j] = DEP;
-						else if(!sq_reg_inst_valid[round_j] && lq_reg_inst_valid[i])
-							lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-							lsq_reg_dep[i][round_j] = NO_IDEA;
-					end	//for
+						if(lsq_opb_in_valid1 && lsq_opb_in_valid2 && (lsq_opa_in1 + lsq_opb_in1)!= (lsq_opa_in2 + lsq_opb_in2) && is_thread1)
+							n_lsq_reg_dep[i][sq_t1_tail] = NO_DEP_ADDR;
+							
+						else if(lsq_opb_in_valid1 && lsq_opb_in_valid2 && (lsq_opa_in1 + lsq_opb_in1)!= (lsq_opa_in2 + lsq_opb_in2) && !is_thread1)
+							n_lsq_reg_dep[i][sq_t2_tail] = NO_DEP_ADDR;
+							
+						else if(lsq_opb_in_valid1 && (lsq_opa_in1 + lsq_opb_in1)== (lsq_opa_in2 + lsq_opb_in2) && lsq_opb_in_valid2 && is_thread1) begin
+							n_lsq_reg_dep[i][sq_t1_tail] = DEP;							
+							n_lq_reg_data[i]		= lsq_ra_data1;
+							n_lq_reg_data_valid[i]	= lsq_ra_data_valid1;
+						end
+							
+						else if(lsq_opb_in_valid1 && (lsq_opa_in1 + lsq_opb_in1)== (lsq_opa_in2 + lsq_opb_in2) && lsq_opb_in_valid2 && is_thread1)
+							n_lsq_reg_dep[i][sq_t2_tail] = DEP;
+							
 					break;
 				end //if
 			end 	//for
-			end		//if
-
-			else if(id_wr_mem_in2) begin   //store + store
-			for(round_j=sq_head +1 ; round_j!=sq_tail && round_j !=sq_tail+1; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && st_in1 && round_j!=st_idx1 && !st_in2) begin
-					n_sq_head 					= sq_head;
-					n_sq_tail 					= sq_tail+2;
-					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_new2; 
-					n_sq_reg_data[round_j] 		= lsq_ra_new2;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in2;
-					n_sq_reg_opb[round_j] 		= lsq_opb_new2;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_opb_new_valid2;
-					n_sq_reg_data_valid[round_j]= lsq_ra_new_valid2;
-					st_in1 						= 1;
-					st_idx1					= round_j;
-					for(int i=0; i<`LQ_SIZE; i++) begin
-						if(lq_reg_inst_valid[i])
-						lsq_reg_dep[i][round_j] = NO_DEP_ORDER;
-						else
-						lsq_reg_dep[i][round_j] = NO_IDEA;
-					end //for
+		end		//if
+		
+		//load from sq
+		for (int i = 0; i < `LQ_SIZE; i++) begin
+			for(int j=0;j <`SQ_SIZE;j++) begin
+				//the addr can be figured out at every cycle
+				if(sq_reg_inst_valid[j] && sq_reg_addr_valid[j] && sq_reg_addr[j] != (lsq_opa_in1 + lsq_opb_in1) && lsq_opb_in_valid1)
+					n_lsq_reg_dep[i][j] = NO_DEP_ADDR;
+				else if(sq_reg_inst_valid[j] && sq_reg_addr_valid[j] && sq_reg_addr[j] == (lsq_opa_in1 + lsq_opb_in1) && lsq_opb_in_valid1) begin
+					n_lsq_reg_dep[i][j] 	= DEP;
+					n_lq_reg_data[i]		=sq_reg_data[j];
+					n_lq_reg_data_valid[i]	=sq_reg_data_valid[j];
+				end
+				else if(!sq_reg_inst_valid[j])
+					n_lsq_reg_dep[i][j] = NO_DEP_ORDER;
 					
+			end	//for
+		end //for
+
+		//the data can be figured out at every cycle
+		for (int i = 0; i < `LQ_SIZE; i++) begin
+		 if (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 0) begin
+		 	for(round_j = sq_t1_head; round_j!=sq_t1_tail; round_j++) begin
+				if(lsq_reg_dep[i][round_j]==DEP) begin
+					n_lq_reg_data[i]		=sq_reg_data[round_j];
+					n_lq_reg_data_valid[i]	=sq_reg_data_valid[round_j];				
 				end
-			end //for
-			end //if
-
-
-			//forward data
-			lsq_CDB_result_out1 = 0;
-			lsq_CDB_result_out2 = 0;
-			lsq_CDB_result_is_valid1 = 0;
-			lsq_CDB_result_is_valid2 = 0;
-			ld_out_idx1=0;
-			ld_out_idx2=0;
-
-			//if not able to forward from lq, then load from memory
-			
-			if(instr_load_mem_in_valid1) begin
+			end
+		 end
+		 else begin
+		 	for(round_j = sq_t2_head;round_j!=sq_t2_tail; round_j++) begin
+				if(lsq_reg_dep[i][round_j]==DEP) begin
+					n_lq_reg_data[i]		=sq_reg_data[round_j];
+					n_lq_reg_data_valid[i]	=sq_reg_data_valid[round_j];				
+				end
+			end
+		 end
+		end		
+				
+		//get value from mem
+		if(instr_load_mem_in_valid1) begin
 			for(int i=0; i<`LQ_SIZE; i++)
-				if(wait_idx[i]==mem_load_tag_in) begin
-						lsq_CDB_dest_tag2 	= lq_reg_dest_tag[i];
-						lsq_CDB_result_out2 = instr_load_from_mem1;
-						lsq_CDB_result_is_valid2 = 1;
+				if(wait_idx[i]==mem_load_tag_in && wait_valid[i]) begin
+						n_lq_reg_data[i] 	= instr_load_from_mem1;
+						n_lq_reg_data_valid[i] = 1;
 						n_wait_idx[i] = 0;
+						n_wait_valid[i] = 0;
 			end
-			end
+		end
 			
-			for(int i=0; i<`LQ_SIZE; i++) begin		//forward
-				if(lq_reg_addr_valid[i] && !lsq_CDB_result_out1) begin
-					for(round_j = sq_head; round_j!=sq_tail; round_j++) begin
-						mem_res = 0;
-						if(lsq_reg_dep[i][round_j] == NO_IDEA) begin
+		//ask for mem to load data
+		mem_res = 0;
+		mem_load_req = 0;
+		load_from_mem_idx=0;
+		request_from_mem = 0;
+		mem_load_tag_out=0;
+		priority_selector #(1,`LQ_SIZE)load(
+			req(mem_res!),
+			en(1'b1),
+    		// Outputs
+			gnt_bus({mem_load}),
+		);
+		for(int i=0; i<`LQ_SIZE; i++) begin		//mem load???
+				if(lq_reg_addr_valid[i] && !lq_reg_data_valid[i] && (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 0)) begin
+					for(round_j = sq_t1_head; round_j!=sq_t1_tail; round_j++) begin
+						if(n_lsq_reg_dep[i][j] == NO_IDEA) begin
 							break;
 							end
-						else if(lsq_reg_dep[i][round_j] == NO_DEP_ORDER) begin
-							if(!mem_res) begin
-							load_from_mem_idx = lq_reg_addr[i];//fifo
-							request_from_mem = 1;
-							n_wait_int = wait_int+1;
-							n_wait_idx[i] = wait_int;
-							mem_load_tag_out = wait_int;
+						else if(n_lsq_reg_dep[i][j] == NO_DEP_ORDER) begin
+							if(!mem_res[i]) begin
+							mem_load_req[i] = 1;
 							end
 							break;
 							end
-						else if(lsq_reg_dep[i][round_j] == NO_DEP_ADDR) begin
-							if(round_j == sq_tail) break;
+						else if(n_lsq_reg_dep[i][j] == NO_DEP_ADDR) begin
+							if(round_j == sq_t1_tail) break;
 							end
-						else if(lsq_reg_dep[i][round_j] == DEP) begin
-							lsq_CDB_result_is_valid1 = 1;
-							mem_res = 1;
-							n_lq_reg_data_valid[i]= 0;
-							n_lq_reg_data[i] = sq_reg_data[round_j];
-							ysq_than_lq1 	= round_j;
-							ld_out_idx1 = i;
-							lsq_CDB_dest_tag1 	= lq_reg_dest_tag[i];
-							lsq_CDB_result_out1 = sq_reg_data[round_j];
+						else if(n_lsq_reg_dep[i][j] == DEP) begin
+							mem_res[i] = 1;
 							end //else
 					end //for
 				end //if
-			end //for
+		end //for
 			
-			if(!instr_load_mem_in_valid1) begin
-			for(int i=0; i<`LQ_SIZE; i++) begin		//forward
-				if(lq_reg_addr_valid[i] && lsq_CDB_result_is_valid1 && !lsq_CDB_result_is_valid2 && i!= ld_out_idx1) begin
-					for(round_j = sq_head; round_j!=sq_tail; round_j++) begin
-						if(lsq_reg_dep[i][round_j] == NO_IDEA) begin
+		for(int i=0; i<`LQ_SIZE; i++) begin		//mem load???
+				if(lq_reg_addr_valid[i] && !lq_reg_data_valid[i] && (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 1)) begin
+					for(round_j = sq_t2_head; round_j!=sq_t2_tail; round_j++) begin
+						if(n_lsq_reg_dep[i][j] == NO_IDEA) begin
 							break;
 							end
-						else if(lsq_reg_dep[i][round_j] == NO_DEP_ORDER) begin
+						else if(n_lsq_reg_dep[i][j] == NO_DEP_ORDER) begin
+							if(!mem_res[i]) begin
+							mem_load_req[i] = 1;
+							end
 							break;
 							end
-						else if(lsq_reg_dep[i][round_j] == NO_DEP_ADDR) begin
-							if(round_j == sq_tail) break;
+						else if(n_lsq_reg_dep[i][j] == NO_DEP_ADDR) begin
+							if(round_j == sq_t2_tail) break;
 							end
-						else if(lsq_reg_dep[i][round_j] == DEP) begin
-							lsq_CDB_result_is_valid2 = 1;
-							n_lq_reg_data_valid[i] = 0;
-							n_lq_reg_data[i] = sq_reg_data[round_j];
-							ysq_than_lq2 = round_j;
-							ld_out_idx2 = i;
-							lsq_CDB_dest_tag2 	= lq_reg_dest_tag[i];
-							lsq_CDB_result_out2 = sq_reg_data[ysq_than_lq2];
+						else if(n_lsq_reg_dep[i][j] == DEP) begin
+							mem_res[i] = 1;
 							end //else
 					end //for
 				end //if
-			end //for
-			end //if			
-
-			//store to mem 
-			if(sq_rob_idx[sq_head]==rob_commit_idx1 | rob_commit_idx2) begin
-				instr_store_to_mem1 = sq_reg_data[sq_head];
-				n_sq_head = sq_head +1;
-				instr_store_to_mem_valid1 = 1;
-				mem_store_idx = sq_reg_addr[sq_head];
-				rob1_excuted = 1;
-				n_sq_reg_inst_valid[sq_head] = 0;
-			end
-			if(sq_rob_idx[sq_head+1]==rob_commit_idx2) rob2_excuted = 0;
-
-			//load retires
-			for(int i=0; i<`LQ_SIZE; i++) begin	
-				if(lq_rob_idx[i]==rob_commit_idx1)begin
-					n_lq_reg_inst_valid[i] = 0;
-					rob1_excuted = 1;
+		end //for
+			
+		for(int i=0; i<`LQ_SIZE; i++) begin		//send request to load from mem
+				if(mem_load[i]) begin
+						load_from_mem_idx = lq_reg_addr[i];//fifo
+						request_from_mem = 1;
+						n_wait_int = wait_int+1;
+						n_wait_idx[i] = wait_int;
+						mem_load_tag_out = wait_int;
 				end
-				if(lq_rob_idx[i]==rob_commit_idx2) begin
+		end			
+
+			
+		//forward data
+		lsq_CDB_result_out1 = 0;
+		lsq_CDB_result_out2 = 0;
+		lsq_CDB_result_is_valid1 = 0;
+		lsq_CDB_result_is_valid2 = 0;
+		lsq_CDB_dest_tag1 = 0;
+		lsq_CDB_dest_tag2 = 0;
+		ld_out_idx1=0;
+		ld_out_idx2=0;
+
+		priority_selector #(2,`LQ_SIZE)load(
+			req(lq_reg_data_valid),
+			en(1'b1),
+    		// Outputs
+			gnt_bus({lq_cdb1,lq_cdb2}),
+		);
+	
+
+		for(int i=0; i<`LQ_SIZE; i++) begin		//forward
+				if(lq_cdb1[i]) begin
+					lsq_CDB_result_is_valid1 = 1;
+					n_lq_reg_addr_valid[i] = 0;
 					n_lq_reg_inst_valid[i] = 0;
-					rob2_excuted = 1;
+					n_lq_reg_data_valid[i] = 0;
+					lsq_CDB_dest_tag1 	= sq_reg_dest_tag[i];
+					lsq_CDB_result_out1 = lq_reg_data[i];
+				end //if
+				if(lq_cdb2[i]) begin
+					lsq_CDB_result_is_valid2 = 1;
+					n_lq_reg_addr_valid[i] = 0;
+					n_lq_reg_inst_valid[i] = 0;
+					n_lq_reg_data_valid[i] = 0;
+					lsq_CDB_dest_tag2 	= sq_reg_dest_tag[i];
+					lsq_CDB_result_out2 = lq_reg_data[i];
+				end //if
+		end //for	
+
+
+		//load retires
+		rob2_excuted = 1;
+		for(int i=0; i<`LQ_SIZE; i++) begin	
+				if(lq_rob_idx[i]==rob_commit_idx1 && lq_reg_inst_valid[i])begin
+					rob1_excuted = 0;
+				end
+				if(lq_rob_idx[i]==rob_commit_idx2 && lq_reg_inst_valid[i]) begin
+					rob2_excuted = 0;
 				end
 			end
 		end
 	end //comb
+	
+	
+	always_comb begin
+		if (thread1_mispredict) begin
+			for (int i = 0; i < `LQ_SIZE; i++) begin
+				if (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 0) begin
+					lq_reg_addr_valid[i] 	<= #1 0;
+					lq_reg_inst_valid[i] 	<= #1 0;
+					lq_reg_data_valid[i]	<= #1 0;
+				end
+			end
+		end
+		if (thread2_mispredict) begin
+			for (int i = 0; i < `LQ_SIZE; i++) begin
+				if (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 1) begin
+					lq_reg_addr_valid[i] 	<= #1 0;
+					lq_reg_inst_valid[i] 	<= #1 0;
+					lq_reg_data_valid[i]	<= #1 0;
+				end
+			end
+		end
+	end
+	
 endmodule 
+

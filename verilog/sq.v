@@ -38,7 +38,28 @@ module sq(
 	//we need to know weather the instruction commited is a mispredict
 	input	thread1_mispredict,
 	input	thread2_mispredict,
+
+	//we need cdb
+	input  [63:0]								lsq_cdb1_in,     		// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  			lsq_cdb1_tag,    		// CDB tag bus from functional units 
+	input										lsq_cdb1_valid,  		// The data on the CDB is valid 
+	input  [63:0]								lsq_cdb2_in,     		// CDB bus from functional units 
+	input  [$clog2(`PRF_SIZE)-1:0]  			lsq_cdb2_tag,    		// CDB tag bus from functional units 
+	input										lsq_cdb2_valid,  		// The data on the CDB is valid 
 	
+	//output to sq
+	output	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_addr,
+	output	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_data, 	
+	output	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE):0] sq_rob_idx,
+	output	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid,
+	output	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid,
+	output	logic	[$clog2(`SQ_SIZE)-1:0]	sq_reg_data_valid,
+	output	logic 	[$clog2(`SQ_SIZE)-1:0]	sq_t1_head, 
+	output	logic 	[$clog2(`SQ_SIZE)-1:0]	sq_t2_head,
+	output	logic	[$clog2(`SQ_SIZE)-1:0]	sq_t1_tail,
+	output	logic	[$clog2(`SQ_SIZE)-1:0]	sq_t2_tail,
+	
+	//to mem	
 	output	logic	[63:0]						mem_store_value,
 	output	logic								instr_store_to_mem_valid1,
 	output	logic	[63:0]						mem_store_addr,
@@ -51,20 +72,20 @@ module sq(
 );
 
 	//SQ
-	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_addr, n_sq_reg_addr;
-	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_data, n_sq_reg_data;
-	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE):0] sq_rob_idx, n_sq_rob_idx;
+	logic	[`SQ_SIZE-1:0][63:0]	n_sq_reg_addr;
+	logic	[`SQ_SIZE-1:0][63:0]	n_sq_reg_data;
+	logic	[`SQ_SIZE-1:0][$clog2(`ROB_SIZE):0] n_sq_rob_idx;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opa, n_sq_reg_opa;
 	logic	[`SQ_SIZE-1:0][63:0]	sq_reg_opb, n_sq_reg_opb;
-	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid, n_sq_reg_addr_valid;
-	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid, n_sq_reg_inst_valid;
-	
-	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_t1_head, n_sq_t1_head;
-	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_t2_head, n_sq_t2_head;
-	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t1_tail, n_sq_t1_tail;
-	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t2_tail, n_sq_t2_tail;
-	logic											st_out1, st_out2;
-	logic	[$clog2(`SQ_SIZE)-1:0]					sq_reg_data_valid, n_sq_reg_data_valid;
+	logic	[`SQ_SIZE-1:0]			n_sq_reg_addr_valid;
+	logic	[`SQ_SIZE-1:0]			n_sq_reg_inst_valid;
+	logic	[$clog2(`SQ_SIZE)-1:0]	n_sq_reg_data_valid;
+		
+	logic 	[$clog2(`SQ_SIZE)-1:0]					n_sq_t1_head;
+	logic 	[$clog2(`SQ_SIZE)-1:0]					n_sq_t2_head;
+	logic	[$clog2(`SQ_SIZE)-1:0]					n_sq_t1_tail;
+	logic	[$clog2(`SQ_SIZE)-1:0]					n_sq_t2_tail;
+
 
 	//logic	[3:0]					round_j;
 		
@@ -115,6 +136,17 @@ module sq(
 		n_sq_reg_inst_valid	= sq_reg_inst_valid;
 		n_sq_reg_addr_valid	= sq_reg_addr_valid;
 		n_sq_reg_data_valid	= sq_reg_data_valid;
+		
+		for (int i = 0; i < `SQ_SIZE; i++) begin
+		if (~sq_reg_addr_valid[i] && (sq__reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb1_tag[i]) && sq_inst_valid[i] && sq_cdb1_valid[i]) begin
+					sq_reg_opb[i]			= sq_cdb1_in[i];
+					sq_reg_addr_valid[i]	= 1;
+		end
+		if (~sq_reg_addr_valid[i] && (sq__reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb2_tag[i]) && sq_inst_valid[i] && sq_cdb2_valid[i]) begin
+					sq_reg_opb[i]			= sq_cdb2_in[i];
+					sq_reg_addr_valid[i]	= 1;
+		end				
+		end
 		
 		if(id_wr_mem_in1)	begin //store
 					n_sq_reg_addr[sq_t1_tail] 		= lsq_opa_in1 + lsq_opb_in1;
@@ -207,11 +239,11 @@ module sq(
 			n_sq_t2_tail = n_sq_t2_head;
 		end
 		
-		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head)||(sq_t1_tail==sq_t1_head && (sq_reg_inst_valid[sq_t1_tail] && sq_rob_idx[sq_t1_tail]==0)))				//**************************** 
+		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head)||(sq_t1_tail==sq_t1_head && (sq_reg_inst_valid[sq_t1_tail] && sq_rob_idx[sq_t1_tail][$clog2(`ROB_SIZE)]==0)))				//**************************** 
 		begin
 			t1_is_full = 1;
 		end
-		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head)||(sq_t2_tail==sq_t2_head && (sq_reg_inst_valid[sq_t2_tail]  && sq_rob_idx[sq_t1_tail]==1)))
+		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head)||(sq_t2_tail==sq_t2_head && (sq_reg_inst_valid[sq_t2_tail] && sq_rob_idx[sq_t1_tail][$clog2(`ROB_SIZE)]==1)))
 		begin
 			t2_is_full = 1;
 		end
