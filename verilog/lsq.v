@@ -156,7 +156,7 @@ module lsq(
 	logic	[`SQ_SIZE-1:0]			sq_reg_addr_valid, n_sq_reg_addr_valid;
 	logic	[`SQ_SIZE-1:0]			sq_reg_inst_valid, n_sq_reg_inst_valid;
 
-	LSQ_DEP_CODE [`LQ_SIZE-1:0][`SQ_SIZE-1:0]n_lsq_reg_dep;
+	LSQ_DEP_CODE [`LQ_SIZE-1:0][`SQ_SIZE-1:0]n_lsq_reg_dep, lsq_reg_dep;
 
 	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head, n_sq_head;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail, n_sq_tail;
@@ -189,8 +189,8 @@ module lsq(
 	logic	[4:0]		n_wait_int;
 	
 	//for priority selector
-	logic	[`LQ_SIZE-1:0]							lq_cdb1;
-	logic	[`LQ_SIZE-1:0]							lq_cdb2;
+	logic	[`LQ_SIZE-1:0]							lq_cdb1_valid;
+	logic	[`LQ_SIZE-1:0]							lq_cdb2_valid;
 
 sq sq1(
 	//logic
@@ -290,19 +290,19 @@ sq sq1(
 	//get value from cdb
 	for (int i = 0; i < `LQ_SIZE; i++) begin
 		if (~lq_reg_addr_valid[i] && (lq_reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb1_tag[i]) && lq_inst_valid[i] && lq_cdb1_valid[i]) begin
-					n_lq_reg_opb[i]			= lq_cdb1_in[i];
+					n_lq_reg_opb[i]			= lsq_cdb1_in;
 					n_lq_reg_addr_valid[i]	= 1;
 		end
 		if (~lq_reg_addr_valid[i] && (lq_reg_opb[i][$clog2(`PRF_SIZE)-1:0] == cdb2_tag[i]) && lq_inst_valid[i] && lq_cdb2_valid[i]) begin
-					n_lq_reg_opb[i]			= lq_cdb2_in[i];
+					n_lq_reg_opb[i]			= lsq_cdb2_in;
 					n_lq_reg_addr_valid[i]	= 1;
 		end				
 		if (~lq_reg_data_valid[i] && (lq_reg_dest_tag[i][$clog2(`PRF_SIZE)-1:0] == cdb1_tag[i]) && lq_inst_valid[i] && lq_cdb1_valid[i]) begin
-					n_lq_reg_data[i]		= lq_cdb1_in[i];
+					n_lq_reg_data[i]		= lsq_cdb1_in;
 					n_lq_reg_data_valid[i]	= 1;
 		end
 		if (~lq_reg_data_valid[i] && (lq_reg_dest_tag[i][$clog2(`PRF_SIZE)-1:0] == cdb2_tag[i]) && lq_inst_valid[i] && lq_cdb2_valid[i]) begin
-					n_lq_reg_data[i]		= lq_cdb2_in[i];
+					n_lq_reg_data[i]		= lsq_cdb2_in;
 					n_lq_reg_data_valid[i]	= 1;
 		end
 	end
@@ -447,7 +447,7 @@ sq sq1(
 			req(mem_res!),
 			en(1'b1),
     		// Outputs
-			gnt_bus({mem_load}),
+			gnt(mem_load)
 		);
 		for(int i=0; i<`LQ_SIZE; i++) begin		//mem load???
 				if(lq_reg_addr_valid[i] && !lq_reg_data_valid[i] && (lq_rob_idx[i][$clog2(`ROB_SIZE)] == 0)) begin
@@ -518,12 +518,12 @@ sq sq1(
 			req(lq_reg_data_valid),
 			en(1'b1),
     		// Outputs
-			gnt_bus({lq_cdb1,lq_cdb2}),
+			gnt_bus({lq_cdb1_valid,lq_cdb2_valid}),
 		);
 	
 
 		for(int i=0; i<`LQ_SIZE; i++) begin		//forward
-				if(lq_cdb1[i]) begin
+				if(lq_cdb1_valid[i]) begin
 					lsq_CDB_result_is_valid1 = 1;
 					n_lq_reg_addr_valid[i] = 0;
 					n_lq_reg_inst_valid[i] = 0;
@@ -531,7 +531,7 @@ sq sq1(
 					lsq_CDB_dest_tag1 	= sq_reg_dest_tag[i];
 					lsq_CDB_result_out1 = lq_reg_data[i];
 				end //if
-				if(lq_cdb2[i]) begin
+				if(lq_cdb2_valid[i]) begin
 					lsq_CDB_result_is_valid2 = 1;
 					n_lq_reg_addr_valid[i] = 0;
 					n_lq_reg_inst_valid[i] = 0;
@@ -576,6 +576,4 @@ sq sq1(
 			end
 		end
 	end
-	
-endmodule 
-
+endmodule
