@@ -21,14 +21,14 @@ all:    simv
 #####
 
 TESTBENCH = sys_defs.vh	\
-			test_dcache_controller.v
-SIMFILES = 	dcache_controller.v		
+			test_bench/test_dcache_controller.v
+SIMFILES = 	verilog/dcache_controller.v		
 
 SYNFILES = dcache_controller.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-dcache_controller.vg:	$(SIMFILES) dcache_controller.tcl 
-	dc_shell-t -f dcache_controller.tcl | tee synth.out
+dcache_controller.vg:	$(SIMFILES) tcl_files/dcache_controller.tcl 
+	dc_shell-t -f tcl_files/dcache_controller.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
