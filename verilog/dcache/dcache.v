@@ -20,9 +20,8 @@ module dcache(
 	output logic [`DCACHE_BLOCK_SIZE-1:0]	Dcache2proc_data,	 
 	output logic [3:0]						Dcache2proc_tag,	 	// to tell processor the tag of the previous load which is finished
 	output logic [3:0]						Dcache2proc_response,	// to tell processor the tag of present load
-	output logic 							Dcache_data_hit,
+	output logic 							Dcache_data_hit
 );
-	
 	
 	// input from Dcache.v
 	logic  [`DCACHE_BLOCK_SIZE-1:0]			cachemem_data;
