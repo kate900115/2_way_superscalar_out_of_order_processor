@@ -8,6 +8,7 @@ module test_dcache_controller;
 	logic 							cachemem_valid;
 	logic							cachemem_is_dirty;
 	logic							cachemem_is_miss;
+	logic							cachemem_is_full;
 	
 	// input from processor.v
 	logic  [63:0]					proc2Dcache_addr;
@@ -41,6 +42,7 @@ module test_dcache_controller;
 		.cachemem_valid(cachemem_valid),
 		.cachemem_is_dirty(cachemem_is_dirty),
 		.cachemem_is_miss(cachemem_is_miss),
+		.cachemem_is_full(cachemem_is_full),
 		.proc2Dcache_addr(proc2Dcache_addr),
 		.proc2Dcache_command(proc2Dcache_command),
 		.proc2Dcache_data(proc2Dcache_data),	
@@ -95,6 +97,7 @@ module test_dcache_controller;
 		cachemem_valid=1;
 		cachemem_is_dirty=0;
 		cachemem_is_miss=0;
+		cachemem_is_full = 0;
 		proc2Dcache_addr=64'h0000_0000_0000_8888;
 		proc2Dcache_command=BUS_LOAD;
 		proc2Dcache_data=0;
@@ -106,6 +109,7 @@ module test_dcache_controller;
 		cachemem_valid=0;
 		cachemem_is_dirty=0;
 		cachemem_is_miss=1;
+		cachemem_is_full =0;
 		proc2Dcache_addr=64'h0000_0000_0000_8008;
 		proc2Dcache_command=BUS_LOAD;
 		proc2Dcache_data=0;
@@ -144,7 +148,41 @@ module test_dcache_controller;
 		cachemem_is_miss=0;
 		proc2Dcache_addr=64'h0000_0000_0000_3746;
 		proc2Dcache_command=BUS_STORE;
-		proc2Dcache_data=0;
+		proc2Dcache_data=64'h0100_0100_1000_3947;
+	#10;
+	$display("@@@ store data and miss, not dirty!");
+		Dmem2proc_response=4'b0011;
+		Dmem2proc_tag=4'b0000;
+		cachemem_data=0;
+		cachemem_valid=0;
+		cachemem_is_dirty=0;
+		cachemem_is_miss=1;
+		proc2Dcache_addr=64'h0000_0000_0000_6666;
+		proc2Dcache_command=BUS_STORE;
+		proc2Dcache_data=64'h0000_0000_0100_6789;
+	#10;
+	$display("@@@ store data and miss, dirty!");
+		Dmem2proc_response=4'b0100;
+		Dmem2proc_tag=4'b0100;
+		cachemem_data=0;
+		cachemem_valid=0;
+		cachemem_is_dirty=1;
+		cachemem_is_miss=1;
+		proc2Dcache_addr=64'h0000_0000_1111_6666;
+		proc2Dcache_command=BUS_STORE;
+		proc2Dcache_data=64'h0000_0010_0100_6789;
+	#10;
+	$display("@@@ store data and cache is full!");
+		Dmem2proc_response=4'b0100;
+		Dmem2proc_tag=4'b0100;
+		cachemem_data=0;
+		cachemem_valid=0;
+		cachemem_is_dirty=1;
+		cachemem_is_miss=1;
+		cachemem_is_full =1;
+		proc2Dcache_addr=64'h0000_0000_0011_6166;
+		proc2Dcache_command=BUS_STORE;
+		proc2Dcache_data=64'h0000_0010_0101_6709;
 	#10;
 	$finish;
 end
