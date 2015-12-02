@@ -103,17 +103,6 @@ module lsq(
 	output logic [63:0]						lsq_CDB_result_out2,
 	output logic 							lsq_CDB_result_is_valid2,
 
-	//sedn idx to prf to get value
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx1,
-	output	logic							lsq_opb_request1,
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_opb_idx2,
-	output	logic							lsq_opb_request2,
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
-	output	logic							lsq_ra_request1,	//request = 0 if load
-	output	logic [$clog2(`PRF_SIZE)-1:0]	lsq_ra_dest_idx1,
-	output	logic							lsq_ra_request1,
-
-
 	//if sq has storeA @pc=0x100 if loadA @pc=0x120 will load from the sq
 	//but later a storeA @pc=0x110 happens, we need to violate the forwarded data from rob
 	//or the lsq is filled inorder, which means when store A @pc=0x110 mast happen before loadA @pc=0x120?
@@ -124,7 +113,7 @@ module lsq(
 	output	logic	[4:0]						mem_store_idx,
 	output	logic	[15:0]						load_from_mem_idx,//fifo
 	output	logic								request_from_mem,
-	output	logic	[4:0]						mem_load_tag_out,
+	//output	logic	[4:0]						mem_load_tag_out,
 
 	output	logic								rob1_excuted,
 	output	logic								rob2_excuted
@@ -146,6 +135,7 @@ module lsq(
 	logic	[`LQ_SIZE-1:0][4:0]		lq_reg_dest_tag, n_lq_reg_dest_tag;
 	logic	[`LQ_SIZE-1:0]			lq_reg_addr_valid, n_lq_reg_addr_valid;
 	logic	[`LQ_SIZE-1:0]			lq_reg_inst_valid, n_lq_reg_inst_valid;
+	logic	[`LQ_SIZE-1:0]			lq_free;
 	//logic							lq_reg_data_valid, n_lq_reg_data_valid;
 
 	//SQ
@@ -159,8 +149,8 @@ module lsq(
 
 	logic	[`LQ_SIZE-1:0] [`SQ_SIZE-1:0] LSQ_DEP_CODE		lq_dep;
 
-	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head, n_sq_head;
-	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail, n_sq_tail;
+	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_head1, n_sq_head1, sq_head2, n_sq_head2;
+	logic	[$clog2(`SQ_SIZE)-1:0]					sq_tail1, n_sq_tail1, sq_tail2, n_sq_tail2;
 	logic	[$clog2(`SQ_SIZE)-1:0]					ld_idx1, ld_idx2;
 	logic	[$clog2(`SQ_SIZE)-1:0]					st_idx1, st_idx2;
 	logic	[$clog2(`SQ_SIZE)-1:0]					ld_out_idx1, ld_out_idx2;
@@ -186,51 +176,149 @@ module lsq(
 	logic	[`LQ_SIZE-1:0][4:0] wait_idx;
 	logic	[4:0]		wait_int;
 	
+	logic	[15:0][`LQ_SIZE*2-1:0]	tag_ref;
+	logic	[`SQ_SIZE-1:0]			if_committed1;
+	logic	[`SQ_SIZE-1:0]			if_committed2;
+	
 	lq_one_entry [`LQ_SIZE-1:0] lq(
-		.clock,
-		.reset,
+		.clock(clock),
+		.reset(reset),
 
-		.lq_opa_in1,      	// Operand a from Rename  data
-		.lq_opb_in1,      	// Operand a from Rename  tag or data from prf
-		.lq_opb_valid1,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-		.lq_rob_idx_in1,  	// The rob index of instruction 1
-		.lq_mem_in1,
-		.lq_dest_idx1,
-		.lq_free,	
-		.lq_free_enable,	
+		.lq_opa_in1(lsq_opa_in1),		// Operand a from Rename  data
+		.lq_opb_in1(lsq_opb_in1),		// Operand a from Rename  tag or data from prf
+		.lq_opb_valid1(lsq_opb_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
+		.lq_mem_in1(id_rd_mem_in1),
+		.lq_dest_idx1(lsq_dest_idx1),
+		.lq_free(lq_free),
+		.lq_free_enable,
 
     //for instruction2
-		.lq_opa_in2,      	// Operand a from Rename  data
-		.lq_opb_in2,     	// Operand b from Rename  tag or data from prf
-		.lq_opb_valid2,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-		.lq_rob_idx_in2,  	// The rob index of instruction 2
-		.lq_mem_in2,    //ldq
-		.lq_dest_idx2,
+		.lq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
+		.lq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
+		.lq_opb_valid2(lsq_opb_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
+		.lq_mem_in2(id_rd_mem_in2),    //ldq
+		.lq_dest_idx2(lsq_dest_idx2),
 	
-		.lq_cdb1_in,     		// CDB bus from functional units 
-		.lq_cdb1_tag,    		// CDB tag bus from functional units 
-		.lq_cdb1_valid,  		// The data on the CDB is valid 
-		.lq_cdb2_in,     		// CDB bus from functional units 
-		.lq_cdb2_tag,    		// CDB tag bus from functional units 
-		.lq_cdb2_valid,  		// The data on the CDB is valid 
+		.lq_cdb1_in(lsq_cdb1_in),     		// CDB bus from functional units 
+		.lq_cdb1_tag(lsq_cdb1_tag),    		// CDB tag bus from functional units 
+		.lq_cdb1_valid(lsq_cdb1_valid),  	// The data on the CDB is valid 
+		.lq_cdb2_in(lsq_cdb2_in),     		// CDB bus from functional units 
+		.lq_cdb2_tag(lsq_cdb2_tag),    		// CDB tag bus from functional units 
+		.lq_cdb2_valid(lsq_cdb2_valid),  	// The data on the CDB is valid 
 	//output
-		.lq_is_available,
-		.lq_is_ready,
-		.lq_rob_idx,
-		.lq_opa,
-		.lq_opb,
-		.lq_dest_tag,
-		.lq_addr_valid
+		.lq_is_available(),
+		.lq_is_ready(),
+		.lq_rob_idx(),
+		.lq_opa(),
+		.lq_opb(),
+		.lq_dest_tag(),
+		.lq_addr_valid()
 	);
 	
-	always_ff(@posedge clock) begin
+	sq_one_entry sq_t1(
+		clock(clock),
+		reset(reset),
+
+		sq_opa_in1(lsq_opa_in1),      	// Operand a from Rename  data
+		sq_opb_in1(lsq_opb_in1),      	// Operand a from Rename  tag or data from prf
+		sq_opb_valid1(lsq_opa_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		sq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
+		sq_mem_in1(id_wr_mem_in1),
+		sq_dest_idx1(lsq_dest_idx1),
+
+    //for instruction2
+		sq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
+		sq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
+		sq_opb_valid2(lsq_rob_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		sq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
+		sq_mem_in2(id_wr_mem_in2),			//stq ********************************************
+		sq_dest_idx2(lsq_dest_idx2),
+	
+		sq_cdb1_in(lsq_cdb1_in),     		// CDB bus from functional units 
+		sq_cdb1_tag(lsq_cdb1_tag),    		// CDB tag bus from functional units 
+		sq_cdb1_valid(lsq_cdb1_valid),  		// The data on the CDB is valid 
+		sq_cdb2_in(lsq_cdb2_in),     		// CDB bus from functional units 
+		sq_cdb2_tag(lsq_cdb2_tag),    		// CDB tag bus from functional units 
+		sq_cdb2_valid(lsq_cdb2_valid),  		// The data on the CDB is valid
+		if_committed(if_committed1),
+
+		sq_is_available,
+		sq_is_ready,
+		sq_rob_idx,
+		sq_opa,
+		sq_opb,
+		sq_dest_tag,
+		sq_addr_valid
+	);
+
+	sq_one_entry sq_t2(
+		clock(clock),
+		reset(reset),
+
+		sq_opa_in1(lsq_opa_in1),      	// Operand a from Rename  data
+		sq_opb_in1(lsq_opb_in1),      	// Operand a from Rename  tag or data from prf
+		sq_opb_valid1(lsq_opa_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		sq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
+		sq_mem_in1(id_wr_mem_in1),
+		sq_dest_idx1(lsq_dest_idx1),
+
+    //for instruction2
+		sq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
+		sq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
+		sq_opb_valid2(lsq_rob_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		sq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
+		sq_mem_in2(id_wr_mem_in2),			//stq
+		sq_dest_idx2(lsq_dest_idx2),
+	
+		sq_cdb1_in(lsq_cdb1_in),     		// CDB bus from functional units 
+		sq_cdb1_tag(lsq_cdb1_tag),    		// CDB tag bus from functional units 
+		sq_cdb1_valid(lsq_cdb1_valid),  		// The data on the CDB is valid 
+		sq_cdb2_in(lsq_cdb2_in),     		// CDB bus from functional units 
+		sq_cdb2_tag(lsq_cdb2_tag),    		// CDB tag bus from functional units 
+		sq_cdb2_valid(lsq_cdb2_valid),  		// The data on the CDB is valid
+		if_committed(if_committed2),
+
+		sq_is_available,
+		sq_is_ready,
+		sq_rob_idx,
+		sq_opa,
+		sq_opb,
+		sq_dest_tag,
+		sq_addr_valid
+	);
+	//mispredict
+	always_comb begin
+		lq_free		= 0;
+		n_sq_tail1	= 0;
+		n_sq_tail2	= 0;
+		if (thread1_mispredict) begin
+			for (int i = 0; i <`LQ_SIZE; i++) begin
+				if (lq_dest_tag[i][$clog2(`ROB_SIZE)] == 0) begin
+					lq_free[i] = 1;
+				end
+			end
+			n_sq_tail1 = sq_head1;
+		end
+		if (thread2_mispredict) begin
+			for (int i = 0; i <`LQ_SIZE; i++) begin
+				if (lq_dest_tag[i][$clog2(`ROB_SIZE)] == 1) begin
+					lq_free[i] = 1;
+				end
+			end
+			n_sq_tail2 = sq_head2;
+		end
+	end
+	
+	always_comb begin
+		if (mem_load_tag_in)
+			tag_ref[mem_load_tag_in] = 
+	end
+	always_ff @ (posedge clock) begin
 		if(reset) begin
 			sq_head 			<= #1 0;
 			sq_tail 			<= #1 0;
-			sq_reg_addr 		<= #1 0;
-			sq_rob_idx 			<= #1 0;
-			sq_reg_opa 			<= #1 0;
-			sq_reg_opb 			<= #1 0;
 			sq_reg_data 		<= #1 0;
 			sq_reg_addr_valid 	<= #1 0;
 			sq_reg_inst_valid 	<= #1 0;
@@ -238,19 +326,8 @@ module lsq(
 			
 			wait_int			<= #1 0;
 			wait_idx 			<= #1 0;
-
 		end
 		else begin
-
-			lq_reg_addr 		<= #1 n_lq_reg_addr;
-			lq_rob_idx 			<= #1 n_lq_rob_idx;
-			lq_reg_opa 			<= #1 n_lq_reg_opa;
-			lq_reg_opb 			<= #1 n_lq_reg_opb;
-			//lq_reg_data 		<= #1 n_lq_reg_data;
-			lq_reg_inst_valid 	<= #1 n_lq_reg_inst_valid;
-			lq_reg_addr_valid 	<= #1 n_lq_reg_addr_valid;
-			lq_reg_dest_tag		<= #1 n_lq_reg_dest_tag;
-			//lq_reg_data_valid	<= #1 n_lq_reg_data_valid;
 
 			sq_head 			<= #1 n_sq_head;
 			sq_tail 			<= #1 n_sq_tail;
@@ -278,85 +355,12 @@ module lsq(
 		lsq_opb_new_valid2= lsq_opb_valid2;
 		
 		//get value from cdb
-		if ((lsq_cdb1_tag == lsq_ra_data1[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_ra_new1			= lsq_cdb1_in;
-			lsq_ra_new_valid1	= 1'b1;
-		end
-		else if ((lsq_cdb2_tag == lsq_ra_data1[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_ra_new1			= lsq_cdb2_in;
-			lsq_ra_new_valid1	= 1'b1;
-		end
-
-		if ((lsq_cdb1_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_opb_new1		= lsq_cdb1_in;
-			lsq_opb_new_valid1	= 1'b1;
-		end   	
-		else if ((lsq_cdb2_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_opb_new1		= lsq_cdb2_in;
-			lsq_opb_new_valid1	= 1'b1;
-		end
-
-		if ((lsq_cdb1_tag == lsq_ra_data2[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid2 && lsq_cdb1_valid)
-		begin
-			lsq_ra_new2			= lsq_cdb1_in;
-			lsq_ra_new_valid2	= 1'b1;
-		end
-		else if ((lsq_cdb2_tag == lsq_ra_data2[$clog2(`PRF_SIZE)-1:0]) && !lsq_ra_data_valid2 && lsq_cdb2_valid)
-		begin
-			lsq_ra_new2			= lsq_cdb2_in;
-			lsq_ra_new_valid2	= 1'b1;
-		end
-
-		if ((lsq_cdb1_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb1_valid)
-		begin
-			lsq_opb_new2		= lsq_cdb1_in;
-			lsq_opb_new_valid2	= 1'b1;
-		end   	
-		else if ((lsq_cdb2_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb2_valid)
-		begin
-			lsq_opb_new2		= lsq_cdb2_in;
-			lsq_opb_new_valid2	= 1'b1;
-		end  
-
-
 	
 		
 		//store the data from sq or mem
 		//lq enters: 1. get the dependency from sq info 2.forward if they can
-		ld_in1 = 0;
-		ld_in2 = 0;
-		st_in1 = 0;
-		st_in2 = 0;
-		ld_idx1 = 0;
-		ld_idx2 = 0;
-		st_idx1 = 0;
-		st_idx2 = 0;
 
-		n_lq_reg_addr 		= lq_reg_addr;
-		n_lq_rob_idx 		= lq_rob_idx ;
-		n_lq_reg_opa 		= lq_reg_opa;
-		n_lq_reg_opb 		= lq_reg_opb;
-		n_lq_reg_inst_valid = lq_reg_inst_valid;
-		n_lq_reg_addr_valid	= lq_reg_addr_valid;
-		n_lq_reg_dest_tag	= lq_reg_dest_tag;
-		//n_lq_reg_data_valid = lq_reg_data_valid;
-		//n_lq_reg_data 		= lq_reg_data;
-
-		n_sq_head 			= sq_head;
-		n_sq_tail 			= sq_tail;
-		n_sq_reg_addr		= sq_reg_addr;
-		n_sq_reg_data 		= sq_reg_data;
-		n_sq_rob_idx 		= sq_rob_idx;
-		n_sq_reg_opa 		= sq_reg_opa;
-		n_sq_reg_opb 		= sq_reg_opb;
-		n_sq_reg_inst_valid	= sq_reg_inst_valid;
-		n_sq_reg_addr_valid	= sq_reg_addr_valid;
-		n_sq_reg_data_valid	= sq_reg_data_valid;
-
+		//sq init
 		if(id_rd_mem_in1)	begin 		//ldq allocate two entry for ld
 			for(int i=0; i<`LQ_SIZE; i++) begin		//first find locations
 					for(round_j=sq_head; round_j!=sq_tail; round_j++) begin
@@ -427,6 +431,7 @@ module lsq(
 			end 	//for
 			end		//else if
 		end 	//if
+
 
 		if(id_wr_mem_in1)	begin //store 
 			ld_in1 = 0;
