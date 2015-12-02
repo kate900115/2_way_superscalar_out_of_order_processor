@@ -33,9 +33,9 @@ module test_sq;
 	logic	thread1_mispredict;
 	logic	thread2_mispredict;
 	
-	logic	[63:0]						instr_store_to_mem1;
+	logic	[63:0]						mem_store_value;
 	logic								instr_store_to_mem_valid1;
-	logic	[4:0]						mem_store_idx;
+	logic	[63:0]						mem_store_addr;
 	
 	logic								rob1_excuted;
 	logic								rob2_excuted;
@@ -71,9 +71,9 @@ sq sq1(
 	.thread1_mispredict(thread1_mispredict),
 	.thread2_mispredict(thread2_mispredict),
 	
-	.instr_store_to_mem1(instr_store_to_mem1),
+	.mem_store_value(mem_store_value),
 	.instr_store_to_mem_valid1(instr_store_to_mem_valid1),
-	.mem_store_idx(mem_store_idx),
+	.mem_store_addr(mem_store_addr),
 	.rob1_excuted(rob1_excuted),
 	.rob2_excuted(rob2_excuted),
 	.t1_is_full(t1_is_full),
@@ -81,7 +81,7 @@ sq sq1(
 	);
 
 
-always #5 clock = ~clock;
+always #10 clock = ~clock;
 	
 task exit_on_error;
 	begin
@@ -94,18 +94,26 @@ endtask
 initial begin
 	$monitor ("@@@ time:%d, \
 			clock:%b, \
-		    instr_store_to_mem1:%b, \
-			instr_store_to_mem_valid1:%b, \
-		    mem_store_idx:%b, \
+		    mem_store_value:%h, \
+			instr_store_to_mem_valid1:%h, \
+		    mem_store_addr:%h, \
 			rob1_excuted:%b, \
 			sq_t1_head:%b, \
 			sq_t1_tail:%b, \
 			sq_t2_head:%b, \
 			sq_t2_tail:%b, \
+			n_sq_t1_head:%b, \
+			n_sq_t1_tail:%b, \
+			n_sq_t2_head:%b, \
+			n_sq_t2_tail:%b, \
 			rob2_excuted:%b, \
 			t1_is_full:%b, \
-			t2_is_full:%b",
-			$time, clock, instr_store_to_mem1, instr_store_to_mem_valid1, mem_store_idx, rob1_excuted, sq1.sq_t1_head, sq1.sq_t1_tail, sq1.sq_t2_head, sq1.sq_t2_tail,rob2_excuted, t1_is_full, t2_is_full);
+			t2_is_full:%b, \
+			n_sq_reg_addr[sq_t1_tail]:%h, \
+			sq_reg_addr[sq_t1_tail]:%h,\
+			sq_rob_idx[3]:%h",
+			$time, clock, mem_store_value, instr_store_to_mem_valid1, mem_store_addr, rob1_excuted, sq1.sq_t1_head, sq1.sq_t1_tail, sq1.sq_t2_head, sq1.sq_t2_tail,
+			sq1.n_sq_t1_head, sq1.n_sq_t1_tail, sq1.n_sq_t2_head, sq1.n_sq_t2_tail,rob2_excuted, t1_is_full, t2_is_full, sq1.n_sq_reg_addr[sq1.sq_t1_tail], sq1.sq_reg_addr[sq1.sq_t1_tail], sq1.sq_rob_idx[3]);
 
 
 	clock = 0;
@@ -127,13 +135,46 @@ initial begin
 	lsq_opb_in1 = 32'h0000_00f0;    	// Operand a from Rename  tag or data from prf
 	lsq_opb_valid1 = 1; 					// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	lsq_rob_idx_in1 = 12;					// The rob index of instruction 1
-	lsq_ra_data1 = 1016;					//comes from prf according to idx request, 0 if load
+	lsq_ra_data1 = 16'h000f;					//comes from prf according to idx request, 0 if load
 	lsq_ra_data_valid1 = 1;				//weather data comes form prf is valid, if not, get from cdb
 	lsq_opa_in2  = 32'h0000_0002; 	// Operand a from Rename  data
 	lsq_opb_in2  = 32'h0000_00f0;	// Operand b from Rename  tag or data from prf
 	lsq_opb_valid2  = 1;					// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	lsq_rob_idx_in2 = 13;	// The rob index of instruction 2
-	lsq_ra_data2 = 1032;	//comes from prf according to idx request, 0 if load
+	lsq_ra_data2 = 16'h00f0;	//comes from prf according to idx request, 0 if load
+	lsq_ra_data_valid2 = 1;	//weather data comes form prf is valid, if not, get from cdb
+	
+	//we need rob age for store to commit
+	rob_commit_idx1 = 1;
+	rob_commit_idx2 = 2;
+	
+	//we need to know weather the instruction commited is a mispredict
+	thread1_mispredict = 0;
+	thread2_mispredict = 0;
+
+	#1
+	correct = (mem_store_value ==0 && instr_store_to_mem_valid1 == 0 && mem_store_addr == 0 && rob1_excuted==0 && rob2_excuted==0 && t1_is_full==0 && t2_is_full==0);
+	assert(correct) $display("@@@passed1");
+		else #1 exit_on_error;
+
+	@(negedge clock);
+
+
+	reset = 0;
+	id_wr_mem_in1 = 1;
+	id_wr_mem_in2 = 1;		//stq
+	is_thread1 = 1;
+	lsq_opa_in1 = 32'h0000_0002; 	// Operand a from Rename  data
+	lsq_opb_in1 = 32'h0000_00f0;    	// Operand a from Rename  tag or data from prf
+	lsq_opb_valid1 = 1; 					// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	lsq_rob_idx_in1 = 0;					// The rob index of instruction 1
+	lsq_ra_data1 = 1016;					//comes from prf according to idx request, 0 if load
+	lsq_ra_data_valid1 = 1;				//weather data comes form prf is valid, if not, get from cdb
+	lsq_opa_in2  = 32'h0000_0002; 	// Operand a from Rename  data
+	lsq_opb_in2  = 32'h0000_00f0;	// Operand b from Rename  tag or data from prf
+	lsq_opb_valid2  = 1;					// Is Opb a tag or immediate data (READ THIS COMMENT) 
+	lsq_rob_idx_in2 = 2;	// The rob index of instruction 2
+	lsq_ra_data2 = 16'h0002;	//comes from prf according to idx request, 0 if load
 	lsq_ra_data_valid2 = 1;	//weather data comes form prf is valid, if not, get from cdb
 	
 	//we need rob age for store to commit
@@ -145,40 +186,7 @@ initial begin
 	thread2_mispredict = 0;
 
 	#1
-	correct = (instr_store_to_mem1 ==0 && instr_store_to_mem_valid1 == 0 && mem_store_idx == 0 && rob1_excuted==0 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
-	assert(correct) $display("@@@passed1");
-		else #1 exit_on_error;
-
-	@(negedge clock);
-
-
-	reset = 0;
-	id_wr_mem_in1 = 1;
-	id_wr_mem_in2 = 1;		//stq
-	is_thread1 = 1;
-	lsq_opa_in1 = 32'h0000_0001; 	// Operand a from Rename  data
-	lsq_opb_in1 = 32'h0000_00f0;    	// Operand a from Rename  tag or data from prf
-	lsq_opb_valid1 = 1; 					// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	lsq_rob_idx_in1 = 12;					// The rob index of instruction 1
-	lsq_ra_data1 = 1016;					//comes from prf according to idx request, 0 if load
-	lsq_ra_data_valid1 = 1;				//weather data comes form prf is valid, if not, get from cdb
-	lsq_opa_in2  = 32'h0000_0002; 	// Operand a from Rename  data
-	lsq_opb_in2  = 32'h0000_00f0;	// Operand b from Rename  tag or data from prf
-	lsq_opb_valid2  = 1;					// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	lsq_rob_idx_in2 = 13;	// The rob index of instruction 2
-	lsq_ra_data2 = 1032;	//comes from prf according to idx request, 0 if load
-	lsq_ra_data_valid2 = 1;	//weather data comes form prf is valid, if not, get from cdb
-	
-	//we need rob age for store to commit
-	rob_commit_idx1 = 40;
-	rob_commit_idx2 = 13;
-	
-	//we need to know weather the instruction commited is a mispredict
-	thread1_mispredict = 0;
-	thread2_mispredict = 0;
-
-	#1
-	correct = (instr_store_to_mem1 ==1016 && instr_store_to_mem_valid1 == 1 && mem_store_idx == 32'h0000_00f1 && rob1_excuted==1 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
+	correct = (mem_store_value ==16'h000f && instr_store_to_mem_valid1 == 1 && mem_store_addr == 32'h0000_00f1 && rob1_excuted==1 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
 	assert(correct) $display("@@@passed2");
 		else #1 exit_on_error;
 
@@ -202,15 +210,15 @@ initial begin
 	lsq_ra_data_valid2 = 1;	//weather data comes form prf is valid, if not, get from cdb
 	
 	//we need rob age for store to commit
-	rob_commit_idx1 = 40;
-	rob_commit_idx2 = 18;
+	rob_commit_idx1 = 16;
+	rob_commit_idx2 = 2;
 	
 	//we need to know weather the instruction commited is a mispredict
 	thread1_mispredict = 0;
 	thread2_mispredict = 0;
 
 	#1
-	correct = (instr_store_to_mem1 ==1032 && instr_store_to_mem_valid1 == 1 && mem_store_idx == 32'h0000_00f2 && rob1_excuted==0 && rob2_excuted==1 && !t1_is_full && !t2_is_full);
+	correct = (mem_store_value ==0 && instr_store_to_mem_valid1 == 0 && mem_store_addr == 0&& rob1_excuted==0 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
 	assert(correct) $display("@@@passed3");
 		else #1 exit_on_error;
 
@@ -242,7 +250,7 @@ initial begin
 	thread2_mispredict = 0;
 
 	#1
-	correct = (instr_store_to_mem1 == 0 && instr_store_to_mem_valid1 == 0 && mem_store_idx == 0 && rob1_excuted==0 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
+	correct = (mem_store_value == 16'h00f0 && instr_store_to_mem_valid1 == 1 && mem_store_addr == 16'h00f2 && rob1_excuted==0 && rob2_excuted==1 && !t1_is_full && !t2_is_full);
 	assert(correct) $display("@@@passed4");
 		else #1 exit_on_error;
 
@@ -274,7 +282,7 @@ initial begin
 	thread2_mispredict = 0;
 
 	#1
-	correct = (instr_store_to_mem1 ==0 && instr_store_to_mem_valid1 == 0 && mem_store_idx ==0 && rob1_excuted==0 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
+	correct = (mem_store_value ==0 && instr_store_to_mem_valid1 == 0 && mem_store_addr ==0 && rob1_excuted==0 && rob2_excuted==0 && !t1_is_full && !t2_is_full);
 	assert(correct) $display("@@@passed5");
 		else #1 exit_on_error;
 	$finish;
