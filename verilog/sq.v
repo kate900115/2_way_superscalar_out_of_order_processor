@@ -39,9 +39,10 @@ module sq(
 	input	thread1_mispredict,
 	input	thread2_mispredict,
 	
-	output	logic	[63:0]						instr_store_to_mem1,
+	output	logic	[63:0]						mem_store_value,
 	output	logic								instr_store_to_mem_valid1,
-	output	logic	[4:0]						mem_store_idx,
+	output	logic	[63:0]						mem_store_addr,
+	//output	logic	[3:0]						mem_store_tag,
 	
 	output	logic								rob1_excuted,
 	output	logic								rob2_excuted,
@@ -62,14 +63,12 @@ module sq(
 	logic 	[$clog2(`SQ_SIZE)-1:0]					sq_t2_head, n_sq_t2_head;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t1_tail, n_sq_t1_tail;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_t2_tail, n_sq_t2_tail;
-	logic	[$clog2(`SQ_SIZE)-1:0]					st_idx1, st_idx2;
-	logic											st_in1, st_in2;
 	logic											st_out1, st_out2;
 	logic	[$clog2(`SQ_SIZE)-1:0]					sq_reg_data_valid, n_sq_reg_data_valid;
 
-	logic	[$clog2(`SQ_SIZE)-1:0]					round_j;
+	//logic	[3:0]					round_j;
 		
-	always_ff@(posedge clock) begin
+	always_ff @(posedge clock) begin
 		if(reset) begin
 
 
@@ -100,13 +99,10 @@ module sq(
 			sq_reg_inst_valid 	<= #1 n_sq_reg_inst_valid;
 			sq_reg_addr_valid 	<= #1 n_sq_reg_addr_valid;
 			sq_reg_data_valid	<= #1 n_sq_reg_data_valid;
-
 		end
 	end
 	
 	always_comb begin	
-		st_in1 = 0;
-		st_idx1 = 0;
 		n_sq_t1_head 		= sq_t1_head;
 		n_sq_t1_tail 		= sq_t1_tail;
 		n_sq_t2_head 		= sq_t2_head;
@@ -121,83 +117,85 @@ module sq(
 		n_sq_reg_data_valid	= sq_reg_data_valid;
 		
 		if(id_wr_mem_in1)	begin //store
-			for(round_j=sq_t1_head; ; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && !st_in1) begin
-					n_sq_reg_addr[round_j] 		= lsq_opa_in1 + lsq_opb_in1;
-					n_sq_t1_tail 				= sq_t1_tail+1;
-					n_sq_reg_data[round_j] 		= lsq_ra_data1;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in1;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in1;
-					n_sq_reg_opb[round_j] 		= lsq_opb_in1;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_opb_valid1;
-					n_sq_reg_data_valid[round_j]= lsq_ra_data_valid1;
-					st_in1 						= 1;
-					st_idx1						= round_j;
-					if(round_j==sq_t1_tail) break;
-				end
-			end //for
+					n_sq_reg_addr[sq_t1_tail] 		= lsq_opa_in1 + lsq_opb_in1;
+					n_sq_t1_tail 					= sq_t1_tail+1;
+					n_sq_reg_data[sq_t1_tail] 		= lsq_ra_data1;
+					n_sq_rob_idx[sq_t1_tail] 		= lsq_rob_idx_in1;
+					n_sq_reg_opa[sq_t1_tail] 		= lsq_opa_in1;
+					n_sq_reg_opb[sq_t1_tail] 		= lsq_opb_in1;
+					n_sq_reg_inst_valid[sq_t1_tail]= 1;
+					n_sq_reg_addr_valid[sq_t1_tail]= lsq_opb_valid1;
+					n_sq_reg_data_valid[sq_t1_tail]= lsq_ra_data_valid1;
 		end //if
 		
 		if(id_wr_mem_in2 && is_thread1) begin   //store
-			for(round_j=sq_t1_head;; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && (!st_in1 || (st_in1 && round_j!=st_idx1))) begin
-					n_sq_t1_tail 				= sq_t1_tail+st_in1+1;
-					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_in2; 
-					n_sq_reg_data[round_j] 		= lsq_ra_data2;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in2;
-					n_sq_reg_opb[round_j] 		= lsq_opb_in2;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_ra_data2;
-					n_sq_reg_data_valid[round_j]= lsq_ra_data_valid2;
-					if(round_j==sq_t1_tail+st_in1) break;
-					
+				if(!id_wr_mem_in1) begin
+					n_sq_t1_tail 					= sq_t1_tail+3'h1;
+					n_sq_reg_addr[sq_t1_tail] 		= lsq_opa_in2 + lsq_opb_in2; 
+					n_sq_reg_data[sq_t1_tail] 		= lsq_ra_data2;
+					n_sq_rob_idx[sq_t1_tail] 		= lsq_rob_idx_in2;
+					n_sq_reg_opa[sq_t1_tail] 		= lsq_opa_in2;
+					n_sq_reg_opb[sq_t1_tail] 		= lsq_opb_in2;
+					n_sq_reg_inst_valid[sq_t1_tail]	= 1;
+					n_sq_reg_addr_valid[sq_t1_tail]	= lsq_ra_data2;
+					n_sq_reg_data_valid[sq_t1_tail]	= lsq_ra_data_valid2;
 				end
-			end 	//for
+				else begin
+					n_sq_t1_tail 						= sq_t1_tail+3'h2;
+					n_sq_reg_addr[sq_t1_tail+3'b1] 		= lsq_opa_in2 + lsq_opb_in2; 
+					n_sq_reg_data[sq_t1_tail+3'b1] 		= lsq_ra_data2;
+					n_sq_rob_idx[sq_t1_tail+3'b1] 		= lsq_rob_idx_in2;
+					n_sq_reg_opa[sq_t1_tail+3'b1] 		= lsq_opa_in2;
+					n_sq_reg_opb[sq_t1_tail+3'b1] 		= lsq_opb_in2;
+					n_sq_reg_inst_valid[sq_t1_tail+3'b1]= 1;
+					n_sq_reg_addr_valid[sq_t1_tail+3'b1]= lsq_ra_data2;
+					n_sq_reg_data_valid[sq_t1_tail+3'b1]= lsq_ra_data_valid2;
+				end
 		end 	//if
 		
 		if(id_wr_mem_in2 && !is_thread1) begin   //store
-			for(round_j=sq_t2_head; ; round_j++) begin		//first find locations
-				if(!sq_reg_addr_valid[round_j] && (!st_in1 || (st_in1 && round_j!=st_idx1))) begin
 					n_sq_t2_tail 				= sq_t2_tail+1;
-					n_sq_reg_addr[round_j] 		= lsq_opa_in2 + lsq_opb_in2; 
-					n_sq_reg_data[round_j] 		= lsq_ra_data2;
-					n_sq_rob_idx[round_j] 		= lsq_rob_idx_in2;
-					n_sq_reg_opa[round_j] 		= lsq_opa_in2;
-					n_sq_reg_opb[round_j] 		= lsq_opb_in2;
-					n_sq_reg_inst_valid[round_j]= 1;
-					n_sq_reg_addr_valid[round_j]= lsq_ra_data2;
-					n_sq_reg_data_valid[round_j]= lsq_ra_data_valid2;
-					if(round_j==sq_t2_tail) break;
-					
-				end
-			end 	//for
+					n_sq_reg_addr[sq_t2_tail] 		= lsq_opa_in2 + lsq_opb_in2; 
+					n_sq_reg_data[sq_t2_tail] 		= lsq_ra_data2;
+					n_sq_rob_idx[sq_t2_tail] 		= lsq_rob_idx_in2;
+					n_sq_reg_opa[sq_t2_tail] 		= lsq_opa_in2;
+					n_sq_reg_opb[sq_t2_tail] 		= lsq_opb_in2;
+					n_sq_reg_inst_valid[sq_t2_tail]	= 1;
+					n_sq_reg_addr_valid[sq_t2_tail]	= lsq_ra_data2;
+					n_sq_reg_data_valid[sq_t2_tail]	= lsq_ra_data_valid2;
 		end 	//if
 		
 		//store to mem 
 		rob1_excuted = 0;
 		rob2_excuted = 0;
-		instr_store_to_mem1=0;
+		mem_store_value=0;
 		instr_store_to_mem_valid1 =0;
-		mem_store_idx=0;
+		mem_store_addr=0;
 		t1_is_full=0;
 		t2_is_full=0;
-		if(sq_rob_idx[sq_t1_head]==(rob_commit_idx1 ||rob_commit_idx2)) begin
-			instr_store_to_mem1 = sq_reg_data[sq_t1_head];
+		if((sq_rob_idx[sq_t1_head]==rob_commit_idx1 ||sq_rob_idx[sq_t1_head]==rob_commit_idx2) && is_thread1) begin
+			mem_store_value = sq_reg_data[sq_t1_head];
+			//mem_store_tag = round_j;
 			n_sq_t1_head = sq_t1_head +1;
 			instr_store_to_mem_valid1 = 1;
-			mem_store_idx = sq_reg_addr[sq_t1_head];
-			rob1_excuted = rob_commit_idx1;
-			rob2_excuted = (rob_commit_idx1 && rob_commit_idx2) ? 0:rob_commit_idx2;
+			mem_store_addr = sq_reg_addr[sq_t1_head];
+			rob1_excuted = sq_rob_idx[sq_t1_head]==rob_commit_idx1;
+			rob2_excuted = sq_rob_idx[sq_t1_head]==rob_commit_idx2;
 			n_sq_reg_inst_valid[sq_t1_head] = 0;
 		end
-		if(sq_rob_idx[sq_t2_head]==rob_commit_idx2 & !rob1_excuted) begin
-			instr_store_to_mem1 = sq_reg_data[sq_t2_head];
-			n_sq_t2_head = sq_t2_head +1;
+		
+		if((sq_rob_idx[sq_t1_head]==rob_commit_idx1 ||sq_rob_idx[sq_t2_head]==rob_commit_idx2) && !is_thread1) begin
+			mem_store_value = sq_reg_data[sq_t1_head];
+			//mem_store_tag = round_j;
+			n_sq_t1_head = (sq_rob_idx[sq_t1_head]==rob_commit_idx1)?sq_t1_head+1 	: sq_t1_head;
+			n_sq_t2_head = (sq_rob_idx[sq_t1_head]==rob_commit_idx1)?sq_t2_head		:sq_t1_head+1;
 			instr_store_to_mem_valid1 = 1;
-			mem_store_idx = sq_reg_addr[sq_t2_head];
-			rob2_excuted = 1;
+			mem_store_addr = (sq_rob_idx[sq_t1_head]==rob_commit_idx1)?sq_reg_addr[sq_t1_head]:sq_reg_addr[sq_t2_head];
+			rob1_excuted = sq_rob_idx[sq_t1_head]==rob_commit_idx1;
+			rob2_excuted = !(sq_rob_idx[sq_t1_head]==rob_commit_idx1);
+			if(sq_rob_idx[sq_t1_head]==rob_commit_idx1)
+			n_sq_reg_inst_valid[sq_t1_head] = 0;
+			else
 			n_sq_reg_inst_valid[sq_t2_head] = 0;
 		end		
 		
@@ -209,11 +207,11 @@ module sq(
 			n_sq_t2_tail = n_sq_t2_head;
 		end
 		
-		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head))				//**************************** 
+		if ((sq_t1_tail + 2 == sq_t1_head)||(sq_t1_tail + 1 == sq_t1_head)||(sq_t1_tail==sq_t1_head && (sq_reg_inst_valid[sq_t1_tail] && sq_rob_idx[sq_t1_tail]==0)))				//**************************** 
 		begin
 			t1_is_full = 1;
 		end
-		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head))
+		if ((sq_t2_tail + 2 == sq_t2_head)||(sq_t2_tail + 1 == sq_t2_head)||(sq_t2_tail==sq_t2_head && (sq_reg_inst_valid[sq_t2_tail]  && sq_rob_idx[sq_t1_tail]==1)))
 		begin
 			t2_is_full = 1;
 		end

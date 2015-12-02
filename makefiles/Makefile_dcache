@@ -21,14 +21,17 @@ all:    simv
 #####
 
 TESTBENCH = sys_defs.vh	\
-			test_dcache_mem.v
-SIMFILES = 	dcache_mem.v
+			test_bench/test_dcache.v 
+SIMFILES = 	verilog/dcache_controller.v \
+			verilog/dcache_mem.v \
+			verilog/dcache.v
+				
 
-SYNFILES = dcache_mem.vg 
+SYNFILES = dcache.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-dcache_mem.vg:	$(SIMFILES) dcache_mem.tcl 
-	dc_shell-t -f dcache_mem.tcl | tee synth.out
+dcache.vg:	$(SIMFILES) tcl_files/dcache.tcl 
+	dc_shell-t -f tcl_files/dcache.tcl | tee synth.out
 
 #####
 # Should be no need to modify after here
@@ -36,7 +39,7 @@ dcache_mem.vg:	$(SIMFILES) dcache_mem.tcl
 
 dve:	$(SIMFILES) $(TESTBENCH) 
 	$(VCS) +memcbk $(TESTBENCH) $(SIMFILES) -o dve -R -gui
-	
+
 dve_syn:	$(SYNFILES) $(TESTBENCH)
 	$(VCS) $(TESTBENCH) $(SYNFILES) $(LIB) +define+SYNTH_TEST -o syn_simv -R -gui
 
@@ -55,4 +58,4 @@ clean:
           dve *.vpd *.vcd *.dump ucli.key 
 
 nuke:	clean
-	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.syn *.mr *.pvl
+	rm -rvf *.vg *.rep *.db *.chk *.log *.out DVEfiles/ *.ddc *.res *_svsim.sv default.svf *.vdb *.syn *.mr *.pvl *.md
