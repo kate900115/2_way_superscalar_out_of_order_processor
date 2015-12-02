@@ -356,6 +356,13 @@ typedef enum logic[1:0] {
 //for loadl_link and store_cond
 `define LLSC_SIZE	8
 
+//for predictor
+`define LHISTORY_SIZE  64
+`define LOCALTAB_SIZE  4
+
+//for BTB
+`define BTB_SIZE      16
+
 typedef enum logic[2:0] {
 	NO_INST			= 3'b000,
 	IS_LDL_INST		= 3'b001,
