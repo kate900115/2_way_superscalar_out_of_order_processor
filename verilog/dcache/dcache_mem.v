@@ -8,8 +8,7 @@ module dcache_mem(
 	input											write_enable,
 	input [`DCACHE_BLOCK_SIZE-1:0] 					write_data_in,
 	input [3:0]										mem_response,
-	input [3:0]										mem_tag,
-	input 											store_to_memory_enable,							
+	input [3:0]										mem_tag,						
 	
 	// input from mem.v
 	input [`DCACHE_BLOCK_SIZE-1:0]  				load_data_in,
