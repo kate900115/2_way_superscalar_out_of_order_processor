@@ -73,20 +73,44 @@ module test_icache;
 		#5;
 		@(negedge clock);
 		$display("@@@ stop reset!!");
-		$display("@@@ first data in!!");
-		proc2Icache_addr	=0;
-		proc2Icache_command	=0;
-		Imem2proc_response	=0;
+		$display("@@@ pc request for the first instuction!!");
+		proc2Icache_addr	=64'h0000_0000_0000_0000;
+		proc2Icache_command	=BUS_LOAD;
+		Imem2proc_response	=1;
 		Imem2proc_tag		=0;
 		Imem2proc_data		=0;
 		
 		@(negedge clock);
-		$display("@@@ !!");
-		proc2Icache_addr	=0;
-		proc2Icache_command	=0;
-		Imem2proc_response	=0;
+		$display("@@@ pc request for the second instruction!!");
+		proc2Icache_addr	=64'h0000_0000_0000_0008;
+		proc2Icache_command	=BUS_LOAD;
+		Imem2proc_response	=2;
 		Imem2proc_tag		=0;
 		Imem2proc_data		=0;
+		
+		@(negedge clock);
+		$display("@@@ pc request for the third instruction!!");
+		proc2Icache_addr	=64'h0000_0000_0000_0010;
+		proc2Icache_command	=BUS_LOAD;
+		Imem2proc_response	=3;
+		Imem2proc_tag		=0;
+		Imem2proc_data		=0;
+		
+		@(negedge clock);
+		$display("@@@ pc request for the 4th instruction!!");
+		proc2Icache_addr	=64'h0000_0000_0000_0018;
+		proc2Icache_command	=BUS_LOAD;
+		Imem2proc_response	=4;
+		Imem2proc_tag		=1;
+		Imem2proc_data		=64'h1111_1111_1111_1111;
+		
+		@(negedge clock);
+		$display("@@@ pc request for the 4th instruction!!");
+		proc2Icache_addr	=64'h0000_0000_0000_0020;
+		proc2Icache_command	=BUS_LOAD;
+		Imem2proc_response	=5;
+		Imem2proc_tag		=2;
+		Imem2proc_data		=64'h2222_2222_2222_2222;
 		@(negedge clock);
 		$finish;
 	end
