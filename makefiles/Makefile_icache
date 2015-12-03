@@ -30,7 +30,7 @@ SIMFILES = 	verilog/icache_controller.v \
 SYNFILES = icache.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
-dcache.vg:	$(SIMFILES) tcl_files/icache.tcl 
+icache.vg:	$(SIMFILES) tcl_files/icache.tcl 
 	dc_shell-t -f tcl_files/icache.tcl | tee synth.out
 
 #####
