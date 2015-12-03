@@ -233,8 +233,19 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
 
+// Icache output
+logic 					Imem2proc_valid;
 
-logic Imem2proc_valid;
+// Dcache
+// the following signals are all given and received by LSQ
+logic [63:0]			proc2Dcache_addr;
+logic [3:0]				proc2Dcache_command;
+logic [63:0]			proc2Dcache_data;
+logic [63:0]			Dcache2proc_data;
+logic [3:0]				Dcache2proc_tag;
+logic [3:0]				Dcache2proc_response;
+logic 					Dcache_data_hit;
+
 assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
 assign proc2mem_addr = PC_proc2Imem_addr;
@@ -903,4 +914,61 @@ end*/
 //								//
 //////////////////////////////////
 
+
+
+//////////////////////////////////
+//								//
+//			 ICACHE				//
+//								//
+//////////////////////////////////
+icache ica(
+	// input
+	.clock(clock),
+	.reset(reset),
+	// from processor
+	.proc2Icache_addr(PC_proc2Imem_addr), 
+	
+	// from memory
+	.wr1_data(mem2proc_data),
+	
+	// output
+	// to processor
+	Icache_data_out(mem2proc_data),
+	Icache_valid_out(Imem2proc_valid),
+	
+	// to memory
+	proc2Imem_addr(proc2mem_addr),
+	proc2Imem_command(proc2mem_command)
+);
+	
+	
+//////////////////////////////////
+//								//
+//			 DCACHE				//
+//								//
+//////////////////////////////////
+dcache dca(
+	.clock(clock),
+	.reset(reset),
+	// input from Mem.v
+	.Dmem2proc_response(mem2proc_response),
+	.Dmem2proc_tag(mem2proc_tag),
+	.Dmem2proc_data(mem2proc_data),
+	
+	// input from processor.v
+	.proc2Dcache_addr(proc2Dcache_addr),
+	.proc2Dcache_command(proc2Dcache_command),
+	.proc2Dcache_data(proc2Dcache_data),
+	
+	// output to mem.v
+	.proc2Dmem_command(proc2mem_command),
+	.proc2Dmem_addr(proc2mem_addr),
+	.proc2Dmem_data(proc2mem_data),
+	
+	// output to processor.v
+	.Dcache2proc_data(Dcache2proc_data),	 
+	.Dcache2proc_tag(Dcache2proc_tag),	 	
+	.Dcache2proc_response(Dcache2proc_response),
+	.Dcache_data_hit(Dcache_data_hit)
+);
 endmodule
