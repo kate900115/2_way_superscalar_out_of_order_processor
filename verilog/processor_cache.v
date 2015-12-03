@@ -62,14 +62,9 @@ module processor(
 	output logic [63:0]						ROB_commit1_pc,
 	output logic [63:0]						ROB_commit2_pc,
 	output logic [31:0]						ROB_commit1_inst_out,
-	output logic [31:0]						ROB_commit2_inst_out,
-	output logic 						is_next_thread1,
-	output logic						ROB_commit1_is_thread1,
-	output logic						ROB_commit2_is_thread1
+	output logic [31:0]						ROB_commit2_inst_out
 	
 );
-
-
 
 logic	thread1_branch_is_taken;
 logic	thread2_branch_is_taken;
@@ -190,9 +185,9 @@ logic [63:0]					ROB_commit1_target_pc;
 logic [63:0]					ROB_commit2_target_pc;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
-
+logic 							ROB_commit1_is_thread1;
 logic 							ROB_commit1_is_branch;
-
+logic 							ROB_commit2_is_thread1;
 logic							ROB_commit2_is_branch;
 logic							ROB_commit1_is_halt;
 logic							ROB_commit1_is_illegal;
@@ -238,13 +233,24 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
 
+// Icache output
+logic 									Icache_valid_out;
+logic [`ICACHE_BLOCK_SIZE-1:0]			Icache_data_out;
+logic [3:0]								Icache2proc_response;
+logic [3:0]								Icache2proc_tag;
+// Dcache
+// the following signals are all given and received by LSQ
+logic [63:0]			proc2Dcache_addr;
+logic [3:0]				proc2Dcache_command;
+logic [63:0]			proc2Dcache_data;
+logic [63:0]			Dcache2proc_data;
+logic [3:0]				Dcache2proc_tag;
+logic [3:0]				Dcache2proc_response;
+logic 					Dcache_data_hit;
 
-
-
-logic Imem2proc_valid;
-assign proc2mem_command = BUS_LOAD;
+//assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
-assign proc2mem_addr = PC_proc2Imem_addr;
+//assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
@@ -257,7 +263,7 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
                                 ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
-                                (mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
+                                /*(mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :*/
                                 NO_ERROR;
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
@@ -283,9 +289,9 @@ if_stage pc(
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	.Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
-	.Imem2proc_valid(Imem2proc_valid),				// 
-	.is_two_threads(1'b1),
+	.Imem2proc_data(Icache_data_out),					// Data coming back from instruction-memory
+	.Imem2proc_valid(Icache_valid_out),				// 
+	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
 	//.next_PC_out(,
@@ -295,8 +301,7 @@ if_stage pc(
 	.thread2_inst_is_valid(PC_inst2_valid),
 	.thread1_is_available(PC_thread1_is_available),
 	//for debug
-	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
-	.is_next_thread1(is_next_thread1)
+	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous)
 	);
 //////////////////////////////////
 //								//
@@ -885,30 +890,76 @@ cdb cdb1(
 //			  LSQ				//
 //								//
 //////////////////////////////////
-/*always_comb begin
-	//RRAT
-	$display("RRAT2_PRF_free_valid1:%h", RRAT2_PRF_free_valid1);
-	//PRF
-	$display("PRF_RS_inst1_opa:%h", PRF_RS_inst1_opa);
-	$display("PRF_RS_inst1_opa_valid:%h", PRF_RS_inst1_opa_valid);
-	//ROB
-	$display("ROB_commit1_target_pc:%h", ROB_commit1_target_pc);
-	$display("ROB_commit1_is_valid:%h", ROB_commit1_is_valid);
-	//RS
-	$display("RS_EX_dest_tag:%h", RS_EX_dest_tag);
-	$display("RS_EX_out_valid:%h", RS_EX_out_valid);
-	//EX
-	$display("EX_CDB_dest_tag:%h", EX_CDB_dest_tag);
-	$display("EX_CDB_fu_result_out:%h", EX_CDB_fu_result_out);
-	//CDB
-	$display("cdb1_valid:%h", cdb1_valid);
-	$display("cdb1_value:%h", cdb1_value);
 
-end*/
+
+
 //////////////////////////////////
 //								//
 //			  MEM				//
 //								//
 //////////////////////////////////
+
+
+
+//////////////////////////////////
+//								//
+//			 ICACHE				//
+//								//
+//////////////////////////////////
+icache ica(
+	.clock(clock),
+	.reset(reset),
+	
+	// input from processor.v
+	.proc2Icache_addr(PC_proc2Imem_addr),	
+	.proc2Icache_command(BUS_LOAD),
+	
+	// input from memory
+	.Imem2proc_response(mem2proc_response),
+	.Imem2proc_tag(mem2proc_tag),
+	.Imem2proc_data(mem2proc_data),
+	
+	// output to mem.v
+	.proc2Imem_command(proc2mem_command),
+	.proc2Imem_addr(proc2mem_addr),
+	
+	// output to processor.v
+	.Icache_data_out(Icache_data_out),
+	.Icache_valid_out(Icache_valid_out),
+	.Icache2proc_tag(Icache2proc_tag),	 	
+	.Icache2proc_response(Icache2proc_response)
+	);
+	
+	
+//////////////////////////////////
+//								//
+//			 DCACHE				//
+//								//
+//////////////////////////////////
+/*dcache dca(
+	.clock(clock),
+	.reset(reset),
+	// input from Mem.v
+	.Dmem2proc_response(mem2proc_response),
+	.Dmem2proc_tag(mem2proc_tag),
+	.Dmem2proc_data(mem2proc_data),
+	
+	// input from processor.v
+	.proc2Dcache_addr(proc2Dcache_addr),
+	.proc2Dcache_command(proc2Dcache_command),
+	.proc2Dcache_data(proc2Dcache_data),
+	
+	// output to mem.v
+	.proc2Dmem_command(proc2mem_command),
+	.proc2Dmem_addr(proc2mem_addr),
+	.proc2Dmem_data(proc2mem_data),
+	
+	// output to processor.v
+	.Dcache2proc_data(Dcache2proc_data),	 
+	.Dcache2proc_tag(Dcache2proc_tag),	 	
+	.Dcache2proc_response(Dcache2proc_response),
+	.Dcache_data_hit(Dcache_data_hit)
+);
+*/
 
 endmodule

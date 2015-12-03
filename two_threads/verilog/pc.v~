@@ -94,8 +94,8 @@ module pc(
 
 				inst1_is_valid	 <=0;
 				inst2_is_valid	 <=0;
-  				inst1_out	 <= `SD 0;
-				inst2_out	 <= `SD 0;
+  				inst1_out	 <= `SD current_inst1;
+				inst2_out	 <= `SD current_inst2;
     		end
     		else
     		begin
@@ -103,8 +103,6 @@ module pc(
 
 				inst1_is_valid	 <= `SD inst1_is_valid_reg;
 				inst2_is_valid 	 <= `SD inst2_is_valid_reg;
-  				inst1_out	 <= `SD current_inst1;
-				inst2_out	 <= `SD current_inst2;
     		end
   	end  // always
 
