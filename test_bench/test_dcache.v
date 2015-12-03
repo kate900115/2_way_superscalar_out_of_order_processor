@@ -79,12 +79,42 @@ module test_dcache;
 		#5;
 		@(negedge clock);
 		$display("@@@ stop reset!!");
-		$display("@@@ first data in!!");
+		$display("@@@ first load!!");
 		reset				= 1'b0;
 		Dmem2proc_response	= 4'b0001;
 		Dmem2proc_tag		= 0;
 		Dmem2proc_data		= 0;
 		proc2Dcache_addr	= 64'h0000_0000_0000_1230;
+		proc2Dcache_command = BUS_LOAD;
+		proc2Dcache_data	= 64'h0;
+		
+		@(negedge clock);
+		$display("@@@ second load!!");
+		reset				= 1'b0;
+		Dmem2proc_response	= 4'b0010;
+		Dmem2proc_tag		= 0;
+		Dmem2proc_data		= 0;
+		proc2Dcache_addr	= 64'h0000_0000_7777_1450;
+		proc2Dcache_command = BUS_LOAD;
+		proc2Dcache_data	= 64'h0;
+		
+		@(negedge clock);
+		$display("@@@ third load!!");
+		reset				= 1'b0;
+		Dmem2proc_response	= 4'b0011;
+		Dmem2proc_tag		= 0;
+		Dmem2proc_data		= 0;
+		proc2Dcache_addr	= 64'h0000_0000_6687_5f80;
+		proc2Dcache_command = BUS_LOAD;
+		proc2Dcache_data	= 64'h0;
+		
+		@(negedge clock);
+		$display("@@@ 4th load!!");
+		reset				= 1'b0;
+		Dmem2proc_response	= 4'b0100;
+		Dmem2proc_tag		= 4'b0001;
+		Dmem2proc_data		= 64'h0000_0010_1534_9999;
+		proc2Dcache_addr	= 64'h0000_0000_6687_5f80;
 		proc2Dcache_command = BUS_LOAD;
 		proc2Dcache_data	= 64'h0;
 		
