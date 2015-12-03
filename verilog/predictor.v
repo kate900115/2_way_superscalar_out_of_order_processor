@@ -22,7 +22,7 @@ module predictor(
 
 	logic [`LOCALTAB_SIZE-1:0] [$clog2(`LHISTORY_SIZE)-1:0] local_history;
 	logic [`LOCALTAB_SIZE-1:0] [$clog2(`LHISTORY_SIZE)-1:0] local_nexthistory;
-	logic [`LHISTORY_SIZE-1] [1:0] l_nextstate,l_state;
+	logic [`LHISTORY_SIZE-1:0] [1:0] l_nextstate,l_state;
 	//logic [1:0] predict_state;
 	logic [$clog2(`LHISTORY_SIZE)-1:0] inst1_lhistory;
 	logic [$clog2(`LHISTORY_SIZE)-1:0] inst2_lhistory;
