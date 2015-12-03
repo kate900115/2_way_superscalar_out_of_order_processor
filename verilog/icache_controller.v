@@ -1,71 +1,157 @@
-module Icache_controller(										//this is a 128 line direct mapped cache with 128 lines
-	input			clock,
-	input 			reset,
-	input	[3:0]	Imem2proc_response,
-	input	[63:0]	Imem2proc_data,
-	input	[3:0]	Imem2proc_tag,
+module icache_controller(
+	// input from Mem.v										
+	input	[3:0]							Imem2proc_response,
+	input	[3:0]							Imem2proc_tag,
 	
-	input	[63:0]	proc2Icache_addr,								//the address of the current instrucion
-	input	[63:0]	cachemem_data,
-	input			cachemem_valid,
+	// input from processor.v
+	input	[63:0]							proc2Icache_addr,	
+	input  BUS_COMMAND						proc2Icache_command,
 	
+	// input from Icache.v
+	input  [`ICACHE_BLOCK_SIZE-1:0]			cachemem_data,
+	input 									cachemem_valid,
+	input									cachemem_is_full,
+	input									cachemem_is_miss,
+	
+	// output to mem.v
 	output	logic	[1:0]					proc2Imem_command,
 	output	logic	[63:0]					proc2Imem_addr,
 	
+	// output to processor.v
 	output	logic	[63:0]					Icache_data_out,
 	output	logic							Icache_valid_out,
+	output logic [3:0]						Icache2proc_tag,	 	
+	output logic [3:0]						Icache2proc_response,
 	
-	output	logic	[`ICACHE_INDEX_SIZE-1:0]	current_index,
-	output	logic	[`ICACHE_TAG_SIZE-1:0]		current_tag,
-	output	logic	[`ICACHE_INDEX_SIZE-1:0]	last_index,
-	output	logic	[`ICACHE_TAG_SIZE-1:0]		last_tag,
-	output	logic								data_write_enable
+	// output to Icache.v
+	output logic [`ICACHE_INDEX_SIZE-1:0]   index,
+	output logic [`ICACHE_TAG_SIZE-1:0]		tag,  
+	output logic							read_enable,    
+	output logic [3:0]						mem_response,
+	output logic [3:0]						mem_tag
 );
 
-	logic	[3:0]	current_mem_tag;
-	logic	miss_outstanding;
-	logic 	unanswered_miss;
-	logic	changed_addr;
-	logic 	update_mem_tag;
+	// output to Icache.v
+	assign {tag, index} 			= proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
+	assign write_data_to_Icache 	= proc2Icache_data;
 
-	assign	{current_tag,current_index} = proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
-
-	assign	changed_addr = (current_index!=last_index) || (current_tag!=last_tag);	//if the address come from IF has changed(64 bits instructoin normally 2cycles a change)
-
-	assign	Icache_data_out = cachemem_data;						//the output instruction to IF_stage comes from Icache
-
-	assign	Icache_valid_out = cachemem_valid;							//so is the valid signal
-
-	assign 	proc2Imem_addr = {proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET],{`ICACHE_BLOCK_OFFSET}1'b0};						//
-				
-	assign 	proc2Imem_command = (miss_outstanding && !changed_addr) ? `BUS_LOAD : `BUS_NONE;	//if before the last posedge, the i cache missed, and the address hasn't changed, so that we need to load from mem.v, it start after the posedge
 	
-	assign	data_write_enable = (current_mem_tag==Imem2proc_tag) && (current_mem_tag!=0);		//if we get data from mem.v, it match the current tag which the icache don't have , we need to put it in icache
-
-	assign	update_mem_tag = changed_addr | miss_outstanding | data_write_enable;			//a control signal to tell whether we want to change the current_mem_tag
-	
-	assign	unanswered_miss = changed_addr ? !Icache_valid_out : miss_outstanding & (Imem2proc_response==0);
-	
-	always_comb begin
-		current_index
-	end
-	
-	always_ff @(posedge clock)
+	always_comb
 	begin
-		if(reset)
-		begin
-			last_index	<= `SD -1;
-			last_tag	<= `SD -1;
-			current_mem_tag	<= `SD 0;
-			miss_outstanding<= `SD 0;
-		end
-		else
-		begin
-			last_index	<= `SD current_index;
-			last_tag	<= `SD current_tag;
-			miss_outstanding<= `SD unanswered_miss;
-			if(update_mem_tag)
-				current_mem_tag	<= `SD Imem2proc_reponse;				//this signal  tracks the ID number for your transaction, so that , when the tag come back from mem, we can check if it is the tag we want!!!
-		end
-	end
+		case(proc2Icache_command)
+			BUS_LOAD:
+				begin
+					// to icache.v
+					read_enable 		    	 = 1'b1;  
+					if (cachemem_is_miss && cachemem_is_full) 
+					begin
+						// to mem.v
+						proc2Imem_command 		 = BUS_NONE;
+						proc2Imem_addr 	 		 = 0;
+						// to icache.v
+						// for present inst
+						mem_response	  		 = 0;
+						// for previous inst
+						mem_tag			  	 	 = Imem2proc_tag;
+						// to proc.v
+						// for current instruction
+						Icache2proc_response	 = 0;
+						Icache_data_valid		 = 0;
+						// for previous instruction
+						Icache_data_out  		 = cachemem_data;
+						Icache2proc_tag  		 = Imem2proc_tag;
+					end
+					else if (cachemem_is_miss)
+					begin
+						// to mem.v
+						proc2Imem_command 		 = BUS_LOAD;
+						proc2Imem_addr 	 		 = {proc2Icache_addr[63:3],3'b0};
+						// to icache.v
+						// for present inst
+						mem_response	  		 = Imem2proc_response;
+						// for previous inst
+						mem_tag			  	 	 = Imem2proc_tag;
+						// to proc.v
+						// for current instruction
+						Icache2proc_response	 = Imem2proc_response;
+						Icache_data_valid		 = 0;
+						// for previous instruction
+						Icache_data_out  		 = cachemem_data;
+						Icache2proc_tag  		 = Imem2proc_tag;
+					end
+					else if ((cachemem_is_miss==0) && (Imem2proc_tag!=0))
+					begin
+						// to mem.v
+						proc2Imem_command		 = BUS_NONE;
+						proc2Imem_addr 	 		 = 0;
+						// to icache.v
+						mem_response			 = Imem2proc_response;
+						mem_tag			  		 = Imem2proc_tag;
+						// to proc.v
+						// for current instruction
+						Icache2proc_response 	 = Imem2proc_response;
+						Icache_data_valid		 = 0;
+						// for previous instruction
+						Icache_data_out  		 = cachemem_data;
+						Icache2proc_tag  		 = Imem2proc_tag;
+					end
+					else
+					begin
+						// to mem.v
+						proc2Imem_command		 = BUS_NONE;
+						proc2Imem_addr 	 		 = 0;
+						// to icache.v
+						mem_response			 = Imem2proc_response;
+						mem_tag			  		 = Imem2proc_tag;
+						// to proc.v
+						// for current instruction
+						Icache2proc_response	 = Imem2proc_response;
+						Icache_data_valid		 = 1;
+						// for previous instruction
+						Icache_data_out  		 = cachemem_data;
+						Icache2proc_tag  		 = Imem2proc_tag;
+					end
+				end
+			
+			BUS_NONE:
+				begin
+						// to mem.v
+						proc2Imem_command		 = BUS_NONE;
+						proc2Imem_addr 	 		 = 0;
+						// to icache.v
+						mem_response			 = Imem2proc_response;
+						mem_tag			  		 = Imem2proc_tag;
+						read_enable 		     = 1'b0;   
+						// to proc.v
+						// for current instruction
+						Icache2proc_response 	 = Imem2proc_response;
+						Icache_data_valid		 = 0;
+						// for previous instruction
+						Icache_data_out  		 = cachemem_data;
+						Icache2proc_tag  		 = 0;
+				end
+				
+			default:
+				begin
+					// to mem.v
+					proc2Imem_command		 = BUS_NONE;
+					proc2Imem_addr 	 		 = 0;
+					// to icache.v
+					mem_response			 = Imem2proc_response;
+					mem_tag			  		 = Imem2proc_tag;
+					read_enable 		     = 1'b0; 
+					// to proc.v
+					// for current instruction
+					if (cachemem_is_full)
+						Icache2proc_response = 0;
+					else
+						Icache2proc_response = Imem2proc_response;
+					Icache_data_valid		 = 0;
+					// for previous instruction
+					Icache_data_out  		 = cachemem_data;
+					Icache2proc_tag  		 = 0;
+				end
+		endcase
+	end	
+endmodule
 endmodule

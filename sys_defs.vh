@@ -342,7 +342,9 @@ typedef enum logic[1:0] {
 `define ICACHE_BLOCK_SIZE	64	 									//bit
 `define	ICACHE_INDEX_SIZE	$clog2(`ICACHE_SIZE/`ICACHE_BLOCK_SIZE)	//bit
 `define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE) 				//bit
-`define ICACHE_TAG_SIZE		64-`ICACHE_BLOCK_OFFSET-`INDEX_SIZE		//bit
+`define ICACHE_TAG_SIZE		64-`ICACHE_BLOCK_OFFSET-`ICACHE_INDEX_SIZE		//bit
+`define ICACHE_ENTRY_NUM	`ICACHE_SIZE/`ICACHE_BLOCK_SIZE
+
 
 `define DCACHE_SIZE					2048 //bits size
 `define DCACHE_BLOCK_SIZE			64	 //bits size
