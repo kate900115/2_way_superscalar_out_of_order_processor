@@ -19,7 +19,7 @@ module icache_controller(
 	
 	// output to processor.v
 	output	logic	[63:0]					Icache_data_out,
-	output	logic							Icache_valid_out,
+	output	logic							Icache_data_valid,
 	output logic [3:0]						Icache2proc_tag,	 	
 	output logic [3:0]						Icache2proc_response,
 	
@@ -33,8 +33,6 @@ module icache_controller(
 
 	// output to Icache.v
 	assign {tag, index} 			= proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
-	assign write_data_to_Icache 	= proc2Icache_data;
-
 	
 	always_comb
 	begin
@@ -153,5 +151,4 @@ module icache_controller(
 				end
 		endcase
 	end	
-endmodule
 endmodule

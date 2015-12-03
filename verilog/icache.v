@@ -12,7 +12,7 @@ module icache(
 	input	[`ICACHE_BLOCK_SIZE-1:0]		Imem2proc_data,
 	
 	// output to mem.v
-	output	logic	[1:0]					proc2Imem_command,
+	output	BUS_COMMAND					proc2Imem_command,
 	output	logic	[63:0]					proc2Imem_addr,
 	
 	// output to processor.v
@@ -24,11 +24,10 @@ module icache(
 	);
 	
 	// input from Icachemem.v
-	logic  [`ICACHE_BLOCK_SIZE-1:0]			cachemem_data,
-	logic 									cachemem_valid,
-	logic									cachemem_is_full,
-	logic									cachemem_is_miss,
-	
+	logic  [`ICACHE_BLOCK_SIZE-1:0]			cachemem_data;
+	logic 									cachemem_valid;
+	logic									cachemem_is_full;
+	logic									cachemem_is_miss;	
 	// output to Icachemem.v
 	logic [`ICACHE_INDEX_SIZE-1:0]  		index;
 	logic [`ICACHE_TAG_SIZE-1:0]			tag; 
@@ -36,7 +35,7 @@ module icache(
 	logic [3:0]								mem_response;
 	logic [3:0]								mem_tag;
 	
-	icache_controller(
+	icache_controller ic(
 		// input from Mem.v										
 		.Imem2proc_response(Imem2proc_response),
 		.Imem2proc_tag(Imem2proc_tag),
@@ -54,7 +53,7 @@ module icache(
 		.proc2Imem_addr(proc2Imem_addr),
 		// output to processor.v
 		.Icache_data_out(Icache_data_out),
-		.Icache_valid_out(Icache_valid_out),
+		.Icache_data_valid(Icache_valid_out),
 		.Icache2proc_tag(Icache2proc_tag),	 	
 		.Icache2proc_response(Icache2proc_response),
 		// output to Icache.v
@@ -67,7 +66,7 @@ module icache(
 
 	
 	
-	icachemem(
+	icachemem im(
 		.clock(clock),
 		.reset(reset),
 		// input from icache_controller.v

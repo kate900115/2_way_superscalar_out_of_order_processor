@@ -17,22 +17,22 @@ module test_icache;
 	logic [3:0]							Icache2proc_tag;	 	
 	logic [3:0]							Icache2proc_response;
 
-	icache(
+	icache ic(
 		// input	
-		clock(clock),
-		reset(reset),
-		proc2Icache_addr(proc2Icache_addr),	
-		proc2Icache_command(proc2Icache_command),
-		Imem2proc_response(Imem2proc_response),
-		Imem2proc_tag(Imem2proc_tag),
-		Imem2proc_data(Imem2proc_data),
+		.clock(clock),
+		.reset(reset),
+		.proc2Icache_addr(proc2Icache_addr),	
+		.proc2Icache_command(proc2Icache_command),
+		.Imem2proc_response(Imem2proc_response),
+		.Imem2proc_tag(Imem2proc_tag),
+		.Imem2proc_data(Imem2proc_data),
 		// output
-		proc2Imem_command(proc2Imem_command),
-		proc2Imem_addr(proc2Imem_addr),
-		Icache_data_out(Icache_data_out),
-		Icache_valid_out(Icache_valid_out),
-		Icache2proc_tag(Icache2proc_tag),	 	
-		Icache2proc_response(Icache2proc_response)
+		.proc2Imem_command(proc2Imem_command),
+		.proc2Imem_addr(proc2Imem_addr),
+		.Icache_data_out(Icache_data_out),
+		.Icache_valid_out(Icache_valid_out),
+		.Icache2proc_tag(Icache2proc_tag),	 	
+		.Icache2proc_response(Icache2proc_response)
 	);
 	
 	always #5 clock = ~clock;

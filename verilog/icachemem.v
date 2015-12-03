@@ -66,12 +66,10 @@ module icachemem(
 		internal_data_in 						= internal_data;
 		internal_tag_in  						= internal_tag;
 		internal_valid_in						= internal_valid;
-		internal_dirty_in 						= internal_dirty;
 		internal_response_in					= internal_response;
 		internal_way_next						= internal_way;
 		data_is_valid							= 1'b0;
 		data_is_miss							= 1'b0;
-		store_data_out							= 0;
 		read_data								= load_data_in;
 		cache_is_full							= 1'b0;
 		
@@ -133,7 +131,6 @@ module icachemem(
 				begin
 					internal_data_in[i][j] 			= load_data_in;
 					internal_valid_in[i][j]			= 1'b1;
-					internal_dirty_in[i][j]			= 1'b0;
 					internal_response_in[i][j]		= 0;
 					read_data						= load_data_in;
 					//internal_way_next[i]			= ~j;
