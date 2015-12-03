@@ -888,26 +888,9 @@ cdb cdb1(
 //			  LSQ				//
 //								//
 //////////////////////////////////
-/*always_comb begin
-	//RRAT
-	$display("RRAT2_PRF_free_valid1:%h", RRAT2_PRF_free_valid1);
-	//PRF
-	$display("PRF_RS_inst1_opa:%h", PRF_RS_inst1_opa);
-	$display("PRF_RS_inst1_opa_valid:%h", PRF_RS_inst1_opa_valid);
-	//ROB
-	$display("ROB_commit1_target_pc:%h", ROB_commit1_target_pc);
-	$display("ROB_commit1_is_valid:%h", ROB_commit1_is_valid);
-	//RS
-	$display("RS_EX_dest_tag:%h", RS_EX_dest_tag);
-	$display("RS_EX_out_valid:%h", RS_EX_out_valid);
-	//EX
-	$display("EX_CDB_dest_tag:%h", EX_CDB_dest_tag);
-	$display("EX_CDB_fu_result_out:%h", EX_CDB_fu_result_out);
-	//CDB
-	$display("cdb1_valid:%h", cdb1_valid);
-	$display("cdb1_value:%h", cdb1_value);
 
-end*/
+
+
 //////////////////////////////////
 //								//
 //			  MEM				//
@@ -947,7 +930,7 @@ icache ica(
 //			 DCACHE				//
 //								//
 //////////////////////////////////
-dcache dca(
+/*dcache dca(
 	.clock(clock),
 	.reset(reset),
 	// input from Mem.v
@@ -971,4 +954,6 @@ dcache dca(
 	.Dcache2proc_response(Dcache2proc_response),
 	.Dcache_data_hit(Dcache_data_hit)
 );
+*/
+
 endmodule
