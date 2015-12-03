@@ -74,6 +74,7 @@ module test_icache;
 		@(negedge clock);
 		$display("@@@ stop reset!!");
 		$display("@@@ pc request for the first instuction!!");
+		reset =1'b0;
 		proc2Icache_addr	=64'h0000_0000_0000_0000;
 		proc2Icache_command	=BUS_LOAD;
 		Imem2proc_response	=1;
