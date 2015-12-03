@@ -9,8 +9,7 @@ module test_dcache_mem;
 	logic									write_enable;
 	logic [`DCACHE_BLOCK_SIZE-1:0] 			write_data_in;
 	logic [3:0]								mem_response;
-	logic [3:0]								mem_tag;
-	logic 									store_to_memory_enable;						
+	logic [3:0]								mem_tag;					
 	// input from mem.v
 	logic [`DCACHE_BLOCK_SIZE-1:0]  		load_data_in;
 	
@@ -34,8 +33,7 @@ module test_dcache_mem;
 		.write_enable(write_enable),
 		.write_data_in(write_data_in),
 		.mem_response(mem_response),
-		.mem_tag(mem_tag),
-		.store_to_memory_enable(store_to_memory_enable),							
+		.mem_tag(mem_tag),							
 		.load_data_in(load_data_in),
 	
 		// output
@@ -87,7 +85,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0001;
 		mem_tag					= 0;
-		store_to_memory_enable	= 0;
 		load_data_in			= 0;
 		
 		@(negedge clock);
@@ -101,7 +98,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0010;
 		mem_tag					= 0;
-		store_to_memory_enable	= 0;
 		load_data_in			= 0;
 		
 		@(negedge clock);
@@ -115,7 +111,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0011;
 		mem_tag					= 0;
-		store_to_memory_enable	= 0;
 		load_data_in			= 0;
 		
 		@(negedge clock);
@@ -130,7 +125,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0100;
 		mem_tag					= 4'b0001;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_0000_ffff;
 		
 		@(negedge clock);
@@ -145,7 +139,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0101;
 		mem_tag					= 4'b0010;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_0000_abcd;
 		
 		@(negedge clock);
@@ -159,7 +152,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b0000;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_0000_0000;
 		
 		@(negedge clock);
@@ -174,7 +166,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0000_0000_0000_cccc;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b0011;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_0000_bcde;
 		
 		@(negedge clock);
@@ -188,7 +179,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b0000;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_0000_0000;
 		
 		@(negedge clock);
@@ -203,7 +193,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 4'b0001;
 		mem_tag					= 4'b0100;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_5678_1234;
 		
 		@(negedge clock);
@@ -218,7 +207,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0000_0000_0010_0111;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b0101;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_1234_1234;
 		
 		@(negedge clock);
@@ -233,7 +221,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0000_0000_0010_0111;
 		mem_response			= 4'b1110;
 		mem_tag					= 4'b0001;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_7777_7007;
 		
 		@(negedge clock);
@@ -248,7 +235,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0000_0000_0010_0111;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b1110;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0000_0000_cccc_7007;
 		
 		@(negedge clock);
@@ -262,7 +248,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0;
 		mem_response			= 4'b1001;
 		mem_tag					= 4'b0000;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0;
 		
 		@(negedge clock);
@@ -276,7 +261,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0;
 		mem_response			= 4'b1101;
 		mem_tag					= 4'b0000;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0;
 		
 		@(negedge clock);
@@ -290,7 +274,6 @@ module test_dcache_mem;
 		write_data_in			= 64'h0;
 		mem_response			= 4'b0000;
 		mem_tag					= 4'b0000;
-		store_to_memory_enable	= 0;
 		load_data_in			= 64'h0;
 		
 		@(negedge clock);
@@ -302,7 +285,6 @@ module test_dcache_mem;
 		write_data_in			= 0;
 		mem_response			= 0;
 		mem_tag					= 0;
-		store_to_memory_enable	= 0;
 		load_data_in			= 0;
 		@(negedge clock);
 		$finish;
