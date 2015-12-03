@@ -365,11 +365,12 @@ typedef enum logic[1:0] {
 //for BTB
 `define BTB_SIZE      16
 
-typedef enum logic[2:0] {
+typedef enum logic[3:0] {
 	NO_INST			= 3'b000,
-	IS_LDL_INST		= 3'b001,
+	IS_LDQ_L_INST	= 3'b001,
 	IS_STQ_C_INST	= 3'b010,			
-  	IS_LD_INST		= 3'b011,
-  	IS_STQ_INST		= 3'b100
+  	IS_LDQ_INST		= 3'b011,
+  	IS_STQ_INST		= 3'b100,
+  	IS_LDA_INST		= 3'b101
 } MEM_INST_TYPE;
 `endif

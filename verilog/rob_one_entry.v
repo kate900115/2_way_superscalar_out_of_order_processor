@@ -124,7 +124,38 @@ module rob_one_entry(
 		next_halt			= halt;
 		next_illegal		= illegal;
 		next_rob_inst		= rob_inst;
-		if (inst1_rob_load_in)
+		
+		if (if_committed && inst1_rob_load_in)
+		begin
+			next_thread			= is_thread1;
+			next_pc				= inst1_pc_in;
+			next_arn_dest		= inst1_arn_dest_in;
+			next_prn_dest		= inst1_prn_dest_in;
+			next_is_branch		= inst1_is_branch_in;
+			next_is_executed	= 0;
+			next_mispredict		= 0;
+			next_inuse			= 1'b1;
+			next_halt			= inst1_halt_in;
+			next_illegal		= inst1_illegal_in;
+			next_rob_inst		= rob_inst1_in;
+		end
+		else if (if_committed && inst2_rob_load_in)
+		begin
+			next_thread			= is_thread1;
+			next_pc				= inst2_pc_in;
+			next_arn_dest		= inst2_arn_dest_in;
+			next_prn_dest		= inst2_prn_dest_in;
+			next_is_branch		= inst2_is_branch_in;
+			next_is_executed	= 0;
+			next_mispredict		= 0;
+			next_inuse			= 1'b1;
+			next_halt			= inst2_halt_in;
+			next_illegal		= inst2_illegal_in;
+			next_rob_inst		= rob_inst2_in;
+		end
+		else if (if_committed)
+			next_inuse		= 1'b0;	//if committed, the next clock period we set inuse to be 0
+		else if (inst1_rob_load_in)
 		begin
 			next_thread			= is_thread1;
 			next_pc				= inst1_pc_in;
@@ -156,10 +187,6 @@ module rob_one_entry(
 			next_is_executed 	= is_ex_in;
 			next_mispredict		= mispredict_in;
 			next_target_pc		= target_pc_in;
-		end
-		else if (if_committed)
-		begin
-			next_inuse		= 1'b0;	//if committed, the next clock period we set inuse to be 0
 		end
 	end
 	always_ff @(posedge clock)
