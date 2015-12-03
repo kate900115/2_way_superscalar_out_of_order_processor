@@ -13,6 +13,7 @@ module sq_one_entry(
 	input	[63:0] 					sq_opb_in1,      	// Operand a from Rename  tag or data from prf
 	input         					sq_opb_valid1,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input	[$clog2(`ROB_SIZE):0]	sq_rob_idx_in1,  	// The rob index of instruction 1
+	input	[$clog2(`PRF_SIZE)-1:0]	sq_dest_idx1,
 
     //for instruction2
 	input							sq_mem_in2,
@@ -23,6 +24,7 @@ module sq_one_entry(
 	input	[63:0] 					sq_opb_in2,      	// Operand a from Rename  tag or data from prf
 	input         					sq_opb_valid2,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 	input	[$clog2(`ROB_SIZE):0]	sq_rob_idx_in2,  	// The rob index of instruction 1
+	input	[$clog2(`PRF_SIZE)-1:0]	sq_dest_idx2,
 	
 	//cdb
 	input  [63:0]					sq_cdb1_in,     		// CDB bus from functional units 
@@ -42,6 +44,7 @@ module sq_one_entry(
 	output logic							sq_addr_valid,
 	output logic	[$clog2(`ROB_SIZE):0]	sq_rob_idx,
 	output logic	[63:0]					sq_store_data,
+	output logic	[$clog2(`PRF_SIZE)-1:0]	sq_dest_tag
 );
 
 	logic							inuse, next_inuse;
@@ -52,9 +55,10 @@ module sq_one_entry(
 	logic							next_sq_addr_valid;
 	logic	[$clog2(`ROB_SIZE):0]	next_sq_rob_idx;
 	logic	[63:0]					next_sq_store_data;
+	logic	[$clog2(`PRF_SIZE)-1:0]	next_sq_dest_tag;
 	
 	assign sq_is_available 	= ~inuse;
-	assign sq_is_ready		= inuse && sq_addr_valid;
+	assign sq_is_ready		= inuse && sq_addr_valid; //(inuse || next_inuse) && (sq_addr_valid || next_sq_addr_valid);
 	
 	always_ff @(posedge clock) begin
 		if(reset) begin
@@ -66,6 +70,7 @@ module sq_one_entry(
 			sq_addr_valid 	<= #1 0;
 			sq_rob_idx 		<= #1 0;
 			sq_store_data	<= #1 0;
+			sq_dest_tag		<= #1 0;
 		end
 		else begin
 			inuse			<= #1 next_inuse;
@@ -76,6 +81,7 @@ module sq_one_entry(
 			sq_addr_valid 	<= #1 next_sq_addr_valid;
 			sq_rob_idx 		<= #1 next_sq_rob_idx;
 			sq_store_data	<= #1 next_sq_store_data;
+			sq_dest_tag		<= #1 next_sq_dest_tag;
 		end
 	end
 
@@ -87,6 +93,7 @@ module sq_one_entry(
 		next_sq_opb			= sq_opb;
 		next_sq_addr_valid	= sq_addr_valid;
 		next_sq_rob_idx 	= sq_rob_idx;
+		next_sq_dest_tag	= sq_dest_tag;
 		if (sq_clean && sq_mem_in1) begin
 			next_inuse			= 1;
 			next_sq_pc			= sq_pc_in1;
@@ -96,6 +103,7 @@ module sq_one_entry(
 			next_sq_addr_valid	= sq_opb_valid1;
 			next_sq_rob_idx		= sq_rob_idx_in1;
 			next_sq_store_data	= sq_inst1_rega;
+			next_sq_dest_tag	= sq_dest_idx1;
 		end
 		else if (sq_clean && sq_mem_in2) begin
 			next_inuse			= 1;
@@ -106,9 +114,10 @@ module sq_one_entry(
 			next_sq_addr_valid	= sq_opb_valid2;
 			next_sq_rob_idx		= sq_rob_idx_in2;
 			next_sq_store_data	= sq_inst2_rega;
+			next_sq_dest_tag	= sq_dest_idx2;
 		end
 		else if (sq_clean) begin
-			inuse = 0;
+			next_inuse = 0;
 		end
 		else if (sq_mem_in1) begin
 			next_inuse			= 1;
@@ -119,6 +128,7 @@ module sq_one_entry(
 			next_sq_addr_valid	= sq_opb_valid1;
 			next_sq_rob_idx		= sq_rob_idx_in1;
 			next_sq_store_data	= sq_inst1_rega;
+			next_sq_dest_tag	= sq_dest_idx1;
 		end
 		else if (sq_mem_in2) begin
 			next_inuse			= 1;
@@ -129,15 +139,16 @@ module sq_one_entry(
 			next_sq_addr_valid	= sq_opb_valid2;
 			next_sq_rob_idx		= sq_rob_idx_in2;
 			next_sq_store_data	= sq_inst2_rega;
+			next_sq_dest_tag	= sq_dest_idx2;
 		end
 		else begin
-			if (~sq_addr_valid && (sq_opb[$clog2(`PRF_SIZE)-1:0] == cdb1_tag) && inuse && sq_cdb1_valid) begin
-				sq_opb			= sq_cdb1_in;
-				sq_addr_valid	= 1;
+			if (~sq_addr_valid && (sq_opb[$clog2(`PRF_SIZE)-1:0] == sq_cdb1_tag) && inuse && sq_cdb1_valid) begin
+				next_sq_opb			= sq_cdb1_in;
+				next_sq_addr_valid	= 1;
 			end
-			if (~sq_addr_valid && (sq_opb[$clog2(`PRF_SIZE)-1:0] == cdb1_tag) && inuse && sq_cdb2_valid) begin
-				sq_opb			= sq_cdb2_in;
-				sq_addr_valid	= 1;
+			if (~sq_addr_valid && (sq_opb[$clog2(`PRF_SIZE)-1:0] == sq_cdb2_tag) && inuse && sq_cdb2_valid) begin
+				next_sq_opb			= sq_cdb2_in;
+				next_sq_addr_valid	= 1;
 			end
 		end
 	end

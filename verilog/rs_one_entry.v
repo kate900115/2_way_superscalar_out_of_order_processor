@@ -130,7 +130,7 @@ module rs_one_entry(
 
 	assign rs1_available_out= rs1_ready_out ? rs1_free_enable_fu : ~InUse;
  
-	assign rs1_ready_out 	= InUse && OPaValid_reg && OPbValid_reg && OPcuse; 
+	assign rs1_ready_out 	= InUse && OPaValid_reg && OPbValid_reg && OPcuse; //(next_InUse || InUse) && (OPaValid_reg || OPaValid) && (OPbValid_reg || OPbValid) && OPcuse; 
  
 	assign rs1_opa_out 		= rs1_free_enable_fu ? OPa_reg : 64'b0;
 
