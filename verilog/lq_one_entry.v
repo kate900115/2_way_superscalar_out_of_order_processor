@@ -161,7 +161,7 @@ module lq_one_entry(
 				next_lq_addr_valid	= 1;
 			end
 			if (~lq_mem_value_valid && lq_mem_data_in_valid && inuse) begin
-				next_lq_mem_value = lq_mem_value;
+				next_lq_mem_value = lq_mem_data_in;
 				next_lq_mem_value_valid = 1;
 			end
 		end

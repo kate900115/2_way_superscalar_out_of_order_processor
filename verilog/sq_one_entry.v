@@ -3,6 +3,7 @@ module sq_one_entry(
 	input	reset,
 	
 	input							sq_clean,
+	input							sq_free_enable,
 	
 	//for instruction1
 	input							sq_mem_in1,
@@ -94,7 +95,8 @@ module sq_one_entry(
 		next_sq_addr_valid	= sq_addr_valid;
 		next_sq_rob_idx 	= sq_rob_idx;
 		next_sq_dest_tag	= sq_dest_tag;
-		if (sq_clean && sq_mem_in1) begin
+		next_sq_store_data	= sq_store_data;
+		if (sq_free_enable && sq_mem_in1) begin
 			next_inuse			= 1;
 			next_sq_pc			= sq_pc_in1;
 			next_sq_inst		= sq_inst1_in;
@@ -105,7 +107,7 @@ module sq_one_entry(
 			next_sq_store_data	= sq_inst1_rega;
 			next_sq_dest_tag	= sq_dest_idx1;
 		end
-		else if (sq_clean && sq_mem_in2) begin
+		else if (sq_free_enable && sq_mem_in2) begin
 			next_inuse			= 1;
 			next_sq_pc			= sq_pc_in2;
 			next_sq_inst		= sq_inst2_in;
@@ -116,7 +118,7 @@ module sq_one_entry(
 			next_sq_store_data	= sq_inst2_rega;
 			next_sq_dest_tag	= sq_dest_idx2;
 		end
-		else if (sq_clean) begin
+		else if (sq_free_enable) begin
 			next_inuse = 0;
 		end
 		else if (sq_mem_in1) begin

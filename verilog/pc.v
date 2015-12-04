@@ -58,8 +58,8 @@ module pc(
 	logic 	[63:0]					PC_current;
 	logic							if_address_minused;
 
-	assign inst1_is_valid_current  = PC_stall? 0 : (current_thread_state != THREAD1_IS_EX || current_thread_state != THREAD2_IS_EX) ? inst1_is_valid_one : inst1_is_valid_two;
-	assign inst2_is_valid_current  = PC_stall? 0 : (current_thread_state != THREAD1_IS_EX || current_thread_state != THREAD2_IS_EX) ? inst2_is_valid_one : inst2_is_valid_two;
+	assign inst1_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst1_is_valid_one : inst1_is_valid_two;
+	assign inst2_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst2_is_valid_one : inst2_is_valid_two;
 	assign PC_current			   = PC_reg;
 
 
@@ -196,7 +196,7 @@ module pc(
 			else
 			begin	
 				inst1_is_valid_reg  = 1'b1;
-				inst2_is_valid_reg  = 1'b1;
+				//inst2_is_valid_reg  = 1'b1;
 			end
 		end
 	end

@@ -45,6 +45,7 @@ module lsq(
 	input	[63:0]								mem_data_in,		//when no forwarding possible, load from memory
 	input	[4:0]								mem_response_in,
 	input	[4:0]								mem_tag_in,
+	input										cache_hit,
 	
 	//retired store idx
 	input	[$clog2(`ROB_SIZE)-1:0]				t1_head,
@@ -78,6 +79,7 @@ module lsq(
 	//lq_reg stores address
 	logic	[`LQ_SIZE-1:0]			lq_mem_in1, lq_mem_in2;
 	logic	[`LQ_SIZE-1:0]			lq1_clean, lq2_clean;
+	logic	[`LQ_SIZE-1:0]			lq1_free_en, lq2_free_en;
 	logic	[`LQ_SIZE-1:0]			lq1_is_ready, lq2_is_ready;
 	logic 	[$clog2(`LQ_SIZE)-1:0]	lq_head1, n_lq_head1, lq_head2, n_lq_head2;
 	logic	[$clog2(`LQ_SIZE)-1:0]	lq_tail1, n_lq_tail1, lq_tail2, n_lq_tail2;
@@ -95,6 +97,7 @@ module lsq(
 	logic	[`SQ_SIZE-1:0]			sq_mem_in1;
 	logic	[`SQ_SIZE-1:0]			sq_mem_in2;
 	logic	[`SQ_SIZE-1:0]			sq1_clean, sq2_clean;
+	logic	[`LQ_SIZE-1:0]			sq1_free_en, sq2_free_en;
 	logic	[`SQ_SIZE-1:0]			sq1_is_ready, sq2_is_ready;
 	logic 	[$clog2(`SQ_SIZE)-1:0]	sq_head1, n_sq_head1, sq_head2, n_sq_head2;
 	logic	[$clog2(`SQ_SIZE)-1:0]	sq_tail1, n_sq_tail1, sq_tail2, n_sq_tail2;
@@ -137,7 +140,7 @@ module lsq(
 		.reset(reset),
 		
 		.lq_clean(lq1_clean),
-		.lq_free_enable(),
+		.lq_free_enable(lq1_free_en),
 		
 		//for instruction1
 		//.lq_mem_in1(),
@@ -189,7 +192,7 @@ module lsq(
 		.reset(reset),
 		
 		.lq_clean(lq2_clean),
-		.lq_free_enable(),
+		.lq_free_enable(lq2_free_en),
 		
 		//for instruction1
 		//.lq_mem_in1(),
@@ -241,6 +244,7 @@ module lsq(
 		.reset(reset),
 		
 		.sq_clean(sq1_clean),
+		.sq_free_enable(sq1_free_en),
 	
 		//for instruction1
 		.sq_mem_in1(sq_mem_in1),
@@ -288,6 +292,7 @@ module lsq(
 		.reset(reset),
 		
 		.sq_clean(sq2_clean),
+		.sq_free_enable(sq2_free_en),
 	
 		//for instruction1
 		.sq_mem_in1(sq_mem_in1),
@@ -348,6 +353,10 @@ module lsq(
 		lq2_clean	= 0;
 		sq1_clean	= 0;
 		sq2_clean	= 0;
+		lq_mem_in1	= 0;
+		lq_mem_in2	= 0;
+		sq_mem_in1	= 0;
+		sq_mem_in2	= 0;
 		//mispredict
 		if (thread1_mispredict || thread2_mispredict) begin
 			if (thread1_mispredict) begin
@@ -438,6 +447,18 @@ module lsq(
 		out2_is_lq2 = 0;
 		out2_is_sq1 = 0;
 		out2_is_sq2 = 0;
+		cdb_rob_idx1	= 0;
+		cdb_rob_idx2	= 0;
+		cdb_result_out1	= 0;
+		cdb_result_out2	= 0;
+		cdb_result_is_valid1	= 0;
+		cdb_result_is_valid2	= 0;
+		cdb_dest_tag1	= 0;
+		cdb_dest_tag2	= 0;
+		lq1_free_en		= 0;
+		lq2_free_en		= 0;
+		sq1_free_en		= 0;
+		sq2_free_en		= 0;
 		if (inst1_type == `LDA_INST) begin
 			cdb_dest_tag1			= dest_reg_idx1;
 			cdb_result_out1			= lsq_opa_in1 + lsq_opb_in1;
@@ -451,6 +472,7 @@ module lsq(
 			cdb_result_is_valid1	= 1;
 			cdb_rob_idx1			= lq1_rob_idx;
 			out1_is_lq1				= 1;
+			lq1_free_en[lq_head1]	= 1;
 		end
 		else if (lq2_is_ready[lq_head2]) begin
 			cdb_dest_tag1			= lq2_dest_tag[lq_head2];
@@ -458,6 +480,7 @@ module lsq(
 			cdb_result_is_valid1	= 1;
 			cdb_rob_idx1			= lq2_rob_idx;
 			out1_is_lq2				= 1;
+			lq2_free_en[lq_head2]	= 1;
 		end
 		else if (sq1_is_ready[sq_head1]) begin
 			cdb_dest_tag1			= sq1_dest_tag[sq_head1];
@@ -465,6 +488,7 @@ module lsq(
 			cdb_result_is_valid1	= 1;
 			cdb_rob_idx1			= sq1_rob_idx;
 			out1_is_sq1				= 1;
+			sq1_free_en[sq_head1]	= 1;
 		end
 		else if (sq2_is_ready[sq_head2]) begin
 			cdb_dest_tag1			= sq2_dest_tag[sq_head2];
@@ -472,6 +496,7 @@ module lsq(
 			cdb_result_is_valid1	= 1;
 			cdb_rob_idx1			= sq2_rob_idx;
 			out1_is_sq2				= 1;
+			sq2_free_en[sq_head2]	= 1;
 		end
 		//
 		if (inst2_type == `LDA_INST) begin
@@ -487,6 +512,7 @@ module lsq(
 			cdb_result_is_valid2	= 1;
 			cdb_rob_idx2			= lq1_rob_idx;
 			out2_is_lq1				= 1;
+			lq1_free_en[lq_head1+out1_is_lq1]	= 1;
 		end
 		else if (lq2_is_ready[lq_head2+out1_is_lq2]) begin
 			cdb_dest_tag2			= lq2_dest_tag[lq_head2+out1_is_lq2];
@@ -494,6 +520,7 @@ module lsq(
 			cdb_result_is_valid2	= 1;
 			cdb_rob_idx2			= lq2_rob_idx;
 			out2_is_lq2				= 1;
+			lq2_free_en[lq_head2+out1_is_lq2]	= 1;
 		end
 		else if (sq1_is_ready[sq_head1+out1_is_sq1]) begin
 			cdb_dest_tag2			= sq1_dest_tag[sq_head1+out1_is_sq1];
@@ -501,6 +528,7 @@ module lsq(
 			cdb_result_is_valid2	= 1;
 			cdb_rob_idx2			= sq1_rob_idx;
 			out2_is_sq1				= 1;
+			sq1_free_en[sq_head1+out1_is_sq1]	= 1;
 		end
 		else if (sq2_is_ready[sq_head2+out1_is_sq2]) begin
 			cdb_dest_tag2			= sq2_dest_tag[sq_head2+out1_is_sq2];
@@ -508,6 +536,7 @@ module lsq(
 			cdb_result_is_valid2	= 1;
 			cdb_rob_idx2			= sq2_rob_idx;
 			out2_is_sq2				= 1;
+			sq2_free_en[sq_head2+out1_is_sq2]	= 1;
 		end
 		n_lq_head1 = lq_head1+out1_is_lq1+out2_is_lq1;
 		n_lq_head2 = lq_head2+out1_is_lq2+out2_is_lq2;
@@ -521,12 +550,12 @@ module lsq(
 		mem_address_out		= 0;
 		current_mem_inst	= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && lq1_pc[lq_head1] < sq1_pc[sq_head1]) begin
+		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && lq1_pc[lq_head1] < sq1_pc[sq_head1] && ~sq1_is_available[sq_head1]) begin
 			current_mem_inst	= {1'b0,1'b0,lq_head1};
 			mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
 			lsq2Dcache_command	= BUS_LOAD;
 		end
-		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && lq2_pc[lq_head2] < sq2_pc[sq_head2]) begin
+		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && lq2_pc[lq_head2] < sq2_pc[sq_head2] && ~sq2_is_available[sq_head2]) begin
 			current_mem_inst	= {1'b1,1'b0,lq_head2};
 			mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
 			lsq2Dcache_command	= BUS_LOAD;
@@ -549,7 +578,7 @@ module lsq(
 	always_comb begin
 		lq1_mem_data_in_valid	= 0;
 		lq2_mem_data_in_valid	= 0;
-		if (mem_response_in == mem_tag_in) begin
+		if (cache_hit) begin
 			if (~current_mem_inst[$clog2(`LQ_SIZE)+1] && ~current_mem_inst[$clog2(`LQ_SIZE)])
 				lq1_mem_data_in_valid[current_mem_inst[$clog2(`SQ_SIZE)-1:0]] = 1;
 			else if (current_mem_inst[$clog2(`LQ_SIZE)+1] && ~current_mem_inst[$clog2(`LQ_SIZE)])

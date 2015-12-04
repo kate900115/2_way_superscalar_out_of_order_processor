@@ -10,11 +10,11 @@
 #/* new design                                              */
 #/***********************************************************/
 
-read_file -f sverilog [list "sys_defs.vh" "./verilog/lsq.v"]
+read_file -f sverilog [list "sys_defs.vh" "./verilog/lsq.v" "./verilog/lq_one_entry.v" "./verilog/sq_one_entry.v"]
 set design_name lsq
 set clock_name clock
 set reset_name reset
-set CLK_PERIOD 4.25
+set CLK_PERIOD 10
 
 #/***********************************************************/
 #/* The rest of this file may be left alone for most small  */

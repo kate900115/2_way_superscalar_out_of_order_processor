@@ -37,6 +37,7 @@ module test_lsq();
 	logic	[63:0]								mem_data_in;		//when no forwarding possible; load from memory
 	logic	[4:0]								mem_response_in;
 	logic	[4:0]								mem_tag_in;
+	logic										cache_hit;
 	
 	//retired store idx
 	logic	[$clog2(`ROB_SIZE)-1:0]				t1_head;
@@ -101,6 +102,7 @@ module test_lsq();
 		mem_data_in,		//when no forwarding possible, load from memory
 		mem_response_in,
 		mem_tag_in,
+		cache_hit,
 	
 	//retired store idx
 		t1_head,
@@ -159,40 +161,83 @@ module test_lsq();
 		reset = 0;
 		#5
 		@(negedge clock);
-		reset = 1;
-		lsq_cdb1_in			=     		
-		lsq_cdb1_tag		=    		
-		lsq_cdb1_valid		=  		
-		lsq_cdb2_in			=     		
-		lsq_cdb2_tag		=    		
-		lsq_cdb2_valid		=
-		inst1_valid			=
-		inst1_op_type		=
-		inst1_pc			=
-		inst1_in			=
-		inst1_rega			=
-		lsq_opa_in1			=      	
-		lsq_opb_in1			=      	
-		lsq_opb_valid1		=   	
-		lsq_rob_idx_in1		=  	
-		dest_reg_idx1		=	
-   		inst2_valid			=
-   		inst2_op_type		=
-		inst2_pc			=
-		inst2_in			=
-		inst2_rega			=
-		lsq_opa_in2			=      	
-		lsq_opb_in2			=     
-		lsq_opb_valid2		=   	
-		lsq_rob_idx_in2		=  	
-		dest_reg_idx2		=
-		mem_data_in			=			
-		mem_response_in		=
-		mem_tag_in			=
-		t1_head				=
-		t2_head				=
-		thread1_mispredict	=
-		thread2_mispredict	=
+		reset 				= 1;
+		$display("@@@ stop reset!");
+		$display("@@@ the first instruction in!");
+		$display("@@@ load! waiting for CDB calculate the address!");
+		lsq_cdb1_in			= 0;
+		lsq_cdb1_tag		= 0;
+		lsq_cdb1_valid		= 0;
+		lsq_cdb2_in			= 0;
+		lsq_cdb2_tag		= 0;
+		lsq_cdb2_valid		= 0;
+		inst1_valid			= 1'b1;
+		inst1_op_type		= `LDQ_INST;
+		inst1_pc			= 64'h0000_0000_0000_0008;
+		inst1_in			= 64'h1234_4534_8971_1536;
+		inst1_rega			= 64'h0;
+		lsq_opa_in1			= 64'h0000_0000_0000_0010;
+		lsq_opb_in1			= 64'h0000_0000_0000_0100;
+		lsq_opb_valid1		= 0;
+		lsq_rob_idx_in1		= 4'b0001;
+		dest_reg_idx1		= 6'd17;
+   		inst2_valid			= 0;
+   		inst2_op_type		= 0;
+		inst2_pc			= 0;
+		inst2_in			= 0;
+		inst2_rega			= 0;
+		lsq_opa_in2			= 0;
+		lsq_opb_in2			= 0;
+		lsq_opb_valid2		= 0;
+		lsq_rob_idx_in2		= 0;
+		dest_reg_idx2		= 0;
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0;
+		mem_tag_in			= 4'b0;
+		t1_head				= 0;
+		t2_head				= 0;
+		thread1_mispredict	= 0;
+		thread2_mispredict	= 0;
+		cache_hit			= 0;
+		@(negedge clock);
+		$display("@@@ stop reset!");
+		$display("@@@ the 2nd instruction in!");
+		$display("@@@ load! CDB send the result in!");
+		lsq_cdb1_in			= 64'h0000_0000_0000_0100;
+		lsq_cdb1_tag		= 6'b000100;
+		lsq_cdb1_valid		= 1;
+		lsq_cdb2_in			= 0;
+		lsq_cdb2_tag		= 0;
+		lsq_cdb2_valid		= 0;
+		inst1_valid			= 1'b1;
+		inst1_op_type		= `LDQ_INST;
+		inst1_pc			= 64'h0000_0000_0000_0008;
+		inst1_in			= 64'h1200_1435_7341_0987;
+		inst1_rega			= 64'h0;
+		lsq_opa_in1			= 64'h0000_0000_0000_0018;
+		lsq_opb_in1			= 0;
+		lsq_opb_valid1		= 0;
+		lsq_rob_idx_in1		= 4'b0010;
+		dest_reg_idx1		= 6'd9;
+   		inst2_valid			= 0;
+   		inst2_op_type		= 0;
+		inst2_pc			= 0;
+		inst2_in			= 0;
+		inst2_rega			= 0;
+		lsq_opa_in2			= 0;
+		lsq_opb_in2			= 0;
+		lsq_opb_valid2		= 0;
+		lsq_rob_idx_in2		= 0;
+		dest_reg_idx2		= 0;
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0;
+		mem_tag_in			= 4'b0;
+		t1_head				= 0;
+		t2_head				= 0;
+		thread1_mispredict	= 0;
+		thread2_mispredict	= 0;
+		cache_hit			= 0;
+		
 		@(negedge clock);
 		$finish;
 	end
