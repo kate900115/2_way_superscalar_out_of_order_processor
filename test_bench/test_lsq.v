@@ -160,50 +160,39 @@ module test_lsq();
 		#5
 		@(negedge clock);
 		reset = 1;
-		lsq_cdb1_in;     		// CDB bus from functional units 
-		lsq_cdb1_tag;    		// CDB tag bus from functional units 
-		lsq_cdb1_valid;  		// The data on the CDB is valid 
-		lsq_cdb2_in;     		// CDB bus from functional units 
-		lsq_cdb2_tag;    		// CDB tag bus from functional units 
-		lsq_cdb2_valid;  		// The data on the CDB is valid 
-	
-    //for instruction1
-		inst1_valid;
-		inst1_op_type;
-		inst1_pc;
-	logic	[31:0]								inst1_in;
-	logic	[63:0]								inst1_rega;
-	logic	[63:0] 								lsq_opa_in1;      	// Operand a from Rename  data
-	logic	[63:0] 								lsq_opb_in1;      	// Operand a from Rename  tag or data from prf
-	logic         								lsq_opb_valid1;   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	logic	[$clog2(`ROB_SIZE):0]				lsq_rob_idx_in1;  	// The rob index of instruction 1
-	logic	[$clog2(`PRF_SIZE)-1:0]				dest_reg_idx1;		//`none_reg if store
-
-
-    //for instruction2
-   	logic										inst2_valid;
-   	logic	[5:0]								inst2_op_type;
-	logic	[63:0]								inst2_pc;
-	logic	[31:0]								inst2_in;
-	logic	[63:0]								inst2_rega;
-	logic	[63:0] 								lsq_opa_in2;      	// Operand a from Rename  data
-	logic	[63:0] 								lsq_opb_in2;     	// Operand b from Rename  tag or data from prf
-	logic         								lsq_opb_valid2;   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
-	logic	[$clog2(`ROB_SIZE):0]				lsq_rob_idx_in2;  	// The rob index of instruction 2
-	logic	[$clog2(`PRF_SIZE)-1:0]				dest_reg_idx2;
-	//from mem
-	logic	[63:0]								mem_data_in;		//when no forwarding possible; load from memory
-	logic	[4:0]								mem_response_in;
-	logic	[4:0]								mem_tag_in;
-	
-	//retired store idx
-	logic	[$clog2(`ROB_SIZE)-1:0]				t1_head;
-	logic	[$clog2(`ROB_SIZE)-1:0]				t2_head;
-
-	//we need to know weather the instruction commited is a mispredict
-	logic	thread1_mispredict;
-	logic	thread2_mispredict;
-		#5
+		lsq_cdb1_in			=     		
+		lsq_cdb1_tag		=    		
+		lsq_cdb1_valid		=  		
+		lsq_cdb2_in			=     		
+		lsq_cdb2_tag		=    		
+		lsq_cdb2_valid		=
+		inst1_valid			=
+		inst1_op_type		=
+		inst1_pc			=
+		inst1_in			=
+		inst1_rega			=
+		lsq_opa_in1			=      	
+		lsq_opb_in1			=      	
+		lsq_opb_valid1		=   	
+		lsq_rob_idx_in1		=  	
+		dest_reg_idx1		=	
+   		inst2_valid			=
+   		inst2_op_type		=
+		inst2_pc			=
+		inst2_in			=
+		inst2_rega			=
+		lsq_opa_in2			=      	
+		lsq_opb_in2			=     
+		lsq_opb_valid2		=   	
+		lsq_rob_idx_in2		=  	
+		dest_reg_idx2		=
+		mem_data_in			=			
+		mem_response_in		=
+		mem_tag_in			=
+		t1_head				=
+		t2_head				=
+		thread1_mispredict	=
+		thread2_mispredict	=
 		@(negedge clock);
 		$finish;
 	end
