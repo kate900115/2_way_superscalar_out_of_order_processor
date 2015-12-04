@@ -50,25 +50,23 @@ module pc(
 	logic      						PC_stall; 
 	logic 							inst1_is_valid_reg;
 	logic							inst2_is_valid_reg;
-
-
-	logic 							inst1_is_valid;
-	logic							inst2_is_valid;
+	logic 							inst1_is_valid_two;
+	logic							inst2_is_valid_two;
+	logic 							inst1_is_valid_one;
+	logic							inst2_is_valid_one;
 
 	logic 	[63:0]					PC_current;
 	logic							if_address_minused;
 
-	assign inst1_is_valid_current  = PC_stall? 0 : inst1_is_valid;
-	assign inst2_is_valid_current  = PC_stall? 0 : inst2_is_valid;
+	assign inst1_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst1_is_valid_one : inst1_is_valid_two;
+	assign inst2_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst2_is_valid_one : inst2_is_valid_two;
 	assign PC_current			   = PC_reg;
 
 
 	assign proc2Imem_addr 		   = {PC_current[63:3], 3'b0};
-	assign current_inst1  		   = Imem2proc_data[31:0];
-	assign current_inst2  		   = Imem2proc_data[63:32];
 
-	assign PC_stall	      		   = rs_stall ||rat_stall || memory_structure_hazard_stall;				//not including rob_stall 
-	
+	assign PC_stall	      		   = rs_stall || rat_stall || memory_structure_hazard_stall;	//not including rob_stall 
+
 	// for debug
 	assign next_PC_out    		   = next_PC;
 	assign proc2Imem_addr_previous = (proc2Imem_addr==0)? 0 : proc2Imem_addr - 8;
@@ -83,26 +81,25 @@ module pc(
   	// Pass PC+8 down pipeline instruction
 
   	// This register holds the PC value
-
- 
+	
   	always_ff @(posedge clock) 
 	begin
 			// synopsys sync_set_reset "reset"
-    		if(reset)			
+    		if(reset)
     		begin
-	      		PC_reg 		  	 <= `SD 0;  
-				inst1_is_valid	 <= 1'b0;
-				inst2_is_valid	 <= 1'b0;
-  				inst1_out	 	 <= `SD 0;
-				inst2_out	 	 <= `SD 0;
+	      		PC_reg 		  	 	<= `SD 0;  
+				inst1_is_valid_two	<= `SD 1'b0;
+				inst2_is_valid_two	<= `SD 1'b0;
+  				inst1_out	 	 	<= `SD 0;
+				inst2_out	 	 	<= `SD 0;
     		end
     		else
     		begin
-    			PC_reg 		  	 <= `SD next_PC;  
-				inst1_is_valid	 <= `SD inst1_is_valid_reg;
-				inst2_is_valid 	 <= `SD inst2_is_valid_reg;
-  				inst1_out	 	 <= `SD current_inst1;
-				inst2_out	 	 <= `SD current_inst2;
+    			PC_reg				<= `SD next_PC;  
+				inst1_is_valid_two	<= `SD inst1_is_valid_reg;
+				inst2_is_valid_two	<= `SD inst2_is_valid_reg;
+  				inst1_out			<= `SD current_inst1;
+				inst2_out			<= `SD current_inst2;
     		end
   	end  // always
 
@@ -119,21 +116,23 @@ module pc(
 		begin
 			if( ((is_thread1pc && current_thread_state==THREAD1_IS_EX) || (~is_thread1pc && current_thread_state==THREAD2_IS_EX))&& is_two_threads )
 			begin	
-
 				if(PC_stall)
-				if_address_minused <= `SD 1;
+					if_address_minused <= `SD 1;
 				else
-				if_address_minused <= `SD 0;
-
+					if_address_minused <= `SD 0;
 			end	
 		end
 	end
 
 	always_comb
 	begin
+		current_inst1	= Imem2proc_data[31:0];
+		current_inst2	= Imem2proc_data[63:32];
 		if (branch_is_taken)
 		begin
-			next_PC = fu_target_pc + 8;
+			next_PC = fu_target_pc + 4;
+			inst1_is_valid_one	= 1'b1;
+			inst2_is_valid_one	= 1'b1;
 		end
 		else
 		begin
@@ -152,10 +151,23 @@ module pc(
 					next_PC = PC_reg + 8;
 				end
 			end
-			/*else							//*********one thread
+			else	// one thread				
 			begin
-
-			end*/
+				if (PC_stall || rob_stall || (!pc_enable) || (!Imem2proc_valid))
+				begin
+					next_PC			= PC_reg; 
+					inst1_is_valid_one  = 1'b0;
+					inst2_is_valid_one  = 1'b0;
+					current_inst1 	= inst1_out;
+					current_inst2 	= inst2_out;
+				end
+				else
+				begin
+					next_PC 		= PC_reg + 8;
+					inst1_is_valid_one	= 1'b1;
+					inst2_is_valid_one	= 1'b1;
+				end
+			end
 		end
 	end
 
@@ -184,6 +196,7 @@ module pc(
 			else
 			begin	
 				inst1_is_valid_reg  = 1'b1;
+				//inst2_is_valid_reg  = 1'b1;
 			end
 		end
 	end
