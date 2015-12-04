@@ -50,8 +50,8 @@ module lq_one_entry(
 );
 
 	logic							inuse, next_inuse;
-	logic	[63:0]					next_lq_pc,
-	logic	[31:0]					next_lq_inst,
+	logic	[63:0]					next_lq_pc;
+	logic	[31:0]					next_lq_inst;
 	logic	[63:0]					next_lq_opa;
 	logic	[63:0]					next_lq_opb;
 	logic							next_lq_addr_valid;
@@ -61,7 +61,7 @@ module lq_one_entry(
 	logic							next_lq_mem_value_valid;
 	
 	assign lq_is_available 	= lq_is_ready ? lq_free_enable : ~inuse;
-	assign lq_is_ready		= inuse && lq_addr_valid && lq_mem_valid;
+	assign lq_is_ready		= inuse && lq_addr_valid && lq_mem_value_valid;//(inuse || next_inuse) && (lq_addr_valid || next_lq_addr_valid) && (lq_mem_value_valid || next_lq_mem_value_valid);
 	
 	always_ff @(posedge clock) begin
 		if(reset) begin
@@ -80,11 +80,11 @@ module lq_one_entry(
 			inuse			<= #1 next_inuse;
 			lq_pc			<= #1 next_lq_pc;
 			lq_inst			<= #1 next_lq_inst;
-			lq_opa 			<= #1 next_lq_reg_opa;
-			lq_opb	 		<= #1 next_lq_reg_opb;
-			lq_addr_valid 	<= #1 next_lq_reg_addr_valid;
+			lq_opa 			<= #1 next_lq_opa;
+			lq_opb	 		<= #1 next_lq_opb;
+			lq_addr_valid 	<= #1 next_lq_addr_valid;
 			lq_rob_idx 		<= #1 next_lq_rob_idx;
-			lq_dest_tag 	<= #1 next_lq_reg_dest_tag;
+			lq_dest_tag 	<= #1 next_lq_dest_tag;
 			lq_mem_value	<= #1 next_lq_mem_value;
 			lq_mem_value_valid	<= #1 next_lq_mem_value_valid;
 		end
@@ -112,7 +112,7 @@ module lq_one_entry(
 			next_lq_opb			= lq_opb_in1;
 			next_lq_addr_valid	= lq_opb_valid1;
 			next_lq_rob_idx		= lq_rob_idx_in1;
-			next_lq_dest_tag	= dest_reg_idx1;
+			next_lq_dest_tag	= lq_dest_idx1;
 			next_lq_mem_value_valid = 0;
 		end
 		else if (lq_free_enable && lq_mem_in2) begin
@@ -123,7 +123,7 @@ module lq_one_entry(
 			next_lq_opb			= lq_opb_in2;
 			next_lq_addr_valid	= lq_opb_valid2;
 			next_lq_rob_idx		= lq_rob_idx_in2;
-			next_lq_dest_tag	= dest_reg_idx2;
+			next_lq_dest_tag	= lq_dest_idx2;
 			next_lq_mem_value_valid = 0;
 		end
 		else if (lq_free_enable) begin
@@ -137,7 +137,7 @@ module lq_one_entry(
 			next_lq_opb			= lq_opb_in1;
 			next_lq_addr_valid	= lq_opb_valid1;
 			next_lq_rob_idx		= lq_rob_idx_in1;
-			next_lq_dest_tag	= dest_reg_idx1;
+			next_lq_dest_tag	= lq_dest_idx1;
 			next_lq_mem_value_valid = 0;
 		end
 		else if (lq_mem_in2) begin
@@ -148,20 +148,20 @@ module lq_one_entry(
 			next_lq_opb			= lq_opb_in2;
 			next_lq_addr_valid	= lq_opb_valid2;
 			next_lq_rob_idx		= lq_rob_idx_in2;
-			next_lq_dest_tag	= dest_reg_idx2;
+			next_lq_dest_tag	= lq_dest_idx2;
 			next_lq_mem_value_valid = 0;
 		end
 		else begin
-			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == cdb1_tag) && inuse && lq_cdb1_valid) begin
-				lq_opb			= lq_cdb1_in;
-				lq_addr_valid	= 1;
+			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb1_tag) && inuse && lq_cdb1_valid) begin
+				next_lq_opb			= lq_cdb1_in;
+				next_lq_addr_valid	= 1;
 			end
-			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == cdb1_tag) && inuse && lq_cdb2_valid) begin
-				lq_opb			= lq_cdb2_in;
-				lq_addr_valid	= 1;
+			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb1_tag) && inuse && lq_cdb2_valid) begin
+				next_lq_opb			= lq_cdb2_in;
+				next_lq_addr_valid	= 1;
 			end
 			if (~lq_mem_value_valid && lq_mem_data_in_valid && inuse) begin
-				next_lq_mem_value = lq_mem_data;
+				next_lq_mem_value = lq_mem_value;
 				next_lq_mem_value_valid = 1;
 			end
 		end

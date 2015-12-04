@@ -340,7 +340,7 @@ module testbench;
     // each argument is number of registers/signals for the group
     // (IF, RS, ID, ROB, EX, EX/MEM, MEM, RAT, WB, Misc)
     // p: PC 6  g: ID 13  
-    initcurses(6,13,26,26,9,48,10,42,10,2);
+    initcurses(6,13,26,24,9,48,10,42,10,2);
 
     // Pulse the reset signal
     reset = 1'b1;
@@ -596,11 +596,9 @@ module testbench;
     $display("jr30 6:%d",   processor_0.rrat1.rrat_reg[30]);
     $display("jr31 6:%d",   processor_0.rrat1.rrat_reg[31]);
     // rob signals (22) - prefix 'i'
-    $display("hROB_commit1_if_rename_out 1:%h",     processor_0.ROB_commit1_if_rename_out);
     $display("hROB_commit1_mispredict 1:%h",        processor_0.ROB_commit1_mispredict);
     $display("hROB_t1_is_full 1:%h",       			processor_0.ROB_t1_is_full);
     $display("hROB_t2_is_full 1:%h",       			processor_0.ROB_t2_is_full);//4
-    $display("hROB_commit2_if_rename_out 1:%h",     processor_0.ROB_commit2_if_rename_out);
     $display("hROB_commit2_mispredict 1:%h",        processor_0.ROB_commit2_mispredict);
     $display("hcdb1_branch_taken 1:%h",       		processor_0.cdb1_branch_taken);
     $display("hcdb2_branch_taken 1:%h",       		processor_0.cdb2_branch_taken);//4
