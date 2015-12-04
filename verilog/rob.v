@@ -77,6 +77,8 @@ module rob(
 	output	logic								t1_is_full,
 	output	logic								t2_is_full,
 	
+	output	logic 	[$clog2(`ROB_SIZE)-1:0]		t1_head,
+	output	logic 	[$clog2(`ROB_SIZE)-1:0]		t2_head,
 	//for debug
 	input	[31:0]								rob_inst1_in,
 	input	[31:0]								rob_inst2_in,
@@ -87,9 +89,7 @@ module rob(
 //data logic variable needed
 
 //function variable needed
-	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_head;
 	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_tail;
-	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_head;
 	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_tail;
 	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_head;
 	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_tail;
