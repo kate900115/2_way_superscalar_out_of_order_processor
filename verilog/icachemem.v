@@ -16,6 +16,7 @@ module icachemem(
 	output logic									data_is_miss,
 	output logic									cache_is_full,
 	output logic [`ICACHE_BLOCK_SIZE-1:0]			data_out
+	//output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data
 	);
 	
 	// internal registers
@@ -38,7 +39,7 @@ module icachemem(
 	
 					
 	
-	always_ff@(posedge clock)
+	always_ff@(negedge clock)
 	begin
 		if (reset)
 		begin
