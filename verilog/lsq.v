@@ -22,8 +22,8 @@ module lsq(
 	input	[5:0]								inst1_op_type,
 	input	[63:0]								inst1_pc,
 	input	[31:0]								inst1_in,
-	input	[63:0]								inst1_rega,
-	input										inst1_rega_valid,
+	input	[63:0]								lsq_rega_in1,
+	input										lsq_rega_valid1,
 	input	[63:0] 								lsq_opa_in1,      	// Operand a from Rename  data
 	input	[63:0] 								lsq_opb_in1,      	// Operand a from Rename  tag or data from prf
 	input         								lsq_opb_valid1,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -36,8 +36,8 @@ module lsq(
    	input	[5:0]								inst2_op_type,
 	input	[63:0]								inst2_pc,
 	input	[31:0]								inst2_in,
-	input	[63:0]								inst2_rega,
-	input										inst2_rega_valid,
+	input	[63:0]								lsq_rega_in2,
+	input										lsq_rega_valid2,
 	input	[63:0] 								lsq_opa_in2,      	// Operand a from Rename  data
 	input	[63:0] 								lsq_opb_in2,     	// Operand b from Rename  tag or data from prf
 	input         								lsq_opb_valid2,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -148,8 +148,8 @@ module lsq(
 		.lq_pc_in1(inst2_pc),
 		.lq_inst1_in(inst1_in),
 		.lq_opa_in1(lsq_opa_in1),			// Operand a from Rename  data
-		.lq_opb_in1(lsq_opb_in1),			// Operand a from Rename  tag or data from prf
-		.lq_opb_valid1(lsq_opb_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_opb_in1(inst1_opb),			// Operand a from Rename  tag or data from prf
+		.lq_opb_valid1(inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
 		.lq_dest_idx1(dest_reg_idx1),
 		.lq_mem_in1(lq_mem_in1),
@@ -159,8 +159,8 @@ module lsq(
 		.lq_pc_in2(inst2_pc),
 		.lq_inst2_in(inst2_in),
 		.lq_opa_in2(lsq_opa_in2),      		// Operand a from Rename  data
-		.lq_opb_in2(lsq_opb_in2),     		// Operand b from Rename  tag or data from prf
-		.lq_opb_valid2(lsq_opb_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_opb_in2(inst2_opb),     		// Operand b from Rename  tag or data from prf
+		.lq_opb_valid2(inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
 		.lq_dest_idx2(dest_reg_idx2),
 		.lq_mem_in2(lq_mem_in1),    		//ldq
@@ -199,8 +199,8 @@ module lsq(
 		.lq_pc_in1(inst1_pc),
 		.lq_inst1_in(inst1_in),
 		.lq_opa_in1(lsq_opa_in1),			// Operand a from Rename  data
-		.lq_opb_in1(lsq_opb_in1),			// Operand a from Rename  tag or data from prf
-		.lq_opb_valid1(lsq_opb_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_opb_in1(inst1_opb),			// Operand a from Rename  tag or data from prf
+		.lq_opb_valid1(inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
 		.lq_dest_idx1(dest_reg_idx1),
 		.lq_mem_in1(lq_mem_in2),
@@ -209,8 +209,8 @@ module lsq(
 		.lq_pc_in2(inst2_pc),
 		.lq_inst2_in(inst2_in),
 		.lq_opa_in2(lsq_opa_in2),      		// Operand a from Rename  data
-		.lq_opb_in2(lsq_opb_in2),     		// Operand b from Rename  tag or data from prf
-		.lq_opb_valid2(lsq_opb_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.lq_opb_in2(inst2_opb),     		// Operand b from Rename  tag or data from prf
+		.lq_opb_valid2(inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
 		.lq_dest_idx2(dest_reg_idx2),
 		.lq_mem_in2(lq_mem_in2),    		//ldq
@@ -252,8 +252,8 @@ module lsq(
 		.sq_inst1_rega(inst1_rega),
 		.sq_inst1_rega_valid(inst1_rega_valid),
 		.sq_opa_in1(lsq_opa_in1),      	// Operand a from Rename  data
-		.sq_opb_in1(lsq_opb_in1),      	// Operand a from Rename  tag or data from prf
-		.sq_opb_valid1(lsq_opa_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.sq_opb_in1(inst1_opb),      	// Operand a from Rename  tag or data from prf
+		.sq_opb_valid1(inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.sq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
 		.sq_dest_idx1(dest_reg_idx1),
 
@@ -264,8 +264,8 @@ module lsq(
 		.sq_inst2_rega(inst2_rega),
 		.sq_inst2_rega_valid(inst2_rega_valid),
 		.sq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
-		.sq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
-		.sq_opb_valid2(lsq_rob_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.sq_opb_in2(inst2_opb),     	// Operand b from Rename  tag or data from prf
+		.sq_opb_valid2(inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.sq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
 		.sq_dest_idx2(dest_reg_idx2),
 	
@@ -301,8 +301,8 @@ module lsq(
 		.sq_inst1_rega(inst1_rega),
 		.sq_inst1_rega_valid(inst1_rega_valid),
 		.sq_opa_in1(lsq_opa_in1),      	// Operand a from Rename  data
-		.sq_opb_in1(lsq_opb_in1),      	// Operand a from Rename  tag or data from prf
-		.sq_opb_valid1(lsq_opa_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.sq_opb_in1(inst1_opb),      	// Operand a from Rename  tag or data from prf
+		.sq_opb_valid1(inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.sq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
 		.sq_dest_idx1(dest_reg_idx1),
 
@@ -313,8 +313,8 @@ module lsq(
 		.sq_inst2_rega(inst2_rega),
 		.sq_inst2_rega_valid(inst2_rega_valid),
 		.sq_opa_in2(lsq_opa_in2),      	// Operand a from Rename  data
-		.sq_opb_in2(lsq_opb_in2),     	// Operand b from Rename  tag or data from prf
-		.sq_opb_valid2(lsq_rob_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
+		.sq_opb_in2(inst2_opb),     	// Operand b from Rename  tag or data from prf
+		.sq_opb_valid2(inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.sq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
 		.sq_dest_idx2(dest_reg_idx2),
 	
@@ -413,14 +413,22 @@ module lsq(
 			n_lq_tail2 = lq_tail2 + inst1_is_lq2 + inst2_is_lq2;
 			n_sq_tail1 = sq_tail1 + inst1_is_sq1 + inst2_is_sq1;
 			n_sq_tail2 = sq_tail2 + inst1_is_sq2 + inst2_is_sq2;
-			for (int j = 0; j < inst1_is_lq1 + inst2_is_lq1; j++)
-				lq_mem_in1[lq_tail1+j] = 1;
-			for (int k = 0; k < inst1_is_lq2 + inst2_is_lq2; k++)
-				lq_mem_in2[lq_tail2+k] = 1;
-			for (int l = 0; l < inst1_is_sq1 + inst2_is_sq1; l++)
-				sq_mem_in1[sq_tail1+l] = 1;
-			for (int m = 0; m < inst1_is_sq2 + inst2_is_sq2; m++)
-				sq_mem_in2[sq_tail2+m] = 1;
+			if (inst1_is_lq1)
+				lq_mem_in1[lq_tail1] = 1;
+			if (inst2_is_lq1)
+				lq_mem_in1[lq_tail1+1] = 1;
+			if (inst1_is_lq2)
+				lq_mem_in2[lq_tail2] = 1;
+			if (inst2_is_lq2)
+				lq_mem_in2[lq_tail2+1] = 1;
+			if (inst1_is_sq1)
+				sq_mem_in1[sq_tail1] = 1;
+			if (inst2_is_sq1)
+				sq_mem_in1[sq_tail1+1] = 1;
+			if (inst1_is_sq2)
+				sq_mem_in2[sq_tail2] = 1;
+			if (inst2_is_sq2)
+				lq_mem_in2[lq_tail2+1] = 1;
 		end
 	end
 	
@@ -576,73 +584,56 @@ module lsq(
 	end
 	
 	//cdb
-	/*always_comb begin
+	always_comb begin
+		inst1_opb			= lsq_opb_in1;
+		inst1_opb_valid		= lsq_opb_valid1;
+		inst1_rega			= lsq_rega_in1;
+		inst1_rega_valid	= lsq_rega_valid1;
+		inst2_opb			= lsq_opb_in2;
+		inst2_opb_valid		= lsq_opb_valid2;
+		inst2_rega			= lsq_rega_in2;
+		inst2_rega_valid	= lsq_rega_valid2;
 		if ((lsq_cdb1_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb1_valid)
 		begin
-			inst1_OPa		= rs_cdb1_in;
-			inst1_OPaValid	= 1'b1;
+			inst1_opb		= lsq_cdb1_in;
+			inst1_opb_valid	= 1'b1;
 		end
-		else if ((rs_cdb2_tag == inst1_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opa_valid && rs_cdb2_valid)
+		else if ((lsq_cdb2_tag == lsq_opb_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid1 && lsq_cdb2_valid)
 		begin
-			inst1_OPa		= rs_cdb2_in;
-			inst1_OPaValid	= 1'b1;
+			inst1_opb		= lsq_cdb2_in;
+			inst1_opb_valid	= 1'b1;
 		end
-
-		if ((rs_cdb1_tag == inst1_rs_opb_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opb_valid && rs_cdb1_valid)
+		if ((lsq_cdb1_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid2 && lsq_cdb1_valid)
 		begin
-			inst1_OPb		= rs_cdb1_in;
-			inst1_OPbValid	= 1'b1;
-		end   	
-		else if ((rs_cdb2_tag == inst1_rs_opb_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opb_valid && rs_cdb2_valid)
-		begin
-			inst1_OPb		= rs_cdb2_in;
-			inst1_OPbValid	= 1'b1;
+			inst2_opb		= lsq_cdb1_in;
+			inst2_opb_valid	= 1'b1;
 		end
-
-		if ((rs_cdb1_tag == inst1_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opc_valid && rs_cdb1_valid)
+		else if ((lsq_cdb2_tag == lsq_opb_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_opb_valid2 && lsq_cdb2_valid)
 		begin
-			inst1_OPc		= rs_cdb1_in;
-			inst1_OPcValid	= 1'b1;
+			inst2_opb		= lsq_cdb2_in;
+			inst2_opb_valid	= 1'b1;
 		end
-		else if ((rs_cdb2_tag == inst1_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst1_rs_opc_valid && rs_cdb2_valid)
+		if ((lsq_cdb1_tag == lsq_rega_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_rega_valid1 && lsq_cdb1_valid)
 		begin
-			inst1_OPc		= rs_cdb2_in;
-			inst1_OPcValid	= 1'b1;
+			inst1_rega			= lsq_cdb1_in;
+			inst1_rega_valid	= 1'b1;
 		end
-
-		if ((rs_cdb1_tag == inst2_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opa_valid && rs_cdb1_valid)
+		else if ((lsq_cdb2_tag == lsq_rega_in1[$clog2(`PRF_SIZE)-1:0]) && !lsq_rega_valid1 && lsq_cdb2_valid)
 		begin
-			inst2_OPa		= rs_cdb1_in;
-			inst2_OPaValid	= 1'b1;
+			inst1_rega			= lsq_cdb2_in;
+			inst1_rega_valid	= 1'b1;
 		end
-		else if ((rs_cdb2_tag == inst2_rs_opa_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opa_valid && rs_cdb2_valid)
+		if ((lsq_cdb1_tag == lsq_rega_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_rega_valid2 && lsq_cdb1_valid)
 		begin
-			inst2_OPa		= rs_cdb2_in;
-			inst2_OPaValid	= 1'b1;
+			inst2_rega			= lsq_cdb1_in;
+			inst2_rega_valid	= 1'b1;
 		end
-
-		if ((rs_cdb1_tag == inst2_rs_opb_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opb_valid && rs_cdb1_valid)
+		else if ((lsq_cdb2_tag == lsq_rega_in2[$clog2(`PRF_SIZE)-1:0]) && !lsq_rega_valid2 && lsq_cdb2_valid)
 		begin
-			inst2_OPb		= rs_cdb1_in;
-			inst2_OPbValid	= 1'b1;
-		end   	
-		else if ((rs_cdb2_tag == inst2_rs_opb_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opb_valid && rs_cdb2_valid)
-		begin
-			inst2_OPb		= rs_cdb2_in;
-			inst2_OPbValid	= 1'b1;
-		end  
-
-		if ((rs_cdb1_tag == inst2_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opc_valid && rs_cdb1_valid)
-		begin
-			inst2_OPc		= rs_cdb1_in;
-			inst2_OPcValid	= 1'b1;
+			inst2_rega			= lsq_cdb2_in;
+			inst2_rega_valid	= 1'b1;
 		end
-		else if ((rs_cdb2_tag == inst2_rs_opc_in[$clog2(`PRF_SIZE)-1:0]) && !inst2_rs_opc_valid && rs_cdb2_valid)
-		begin
-			inst2_OPc		= rs_cdb2_in;
-			inst2_OPcValid	= 1'b1;
-		end
-	end*/
+	end
 	
 	//tag table
 	always_comb begin
