@@ -566,12 +566,12 @@ module lsq(
 		mem_address_out		= 0;
 		current_mem_inst	= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && lq1_pc[lq_head1] < sq1_pc[sq_head1] && ~sq1_is_available[sq_head1]) begin
+		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && (lq1_pc[lq_head1] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
 			current_mem_inst	= {1'b0,1'b0,lq_head1};
 			mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
 			lsq2Dcache_command	= BUS_LOAD;
 		end
-		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && lq2_pc[lq_head2] < sq2_pc[sq_head2] && ~sq2_is_available[sq_head2]) begin
+		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && (lq2_pc[lq_head2] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
 			current_mem_inst	= {1'b1,1'b0,lq_head2};
 			mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
 			lsq2Dcache_command	= BUS_LOAD;
