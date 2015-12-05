@@ -600,7 +600,7 @@ prf prf1(
 	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
 	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
 	.rat1_read_enable(PC_thread1_is_available),
-	.is_one_thread(1'b1),
+	.is_one_thread(1'b0),
 
 
 	//output

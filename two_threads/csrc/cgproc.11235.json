@@ -1,0 +1,343 @@
+{
+    "Modules": {
+        "mult_stage": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "alu": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "...MASTER...": {},
+        "rs_one_entry": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "cdb_one_entry": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "priority_selector_0001": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "_vcs_unit__2649932360": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "std": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "testbench": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "mem": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "cdb": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "decoder": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "prf_one_entry": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "processor": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "pc": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "priority_selector_0000": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "wand_sel_0001": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "priority_selector_0002": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "rat": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "rob_one_entry": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "rrat": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        }
+    },
+    "reusePaths": {},
+    "CompUnits": {
+        "wnjK2_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "rob_one_entry",
+            "checksum": 4294967295,
+            "out": "wnjK2_d.o",
+            "bytes": 25748,
+            "mode": 4
+        },
+        "JqSQt_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "cdb",
+            "checksum": 4294967295,
+            "out": "JqSQt_d.o",
+            "bytes": 14060,
+            "mode": 4
+        },
+        "amcQw_d": {
+            "mod": "...MASTER...",
+            "checksum": 4294967295,
+            "out": "objs/amcQw_d.o",
+            "bytes": 7457,
+            "mode": 4
+        },
+        "iAVhC_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "testbench",
+            "checksum": 4294967295,
+            "out": "iAVhC_d.o",
+            "bytes": 66997,
+            "mode": 4
+        },
+        "FSbWZ_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "mem",
+            "checksum": 4294967295,
+            "out": "FSbWZ_d.o",
+            "bytes": 17266,
+            "mode": 4
+        },
+        "MiKZC_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "_vcs_unit__2649932360",
+            "checksum": 4294967295,
+            "out": "MiKZC_d.o",
+            "bytes": 17081,
+            "mode": 4
+        },
+        "EJdGq_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "pc",
+            "checksum": 4294967295,
+            "out": "EJdGq_d.o",
+            "bytes": 26411,
+            "mode": 4
+        },
+        "reYIK_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "std",
+            "checksum": 4294967295,
+            "out": "reYIK_d.o",
+            "bytes": 28470,
+            "mode": 4
+        },
+        "C26kq_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "alu",
+            "checksum": 4294967295,
+            "out": "C26kq_d.o",
+            "bytes": 16374,
+            "mode": 4
+        },
+        "tJRNL_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "priority_selector_0000",
+            "checksum": 4294967295,
+            "out": "tJRNL_d.o",
+            "bytes": 112182,
+            "mode": 4
+        },
+        "ekD33_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "cdb_one_entry",
+            "checksum": 4294967295,
+            "out": "ekD33_d.o",
+            "bytes": 16010,
+            "mode": 4
+        },
+        "aUVMg_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "mult_stage",
+            "checksum": 4294967295,
+            "out": "aUVMg_d.o",
+            "bytes": 12927,
+            "mode": 4
+        },
+        "zf0bY_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "decoder",
+            "checksum": 4294967295,
+            "out": "zf0bY_d.o",
+            "bytes": 19353,
+            "mode": 4
+        },
+        "MJYMx_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "prf_one_entry",
+            "checksum": 4294967295,
+            "out": "MJYMx_d.o",
+            "bytes": 15578,
+            "mode": 4
+        },
+        "WfHY7_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "priority_selector_0001",
+            "checksum": 4294967295,
+            "out": "WfHY7_d.o",
+            "bytes": 22548,
+            "mode": 4
+        },
+        "fSTpM_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "priority_selector_0002",
+            "checksum": 4294967295,
+            "out": "fSTpM_d.o",
+            "bytes": 20779,
+            "mode": 4
+        },
+        "ci1CE_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "wand_sel_0001",
+            "checksum": 4294967295,
+            "out": "ci1CE_d.o",
+            "bytes": 27298,
+            "mode": 4
+        },
+        "FAtab_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "processor",
+            "checksum": 4294967295,
+            "out": "FAtab_d.o",
+            "bytes": 493914,
+            "mode": 4
+        },
+        "CQHA8_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "rat",
+            "checksum": 4294967295,
+            "out": "CQHA8_d.o",
+            "bytes": 38443,
+            "mode": 4
+        },
+        "BaH3Z_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "rrat",
+            "checksum": 4294967295,
+            "out": "BaH3Z_d.o",
+            "bytes": 20003,
+            "mode": 4
+        },
+        "vRLff_d": {
+            "archive": "archive.0/_11235_archive_1.a",
+            "mod": "rs_one_entry",
+            "checksum": 4294967295,
+            "out": "vRLff_d.o",
+            "bytes": 44141,
+            "mode": 4
+        }
+    },
+    "ObjArchives": [
+        {
+            "archive": "archive.0/_11235_archive_1.a",
+            "objects": [
+                [
+                    "MiKZC_d.o",
+                    17081
+                ],
+                [
+                    "reYIK_d.o",
+                    28470
+                ],
+                [
+                    "iAVhC_d.o",
+                    66997
+                ],
+                [
+                    "FSbWZ_d.o",
+                    17266
+                ],
+                [
+                    "JqSQt_d.o",
+                    14060
+                ],
+                [
+                    "ekD33_d.o",
+                    16010
+                ],
+                [
+                    "C26kq_d.o",
+                    16374
+                ],
+                [
+                    "zf0bY_d.o",
+                    19353
+                ],
+                [
+                    "aUVMg_d.o",
+                    12927
+                ],
+                [
+                    "EJdGq_d.o",
+                    26411
+                ],
+                [
+                    "MJYMx_d.o",
+                    15578
+                ],
+                [
+                    "tJRNL_d.o",
+                    112182
+                ],
+                [
+                    "WfHY7_d.o",
+                    22548
+                ],
+                [
+                    "fSTpM_d.o",
+                    20779
+                ],
+                [
+                    "ci1CE_d.o",
+                    27298
+                ],
+                [
+                    "FAtab_d.o",
+                    493914
+                ],
+                [
+                    "CQHA8_d.o",
+                    38443
+                ],
+                [
+                    "wnjK2_d.o",
+                    25748
+                ],
+                [
+                    "BaH3Z_d.o",
+                    20003
+                ],
+                [
+                    "vRLff_d.o",
+                    44141
+                ]
+            ],
+            "size": 1055583
+        }
+    ]
+}
