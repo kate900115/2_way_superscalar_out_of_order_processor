@@ -163,7 +163,7 @@ module lsq(
 		.lq_opb_valid2(lsq_opb_valid2),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in2(lsq_rob_idx_in2),  	// The rob index of instruction 2
 		.lq_dest_idx2(dest_reg_idx2),
-		.lq_mem_in2(lq_mem_in2),    		//ldq
+		.lq_mem_in2(lq_mem_in1),    		//ldq
 		//cdb
 		.lq_cdb1_in(lsq_cdb1_in),     		// CDB bus from functional units 
 		.lq_cdb1_tag(lsq_cdb1_tag),    		// CDB tag bus from functional units 
@@ -203,7 +203,7 @@ module lsq(
 		.lq_opb_valid1(lsq_opb_valid1),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 		.lq_rob_idx_in1(lsq_rob_idx_in1),  	// The rob index of instruction 1
 		.lq_dest_idx1(dest_reg_idx1),
-		.lq_mem_in1(lq_mem_in1),
+		.lq_mem_in1(lq_mem_in2),
 
 		//for instruction2
 		.lq_pc_in2(inst2_pc),
@@ -258,7 +258,7 @@ module lsq(
 		.sq_dest_idx1(dest_reg_idx1),
 
 		//for instruction2
-		.sq_mem_in2(sq_mem_in2),
+		.sq_mem_in2(sq_mem_in1),
 		.sq_pc_in2(inst2_pc),
 		.sq_inst2_in(inst2_in),
 		.sq_inst2_rega(inst2_rega),
@@ -295,7 +295,7 @@ module lsq(
 		.sq_free_enable(sq2_free_en),
 	
 		//for instruction1
-		.sq_mem_in1(sq_mem_in1),
+		.sq_mem_in1(sq_mem_in2),
 		.sq_pc_in1(inst1_pc),
 		.sq_inst1_in(inst1_in),
 		.sq_inst1_rega(inst1_rega),
