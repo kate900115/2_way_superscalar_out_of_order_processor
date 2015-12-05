@@ -311,20 +311,6 @@ if_stage pc(
 	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous)
 	);
 
-//////////////////////////////////////////
-//					//
-//		Predictor & BTB         //     
-//					//
-//////////////////////////////////////////
-
-
-
-
-
-
-
-
-
 //////////////////////////////////
 //								//
 //			Decoder				//
@@ -909,49 +895,55 @@ cdb cdb1(
 );
 
 
+
+//////////////////////////////////////////
+//										//
+//		Predictor & BTB         		//     
+//										//
+//////////////////////////////////////////
+
 	predictor predictor1(
-	.two_threads_enable(1'b1),
-	.reset(reset),
-	.clock(clock),
-	.if_inst1_pc(PC_inst1),
-	.inst1_valid(PC_inst1_valid),
-	.if_inst2_pc(PC_inst2),
-	.inst2_valid(PC_inst1_valid),
+		.two_threads_enable(1'b1),
+		.reset(reset),
+		.clock(clock),
+		.if_inst1_pc(PC_inst1),
+		.inst1_valid(PC_inst1_valid),
+		.if_inst2_pc(PC_inst2),
+		.inst2_valid(PC_inst1_valid),
 
-	.branch_result1(thread1_branch_is_taken),              //branch taken or not taken
-	.branch_pc1(ROB_commit1_pc),             //branch local pc
-	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
-	.branch_result2(thread2_branch_is_taken),
-	.branch_pc2(ROB_commit1_pc),
-	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+		.branch_result1(thread1_branch_is_taken),              //branch taken or not taken
+		.branch_pc1(ROB_commit1_pc),             //branch local pc
+		.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
+		.branch_result2(thread2_branch_is_taken),
+		.branch_pc2(ROB_commit1_pc),
+		.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
 
-	.inst1_predict(inst1_predict),              //inst predict signal
-	.inst1_predict_valid(inst1_predict_valid),
-	.inst2_predict(inst2_predict),
-	.inst2_predict_valid(inst2_predict_valid)
+		.inst1_predict(inst1_predict),              //inst predict signal
+		.inst1_predict_valid(inst1_predict_valid),
+		.inst2_predict(inst2_predict),
+		.inst2_predict_valid(inst2_predict_valid)
 	);
 
 
 	BTB BTB_1(
-	.reset(reset),
-	.clock(clock),
-	.if_inst1_pc(PC_inst1),
-	.if_inst2_pc(PC_inst2),
-	.inst1_valid(PC_inst1_valid),
-	.inst2_valid(PC_inst1_valid),
+		.reset(reset),
+		.clock(clock),
+		.if_inst1_pc(PC_inst1),
+		.if_inst2_pc(PC_inst2),
+		.inst1_valid(PC_inst1_valid),
+		.inst2_valid(PC_inst1_valid),
 		
-	.pc_idx1(ROB_commit1_pc),
-	.pc_idx2(ROB_commit2_pc),		
-	.target_pc1(ROB_commit1_target_pc),
-	.target_pc2(ROB_commit2_target_pc),
-	.target_pc1_valid(inst1_predict_valid && inst1_predict),
-	.target_pc2_valid(inst2_predict_valid && inst2_predict),
+		.pc_idx1(ROB_commit1_pc),
+		.pc_idx2(ROB_commit2_pc),		
+		.target_pc1(ROB_commit1_target_pc),
+		.target_pc2(ROB_commit2_target_pc),
+		.target_pc1_valid(inst1_predict_valid && inst1_predict),
+		.target_pc2_valid(inst2_predict_valid && inst2_predict),
 		
-	.target_inst1_pc(BTB_target_inst1_pc),
-	.target_inst2_pc(BTB_target_inst2_pc),
-	.target_inst1_valid(BTB_target_inst1_valid),
-	.target_inst2_valid(BTB_target_inst2_valid)
-
+		.target_inst1_pc(BTB_target_inst1_pc),
+		.target_inst2_pc(BTB_target_inst2_pc),
+		.target_inst1_valid(BTB_target_inst1_valid),
+		.target_inst2_valid(BTB_target_inst2_valid)
 	);		
 		
 		
