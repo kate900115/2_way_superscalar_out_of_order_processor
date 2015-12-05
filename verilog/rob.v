@@ -258,27 +258,27 @@ module rob(
 			rob2_internal_is_ex_in[j] = 1'b0;
 			rob1_internal_mispredict_in[j] = 1'b0;
 			rob2_internal_mispredict_in[j] = 1'b0;
-			rob1_internal_target_pc_in[j] = 0;
-			rob2_internal_target_pc_in[j] = 0;
-			if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx1[$clog2(`ROB_SIZE)])
+			rob1_internal_target_pc_in[j] = 1'b0;
+			rob2_internal_target_pc_in[j] = 1'b0;
+			if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && !fu_rob_idx1[$clog2(`ROB_SIZE)] && if_fu_executed1 )
 			begin
 				rob1_internal_is_ex_in[j] = if_fu_executed1;
 				rob1_internal_mispredict_in[j] = mispredict_in1;
 				rob1_internal_target_pc_in[j] = target_pc_in1;
 			end
-			else if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx1[$clog2(`ROB_SIZE)])
+			else if (j == fu_rob_idx1[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx1[$clog2(`ROB_SIZE)] && if_fu_executed1 )
 			begin
 				rob2_internal_is_ex_in[j] = if_fu_executed1;
 				rob2_internal_mispredict_in[j] = mispredict_in1;
 				rob2_internal_target_pc_in[j] = target_pc_in1;
 			end
-			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && ~fu_rob_idx2[$clog2(`ROB_SIZE)])
+			if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && !fu_rob_idx2[$clog2(`ROB_SIZE)] && if_fu_executed2 )
 			begin
 				rob1_internal_is_ex_in[j] = if_fu_executed2;
 				rob1_internal_mispredict_in[j] = mispredict_in2;
 				rob1_internal_target_pc_in[j] = target_pc_in2;
 			end
-			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)])
+			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)] && if_fu_executed2 )
 			begin
 				rob2_internal_is_ex_in[j] = if_fu_executed2;
 				rob2_internal_mispredict_in[j] = mispredict_in2;

@@ -97,8 +97,8 @@ logic			ID_inst1_is_halt;
 logic			ID_inst2_is_halt;
 logic			ID_inst1_is_illegal;
 logic			ID_inst2_is_illegal;
-logic [4:0]			ID_rega_inst1;
-logic [4:0]			ID_rega_inst2;
+logic [4:0]		ID_rega_inst1;
+logic [4:0]		ID_rega_inst2;
 
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
@@ -193,6 +193,8 @@ logic							ROB_commit1_is_halt;
 logic							ROB_commit1_is_illegal;
 logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t1_head;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t2_head;
 
 //rs output
 logic [3:0][63:0]		RS_EX_opa;
@@ -205,6 +207,16 @@ logic [3:0]					RS_EX_out_valid;
 logic [3:0] [1:0]			RS_EX_branch_out;
 logic						RS_full;
 
+//lsq output
+logic [$clog2(`PRF_SIZE)-1:0]	LSQ_CDB_dest_tag1;
+logic [63:0]					LSQ_CDB_result_out1;
+logic							LSQ_CDB_result_is_valid1;
+logic [$clog2(`ROB_SIZE):0]		LSQ_CDB_rob_idx1;
+logic [$clog2(`PRF_SIZE)-1:0]	LSQ_CDB_dest_tag2;
+logic [63:0]					LSQ_CDB_result_out2;
+logic							LSQ_CDB_result_is_valid2;
+logic [$clog2(`ROB_SIZE):0]		LSQ_CDB_rob_idx2;
+logic							LSQ_is_full;
 //ex output
 //logic [5:0]							EX_RS_fu_is_available;
 logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
@@ -247,12 +259,11 @@ logic inst1_predict_valid;
 logic inst2_predict;
 logic inst2_predict_valid;
 
-
 logic Imem2proc_valid;
-assign proc2mem_command = BUS_LOAD;
-       //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
-assign proc2mem_addr = PC_proc2Imem_addr;
-       //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
+logic BUS_COMMAND	LSQ2Dcache_command;
+logic [63:0]		LSQ_address_out;
+assign proc2mem_command	= (LSQ2Dcache_command == BUS_NONE) ? BUS_LOAD : LSQ2Dcache_command;
+assign proc2mem_addr 	= (LSQ2Dcache_command == BUS_NONE) ? PC_proc2Imem_addr : LSQ_address_out;
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) :
@@ -290,7 +301,7 @@ if_stage pc(
 	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread1_target_pc),
-	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
+	.rs_stall(RS_full || LSQ_is_full),	 				// when RS is full, we need to stop PC
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
 	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
@@ -404,7 +415,6 @@ rat rat1(
 	.rega_arf_inst1(ID_rega_inst1),
 	.rega_arf_inst2(ID_rega_inst2),
 
-
 	.opa_valid_in1(ID_inst1_opa_valid),	//if high opa_valid is immediate
 	.opb_valid_in1(ID_inst1_opb_valid),
 	.opa_valid_in2(ID_inst2_opa_valid),	//if high opa_valid is immediate
@@ -426,8 +436,6 @@ rat rat1(
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
 	.request1(RAT1_PRF_allocate_req1),  //send to PRF indicate whether it need data
 	//.RAT_allo_halt1(),
-
-
 
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
@@ -867,14 +875,15 @@ cdb cdb1(
 	.adder2_dest_reg_idx(EX_CDB_dest_tag[3]),
 	.adder2_rob_idx(EX_CDB_rob_idx[3]),
 	.adder2_branch_taken(EX_CDB_mispredict_sig[1]),
-	.memory1_result_ready(EX_CDB_fu_result_is_valid[4]),
-	.memory1_result_in(EX_CDB_fu_result_out[4]),
-	.memory1_dest_reg_idx(EX_CDB_dest_tag[4]),
-	.memory1_rob_idx(EX_CDB_rob_idx[4]),
-	.memory2_result_ready(EX_CDB_fu_result_is_valid[5]),
-	.memory2_result_in(EX_CDB_fu_result_out[5]),
-	.memory2_dest_reg_idx(EX_CDB_dest_tag[5]),
-	.memory2_rob_idx(EX_CDB_rob_idx[5]),
+	.memory1_result_ready(LSQ_CDB_result_is_valid1),
+	.memory1_result_in(LSQ_CDB_result_out1),
+	.memory1_dest_reg_idx(LSQ_CDB_dest_tag1),
+	.memory1_rob_idx(LSQ_CDB_rob_idx1),
+	.memory2_result_ready(LSQ_CDB_result_is_valid2),
+	.memory2_result_in(LSQ_CDB_result_out2),
+	.memory2_dest_reg_idx(LSQ_CDB_dest_tag1),
+	.memory2_rob_idx(LSQ_CDB_rob_idx1),
+	
 //output	
 	.cdb1_valid(cdb1_valid),
 	.cdb1_tag(cdb1_tag),
@@ -989,32 +998,33 @@ cdb cdb1(
 		.lsq_rob_idx_in2(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 		.dest_reg_idx2(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),
 	//from mem
-		.mem_data_in(),		//when no forwarding possible, load from memory
-		.mem_response_in(),
-		.mem_tag_in(),
-		.cache_hit(),
+		.mem_data_in(mem2proc_data),		//when no forwarding possible, load from memory
+		.mem_response_in(mem2proc_response),
+		.mem_tag_in(mem2proc_tag),
+		.cache_hit(1),
 	
 	//retired store idx
-		.t1_head(),
-		.t2_head(),
+		.t1_head(ROB_t1_head),
+		.t2_head(ROB_t2_head),
 	//we need to know weather the instruction commited is a mispredict
 		.thread1_mispredict(thread1_branch_is_taken),
 		.thread2_mispredict(thread2_branch_is_taken),
 	//output
 	//cdb
-		.cdb_dest_tag1,
-		.cdb_result_out1,
-		.cdb_result_is_valid1,
-		.cdb_rob_idx1,
-		.cdb_dest_tag2,
-		.cdb_result_out2,
-		.cdb_result_is_valid2,
-		.cdb_rob_idx2,
+		.cdb_dest_tag1(LSQ_CDB_dest_tag1),
+		.cdb_result_out1(LSQ_CDB_result_out1),
+		.cdb_result_is_valid1(LSQ_CDB_result_is_valid1),
+		.cdb_rob_idx1(LSQ_CDB_rob_idx1),
+		.cdb_dest_tag2(LSQ_CDB_dest_tag2),
+		.cdb_result_out2(LSQ_CDB_result_out2),
+		.cdb_result_is_valid2(LSQ_CDB_result_is_valid2),
+		.cdb_rob_idx2(LSQ_CDB_rob_idx2),
 	//mem
-		.mem_data_out,
-		.mem_address_out,
-		.lsq2Dcache_command,
-		.lsq_is_full
+		.mem_data_out(proc2mem_data),
+		.mem_address_out(LSQ_address_out),
+		.lsq2Dcache_command(LSQ2Dcache_command),
+	//full
+		.lsq_is_full(LSQ_is_full)
 	);
 
 //////////////////////////////////

@@ -34,10 +34,10 @@ module predictor(
 
 	always_comb begin
 
-		branch1_mispredict=0;
+		/*branch1_mispredict=0;
 		branch1_mispredict_valid=0;
 		branch2_mispredict=0;
-		branch2_mispredict_valid=0;
+		branch2_mispredict_valid=0;*/
 
 		for (int j=0; j<`LHISTORY_SIZE; j++) begin
 
@@ -53,6 +53,34 @@ module predictor(
 						if(branch_result1 && l_state[j]!= 2'b11) begin
 							l_nextstate[j]=l_state[j]+1;
 
+							/*if(l_state[j][1])   begin     //predict branch taken
+								branch1_mispredict=1'b0;
+								branch1_mispredict_valid=1'b1;
+							end
+							else begin
+								branch1_mispredict=1'b1;
+								branch1_mispredict_valid=1'b1;
+							end*/
+						end
+
+						else if(~branch_result1 && l_state[j]!= 2'b00) begin
+							l_nextstate[j]=l_state[j]-1;
+				
+							/*if(l_state[j][1])   begin     //predict branch taken
+								branch1_mispredict=1'b1;
+								branch1_mispredict_valid=1'b1;
+							end
+							else begin
+								branch1_mispredict=1'b0;
+								branch1_mispredict_valid=1'b1;
+							end*/
+						end	
+						
+						else
+							l_nextstate[j]=l_state[j];
+
+
+						if(branch_result1) begin
 							if(l_state[j][1])   begin     //predict branch taken
 								branch1_mispredict=1'b0;
 								branch1_mispredict_valid=1'b1;
@@ -62,11 +90,7 @@ module predictor(
 								branch1_mispredict_valid=1'b1;
 							end
 						end
-
-
-						else if(~branch_result1 && l_state[j]!= 2'b00) begin
-							l_nextstate[j]=l_state[j]-1;
-				
+						else begin
 							if(l_state[j][1])   begin     //predict branch taken
 								branch1_mispredict=1'b1;
 								branch1_mispredict_valid=1'b1;
@@ -75,10 +99,7 @@ module predictor(
 								branch1_mispredict=1'b0;
 								branch1_mispredict_valid=1'b1;
 							end
-						end	
-						
-						else
-							l_nextstate[j]=l_state[j];
+						end
 					end
 				end
 			
@@ -90,20 +111,44 @@ module predictor(
 						if(branch_result2 && l_state[j]!= 2'b11) begin
 							l_nextstate[j]=l_state[j]+1;
 			
-							if(l_state[j][1])   begin     //predict branch taken
+							/*if(l_state[j][1])   begin     //predict branch taken
 								branch2_mispredict=1'b0;
 								branch2_mispredict_valid=1'b1;
 							end
 							else begin
 								branch2_mispredict=1'b1;
 								branch2_mispredict_valid=1'b1;
-							end
+							end*/
 						end
 
 
 						else if(~branch_result2 && l_state[j]!= 2'b00)
 							l_nextstate[j]=l_state[j]-1;
 				
+							/*if(l_state[j][1])   begin     //predict branch taken
+								branch2_mispredict=1'b1;
+								branch2_mispredict_valid=1'b1;
+							end
+							else begin
+								branch2_mispredict=1'b0;
+								branch2_mispredict_valid=1'b1;
+							end*/
+						end
+
+						else
+							l_nextstate[j]=l_state[j];
+						
+						if(branch_result2) begin
+							if(l_state[j][1])   begin     //predict branch taken
+								branch2_mispredict=1'b0;
+								branch2_mispredict_valid=1'b1;
+							end
+							else begin
+								branch2_mispredict=1'b1;
+								branch2_mispredict_valid=1'b1;
+							end
+						end
+						else begin
 							if(l_state[j][1])   begin     //predict branch taken
 								branch2_mispredict=1'b1;
 								branch2_mispredict_valid=1'b1;
@@ -113,9 +158,6 @@ module predictor(
 								branch2_mispredict_valid=1'b1;
 							end
 						end
-
-						else
-							l_nextstate[j]=l_state[j];
 					end
 				end
 			end
@@ -131,7 +173,6 @@ module predictor(
 	assign inst2_predict_valid= inst2_valid && two_threads_enable;
 
 	
-		
 
 	
 	always_ff @(posedge clock) begin
