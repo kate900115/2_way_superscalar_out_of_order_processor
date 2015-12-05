@@ -210,8 +210,8 @@ module BTB(
 						//next_switch_hit[i]=1'b0;
 					end
 					else begin
-						target_inst1_pc=0;
-						target_inst1_valid=1'b0;
+						target_inst1_pc=if_inst1_pc;
+						target_inst1_valid=1'b1;
 						//next_switch[i]=switch[i];
 					end
 				end
@@ -228,8 +228,8 @@ module BTB(
 						//next_switch_hit[i]=1'b0;
 					end
 					else begin
-						target_inst2_pc=0;
-						target_inst2_valid=1'b0;
+						target_inst2_pc=if_inst2_pc;
+						target_inst2_valid=1'b1;
 						//next_switch[i]=switch[i];
 					end
 				end
