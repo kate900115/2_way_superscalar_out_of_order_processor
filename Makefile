@@ -35,13 +35,18 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/prf.v	\
 			verilog/prf_one_entry.v	\
 			verilog/priority_selector.v	\
-			verilog/processor.v	\
+			verilog/processor_ppp.v	\
 			verilog/rat.v	\
 			verilog/rob.v	\
 			verilog/rob_one_entry.v	\
 			verilog/rrat.v	\
 			verilog/rs.v	\
 			verilog/rs_one_entry.v	\
+			verilog/icache_controller.v \
+			verilog/icachemem.v \
+			verilog/icache.v \
+			verilog/BTB.v \
+			verilog/predictor.v \
 			 
 
 SYNFILES = processor.vg 
