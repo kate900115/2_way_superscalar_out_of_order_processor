@@ -74,7 +74,14 @@ module lsq(
 
 	output logic								lsq_is_full
 );
-	
+	logic	[63:0]			inst1_opb;
+	logic					inst1_opb_valid;
+	logic	[63:0]			inst2_opb;
+	logic					inst2_opb_valid;
+	logic	[63:0]			inst1_rega;
+	logic					inst1_rega_valid;
+	logic	[63:0]			inst2_rega;
+	logic					inst2_rega_valid;
 	//LQ
 	//the relative ages of two instructions can be determined by examing the physical locations they occupied in LSQ
 	//for example, instruction at slot 5 is older than instruction at slot 8
@@ -559,12 +566,12 @@ module lsq(
 		mem_address_out		= 0;
 		current_mem_inst	= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && lq1_pc[lq_head1] < sq1_pc[sq_head1] && ~sq1_is_available[sq_head1]) begin
+		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && (lq1_pc[lq_head1] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
 			current_mem_inst	= {1'b0,1'b0,lq_head1};
 			mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
 			lsq2Dcache_command	= BUS_LOAD;
 		end
-		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && lq2_pc[lq_head2] < sq2_pc[sq_head2] && ~sq2_is_available[sq_head2]) begin
+		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && (lq2_pc[lq_head2] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
 			current_mem_inst	= {1'b1,1'b0,lq_head2};
 			mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
 			lsq2Dcache_command	= BUS_LOAD;
