@@ -44,7 +44,9 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/rs_one_entry.v	\
 			verilog/icache_controller.v \
 			verilog/icachemem.v \
-			verilog/icache.v
+			verilog/icache.v \
+			verilog/BTB.v \
+			verilog/predictor.v \
 			 
 
 SYNFILES = processor.vg 
