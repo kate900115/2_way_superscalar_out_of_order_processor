@@ -1,4 +1,3 @@
-
 //`include "sys_defs.vh"
 `timescale 1ns/100ps
 
@@ -340,7 +339,7 @@ module testbench;
     // each argument is number of registers/signals for the group
     // (IF, RS, ID, ROB, EX, EX/MEM, MEM, RAT, WB, Misc)
     // p: PC 6  g: ID 13  
-    initcurses(6,13,26,24,9,48,10,42,10,2);
+    initcurses(6,32,26,24,9,48,10,42,32,2);
 
     // Pulse the reset signal
     reset = 1'b1;
@@ -626,19 +625,38 @@ module testbench;
 
 
     // RS signals (13) - prefix 'g'
-    $display("gRS_EX_out_valid1 6:%b",     			processor_0.RS_EX_out_valid[0]);
-    $display("gRS_EX_out_valid2 6:%b",     			processor_0.RS_EX_out_valid[1]);
-    $display("gRS_EX_out_valid3 6:%b",     			processor_0.RS_EX_out_valid[2]);
-    $display("gRS_EX_out_valid4 6:%b",     			processor_0.RS_EX_out_valid[3]);
-    $display("gRS_EX_out_valid5 6:%b",     			processor_0.RS_EX_out_valid[4]);
-    $display("gRS_EX_out_valid6 6:%b",     			processor_0.RS_EX_out_valid[5]);
-    $display("gRS_EX_alu_func1 6:%b",   			processor_0.RS_EX_alu_func[0]);
-    $display("gRS_EX_alu_func2 6:%b",   			processor_0.RS_EX_alu_func[1]);
-    $display("gRS_EX_alu_func3 6:%b",   			processor_0.RS_EX_alu_func[2]);
-    $display("gRS_EX_alu_func4 6:%b",   			processor_0.RS_EX_alu_func[3]);
-    $display("gRS_EX_alu_func5 6:%b",   			processor_0.RS_EX_alu_func[4]);
-    $display("gRS_EX_alu_func6 6:%b",   			processor_0.RS_EX_alu_func[5]);
-    $display("gRS_full 1:%b",   					processor_0.RS_full);
+    $display("gr0 6:%d",   processor_0.rrat2.rrat_reg[0]);
+    $display("gr1 6:%d",   processor_0.rrat2.rrat_reg[1]);
+    $display("gr2 6:%d",   processor_0.rrat2.rrat_reg[2]);
+    $display("gr3 6:%d",   processor_0.rrat2.rrat_reg[3]);
+    $display("gr4 6:%d",   processor_0.rrat2.rrat_reg[4]);
+    $display("gr5 6:%d",   processor_0.rrat2.rrat_reg[5]);
+    $display("gr6 6:%d",   processor_0.rrat2.rrat_reg[6]);
+    $display("gr7 6:%d",   processor_0.rrat2.rrat_reg[7]);
+    $display("gr8 6:%d",   processor_0.rrat2.rrat_reg[8]);
+    $display("gr9 6:%d",   processor_0.rrat2.rrat_reg[9]);
+    $display("gr10 6:%d",   processor_0.rrat2.rrat_reg[10]);
+    $display("gr11 6:%d",   processor_0.rrat2.rrat_reg[11]);
+    $display("gr12 6:%d",   processor_0.rrat2.rrat_reg[12]);
+    $display("gr13 6:%d",   processor_0.rrat2.rrat_reg[13]);
+    $display("gr14 6:%d",   processor_0.rrat2.rrat_reg[14]);
+    $display("gr15 6:%d",   processor_0.rrat2.rrat_reg[15]);
+    $display("gr16 6:%d",   processor_0.rrat2.rrat_reg[16]);
+    $display("gr17 6:%d",   processor_0.rrat2.rrat_reg[17]);
+    $display("gr18 6:%d",   processor_0.rrat2.rrat_reg[18]);
+    $display("gr19 6:%d",   processor_0.rrat2.rrat_reg[19]);
+    $display("gr20 6:%d",   processor_0.rrat2.rrat_reg[20]);
+    $display("gr21 6:%d",   processor_0.rrat2.rrat_reg[21]);
+    $display("gr22 6:%d",   processor_0.rrat2.rrat_reg[22]);
+    $display("gr23 6:%d",   processor_0.rrat2.rrat_reg[23]);
+    $display("gr24 6:%d",   processor_0.rrat2.rrat_reg[24]);
+    $display("gr25 6:%d",   processor_0.rrat2.rrat_reg[25]);
+    $display("gr26 6:%d",   processor_0.rrat2.rrat_reg[26]);
+    $display("gr27 6:%d",   processor_0.rrat2.rrat_reg[27]);
+    $display("gr28 6:%d",   processor_0.rrat2.rrat_reg[28]);
+    $display("gr29 6:%d",   processor_0.rrat2.rrat_reg[29]);
+    $display("gr30 6:%d",   processor_0.rrat2.rrat_reg[30]);
+    $display("gr31 6:%d",   processor_0.rrat2.rrat_reg[31]);
     
     //rs output
 //logic [5:0][63:0]		RS_EX_opa;
@@ -659,16 +677,38 @@ module testbench;
     $display("ememory2_send_in_success 1:%h",       processor_0.memory2_send_in_success);//9
     
     //CDB signals(10) --prefix 'd'
-    $display("wcdb1_valid 1:%h",        			processor_0.cdb1_valid);
-    $display("wcdb1_value 16:%h",         			processor_0.cdb1_value); 
-    $display("wcdb1_tag 16:%h",         			processor_0.cdb1_tag); 
-    $display("wcdb1_rob_idx 16:%h",         		processor_0.cdb1_rob_idx); 
-    $display("wthread1_target_pc 16:%h",         	processor_0.thread1_target_pc); 
-    $display("wcdb2_valid 1:%h",        			processor_0.cdb2_valid); 
-    $display("wcdb2_value 16:%h",         			processor_0.cdb2_value); 
-    $display("wcdb2_tag 16:%h",         			processor_0.cdb2_tag);
-    $display("wcdb2_rob_idx 16:%h",         		processor_0.cdb2_rob_idx); 
-    $display("wthread2_target_pc 16:%h",         	processor_0.thread2_target_pc); //10
+    $display("wr0 6:%d",processor_0.rat2.rat_reg[0]);
+    $display("wr1 6:%d",processor_0.rat2.rat_reg[1]);
+    $display("wr2 6:%d",processor_0.rat2.rat_reg[2]);
+    $display("wr3 6:%d",processor_0.rat2.rat_reg[3]);
+    $display("wr4 6:%d",processor_0.rat2.rat_reg[4]);
+    $display("wr5 6:%d",processor_0.rat2.rat_reg[5]);
+    $display("wr6 6:%d",processor_0.rat2.rat_reg[6]);
+ 	$display("wr7 6:%d",processor_0.rat2.rat_reg[7]);
+  	$display("wr8 6:%d",processor_0.rat2.rat_reg[8]);
+  	$display("wr9 6:%d",processor_0.rat2.rat_reg[9]);
+  	$display("wr10 6:%d",processor_0.rat2.rat_reg[10]);
+	$display("wr11 6:%d",processor_0.rat2.rat_reg[11]);
+    $display("wr12 6:%d",processor_0.rat2.rat_reg[12]);
+    $display("wr13 6:%d",processor_0.rat2.rat_reg[13]);
+    $display("wr14 6:%d",processor_0.rat2.rat_reg[14]);
+    $display("wr15 6:%d",processor_0.rat2.rat_reg[15]);
+    $display("wr16 6:%d",processor_0.rat2.rat_reg[16]);
+ 	$display("wr17 6:%d",processor_0.rat2.rat_reg[17]);
+  	$display("wr18 6:%d",processor_0.rat2.rat_reg[18]);
+  	$display("wr19 6:%d",processor_0.rat2.rat_reg[19]);
+  	$display("wr20 6:%d",processor_0.rat2.rat_reg[20]);
+  	$display("wr21 6:%d",processor_0.rat2.rat_reg[21]);
+    $display("wr22 6:%d",processor_0.rat2.rat_reg[22]);
+    $display("wr23 6:%d",processor_0.rat2.rat_reg[23]);
+    $display("wr24 6:%d",processor_0.rat2.rat_reg[24]);
+    $display("wr25 6:%d",processor_0.rat2.rat_reg[25]);
+    $display("wr26 6:%d",processor_0.rat2.rat_reg[26]);
+ 	$display("wr27 6:%d",processor_0.rat2.rat_reg[27]);
+  	$display("wr28 6:%d",processor_0.rat2.rat_reg[28]);
+  	$display("wr29 6:%d",processor_0.rat2.rat_reg[29]);
+  	$display("wr30 6:%d",processor_0.rat2.rat_reg[30]);
+  	$display("wr31 6:%d",processor_0.rat2.rat_reg[31]); //10
     
     // MEM signals (10) - prefix 'm'*****Writeback
       
@@ -701,5 +741,3 @@ module testbench;
   end
 
 endmodule  // module testbench
-
-
