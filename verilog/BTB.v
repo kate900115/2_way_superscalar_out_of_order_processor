@@ -43,10 +43,7 @@ module BTB(
 			BTB_nextpc_2[i]=BTB_pc_2[i];
 			BTB_nextidx2[i]=BTB_idx2[i];
 			next_valid_2[i]=valid_2[i];
-			//target_inst1_pc=0;
-			//target_inst1_valid=1'b0;
-			//target_inst2_pc=0;
-			//target_inst2_valid=1'b0;
+
 			next_switch[i] =switch;
 			if(i==pc_idx1[$clog2(`BTB_SIZE)+1:2] && target_pc1_valid) begin       //index match
 				if(~valid_1[i] && ~valid_2[i]) begin                                       //if has vacancy
@@ -198,6 +195,10 @@ module BTB(
 	//assign target_inst1_pc = inst1_valid ? BTB_idx1[if_inst1_pc[$clog2(`BTB_SIZE)+1:2]]==if_inst1_pc[63:$clog2(`BTB_SIZE)+2] &&
 	
 		always_comb begin
+				target_inst1_pc=0;
+				target_inst1_valid=1'b0;
+				target_inst2_pc=0;
+				target_inst2_valid=1'b0;
 				if(inst1_valid) begin
 					if(valid_1[if_inst1_pc[$clog2(`BTB_SIZE)+1:2]] && if_inst1_pc[63:$clog2(`BTB_SIZE)+2] == BTB_idx1[if_inst1_pc[$clog2(`BTB_SIZE)+1:2]]) begin
 						target_inst1_pc=BTB_pc_1[if_inst1_pc[$clog2(`BTB_SIZE)+1:2]];
@@ -210,8 +211,8 @@ module BTB(
 						//next_switch_hit[i]=1'b0;
 					end
 					else begin
-						target_inst1_pc=if_inst1_pc;
-						target_inst1_valid=1'b1;
+						target_inst1_pc=0;
+						target_inst1_valid=1'b0;
 						//next_switch[i]=switch[i];
 					end
 				end
@@ -228,8 +229,8 @@ module BTB(
 						//next_switch_hit[i]=1'b0;
 					end
 					else begin
-						target_inst2_pc=if_inst2_pc;
-						target_inst2_valid=1'b1;
+						target_inst2_pc=0;
+						target_inst2_valid=1'b0;
 						//next_switch[i]=switch[i];
 					end
 				end
