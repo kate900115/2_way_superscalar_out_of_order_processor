@@ -45,6 +45,9 @@ module rob(
 	input										mispredict_in2,
 	input	[63:0]								target_pc_in2,
 
+	input                                                   inst1_mispredict_sig,
+	input                                                   inst2_mispredict_sig,
+
 	//output
 	//after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	output	logic	[$clog2(`ROB_SIZE):0]		inst1_rs_rob_idx_in,				//it is combinational logic so that the output is dealt with right after a
@@ -332,7 +335,7 @@ module rob(
 			commit1_is_illegal_out	= rob1_internal_is_illegal_out[t1_head];
 			commit1_inst_out		= rob1_internal_inst_out[t1_head];
 			rob1_internal_if_committed[t1_head] = 1;
-			if (rob1_internal_is_ex_out[t1_head+4'b1] && t1_head+4'b1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			if (rob1_internal_is_ex_out[t1_head+4'b1] && t1_head+4'b1 != t1_tail && ~(commit1_is_branch_out && inst1_mispredict_sig))
 			begin
 				commit2_pc_out			= rob1_internal_pc_out[t1_head+4'b1];
 				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+4'b1];
@@ -388,7 +391,7 @@ module rob(
 			commit1_is_illegal_out	= rob2_internal_is_illegal_out[t2_head];
 			commit1_inst_out		= rob2_internal_inst_out[t2_head];
 			rob2_internal_if_committed[t2_head] = 1;
-			if (rob2_internal_is_ex_out[t2_head+4'b1] && t2_head+4'b1 != t2_tail && ~(commit1_is_branch_out && commit1_mispredict_out))
+			if (rob2_internal_is_ex_out[t2_head+4'b1] && t2_head+4'b1 != t2_tail && ~(commit1_is_branch_out && inst1_mispredict_sig))
 			begin
 				commit2_pc_out			= rob2_internal_pc_out[t2_head+4'b1];
 				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head+4'b1];
@@ -441,19 +444,19 @@ module rob(
 		next_t2_tail = t2_tail;
 		t1_is_full = 0;
 		t2_is_full = 0;
-		if (commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
+		if (commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
 		begin
 			next_t1_tail = next_t1_head;
 		end
-		else if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
+		else if (~commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
 		begin
 			next_t2_tail = next_t2_head;
 		end
-		else if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		else if (commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
 		begin
 			next_t1_tail = next_t1_head;
 		end
-		else if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		else if (~commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
 		begin
 			next_t2_tail = next_t2_head;
 		end
