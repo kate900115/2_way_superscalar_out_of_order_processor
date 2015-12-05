@@ -232,6 +232,20 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
+logic [63:0]	BTB_thread1_target_pc;
+logic [63:0]	BTB_thread2_target_pc;
+
+//BTB output
+logic [63:0]	BTB_target_inst1_pc;
+logic [63:0]	BTB_target_inst2_pc;
+logic			BTB_target_inst1_valid;
+logic			BTB_target_inst2_valid;
+
+//predictor output
+logic inst1_predict;             //inst predict signal
+logic inst1_predict_valid;
+logic inst2_predict;
+logic inst2_predict_valid;
 
 
 logic Imem2proc_valid;
@@ -241,9 +255,13 @@ assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
-							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) :
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch)?BTB_target_inst2_pc:BTB_target_inst1_pc;
+ 			
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
-							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch)?BTB_target_inst2_pc:BTB_target_inst1_pc;
+							
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
 assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
@@ -252,7 +270,9 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
                                 (mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
                                 NO_ERROR;
-assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
+ 
+//HERE THE BRANCH TAKEN SIGNAL IS THE MISPREDICT SIGNAL                              
+assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1); //predict taken 
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
 assign Imem2proc_valid = !(mem2proc_tag == 0);
 
@@ -269,7 +289,7 @@ if_stage pc(
 	.thread1_branch_is_taken(thread1_branch_is_taken),
 	.thread2_branch_is_taken(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
-	.thread2_target_pc(thread2_target_pc),
+	.thread2_target_pc(thread1_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
@@ -887,6 +907,54 @@ cdb cdb1(
 	.memory1_send_in_success(memory1_send_in_success),
 	.memory2_send_in_success(memory2_send_in_success)
 );
+
+
+	predictor predictor1(
+	.two_threads_enable(1'b1),
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(PC_inst1),
+	.inst1_valid(PC_inst1_valid),
+	.if_inst2_pc(PC_inst2),
+	.inst2_valid(PC_inst1_valid),
+
+	.branch_result1(thread1_branch_is_taken),              //branch taken or not taken
+	.branch_pc1(ROB_commit1_pc),             //branch local pc
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
+	.branch_result2(thread2_branch_is_taken),
+	.branch_pc2(ROB_commit1_pc),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+
+	.inst1_predict(inst1_predict),              //inst predict signal
+	.inst1_predict_valid(inst1_predict_valid),
+	.inst2_predict(inst2_predict),
+	.inst2_predict_valid(inst2_predict_valid)
+	);
+
+
+	BTB BTB_1(
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(PC_inst1),
+	.if_inst2_pc(PC_inst2),
+	.inst1_valid(PC_inst1_valid),
+	.inst2_valid(PC_inst1_valid),
+		
+	.pc_idx1(ROB_commit1_pc),
+	.pc_idx2(ROB_commit2_pc),		
+	.target_pc1(ROB_commit1_target_pc),
+	.target_pc2(ROB_commit2_target_pc),
+	.target_pc1_valid(inst1_predict_valid && inst1_predict),
+	.target_pc2_valid(inst2_predict_valid && inst2_predict),
+		
+	.target_inst1_pc(BTB_target_inst1_pc),
+	.target_inst2_pc(BTB_target_inst2_pc),
+	.target_inst1_valid(BTB_target_inst1_valid),
+	.target_inst2_valid(BTB_target_inst2_valid)
+
+	);		
+		
+		
 //////////////////////////////////
 //								//
 //			  LSQ				//
