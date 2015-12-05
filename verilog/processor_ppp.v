@@ -264,14 +264,14 @@ assign proc2mem_addr = PC_proc2Imem_addr;
 							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;*/
 							
 always_comb begin
-   if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict&&inst1_mispredict_valid)) 
-   	thread1_target_pc = ROB_commit1_target_pc;
-   else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict&&inst2_mispredict_valid)
-   	thread1_target_pc = ROB_commit2_target_pc;
-   else if(BTB_target_inst1_valid)
-   	thread1_target_pc = BTB_target_inst1_pc;
-   else if (BTB_target_inst2_valid)
- 	thread1_target_pc = BTB_target_inst2_pc;
+   	if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) 
+   		thread1_target_pc = ROB_commit1_target_pc;
+   	else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid)
+   		thread1_target_pc = ROB_commit2_target_pc;
+   	else if(BTB_target_inst1_valid)
+   		thread1_target_pc = BTB_target_inst1_pc;
+  	 else if (BTB_target_inst2_valid)
+ 		thread1_target_pc = BTB_target_inst2_pc;
  	else thread1_target_pc =0;
 end
 
@@ -939,10 +939,10 @@ cdb cdb1(
 
 	.branch_result1(ROB_commit1_branch_taken),              //branch taken or not taken
 	.branch_pc1(ROB_commit1_pc),             //branch local pc
-	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
 	.branch_result2(ROB_commit2_branch_taken),
 	.branch_pc2(ROB_commit2_pc),
-	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
 
 	.inst1_predict(inst1_predict),              //inst predict signal
 	.inst1_predict_valid(inst1_predict_valid),
@@ -967,8 +967,8 @@ cdb cdb1(
 	.pc_idx2(ROB_commit2_pc),		
 	.target_pc1(ROB_commit1_target_pc),
 	.target_pc2(ROB_commit2_target_pc),
-	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
-	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
 		
 	.target_inst1_pc(BTB_target_inst1_pc),
 	.target_inst2_pc(BTB_target_inst2_pc),
