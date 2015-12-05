@@ -66,7 +66,10 @@ module processor(
 	
 );
 
-logic	thread1_branch_is_taken;
+logic	thread1_branch_is_taken_pc;  //for pc to change addr
+logic	thread2_branch_is_taken_pc;
+
+logic	thread1_branch_is_taken;  //for flush
 logic	thread2_branch_is_taken;
 //pc output
 logic			PC_thread1_is_available;
@@ -232,8 +235,6 @@ logic [$clog2(`ROB_SIZE):0]		cdb2_rob_idx;
 
 logic [63:0]	thread1_target_pc;
 logic [63:0]	thread2_target_pc;
-logic [63:0]	BTB_thread1_target_pc;
-logic [63:0]	BTB_thread2_target_pc;
 
 //BTB output
 logic [63:0]	BTB_target_inst1_pc;
@@ -254,13 +255,24 @@ assign proc2mem_command = BUS_LOAD;
 assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
 
-assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+/*assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) :
-							(ROB_commit2_is_thread1 && ROB_commit2_is_branch)?BTB_target_inst2_pc:BTB_target_inst1_pc;
- 			
+							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;*/
+							
+always_comb begin
+   if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict)) 
+   	thread1_target_pc = ROB_commit1_target_pc;
+   else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict)
+   	thread1_target_pc = ROB_commit2_target_pc;
+   else if(BTB_target_inst2_valid)
+   	thread1_target_pc = BTB_target_inst2_pc;
+   else
+ 	thread1_target_pc = BTB_target_inst1_pc;
+end
+
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 
-							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch)?BTB_target_inst2_pc:BTB_target_inst1_pc;
+							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;
 							
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
@@ -272,7 +284,9 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 NO_ERROR;
  
 //HERE THE BRANCH TAKEN SIGNAL IS THE MISPREDICT SIGNAL                              
-assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1) ||(inst1_predict_valid && inst1_predict || inst2_predict_valid && inst2_predict); //predict taken 
+assign thread1_branch_is_taken_pc = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1) ||(BTB_target_inst2_valid || BTB_target_inst1_valid); //predict taken 
+assign thread2_branch_is_taken_pc = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1) ||(BTB_target_inst2_valid || BTB_target_inst1_valid);
+assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
 assign Imem2proc_valid = !(mem2proc_tag == 0);
 
@@ -286,8 +300,8 @@ if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
-	.thread1_branch_is_taken(thread1_branch_is_taken),
-	.thread2_branch_is_taken(thread2_branch_is_taken),
+	.thread1_branch_is_taken(thread1_branch_is_taken_pc),
+	.thread2_branch_is_taken(thread2_branch_is_taken_pc),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread1_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
