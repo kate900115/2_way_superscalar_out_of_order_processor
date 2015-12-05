@@ -242,7 +242,7 @@ module testbench;
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
     		
-    		#5500;
+			#5500;
 		$display("@@@\n@@");
 		show_clk_count;
 		//print_close(); // close the pipe_print output file
@@ -262,18 +262,18 @@ module testbench;
 	begin
 		if(reset)
 			begin
-			clock_count <= `SD 0;
-			instr_count <= `SD 0;
+			clock_count = 0;
+			instr_count = 0;
 			end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
 			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
+			clock_count = (clock_count + 1);
+			instr_count = (instr_count + 2*pipeline_completed_insts);
 			end
 		else
 			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + pipeline_completed_insts);
+			clock_count = (clock_count + 1);
+			instr_count = (instr_count + pipeline_completed_insts);
 			end
 	end  
 
