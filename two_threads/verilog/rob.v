@@ -77,6 +77,9 @@ module rob(
 	output	logic								t1_is_full,
 	output	logic								t2_is_full,
 	
+	output	logic 	[$clog2(`ROB_SIZE)-1:0]		t1_head,
+	output	logic 	[$clog2(`ROB_SIZE)-1:0]		t2_head,
+
 	//for debug
 	input	[31:0]								rob_inst1_in,
 	input	[31:0]								rob_inst2_in,
@@ -87,9 +90,7 @@ module rob(
 //data logic variable needed
 
 //function variable needed
-	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_head;
 	logic 	[$clog2(`ROB_SIZE)-1:0]					t1_tail;
-	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_head;
 	logic 	[$clog2(`ROB_SIZE)-1:0]					t2_tail;
 	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_head;
 	logic	[$clog2(`ROB_SIZE)-1:0]					next_t1_tail;
@@ -280,7 +281,7 @@ module rob(
 				rob1_internal_target_pc_in[j] = target_pc_in2;
 			end
 			
-			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)]  && if_fu_executed2 )
+			else if (j == fu_rob_idx2[$clog2(`ROB_SIZE)-1:0] && fu_rob_idx2[$clog2(`ROB_SIZE)] && if_fu_executed2 )
 			begin
 				rob2_internal_is_ex_in[j] = if_fu_executed2;
 				rob2_internal_mispredict_in[j] = mispredict_in2;
