@@ -308,7 +308,7 @@ if_stage pc(
 	.thread1_branch_is_taken(thread1_branch_is_taken_pc),
 	.thread2_branch_is_taken(thread2_branch_is_taken_pc),
 	.thread1_target_pc(thread1_target_pc),
-	.thread2_target_pc(thread1_target_pc),
+	.thread2_target_pc(thread2_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
 	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
 	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
