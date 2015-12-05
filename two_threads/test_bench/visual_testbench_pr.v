@@ -1,4 +1,3 @@
-
 //`include "sys_defs.vh"
 `timescale 1ns/100ps
 
@@ -701,5 +700,3 @@ module testbench;
   end
 
 endmodule  // module testbench
-
-
