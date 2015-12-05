@@ -62,8 +62,24 @@ module processor(
 	output logic [63:0]						ROB_commit1_pc,
 	output logic [63:0]						ROB_commit2_pc,
 	output logic [31:0]						ROB_commit1_inst_out,
-	output logic [31:0]						ROB_commit2_inst_out
-	
+	output logic [31:0]						ROB_commit2_inst_out,
+//for debug
+	output logic [63:0]	BTB_target_inst1_pc,
+	output	logic[63:0]	BTB_target_inst2_pc,
+	output	logic BTB_target_inst1_valid,
+	output	logic BTB_target_inst2_valid,
+output logic 			inst1_mispredict,
+output logic			inst2_mispredict,
+output logic			inst1_mispredict_valid,
+output logic 			inst2_mispredict_valid,
+
+
+//predictor output
+output logic inst1_predict,            //inst predict signal
+output logic inst1_predict_valid,
+output logic inst2_predict,
+output logic inst2_predict_valid
+
 );
 
 logic	thread1_branch_is_taken_pc;  //for pc to change addr
@@ -264,20 +280,49 @@ assign proc2mem_addr = PC_proc2Imem_addr;
 							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;*/
 							
 always_comb begin
-   if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict&&inst1_mispredict_valid)) 
-   	thread1_target_pc = ROB_commit1_target_pc;
-   else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict&&inst2_mispredict_valid)
-   	thread1_target_pc = ROB_commit2_target_pc;
-   else if(BTB_target_inst1_valid)
-   	thread1_target_pc = BTB_target_inst1_pc;
-   else if (BTB_target_inst2_valid)
- 	thread1_target_pc = BTB_target_inst2_pc;
- 	else thread1_target_pc =0;
+   	if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+		if(ROB_commit1_branch_taken)
+			thread1_target_pc = ROB_commit1_target_pc;
+		else
+   			thread1_target_pc = ROB_commit1_pc;
+	end
+   	else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+		if(ROB_commit2_branch_taken)
+			thread1_target_pc = ROB_commit2_target_pc;
+		else
+   			thread1_target_pc = ROB_commit2_pc;
+	end
+   	else if(BTB_target_inst1_valid)
+   		thread1_target_pc = BTB_target_inst1_pc;
+  	else if (BTB_target_inst2_valid)
+ 		thread1_target_pc = BTB_target_inst2_pc;
+ 	else 
+		thread1_target_pc =0;
 end
 
-assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict&&inst1_mispredict_valid) ? (ROB_commit1_target_pc) : 
+always_comb begin
+   	if((~ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+		if(ROB_commit1_branch_taken)
+			thread2_target_pc = ROB_commit1_target_pc;
+		else
+   			thread2_target_pc = ROB_commit1_pc;
+	end
+   	else if(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+		if(ROB_commit2_branch_taken)
+			thread2_target_pc = ROB_commit2_target_pc;
+		else
+   			thread2_target_pc = ROB_commit2_pc;
+	end
+   	else if (BTB_target_inst1_valid)
+   		thread2_target_pc = BTB_target_inst1_pc;
+  	else if (BTB_target_inst2_valid)
+ 		thread2_target_pc = BTB_target_inst2_pc;
+ 	else 
+		thread2_target_pc =0;
+end
+/*assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict&& inst1_mispredict_valid) ? (ROB_commit1_target_pc) : 
 							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict&&inst2_mispredict_valid) ? (ROB_commit2_target_pc) : 
-							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;
+							(BTB_target_inst2_valid)?BTB_target_inst2_pc:BTB_target_inst1_pc;*/
 							
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
@@ -718,6 +763,9 @@ rob rob1(
 	.fu_rob_idx2(cdb2_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
 	.mispredict_in2(cdb2_branch_taken),
 	.target_pc_in2(cdb2_value),
+
+	.inst1_mispredict_sig(inst1_mispredict && inst1_mispredict_valid),
+	.inst2_mispredict_sig(inst2_mispredict && inst2_mispredict_valid),
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
@@ -727,7 +775,7 @@ rob rob1(
 	.commit1_pc_out(ROB_commit1_pc),
 	.commit1_target_pc_out(ROB_commit1_target_pc),
 	.commit1_is_branch_out(ROB_commit1_is_branch),				       	//if this instruction is a branch
-	.commit1_mispredict_out(ROB_commit1_branch_taken),				       	//if this instrucion is mispredicted
+	.commit1_mispredict_out(ROB_commit1_branch_taken),				       	//if this instrucion is taken branch
 	.commit1_arn_dest_out(ROB_commit1_arn_dest),                       //the architected register number of the destination of this instruction
 	.commit1_prn_dest_out(ROB_commit1_prn_dest),						//the prf number of the destination of this instruction
 	.commit1_if_rename_out(ROB_commit1_valid),				       	//if this entry is committed at this moment(tell RRAT)
@@ -939,10 +987,10 @@ cdb cdb1(
 
 	.branch_result1(ROB_commit1_branch_taken),              //branch taken or not taken
 	.branch_pc1(ROB_commit1_pc),             //branch local pc
-	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
 	.branch_result2(ROB_commit2_branch_taken),
 	.branch_pc2(ROB_commit2_pc),
-	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
 
 	.inst1_predict(inst1_predict),              //inst predict signal
 	.inst1_predict_valid(inst1_predict_valid),
@@ -967,8 +1015,8 @@ cdb cdb1(
 	.pc_idx2(ROB_commit2_pc),		
 	.target_pc1(ROB_commit1_target_pc),
 	.target_pc2(ROB_commit2_target_pc),
-	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch),
-	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch),
+	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
 		
 	.target_inst1_pc(BTB_target_inst1_pc),
 	.target_inst2_pc(BTB_target_inst2_pc),
