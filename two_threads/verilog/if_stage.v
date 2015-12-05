@@ -163,7 +163,7 @@ module if_stage(
 				PROGRAM_START:
 				begin
 					pc_enable1			    = 1'b0;
-					pc_enable2			    = 1'b0;
+					pc_enable2			    = 1'b1;
 					proc2Imem_addr		    = proc2Imem_addr2;	//should be 2******
 					next_PC_out 		    = next_PC_out2;
 					thread1_inst_out 	    = thread1_inst1_out;

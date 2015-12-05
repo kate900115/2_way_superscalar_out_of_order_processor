@@ -69,10 +69,7 @@ module processor(
 	
 );
 
-always_ff @(posedge clock)
-begin
-	PC_proc2Imem_addr_previous<=proc2mem_addr;
-end
+
 
 logic	thread1_branch_is_taken;
 logic	thread2_branch_is_taken;
