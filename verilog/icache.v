@@ -36,8 +36,7 @@ module icache(
 	logic [3:0]								mem_tag;
 	
 	icache_controller ic(
-		// input from Mem.v	
-		.clock(clock),									
+		// input from Mem.v									
 		.Imem2proc_response(Imem2proc_response),
 		.Imem2proc_tag(Imem2proc_tag),
 		// input from processor.v
