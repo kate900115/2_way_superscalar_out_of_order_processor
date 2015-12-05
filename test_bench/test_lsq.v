@@ -14,7 +14,8 @@ module test_lsq();
 	logic	[5:0]								inst1_op_type;
 	logic	[63:0]								inst1_pc;
 	logic	[31:0]								inst1_in;
-	logic	[63:0]								inst1_rega;
+	logic	[63:0]								lsq_rega_in1;
+	logic										lsq_rega_valid1;
 	logic	[63:0] 								lsq_opa_in1;      	// Operand a from Rename  data
 	logic	[63:0] 								lsq_opb_in1;      	// Operand a from Rename  tag or data from prf
 	logic         								lsq_opb_valid1;   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -27,7 +28,8 @@ module test_lsq();
    	logic	[5:0]								inst2_op_type;
 	logic	[63:0]								inst2_pc;
 	logic	[31:0]								inst2_in;
-	logic	[63:0]								inst2_rega;
+	logic	[63:0]								lsq_rega_in2;
+	logic										lsq_rega_valid2;
 	logic	[63:0] 								lsq_opa_in2;      	// Operand a from Rename  data
 	logic	[63:0] 								lsq_opb_in2;     	// Operand b from Rename  tag or data from prf
 	logic         								lsq_opb_valid2;   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -79,7 +81,8 @@ module test_lsq();
 		inst1_op_type,
 		inst1_pc,
 		inst1_in,
-		inst1_rega,
+		lsq_rega_in1,
+		lsq_rega_valid1,
 		lsq_opa_in1,      	// Operand a from Rename  data
 		lsq_opb_in1,      	// Operand a from Rename  tag or data from prf
 	    lsq_opb_valid1,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -92,7 +95,8 @@ module test_lsq();
    		inst2_op_type,
 		inst2_pc,
 		inst2_in,
-		inst2_rega,
+		lsq_rega_in2,
+		lsq_rega_valid2,
 		lsq_opa_in2,      	// Operand a from Rename  data
 		lsq_opb_in2,     	// Operand b from Rename  tag or data from prf
 	    lsq_opb_valid2,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
@@ -175,7 +179,8 @@ module test_lsq();
 		inst1_op_type		= `LDQ_INST;
 		inst1_pc			= 64'h0000_0000_0000_0008;
 		inst1_in			= 64'h1234_4534_8971_1536;
-		inst1_rega			= 64'h0;
+		lsq_rega_in1		= 64'h0;
+		lsq_rega_valid1		= 0;
 		lsq_opa_in1			= 64'h0000_0000_0000_0010;
 		lsq_opb_in1			= 64'h0000_0000_0000_0100;
 		lsq_opb_valid1		= 0;
@@ -185,7 +190,8 @@ module test_lsq();
    		inst2_op_type		= 0;
 		inst2_pc			= 0;
 		inst2_in			= 0;
-		inst2_rega			= 0;
+		lsq_rega_in2		= 0;
+		lsq_rega_valid2		= 0;
 		lsq_opa_in2			= 0;
 		lsq_opb_in2			= 0;
 		lsq_opb_valid2		= 0;
@@ -213,7 +219,8 @@ module test_lsq();
 		inst1_op_type		= `LDQ_INST;
 		inst1_pc			= 64'h0000_0000_0000_0008;
 		inst1_in			= 64'h1200_1435_7341_0987;
-		inst1_rega			= 64'h0;
+		lsq_rega_in1		= 64'h0;
+		lsq_rega_valid1		= 0;
 		lsq_opa_in1			= 64'h0000_0000_0000_0018;
 		lsq_opb_in1			= 0;
 		lsq_opb_valid1		= 0;
@@ -223,7 +230,8 @@ module test_lsq();
    		inst2_op_type		= 0;
 		inst2_pc			= 0;
 		inst2_in			= 0;
-		inst2_rega			= 0;
+		lsq_rega_in2		= 0;
+		lsq_rega_valid2		= 0;
 		lsq_opa_in2			= 0;
 		lsq_opb_in2			= 0;
 		lsq_opb_valid2		= 0;

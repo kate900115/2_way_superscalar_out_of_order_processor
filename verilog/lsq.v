@@ -74,7 +74,14 @@ module lsq(
 
 	output logic								lsq_is_full
 );
-	
+	logic	[63:0]			inst1_opb;
+	logic					inst1_opb_valid;
+	logic	[63:0]			inst2_opb;
+	logic					inst2_opb_valid;
+	logic	[63:0]			inst1_rega;
+	logic					inst1_rega_valid;
+	logic	[63:0]			inst2_rega;
+	logic					inst2_rega_valid;
 	//LQ
 	//the relative ages of two instructions can be determined by examing the physical locations they occupied in LSQ
 	//for example, instruction at slot 5 is older than instruction at slot 8
