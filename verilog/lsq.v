@@ -121,13 +121,23 @@ module lsq(
 	MEM_INST_TYPE	inst2_type;
 	logic	inst1_is_lq1, inst1_is_lq2, inst1_is_sq1, inst1_is_sq2;
 	logic	inst2_is_lq1, inst2_is_lq2, inst2_is_sq1, inst2_is_sq2;
-	logic	out1_is_lq1, out1_is_lq2, out1_is_sq1, out1_is_sq2, out1_is_lda;
-	logic	out2_is_lq1, out2_is_lq2, out2_is_sq1, out2_is_sq2, out2_is_lda;
+	logic	out1_is_lq1, out1_is_lq2, out1_is_sq1, out1_is_sq2;
+	logic	out2_is_lq1, out2_is_lq2, out2_is_sq1, out2_is_sq2;
 	
 	//tag table
 	logic	[$clog2(`SQ_SIZE)+1:0]			current_mem_inst;//{thread,load/store,queue_idx}
 	logic	[15:0][$clog2(`SQ_SIZE)+1:0]	tag_table;
 	logic	[15:0]							tag_valid;
+	
+	//lda
+	logic	[$clog2(`PRF_SIZE)-1:0]	lda1_dest_tag;
+	logic	[63:0]					lda1_result;
+	logic							lda1_valid;
+	logic	[$clog2(`ROB_SIZE):0]	lda1_rob_idx;
+	logic	[$clog2(`PRF_SIZE)-1:0]	lda2_dest_tag;
+	logic	[63:0]					lda2_result;
+	logic							lda2_valid;
+	logic	[$clog2(`ROB_SIZE):0]	lda2_rob_idx;
 	
 	assign inst1_type = (inst1_op_type == `LDQ_L_INST)	? IS_LDQ_L_INST	: 
 						(inst1_op_type == `LDQ_INST)	? IS_LDQ_INST	: 
@@ -451,14 +461,34 @@ module lsq(
 			lsq_is_full = 1;
 	end
 	
+	//lda
+	always_ff @ (posedge clock) begin
+		if (lda1_valid) begin
+			lda1_valid		<= `SD 0;
+		end
+		if (lda2_valid) begin
+			lda2_valid		<= `SD 0;
+		end
+		if (inst1_type == IS_LDA_INST) begin
+			lda1_dest_tag	<= `SD dest_reg_idx1;
+			lda1_result		<= `SD lsq_opa_in1 + lsq_opb_in1;
+			lda1_valid		<= `SD 1;
+			lda1_rob_idx	<= `SD lsq_rob_idx_in1;
+		end
+		if (inst2_type == IS_LDA_INST) begin
+			lda2_dest_tag	<= `SD dest_reg_idx2;
+			lda2_result		<= `SD lsq_opa_in2 + lsq_opb_in2;
+			lda2_valid		<= `SD 1;
+			lda2_rob_idx	<= `SD lsq_rob_idx_in2;
+		end
+	end
+	
 	//cdb output
 	always_comb begin
-		out1_is_lda = 0;
 		out1_is_lq1 = 0;
 		out1_is_lq2 = 0;
 		out1_is_sq1 = 0;
 		out1_is_sq2 = 0;
-		out2_is_lda = 0;
 		out2_is_lq1 = 0;
 		out2_is_lq2 = 0;
 		out2_is_sq1 = 0;
@@ -475,12 +505,11 @@ module lsq(
 		lq2_free_en		= 0;
 		sq1_free_en		= 0;
 		sq2_free_en		= 0;
-		if (inst1_type == `LDA_INST) begin
-			cdb_dest_tag1			= dest_reg_idx1;
-			cdb_result_out1			= lsq_opa_in1 + lsq_opb_in1;
+		if (lda1_valid) begin
+			cdb_dest_tag1			= lda1_dest_tag;
+			cdb_result_out1			= lda1_result;
 			cdb_result_is_valid1	= 1;
-			cdb_rob_idx1			= lsq_rob_idx_in1;
-			out1_is_lda				= 1;
+			cdb_rob_idx1			= lda1_rob_idx;
 		end
 		else if (lq1_is_ready[lq_head1]) begin
 			cdb_dest_tag1			= lq1_dest_tag[lq_head1];
@@ -515,12 +544,11 @@ module lsq(
 			sq2_free_en[sq_head2]	= 1;
 		end
 		//
-		if (inst2_type == `LDA_INST) begin
-			cdb_dest_tag2			= dest_reg_idx2;
-			cdb_result_out2			= lsq_opa_in2 + lsq_opb_in2;
+		if (lda2_valid) begin
+			cdb_dest_tag2			= lda2_dest_tag;
+			cdb_result_out2			= lda2_result;
 			cdb_result_is_valid2	= 1;
-			cdb_rob_idx2			= lsq_rob_idx_in2;
-			out2_is_lda				= 1;
+			cdb_rob_idx2			= lda2_rob_idx;
 		end
 		else if (lq1_is_ready[lq_head1+out1_is_lq1]) begin
 			cdb_dest_tag2			= lq1_dest_tag[lq_head1+out1_is_lq1];
@@ -566,27 +594,29 @@ module lsq(
 		mem_address_out		= 0;
 		current_mem_inst	= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && (lq1_pc[lq_head1] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
-			current_mem_inst	= {1'b0,1'b0,lq_head1};
-			mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
-			lsq2Dcache_command	= BUS_LOAD;
-		end
-		else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && (lq2_pc[lq_head2] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
-			current_mem_inst	= {1'b1,1'b0,lq_head2};
-			mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
-			lsq2Dcache_command	= BUS_LOAD;
-		end
-		else if (sq1_is_ready[sq_head1] && ({1'b0,t1_head} == sq1_rob_idx || {1'b0,t1_head} == sq1_rob_idx)) begin
-			current_mem_inst	= {1'b0,1'b1,sq_head1};
-			mem_data_out 		= sq1_store_data;
-			mem_address_out		= sq1_opa[sq_head1] + sq1_opb[sq_head1];
-			lsq2Dcache_command	= BUS_STORE;
-		end
-		else if (sq1_is_ready[sq_head2] && ({1'b0,t2_head} == sq2_rob_idx || {1'b0,t2_head} == sq2_rob_idx)) begin
-			current_mem_inst	= {1'b1,1'b1,sq_head2};
-			mem_data_out 		= sq2_store_data;
-			mem_address_out		= sq2_opa[sq_head1] + sq2_opb[sq_head1];
-			lsq2Dcache_command	= BUS_STORE;
+		if ((mem_response_in || cache_hit)) begin
+			if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && (lq1_pc[lq_head1] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
+				current_mem_inst	= {1'b0,1'b0,lq_head1};
+				mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
+				lsq2Dcache_command	= BUS_LOAD;
+			end
+			else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && (lq2_pc[lq_head2] < sq2_pc[sq_head2] || sq2_is_available[sq_head2]) && mem_response_in) begin
+				current_mem_inst	= {1'b1,1'b0,lq_head2};
+				mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
+				lsq2Dcache_command	= BUS_LOAD;
+			end
+			else if (sq1_is_ready[sq_head1] && ({1'b0,t1_head} == sq1_rob_idx || {1'b0,t1_head} == sq1_rob_idx)) begin
+				current_mem_inst	= {1'b0,1'b1,sq_head1};
+				mem_data_out 		= sq1_store_data;
+				mem_address_out		= sq1_opa[sq_head1] + sq1_opb[sq_head1];
+				lsq2Dcache_command	= BUS_STORE;
+			end
+			else if (sq1_is_ready[sq_head2] && ({1'b0,t2_head} == sq2_rob_idx || {1'b0,t2_head} == sq2_rob_idx)) begin
+				current_mem_inst	= {1'b1,1'b1,sq_head2};
+				mem_data_out 		= sq2_store_data;
+				mem_address_out		= sq2_opa[sq_head1] + sq2_opb[sq_head1];
+				lsq2Dcache_command	= BUS_STORE;
+			end
 		end
 	end
 	
@@ -662,11 +692,17 @@ module lsq(
 	
 	//tag table update
 	always_ff @ (posedge clock) begin
-		if (mem_response_in != mem_tag_in) begin
-			tag_valid[mem_response_in]	<= #1 1;
-			tag_table[mem_response_in]	<= #1 current_mem_inst;
+		if (reset) begin
+			tag_valid	<= #1 0;
+			tag_table	<= #1 0;
 		end
-		tag_valid[mem_tag_in]	<= #1 0;
+		else begin
+			if (mem_response_in != mem_tag_in) begin
+				tag_valid[mem_response_in]	<= #1 1;
+				tag_table[mem_response_in]	<= #1 current_mem_inst;
+			end
+			tag_valid[mem_tag_in]	<= #1 0;
+		end
 	end
 	
 	//head and tail move

@@ -45,8 +45,8 @@ module rob(
 	input										mispredict_in2,
 	input	[63:0]								target_pc_in2,
 
-	input                                                   inst1_mispredict_sig,
-	input                                                   inst2_mispredict_sig,
+	input                                       inst1_mispredict_sig,
+	input                                       inst2_mispredict_sig,
 
 	//output
 	//after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
