@@ -339,7 +339,7 @@ module testbench;
     // each argument is number of registers/signals for the group
     // (IF, RS, ID, ROB, EX, EX/MEM, MEM, RAT, WB, Misc)
     // p: PC 6  g: ID 13  
-    initcurses(6,32,26,24,19,48,10,42,32,2);
+    initcurses(6,32,26,24,9,48,10,42,32,2);
 
     // Pulse the reset signal
     reset = 1'b1;
