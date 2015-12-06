@@ -48,7 +48,7 @@ SYNFILES = processor.vg
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
 # For visual debugger
-VISTESTBENCH = $(TESTBENCH:testbench_pr.v=visual_testbench_pr.v) \
+VISTESTBENCH = $(TESTBENCH:twothreads_testbench_pr.v=visual_testbench_pr.v) \
 		test_bench/visual_c_hooks.c
 
 processor.vg:	$(SIMFILES) tcl_files/processor.tcl 

@@ -276,7 +276,7 @@ void setup_gui(FILE *fp){
 
   //instantiate window to visualize IF/ID signals
   rs_win = create_newwin((num_rs_regs+2),30,8,75,5);
-  mvwprintw(rs_win,0,12,"RS");
+  mvwprintw(rs_win,0,12,"RRAT2");
   wrefresh(rs_win);
 
   //instantiate a window to visualize ID stage
@@ -311,8 +311,8 @@ void setup_gui(FILE *fp){
 
 
   //instantiate a window to visualize WB stage
-  cdb_win = create_newwin((num_cdb_regs+4),40,37,40,5);
-  mvwprintw(cdb_win,0,10,"CDB");
+  cdb_win = create_newwin((num_cdb_regs+4),40,20,210,5);
+  mvwprintw(cdb_win,0,10,"RAT2");
   wrefresh(cdb_win);
 
   //instantiate an instructional window to help out the user some
