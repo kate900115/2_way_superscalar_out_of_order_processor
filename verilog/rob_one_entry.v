@@ -96,19 +96,19 @@ module rob_one_entry(
 	logic	[31:0]		rob_inst;
 
 //describe the output function
-	assign is_thread1_out = if_committed ? thread : 0;
-	assign is_branch_out  = if_committed ? is_branch : 0;
-	assign mispredict_out = if_committed ? mispredict : 0;
-	assign arn_dest_out   = if_committed ? arn_dest : 0;
-	assign prn_dest_out   = if_committed ? prn_dest : 0;
-	assign target_pc_out  = if_committed ? target_pc : 0;
+	assign is_thread1_out = thread;
+	assign is_branch_out  = is_branch;
+	assign mispredict_out = mispredict;
+	assign arn_dest_out   = arn_dest;
+	assign prn_dest_out   = prn_dest;
+	assign target_pc_out  = target_pc;
 	assign if_rename_out  = if_committed;						//if this entry is committed the output information is important
 	assign is_ex_out      = is_executed || halt;
 	assign available_out  = ~inuse;			//if this entry is not in use, it is available
-	assign halt_out       = if_committed? halt : 0;
-	assign illegal_out    = if_committed? illegal : 0;
-	assign pc_out	      = if_committed? pc : 0;
-	assign rob_inst_out   = if_committed? rob_inst : 0;
+	assign halt_out       = halt;
+	assign illegal_out    = illegal;
+	assign pc_out	      = pc;
+	assign rob_inst_out   = rob_inst;
 
 	always_comb
 	begin
