@@ -119,6 +119,7 @@ module prf(
 	logic   [`PRF_SIZE-1:0]					internal_prf_ready;
 	logic   [`PRF_SIZE-1:0][63:0]			internal_data_out;
 	logic	[`PRF_SIZE-1:0]					internal_prf_available2;
+	logic	[`PRF_SIZE-1:0]					internal_prf_available3;
 
 	// other registers to store value
 	logic									priority_selector1_en;
@@ -138,12 +139,13 @@ module prf(
 
 	always_comb
 	begin
+		internal_prf_available3 = internal_prf_available;
 		for(int i; i<`PRF_SIZE; i++)
 		begin
-			if (internal_prf_available[i]==1'b1)
+			if (internal_prf_available3[i]==1'b1)
 			begin
-				internal_prf_available[i]=1'b0;
-				if (internal_prf_available==0)
+				internal_prf_available3[i]=1'b0;
+				if (internal_prf_available3==0)
 				begin
 					prf_leave_one=1'b1;
 				end
