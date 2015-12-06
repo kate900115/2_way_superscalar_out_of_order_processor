@@ -327,7 +327,7 @@ assign thread2_branch_is_taken_pc = (inst1_mispredict&&inst1_mispredict_valid &&
 assign thread1_branch_is_taken = (inst1_mispredict&&inst1_mispredict_valid && ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (inst1_mispredict&&inst1_mispredict_valid && ~ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ~ROB_commit2_is_thread1);
 //assign Imem2proc_valid = !(mem2proc_tag == 0);
-
+assign Icache2proc_valid = !(Icache2proc_tag == 0)|| Icache_valid_out; //Imem 
 assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
 //////////////////////////////////
 //								//
@@ -349,7 +349,7 @@ if_stage pc(
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.Imem2proc_data(Icache_data_out),					// Data coming back from instruction-memory
-	.Imem2proc_valid(Icache_valid_out),				// 
+	.Imem2proc_valid(Icache2proc_valid),				// 
 	.is_two_threads(1'b0),
 //output
 	.proc2Imem_addr(PC_proc2Imem_addr),
