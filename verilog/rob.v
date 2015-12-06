@@ -116,10 +116,6 @@ module rob(
 	logic	[`ROB_SIZE-1:0]							rob1_internal_if_committed;
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_in;
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_target_pc_out;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_is_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst1_is_illegal_in;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_is_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob1_internal_inst2_is_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_halt_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_illegal_out;
 
@@ -139,10 +135,6 @@ module rob(
 	logic	[`ROB_SIZE-1:0]							rob2_internal_if_committed;
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_in;
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_target_pc_out;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_is_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst1_is_illegal_in;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_is_halt_in;
-	logic	[`ROB_SIZE-1:0]							rob2_internal_inst2_is_illegal_in;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_halt_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_illegal_out;
 	
@@ -288,6 +280,10 @@ module rob(
 				rob2_internal_target_pc_in[j] = target_pc_in2;
 			end
 		end
+		if (rob1_internal_is_halt_out[t1_head])
+			rob1_internal_is_ex_in[t1_head] = 1;
+		if (rob2_internal_is_halt_out[t1_head])
+			rob2_internal_is_ex_in[t1_head] = 1;
 	end
 	
 	//commit									
@@ -444,23 +440,7 @@ module rob(
 		next_t2_tail = t2_tail;
 		t1_is_full = 0;
 		t2_is_full = 0;
-		if (commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
-		begin
-			next_t1_tail = next_t1_head;
-		end
-		else if (~commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
-		begin
-			next_t2_tail = next_t2_head;
-		end
-		else if (commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
-		begin
-			next_t1_tail = next_t1_head;
-		end
-		else if (~commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
-		begin
-			next_t2_tail = next_t2_head;
-		end
-		else if(inst1_load_in && inst2_load_in)
+		if(inst1_load_in && inst2_load_in)
 		begin
 			if (is_thread1)
 			begin
@@ -479,7 +459,22 @@ module rob(
 				next_t2_tail = t2_tail + 4'h2;
 			end
 		end
-		
+		if (commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
+		begin
+			next_t1_tail = next_t1_head;
+		end
+		else if (~commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
+		begin
+			next_t2_tail = next_t2_head;
+		end
+		else if (commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
+		begin
+			next_t1_tail = next_t1_head;
+		end
+		else if (~commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
+		begin
+			next_t2_tail = next_t2_head;
+		end
 		if ((t1_tail + 4'b1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))				//**************************** 
 		begin
 			t1_is_full = 1;

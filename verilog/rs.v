@@ -32,8 +32,8 @@ module rs(
 	input  	     								inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         								inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT)
 
-	input  [63:0]                                                           inst1_rs_opc_in,
-	input 									inst1_rs_opc_valid,
+	input  [63:0]								inst1_rs_opc_in,
+	input 										inst1_rs_opc_valid,
 	
 	input  [$clog2(`ROB_SIZE):0]				inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  ALU_FUNC								inst1_rs_alu_func,    	// ALU function type from decoder
@@ -79,7 +79,7 @@ module rs(
 	output ALU_FUNC [5:0]						fu_alu_func_out,
 	
 	output logic [5:0]							fu_rs_out_valid,			// RS output is valid
-	output logic [5:0] [1:0]                                                fu_rs_branch_out, 
+	output logic [5:0] [1:0]					fu_rs_branch_out, 
 
 	output										rs_full,					// RS is full now
 	
@@ -301,18 +301,23 @@ module rs(
 	//then make the load of the two entries to be 1
 	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps1(                                  
 		.req(internal_rs_available_out),
-		.en(inst1_rs_load_in),
+		.en(1'b1),
 		.gnt_bus(inst1_internal_rs_load_in_temp)
 	);
 	
 	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps2(                                  
 		.req(~inst1_internal_rs_load_in_temp & internal_rs_available_out),
-		.en(inst2_rs_load_in),
+		.en(1'b1),
 		.gnt_bus(inst2_internal_rs_load_in_temp)
 	);
+	assign rs_full = (inst2_internal_rs_load_in_temp == 0);
 	
-	assign 	inst1_internal_rs_load_in = inst1_is_halt? 0 : inst1_internal_rs_load_in_temp;
-	assign 	inst2_internal_rs_load_in = inst2_is_halt? 0 : inst2_internal_rs_load_in_temp;
+	assign 	inst1_internal_rs_load_in = inst1_is_halt	? 0 :
+										inst1_rs_load_in? inst1_internal_rs_load_in_temp :
+										0;
+	assign 	inst2_internal_rs_load_in = inst2_is_halt	? 0 : 
+										inst2_rs_load_in? inst2_internal_rs_load_in_temp :
+										0;
 
 	//during the wake-up rs entries , we want to select two to the two FU. 
 	//but for example: only one adder is available, 
@@ -321,7 +326,6 @@ module rs(
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
 	always_comb begin
-	//$display("internal_rs_available_out:%b", internal_rs_available_out);
 		for (int i = 0; i < `RS_SIZE; i++) begin
 			internal_rs_free_enable_fu[i]		= 0;
 		end
@@ -472,13 +476,6 @@ module rs(
 	//if there is one entry available, rs_full = RS_ONE_ENTRY_EMPTY
 	//if there is two or more entry available, rs_full = RS_TWO_OR_MORE_ENTRY_EMPTY
 
-	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) rs_is_full(                                  
-		.req(internal_rs_available_out),
-		.en(1'b1),
-		.gnt_bus({is_full1, is_full2})
-	);
-	assign rs_full = (is_full1 == 0);
-	
 	always_comb
 	begin
 	    if (thread1_branch_is_taken && thread2_branch_is_taken)
