@@ -1,0 +1,137 @@
+00:00:29    236 --> ...                                              [tcl] ucliGUI::start /home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/dve -ucligui +vc +define+ +memcbk
+00:00:29    237 --> ...                                                  [tcl] set ucliGUI::state
+00:00:29    238 --> ...                                                      [tcl] gui_update_simulator_buttons
+00:00:30    239 --> ...                                                          [tcl] set ucliGUI::state
+00:00:30    240 --> ...                                                              [tcl] ucliCore::getToolPID
+00:00:30    241 --> ...                                                                  [tcl] synopsys::env hasTB
+00:00:30    242 --> ...                                                                      [tcl] trigger_hier_stack_context_switch 0
+00:00:30    243 --> ...                                                                          [tcl] synUtils::setDVEInitPhase 1
+00:00:30    244 --> ...                                                                              [tcl] gui_get_env SIMSETUP::SIMVPD
+00:00:30    245 --> ...                                                                                  [tcl] synopsys::dump -type VPD -file /home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd -locking
+00:00:30    246 --> ...                                                                                      [tcl] synopsys::dump -autoflush on -fid VPD1
+00:00:30    247 --> ...                                                                                          [tcl] set ::dve_fid VPD1
+00:00:30    248 --> ...                                                                                              [tcl] synUtils::setDVEInitPhase 0
+00:00:30    249 --> ...                                                                                                  [tcl] ucliCore::getToolPID
+00:00:30    250 --> ...  [tcl] synUtils::sendTool -active _icl_setToolSocket /tmp/smlnpOT46xN
+00:00:30    251 --> ...      [tcl] synUtils::sendTool -active {_icl_start_rpc -version "K-2015.09_Full64" -sync_file /tmp/vcs_dve_rpc.tianmili.300}
+00:00:30    252 --> ...          [tcl] synUtils::sendTool -active {_icl_createSharedMemory /tmp/vcs_dve_general.tianmili.300}
+00:00:30    253 --> ...              [tcl] config endofsim noexit
+00:00:30    254 --> ...                  [tcl] config onfail enable all
+00:00:30    255 --> ...                      [tcl] config syscaddplainmembers
+00:00:30    256 --> ...                          [tcl] config syscaddsourcenames
+00:00:30    257 --> ...                              [tcl] config syscaddstructtypes
+00:00:30    258 --> ...                                  [tcl] synopsys::listing -disable
+00:00:30    259 --> ...                                      [tcl] if { ![gui_sim_state -check active] } {error "Simulator did not start correctly" error}
+00:00:30    260 --> ...                                          [tcl] gui_set_precision 100ps
+00:00:30    261 --> ...                                              [tcl] gui_set_time_units 100ps
+00:00:30    262 --> ...                                                  [tcl] #</Database>
+00:00:30    263 --> ...                                                      [tcl] # DVE Global setting session:
+00:00:30    264 --> ...                                                          [tcl] # Global: Breakpoints
+00:00:30    265 --> ...                                                              [tcl] # Global: Bus
+00:00:30    266 --> ...                                                                  [tcl] # Global: Expressions
+00:00:30    267 --> ...                                                                      [tcl] # Global: Signal Time Shift
+00:00:30    268 --> ...                                                                          [tcl] # Global: Signal Compare
+00:00:30    269 --> ...                                                                              [tcl] # Global: Signal Groups
+00:00:30    270 --> ...                                                                                  [tcl] gui_load_child_values {testbench.processor_0.pc}
+00:00:30    271 --> ...                                                                                      [tcl] synopsys::dump -add {testbench.processor_0.pc} -scope "." -depth 1 -fid VPD1
+00:00:30    272 --> ...                                                                                          [tcl] gui_load_child_values {testbench.processor_0.prf1}
+00:00:30    273 --> ...                                                                                              [tcl] synopsys::dump -add {testbench.processor_0.prf1} -scope "." -depth 1 -fid VPD1
+00:00:30    274 --> ...                                                                                                  [tcl] gui_load_child_values {testbench.processor_0.pc.pc1}
+00:00:30    275 --> ...  [tcl] synopsys::dump -add {testbench.processor_0.pc.pc1} -scope "." -depth 1 -fid VPD1
+00:00:30    276 --> ...      [tcl] gui_load_child_values {testbench.processor_0.rob1}
+00:00:30    277 --> ...          [tcl] synopsys::dump -add {testbench.processor_0.rob1} -scope "." -depth 1 -fid VPD1
+00:00:30    278 --> ...              [tcl] gui_load_child_values {testbench.processor_0.pc.pc2}
+00:00:30    279 --> ...                  [tcl] synopsys::dump -add {testbench.processor_0.pc.pc2} -scope "." -depth 1 -fid VPD1
+00:00:30    280 --> ...                      [tcl] gui_load_child_values {testbench.processor_0.cdb1}
+00:00:30    281 --> ...                          [tcl] synopsys::dump -add {testbench.processor_0.cdb1} -scope "." -depth 1 -fid VPD1
+00:00:30    282 --> ...                              [tcl] gui_load_child_values {testbench.processor_0}
+00:00:30    283 --> ...                                  [tcl] synopsys::dump -add {testbench.processor_0} -scope "." -depth 1 -fid VPD1
+00:00:30    284 --> ...                                      [tcl] set _session_group_5 Group1
+00:00:30    285 --> ...                                          [tcl] gui_sg_create "$_session_group_5"
+00:00:30    286 --> ...                                              [tcl] set Group1 "$_session_group_5"
+00:00:30    287 --> ...                                                  [tcl] gui_sg_addsignal -group "$_session_group_5" { testbench.processor_0.pc.clock testbench.processor_0.pc.thread2_inst_out testbench.processor_0.pc.thread1_inst_out testbench.processor_0.PC_inst1_valid testbench.processor_0.PC_inst2_valid testbench.processor_0.pc.thread1_is_available testbench.processor_0.pc.Imem2proc_valid testbench.processor_0.pc.Imem2proc_data testbench.processor_0.pc.pc1.if_address_minused testbench.processor_0.pc.pc1.proc2Imem_addr testbench.processor_0.pc.proc2Imem_addr testbench.processor_0.pc.Imem2proc_data testbench.processor_0.pc.pc1.Imem2proc_data testbench.processor_0.pc.pc1.rob_stall testbench.processor_0.pc.pc1.inst1_is_valid_current testbench.processor_0.pc.pc1.inst2_is_valid_current testbench.processor_0.pc.pc1.PC_reg testbench.processor_0.pc.pc2.PC_reg testbench.processor_0.pc.pc1.PC_stall testbench.processor_0.pc.thread1_inst_is_valid testbench.processor_0.pc.thread2_inst_is_valid testbench.processor_0.pc.proc2Imem_addr_previous testbench.processor_0.pc.current_thread_state testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.t2_head testbench.processor_0.rob1.t2_tail testbench.processor_0.rob1.commit1_pc_out testbench.processor_0.rob1.commit2_pc_out testbench.processor_0.rob1.commit1_is_thread1 testbench.processor_0.rob1.commit2_is_thread1 testbench.processor_0.rob1.commit1_valid testbench.processor_0.rob1.commit2_valid testbench.processor_0.rob1.commit1_mispredict_out testbench.processor_0.rob1.commit2_mispredict_out testbench.processor_0.rob1.commit1_arn_dest_out testbench.processor_0.rob1.commit1_prn_dest_out testbench.processor_0.rob1.commit2_arn_dest_out testbench.processor_0.rob1.commit2_prn_dest_out testbench.processor_0.PRF_writeback_value1 testbench.processor_0.PRF_writeback_value2 testbench.processor_0.cdb1.cdb1_valid testbench.processor_0.cdb1.cdb1_tag testbench.processor_0.cdb1.cdb1_out testbench.processor_0.cdb1.cdb1_rob_idx testbench.processor_0.cdb1.cdb2_rob_idx testbench.processor_0.cdb1.cdb2_valid testbench.processor_0.cdb1.cdb2_tag testbench.processor_0.cdb1.cdb2_out testbench.processor_0.prf1.internal_data_in testbench.processor_0.prf1.internal_write_prf_enable {testbench.processor_0.prf1.prf2[0].data_in} {testbench.processor_0.prf1.prf2[0].write_prf_enable} {testbench.processor_0.prf1.prf2[0].prf_in_use} {testbench.processor_0.prf1.prf2[0].value} {testbench.processor_0.prf1.prf2[0].value_next} }
+00:00:30    288 --> ...                                                      [tcl] # Global: Highlighting
+00:00:30    289 --> ...                                                          [tcl] # Global: Stack
+00:00:30    290 --> ...                                                              [tcl] gui_change_stack_mode -mode list
+00:00:30    291 --> ...                                                                  [tcl] synopsys::xml {set_only_active_frame <data value="1" />}
+00:00:30    292 --> ...                                                                      [tcl] # Post database loading setting...
+00:00:30    293 --> ...                                                                          [tcl] # Restore C1 time
+00:00:30    294 --> ...                                                                              [tcl] gui_set_time -C1_only 59730
+00:00:30    295 --> ...                                                                                  [tcl] # Save global setting...
+00:00:30    296 --> ...                                                                                      [tcl] # Wave/List view global setting
+00:00:30    297 --> ...                                                                                          [tcl] gui_cov_show_value -switch false
+00:00:30    298 --> ...                                                                                              [tcl] # Close all empty TopLevel windows
+00:00:30    299 --> ...                                                                                                  [tcl] foreach __top [gui_ekki_get_window_ids -type TopLevel] {     if { [llength [gui_ekki_get_window_ids -parent $__top]] == 0} {         gui_close_window -window $__top     } }
+00:00:30    300 --> ...  [tcl] gui_set_loading_session_type noSession
+00:00:30    301 --> ...      [tcl] # DVE View/pane content session:
+00:00:30    302 --> ...          [tcl] # Hier 'Hier.1'
+00:00:30    303 --> ...              [tcl] gui_show_window -window ${Hier.1}
+00:00:30    304 --> ...                  [tcl] gui_list_set_filter -id ${Hier.1} -list { {Package 1} {All 0} {Process 1} {VirtPowSwitch 0} {UnnamedProcess 1} {UDP 0} {Function 1} {Block 1} {SrsnAndSpaCell 0} {OVA Unit 1} {LeafScCell 1} {LeafVlgCell 1} {Interface 1} {LeafVhdCell 1} {$unit 1} {NamedBlock 1} {Task 1} {VlgPackage 1} {ClassDef 1} {VirtIsoCell 0} }
+00:00:30    305 --> ...                      [tcl] gui_list_set_filter -id ${Hier.1} -text {*}
+00:00:30    306 --> ...                          [tcl] gui_hier_list_init -id ${Hier.1}
+00:00:30    307 --> ...                              [tcl] gui_change_design -id ${Hier.1} -design Sim
+00:00:30    308 --> ...                                  [tcl] catch {gui_list_expand -id ${Hier.1} testbench}
+00:00:30    309 --> ...                                      [tcl] catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
+00:00:30    310 --> ...                                          [tcl] catch {gui_list_expand -id ${Hier.1} testbench.processor_0.prf1}
+00:00:30    311 --> ...                                              [tcl] catch {gui_list_select -id ${Hier.1} {{testbench.processor_0.prf1.prf2[0]}}}
+00:00:30    312 --> ...                                                  [tcl] dveMisc::vbusExpand {testbench.processor_0.prf1.prf2[0]}
+00:00:30    313 --> ...                                                      [tcl] gui_view_scroll -id ${Hier.1} -vertical -set 0
+00:00:30    314 --> ...                                                          [tcl] gui_view_scroll -id ${Hier.1} -horizontal -set 0
+00:00:30    315 --> ...                                                              [tcl] # Data 'Data.1'
+00:00:30    316 --> ...                                                                  [tcl] gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
+00:00:30    317 --> ...                                                                      [tcl] gui_list_set_filter -id ${Data.1} -text {*}
+00:00:30    318 --> ...                                                                          [tcl] gui_list_show_data -id ${Data.1} {testbench.processor_0.prf1.prf2[0]}
+00:00:30    319 --> ...                                                                              [tcl] gui_show_window -window ${Data.1}
+00:00:30    320 --> ...                                                                                  [tcl] catch { gui_list_select -id ${Data.1} {{testbench.processor_0.prf1.prf2[0].free_this_entry} }}
+00:00:30    321 --> ...                                                                                      [tcl] gui_view_scroll -id ${Data.1} -vertical -set 0
+00:00:30    322 --> ...                                                                                          [tcl] gui_view_scroll -id ${Data.1} -horizontal -set 0
+00:00:30    323 --> ...                                                                                              [tcl] gui_view_scroll -id ${Hier.1} -vertical -set 0
+00:00:30    324 --> ...                                                                                                  [tcl] gui_view_scroll -id ${Hier.1} -horizontal -set 0
+00:00:30    325 --> ...  [tcl] # Source 'Source.1'
+00:00:30    326 --> ...      [tcl] gui_src_value_annotate -id ${Source.1} -switch false
+00:00:30    327 --> ...          [tcl] gui_set_env TOGGLE::VALUEANNOTATE 0
+00:00:30    328 --> ...              [tcl] gui_open_source -id ${Source.1}  -replace -active _vcs_unit__2649932360 sys_defs.vh
+00:00:30    329 --> ...                  [tcl] gui_view_scroll -id ${Source.1} -vertical -set 0
+00:00:30    330 --> ...                      [tcl] gui_src_set_reusable -id ${Source.1}
+00:00:30    331 --> ...                          [tcl] # View 'Wave.1'
+00:00:30    332 --> ...                              [tcl] gui_wv_sync -id ${Wave.1} -switch false
+00:00:30    333 --> ...                                  [tcl] set groupExD [gui_get_pref_value -category Wave -key exclusiveSG]
+00:00:30    334 --> ...                                      [tcl] gui_set_pref_value -category Wave -key exclusiveSG -value {false}
+00:00:30    335 --> ...                                          [tcl] set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
+00:00:30    336 --> ...                                              [tcl] gui_list_set_height -id Wave -height 25
+00:00:30    337 --> ...                                                  [tcl] set origGroupCreationState [gui_list_create_group_when_add -wave]
+00:00:30    338 --> ...                                                      [tcl] gui_list_create_group_when_add -wave -disable
+00:00:30    339 --> ...                                                          [tcl] gui_marker_set_ref -id ${Wave.1}  C1
+00:00:30    340 --> ...                                                              [tcl] gui_wv_zoom_timerange -id ${Wave.1} 59552 60383
+00:00:30    341 --> ...                                                                  [tcl] gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
+00:00:30    342 --> ...                                                                      [tcl] synopsys::dump -add {{testbench.processor_0.prf1.prf2[0].data_in} {testbench.processor_0.prf1.prf2[0].prf_in_use} {testbench.processor_0.prf1.prf2[0].value} {testbench.processor_0.prf1.prf2[0].value_next} {testbench.processor_0.prf1.prf2[0].write_prf_enable} } -aggregates  -fid VPD1
+00:00:30    343 --> ...                                                                          [tcl] gui_list_select -id ${Wave.1} {testbench.processor_0.prf1.internal_data_in testbench.processor_0.prf1.internal_write_prf_enable }
+00:00:30    344 --> ...                                                                              [tcl] gui_seek_criteria -id ${Wave.1} {Any Edge}
+00:00:30    345 --> ...                                                                                  [tcl] gui_set_env TOGGLE::DEFAULT_WAVE_WINDOW ${Wave.1}
+00:00:30    346 --> ...                                                                                      [tcl] gui_set_pref_value -category Wave -key exclusiveSG -value $groupExD
+00:00:30    347 --> ...                                                                                          [tcl] gui_list_set_height -id Wave -height $origWaveHeight
+00:00:30    348 --> ...                                                                                              [tcl] if {$origGroupCreationState} { 	gui_list_create_group_when_add -wave -enable }
+00:00:30    349 --> ...                                                                                                  [tcl] if { $groupExD } {  gui_msg_report -code DVWW028 }
+00:00:30    350 --> ...  [tcl] gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
+00:00:30    351 --> ...      [tcl] gui_list_set_filter -id ${Wave.1} -text {*}
+00:00:30    352 --> ...          [tcl] gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -item {testbench.processor_0.prf1.prf2[0].value_next[63:0]} -position below
+00:00:30    353 --> ...              [tcl] gui_marker_move -id ${Wave.1} {C1} 59730
+00:00:30    354 --> ...                  [tcl] gui_view_scroll -id ${Wave.1} -vertical -set 281
+00:00:30    355 --> ...                      [tcl] gui_show_grid -id ${Wave.1} -enable false
+00:00:30    356 --> ...                          [tcl] # Restore toplevel window zorder
+00:00:30    357 --> ...                              [tcl] # The toplevel window could be closed if it has no view/pane
+00:00:30    358 --> ...                                  [tcl] if {[gui_exist_window -window ${TopLevel.1}]} { 	gui_set_active_window -window ${TopLevel.1} 	gui_set_active_window -window ${Source.1} 	gui_set_active_window -window ${DLPane.1} }
+00:00:30    359 --> ...                                      [tcl] if {[gui_exist_window -window ${TopLevel.2}]} { 	gui_set_active_window -window ${TopLevel.2} 	gui_set_active_window -window ${Wave.1} }
+00:00:30    360 --> ...                                          [tcl] #</Session>
+00:00:31    361 --> ...                                              [tcl] synopsys::run
+00:00:31    362 --> ...                                                  [tcl] set ucliGUI::state
+00:00:31    363 --> ...                                                      [tcl] set ucliGUI::state
+00:00:31    364 --> ...                                                          [tcl] gui_update_simulator_buttons
+00:00:32    365 --> ...                                                              [tcl] set ucliGUI::state
+00:00:32    366 --> ...                                                                  [tcl] set ucliGUI::state
+00:00:32    367 --> ...                                                                      [tcl] catch {senv activeDomain} dveMisc::result 
+00:00:32    368 --> ...                                                                          [tcl] set dveMisc::result
+00:00:32    369 --> ...                                                                              [tcl] gui_update_simulator_buttons
+00:00:32    370 --> ...                                                                                  [tcl] dveMisc::vbusExpand _vcs_unit__2649932360
+00:03:51    371 --> ...                                                                                      [tcl] dveMisc::vbusExpand testbench.processor_0.rob1
+00:04:27    372 --> ...                                                                                          [tcl] dveMisc::vbusExpand testbench.processor_0.prf1

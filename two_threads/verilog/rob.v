@@ -483,23 +483,7 @@ module rob(
 		next_t2_tail = t2_tail;
 		t1_is_full = 0;
 		t2_is_full = 0;
-		if (commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
-		begin
-			next_t1_tail = next_t1_head;
-		end
-		else if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
-		begin
-			next_t2_tail = next_t2_head;
-		end
-		else if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
-		begin
-			next_t1_tail = next_t1_head;
-		end
-		else if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
-		begin
-			next_t2_tail = next_t2_head;
-		end
-		else if(inst1_load_in && inst2_load_in)
+		if(inst1_load_in && inst2_load_in)
 		begin
 			if (is_thread1)
 			begin
@@ -518,6 +502,23 @@ module rob(
 				next_t2_tail = t2_tail +4'd2;
 			end
 		end
+		if (commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
+		begin
+			next_t1_tail = next_t1_head;
+		end
+		else if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
+		begin
+			next_t2_tail = next_t2_head;
+		end
+		else if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		begin
+			next_t1_tail = next_t1_head;
+		end
+		else if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		begin
+			next_t2_tail = next_t2_head;
+		end
+		
 		
 		if ((t1_tail +4'd2 == t1_head)||(t1_tail +4'b1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))				//**************************** 
 		begin
