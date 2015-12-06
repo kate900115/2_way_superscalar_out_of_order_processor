@@ -119,54 +119,27 @@ module prf(
 	logic   [`PRF_SIZE-1:0]					internal_prf_ready;
 	logic   [`PRF_SIZE-1:0][63:0]			internal_data_out;
 	logic	[`PRF_SIZE-1:0]					internal_prf_available2;
-	logic	[`PRF_SIZE-1:0]					internal_prf_available3;
 
 	// other registers to store value
 	logic									priority_selector1_en;
 	logic									priority_selector2_en;
 	
-	logic									prf_leave_one;
-	logic									prf_another_full;
-	
 	
 	
 	
 	// when all the internal_prf_available=0, the freelist of prf is zero.
-    assign prf_is_full = ((internal_prf_available != 0)&&(prf_another_full!=1)) ? 1'b0 :1'b1;
+   	assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
     
 	// when RAT wants to allocate new PRF entries.
 	assign allocate_new_prf = {rat1_allocate_new_prf1,rat1_allocate_new_prf2,rat2_allocate_new_prf1,rat2_allocate_new_prf2};	
 
 	always_comb
 	begin
-		internal_prf_available3 = internal_prf_available;
-		for(int i; i<`PRF_SIZE; i++)
-		begin
-			if (internal_prf_available3[i]==1'b1)
-			begin
-				internal_prf_available3[i]=1'b0;
-				if (internal_prf_available3==0)
-				begin
-					prf_leave_one=1'b1;
-				end
-				else
-				begin
-					prf_leave_one=1'b0;
-				end
-				break;
-			end
-			else
-			begin
-				prf_leave_one=1'b0;
-			end
-		end
-	
 		case(allocate_new_prf)
 		4'b1000:
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b0;
-				prf_another_full		   = 1'b0;
 				rat2_prf1_rename_valid_out = 0;
 				rat2_prf2_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;		
@@ -194,7 +167,6 @@ module prf(
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b0;
-				prf_another_full		   = 1'b0;
 				rat2_prf1_rename_valid_out = 0;
 				rat2_prf2_rename_valid_out = 0;
 				rat1_prf1_rename_valid_out = 0;
@@ -222,7 +194,6 @@ module prf(
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b0;
-				prf_another_full		   = 1'b0;
 				rat2_prf2_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat1_prf1_rename_valid_out = 0;
@@ -249,7 +220,6 @@ module prf(
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b0;
-				prf_another_full		   = 1'b0;
 				rat2_prf1_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat1_prf1_rename_valid_out = 0;
@@ -276,13 +246,6 @@ module prf(
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b1;
-				prf_another_full		   = 1'b0;
-				if(prf_leave_one)
-				begin
-					priority_selector1_en      = 1'b0;
-					priority_selector2_en      = 1'b0;
-					prf_another_full		   = 1'b1;
-				end
 				rat2_prf1_rename_valid_out = 0;
 				rat2_prf2_rename_valid_out = 0;
 				rat2_prf1_rename_idx_out   = 0;
@@ -322,13 +285,7 @@ module prf(
 			begin
 				priority_selector1_en      = 1'b1;
 				priority_selector2_en      = 1'b1;
-				prf_another_full		   = 1'b0;
-				if(prf_leave_one)
-				begin
-					priority_selector1_en      = 1'b0;
-					priority_selector2_en      = 1'b0;
-					prf_another_full	       = 1'b1;
-				end
+
 				rat1_prf1_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat1_prf1_rename_idx_out   = 0;
@@ -409,7 +366,6 @@ module prf(
 			begin
 				priority_selector1_en 	   = 1'b0;
 				priority_selector2_en      = 1'b0;
-				prf_another_full		   = 1'b0;
 				rat1_prf1_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat2_prf1_rename_valid_out = 0;
@@ -718,35 +674,35 @@ module prf(
 					writeback_value2 = 0;
 				end
 			end
-			if ((rat1_inst1_opa_prf_idx==48)||(rat2_inst1_opa_prf_idx==48))
+			if ((rat1_inst1_opa_prf_idx==`PRF_SIZE)||(rat2_inst1_opa_prf_idx==`PRF_SIZE))
 			begin	
 				inst1_opa_prf_value = 0;
 				inst1_opa_valid	    = 1'b1;
 			end	
 
-		if((rat1_inst1_opb_prf_idx==48)||(rat2_inst1_opb_prf_idx==48))
+		if((rat1_inst1_opb_prf_idx==`PRF_SIZE)||(rat2_inst1_opb_prf_idx==`PRF_SIZE))
 		begin
 			inst1_opb_prf_value = 0;
 			inst1_opb_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opa_prf_idx==48)||(rat2_inst2_opa_prf_idx==48))
+		if((rat1_inst2_opa_prf_idx==`PRF_SIZE)||(rat2_inst2_opa_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opa_prf_value = 0;
 			inst2_opa_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opb_prf_idx==48)||(rat2_inst2_opb_prf_idx==48))
+		if((rat1_inst2_opb_prf_idx==`PRF_SIZE)||(rat2_inst2_opb_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opb_prf_value = 0;
 			inst2_opb_valid	    = 1'b1;
 		end	
 
 			
-		if((rat1_inst1_opc_prf_idx==48)||(rat2_inst1_opc_prf_idx==48))
+		if((rat1_inst1_opc_prf_idx==`PRF_SIZE)||(rat2_inst1_opc_prf_idx==`PRF_SIZE))
 		begin
 			inst1_opc_prf_value = 0;
 			inst1_opc_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opc_prf_idx==48)||(rat2_inst2_opc_prf_idx==48))
+		if((rat1_inst2_opc_prf_idx==`PRF_SIZE)||(rat2_inst2_opc_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opc_prf_value = 0;
 			inst2_opc_valid	    = 1'b1;
