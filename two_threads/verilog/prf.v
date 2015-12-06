@@ -128,7 +128,7 @@ module prf(
 	
 	
 	// when all the internal_prf_available=0, the freelist of prf is zero.
-    assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
+   	assign prf_is_full = (internal_prf_available == 0)? 1'b1 : 1'b0;
     
 	// when RAT wants to allocate new PRF entries.
 	assign allocate_new_prf = {rat1_allocate_new_prf1,rat1_allocate_new_prf2,rat2_allocate_new_prf1,rat2_allocate_new_prf2};	
@@ -674,35 +674,35 @@ module prf(
 					writeback_value2 = 0;
 				end
 			end
-			if ((rat1_inst1_opa_prf_idx==48)||(rat2_inst1_opa_prf_idx==48))
+			if ((rat1_inst1_opa_prf_idx==`PRF_SIZE)||(rat2_inst1_opa_prf_idx==`PRF_SIZE))
 			begin	
 				inst1_opa_prf_value = 0;
 				inst1_opa_valid	    = 1'b1;
 			end	
 
-		if((rat1_inst1_opb_prf_idx==48)||(rat2_inst1_opb_prf_idx==48))
+		if((rat1_inst1_opb_prf_idx==`PRF_SIZE)||(rat2_inst1_opb_prf_idx==`PRF_SIZE))
 		begin
 			inst1_opb_prf_value = 0;
 			inst1_opb_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opa_prf_idx==48)||(rat2_inst2_opa_prf_idx==48))
+		if((rat1_inst2_opa_prf_idx==`PRF_SIZE)||(rat2_inst2_opa_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opa_prf_value = 0;
 			inst2_opa_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opb_prf_idx==48)||(rat2_inst2_opb_prf_idx==48))
+		if((rat1_inst2_opb_prf_idx==`PRF_SIZE)||(rat2_inst2_opb_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opb_prf_value = 0;
 			inst2_opb_valid	    = 1'b1;
 		end	
 
 			
-		if((rat1_inst1_opc_prf_idx==48)||(rat2_inst1_opc_prf_idx==48))
+		if((rat1_inst1_opc_prf_idx==`PRF_SIZE)||(rat2_inst1_opc_prf_idx==`PRF_SIZE))
 		begin
 			inst1_opc_prf_value = 0;
 			inst1_opc_valid	    = 1'b1;
 		end
-		if((rat1_inst2_opc_prf_idx==48)||(rat2_inst2_opc_prf_idx==48))
+		if((rat1_inst2_opc_prf_idx==`PRF_SIZE)||(rat2_inst2_opc_prf_idx==`PRF_SIZE))
 		begin
 			inst2_opc_prf_value = 0;
 			inst2_opc_valid	    = 1'b1;

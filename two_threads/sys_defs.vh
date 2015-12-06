@@ -309,7 +309,7 @@ typedef enum logic [4:0] {
 // new system define
 
 `define RS_SIZE 	10
-`define PRF_SIZE 	48
+`define PRF_SIZE 	88
 `define ROB_SIZE	16
 `define ARF_SIZE    32
 `define MEM_SIZE	64

@@ -120,12 +120,12 @@ assign request2 = inst2_enable? dest_rename_sig2 : 0;
 	  	PRF_free_list 		= 0;
 	  	n_rat_reg 		= rat_reg;
 
-    	opa_PRF_idx1 		= 6'h30;
-	  	opb_PRF_idx1 		= 6'h30;
+    		opa_PRF_idx1 		= `PRF_SIZE;
+	  	opb_PRF_idx1 		= `PRF_SIZE;
 	  	RAT_allo_halt1 		= ~PRF_rename_valid1 && dest_rename_sig1;  //if don't need rename, halt=0;
 
-	    opa_PRF_idx2 		= 6'h30;
-	  	opb_PRF_idx2 		= 6'h30;
+		opa_PRF_idx2 		= `PRF_SIZE;
+	  	opb_PRF_idx2 		= `PRF_SIZE;
 	  	RAT_allo_halt2 		= ~PRF_rename_valid2 && dest_rename_sig2;  //if don't need rename, halt=0;
 
 	  	
@@ -200,14 +200,14 @@ assign request2 = inst2_enable? dest_rename_sig2 : 0;
 
 	  end //else
 	  	opa_PRF_idx2 	= (~inst2_enable)? 0 : (opa_valid_in2) ? 0:
-				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:(opa_ARF_idx2==5'h1f)?6'h30:rat_reg[opa_ARF_idx2];  //opa request prf
+				(dest_ARF_idx1 == opa_ARF_idx2)? PRF_rename_idx1:(opa_ARF_idx2==5'h1f)?`PRF_SIZE:rat_reg[opa_ARF_idx2];  //opa request prf
 		opb_PRF_idx2 	= (~inst2_enable)? 0 : (opb_valid_in2) ? 0:
-				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:(opb_ARF_idx2==5'h1f)?6'h30:rat_reg[opb_ARF_idx2];
-		opa_PRF_idx1 	= (~inst1_enable)? 0 : (opa_valid_in1) ? 0: (opa_ARF_idx1==5'h1f)? 6'h30:rat_reg[opa_ARF_idx1];  //opa request prf
-		opb_PRF_idx1 	= (~inst1_enable)? 0 : (opb_valid_in1) ? 0: (opb_ARF_idx1==5'h1f)? 6'h30:rat_reg[opb_ARF_idx1];
+				(dest_ARF_idx1 == opb_ARF_idx2)? PRF_rename_idx1:(opb_ARF_idx2==5'h1f)?`PRF_SIZE:rat_reg[opb_ARF_idx2];
+		opa_PRF_idx1 	= (~inst1_enable)? 0 : (opa_valid_in1) ? 0: (opa_ARF_idx1==5'h1f)? `PRF_SIZE:rat_reg[opa_ARF_idx1];  //opa request prf
+		opb_PRF_idx1 	= (~inst1_enable)? 0 : (opb_valid_in1) ? 0: (opb_ARF_idx1==5'h1f)? `PRF_SIZE:rat_reg[opb_ARF_idx1];
 
-		rega_prf_inst1  = (~inst1_enable)? 0 : (rega_arf_inst1 == 5'h1f)? 6'h30:rat_reg[rega_arf_inst1];
-		rega_prf_inst2  = (~inst2_enable)? 0 : (rega_arf_inst2 == 5'h1f)? 6'h30:rat_reg[rega_arf_inst2];
+		rega_prf_inst1  = (~inst1_enable)? 0 : (rega_arf_inst1 == 5'h1f)? `PRF_SIZE:rat_reg[rega_arf_inst1];
+		rega_prf_inst2  = (~inst2_enable)? 0 : (rega_arf_inst2 == 5'h1f)? `PRF_SIZE:rat_reg[rega_arf_inst2];
 
 
 	for(int i=0; i<`ARF_SIZE; i++) begin
