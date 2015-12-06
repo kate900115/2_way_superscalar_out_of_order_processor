@@ -409,6 +409,7 @@ module prf(
 			begin
 				priority_selector1_en 	   = 1'b0;
 				priority_selector2_en      = 1'b0;
+				prf_another_full		   = 1'b0;
 				rat1_prf1_rename_valid_out = 0;
 				rat1_prf2_rename_valid_out = 0;
 				rat2_prf1_rename_valid_out = 0;
