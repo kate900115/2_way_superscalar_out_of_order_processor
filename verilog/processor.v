@@ -1040,7 +1040,7 @@ cdb cdb1(
 //			  LSQ				//
 //								//
 //////////////////////////////////
-	lsq(
+	lsq lsq1(
 		.clock(clock),
 		.reset(reset),
 	

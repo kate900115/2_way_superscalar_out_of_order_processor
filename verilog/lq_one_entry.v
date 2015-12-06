@@ -106,7 +106,7 @@ module lq_one_entry(
 		next_lq_dest_tag	= lq_dest_tag;
 		next_lq_mem_value	= lq_mem_value;
 		next_lq_mem_value_valid	= lq_mem_value_valid;
-		next_lq_requested	= 0;
+		next_lq_requested	= lq_requested;
 		if (lq_clean) begin
 			next_inuse		= 0;
 		end
