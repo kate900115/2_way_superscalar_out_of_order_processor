@@ -24,6 +24,7 @@ TESTBENCH = 	sys_defs.vh	\
 				test_bench/test_lsq.v
 SIMFILES = 		verilog/lq_one_entry.v\
 				verilog/sq_one_entry.v\
+				verilog/priority_selector.v\
 				verilog/lsq.v
 
 SYNFILES = lsq.vg 

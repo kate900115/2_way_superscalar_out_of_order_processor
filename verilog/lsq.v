@@ -87,11 +87,13 @@ module lsq(
 	//for example, instruction at slot 5 is older than instruction at slot 8
 	//lq_reg stores address
 	logic	[`LQ_SIZE-1:0]			lq_mem_in1, lq_mem_in2;
+	logic	[`LQ_SIZE-1:0]			lq1_mem_in_temp1, lq1_mem_in_temp2;
+	logic	[`LQ_SIZE-1:0]			lq2_mem_in_temp1, lq2_mem_in_temp2;
+	logic	[`LQ_SIZE-1:0]			lq1_request2mem, lq2_request2mem;
+	logic	[`LQ_SIZE-1:0]			lq1_requested, lq2_requested;
 	logic	[`LQ_SIZE-1:0]			lq1_clean, lq2_clean;
 	logic	[`LQ_SIZE-1:0]			lq1_free_en, lq2_free_en;
 	logic	[`LQ_SIZE-1:0]			lq1_is_ready, lq2_is_ready;
-	logic 	[$clog2(`LQ_SIZE)-1:0]	lq_head1, n_lq_head1, lq_head2, n_lq_head2;
-	logic	[$clog2(`LQ_SIZE)-1:0]	lq_tail1, n_lq_tail1, lq_tail2, n_lq_tail2;
 	logic	[`LQ_SIZE-1:0]			lq1_mem_data_in_valid, lq2_mem_data_in_valid;
 	logic	[`LQ_SIZE-1:0]			lq1_is_available, lq2_is_available;
 	logic	[`LQ_SIZE-1:0]			lq1_addr_valid, lq2_addr_valid;
@@ -101,6 +103,8 @@ module lsq(
 	logic	[`LQ_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]	lq1_dest_tag, lq2_dest_tag;
 	logic	[`LQ_SIZE-1:0][63:0]	lq1_mem_value, lq2_mem_value;
 	logic	[`LQ_SIZE-1:0]			lq1_mem_value_valid, lq2_mem_value_valid;
+	logic	[`LQ_SIZE-1:0]			lq1_request2mem, lq2_request2mem;
+	logic	[`LQ_SIZE-1:0]			lq1_requested, lq2_requested;
 	
 	//SQ
 	logic	[`SQ_SIZE-1:0]			sq_mem_in1;
@@ -159,9 +163,9 @@ module lsq(
 		
 		.lq_clean(lq1_clean),
 		.lq_free_enable(lq1_free_en),
+		.lq_request2mem(lq1_request2mem),/////////////////////////////////////
 		
 		//for instruction1
-		//.lq_mem_in1(),
 		.lq_pc_in1(inst2_pc),
 		.lq_inst1_in(inst1_in),
 		.lq_opa_in1(lsq_opa_in1),			// Operand a from Rename  data
@@ -172,7 +176,6 @@ module lsq(
 		.lq_mem_in1(lq_mem_in1),
 
 		//for instruction2
-	    //.lq_mem_in2(),
 		.lq_pc_in2(inst2_pc),
 		.lq_inst2_in(inst2_in),
 		.lq_opa_in2(lsq_opa_in2),      		// Operand a from Rename  data
@@ -202,7 +205,8 @@ module lsq(
 		.lq_rob_idx(lq1_rob_idx),
 		.lq_dest_tag(lq1_dest_tag),
 		.lq_mem_value(lq1_mem_value),
-		.lq_mem_value_valid(lq1_mem_value_valid)
+		.lq_mem_value_valid(lq1_mem_value_valid),
+		.lq_requested(lq1_requested)////////////////////////////////////////////
 	);
 	
 	lq_one_entry lq_t2[`LQ_SIZE-1:0](
@@ -211,6 +215,7 @@ module lsq(
 		
 		.lq_clean(lq2_clean),
 		.lq_free_enable(lq2_free_en),
+		.lq_request2mem(lq2_request2mem),
 		
 		//for instruction1
 		.lq_pc_in1(inst1_pc),
@@ -252,7 +257,8 @@ module lsq(
 		.lq_rob_idx(lq2_rob_idx),
 		.lq_dest_tag(lq2_dest_tag),
 		.lq_mem_value(lq2_mem_value),
-		.lq_mem_value_valid(lq2_mem_value_valid)
+		.lq_mem_value_valid(lq2_mem_value_valid),
+		.lq_requested(lq2_requested)
 	);
 	
 	sq_one_entry sq_t1[`SQ_SIZE-1:0](
@@ -354,6 +360,34 @@ module lsq(
 	);
 	
 	//read inst
+	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load1(                                  
+		.req(lq1_is_available),
+		.en((inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in1[$clog2(`ROB_SIZE)]),
+		.gnt_bus(lq1_mem_in_temp1)
+	);
+	
+	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load2(                                  
+		.req(~lq1_mem_in_temp1 & lq1_is_available),
+		.en((inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in2[$clog2(`ROB_SIZE)]),
+		.gnt_bus(lq1_mem_in_temp2)
+	);
+	
+	assign lq_mem_in1 = thread1_mispredict ? 0 : lq1_mem_in_temp1 | lq1_mem_in_temp2;
+	
+	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load1(                                  
+		.req(lq2_is_available),
+		.en((inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread2_mispredict && lsq_rob_idx_in1[$clog2(`ROB_SIZE)]),
+		.gnt_bus(lq2_mem_in_temp1)
+	);
+	
+	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load2(                                  
+		.req(~lq2_mem_in_temp1 & lq2_is_available),
+		.en((inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread2_mispredict && lsq_rob_idx_in1[$clog2(`ROB_SIZE)]),
+		.gnt_bus(lq2_mem_in_temp2)
+	);
+	
+	assign lq_mem_in2 = thread2_mispredict ? 0 : lq2_mem_in_temp1 | lq2_mem_in_temp2;
+	
 	always_comb begin
 		inst1_is_lq1 = 0;
 		inst1_is_lq2 = 0;
@@ -363,23 +397,18 @@ module lsq(
 		inst2_is_lq2 = 0;
 		inst2_is_sq1 = 0;
 		inst2_is_sq2 = 0;
-		n_lq_tail1	= lq_tail1;
-		n_lq_tail2	= lq_tail2;
 		n_sq_tail1	= sq_tail1;
 		n_sq_tail2	= sq_tail2;
 		lq1_clean	= 0;
 		lq2_clean	= 0;
 		sq1_clean	= 0;
 		sq2_clean	= 0;
-		lq_mem_in1	= 0;
-		lq_mem_in2	= 0;
 		sq_mem_in1	= 0;
 		sq_mem_in2	= 0;
 		//mispredict
 		if (thread1_mispredict || thread2_mispredict) begin
 			if (thread1_mispredict) begin
 				n_sq_tail1 = sq_head1;
-				n_lq_tail1 = lq_head1;
 				for (int i = 0; i < `SQ_SIZE; i++) begin
 					lq1_clean[i] = 1;
 					sq1_clean[i] = 1;
@@ -387,57 +416,31 @@ module lsq(
 			end
 			if (thread2_mispredict) begin
 				n_sq_tail2 = sq_head2;
-				n_lq_tail2 = lq_head2;
 				for (int i = 0; i < `SQ_SIZE; i++) begin
 					lq2_clean[i] = 1;
 					sq2_clean[i] = 1;
 				end
 			end
 			for (int i = 0; i < `SQ_SIZE; i++) begin
-				lq_mem_in1[i] = 0;
-				lq_mem_in2[i] = 0;
 				sq_mem_in1[i] = 0;
 				sq_mem_in2[i] = 0;
 			end
 		end
 		else begin//
-			if (lsq_rob_idx_in1[$clog2(`ROB_SIZE)] == 0) begin
-				if (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST)
-					inst1_is_lq1 = 1;
-				else if (inst1_type == IS_STQ_INST || inst1_type == IS_STQ_C_INST)
+			if (inst1_type == IS_STQ_INST || inst1_type == IS_STQ_C_INST) begin
+				if (lsq_rob_idx_in1[$clog2(`ROB_SIZE)] == 0)
 					inst1_is_sq1 = 1;
-			end
-			else begin
-				if (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST)
-					inst1_is_lq2 = 1;
-				else if (inst1_type == IS_STQ_INST || inst1_type == IS_STQ_C_INST)
+				else if (lsq_rob_idx_in1[$clog2(`ROB_SIZE)] == 1)
 					inst1_is_sq2 = 1;
 			end
-		
-			if (lsq_rob_idx_in2[$clog2(`ROB_SIZE)] == 0) begin
-				if (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST)
-					inst2_is_lq1 = 1;
-				else if (inst2_type == IS_STQ_INST || inst2_type == IS_STQ_C_INST)
+			else if (inst2_type == IS_STQ_INST || inst2_type == IS_STQ_C_INST) begin
+				if (lsq_rob_idx_in2[$clog2(`ROB_SIZE)] == 0)
 					inst2_is_sq1 = 1;
-				end
-			else begin
-				if (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST)
-					inst2_is_lq2 = 1;
-				else if (inst2_type == IS_STQ_INST || inst2_type == IS_STQ_C_INST)
+				else if (lsq_rob_idx_in2[$clog2(`ROB_SIZE)] == 1)
 					inst2_is_sq2 = 1;
 			end
-			n_lq_tail1 = lq_tail1 + inst1_is_lq1 + inst2_is_lq1;
-			n_lq_tail2 = lq_tail2 + inst1_is_lq2 + inst2_is_lq2;
 			n_sq_tail1 = sq_tail1 + inst1_is_sq1 + inst2_is_sq1;
 			n_sq_tail2 = sq_tail2 + inst1_is_sq2 + inst2_is_sq2;
-			if (inst1_is_lq1)
-				lq_mem_in1[lq_tail1] = 1;
-			if (inst2_is_lq1)
-				lq_mem_in1[lq_tail1+1] = 1;
-			if (inst1_is_lq2)
-				lq_mem_in2[lq_tail2] = 1;
-			if (inst2_is_lq2)
-				lq_mem_in2[lq_tail2+1] = 1;
 			if (inst1_is_sq1)
 				sq_mem_in1[sq_tail1] = 1;
 			if (inst2_is_sq1)
@@ -445,19 +448,17 @@ module lsq(
 			if (inst1_is_sq2)
 				sq_mem_in2[sq_tail2] = 1;
 			if (inst2_is_sq2)
-				lq_mem_in2[lq_tail2+1] = 1;
+				sq_mem_in2[sq_tail2+1] = 1;
 		end
 	end
 	
 	always_comb begin
 		lsq_is_full = 0;
-		if ((lq_tail1 + 4'b1 == lq_head1) || (lq_tail1 == lq_head1 && !lq1_is_available[lq_tail1]))
-			lsq_is_full = 1;
-		if ((lq_tail2 + 4'b1 == lq_head2) || (lq_tail2 == lq_head2 && !lq2_is_available[lq_tail2]))
-			lsq_is_full = 1;
 		if ((sq_tail1 + 4'b1 == sq_head1) || (sq_tail1 == sq_head1 && !sq1_is_available[sq_tail1]))
 			lsq_is_full = 1;
 		if ((sq_tail2 + 4'b1 == sq_head2) || (sq_tail2 == sq_head2 && !sq2_is_available[sq_tail2]))
+			lsq_is_full = 1;
+		if (lq1_mem_in_temp2 == 0 || lq2_mem_in_temp2 == 0)
 			lsq_is_full = 1;
 	end
 	
@@ -485,14 +486,16 @@ module lsq(
 	
 	//cdb output
 	always_comb begin
-		out1_is_lq1 = 0;
-		out1_is_lq2 = 0;
+		int i = 0;
+		int j = 0;
 		out1_is_sq1 = 0;
 		out1_is_sq2 = 0;
-		out2_is_lq1 = 0;
-		out2_is_lq2 = 0;
 		out2_is_sq1 = 0;
 		out2_is_sq2 = 0;
+		lq1_free_en		= 0;
+		lq2_free_en		= 0;
+		sq1_free_en		= 0;
+		sq2_free_en		= 0;
 		cdb_rob_idx1	= 0;
 		cdb_rob_idx2	= 0;
 		cdb_result_out1	= 0;
@@ -501,31 +504,29 @@ module lsq(
 		cdb_result_is_valid2	= 0;
 		cdb_dest_tag1	= 0;
 		cdb_dest_tag2	= 0;
-		lq1_free_en		= 0;
-		lq2_free_en		= 0;
-		sq1_free_en		= 0;
-		sq2_free_en		= 0;
 		if (lda1_valid) begin
 			cdb_dest_tag1			= lda1_dest_tag;
 			cdb_result_out1			= lda1_result;
 			cdb_result_is_valid1	= 1;
 			cdb_rob_idx1			= lda1_rob_idx;
 		end
-		else if (lq1_is_ready[lq_head1]) begin
-			cdb_dest_tag1			= lq1_dest_tag[lq_head1];
-			cdb_result_out1			= lq1_mem_value;
-			cdb_result_is_valid1	= 1;
-			cdb_rob_idx1			= lq1_rob_idx;
-			out1_is_lq1				= 1;
-			lq1_free_en[lq_head1]	= 1;
+		else if (lq1_is_ready != 0) begin
+			for (i = 0; i < `LQ_SIZE; i++) begin
+				cdb_dest_tag1			= lq1_dest_tag[i];
+				cdb_result_out1			= lq1_mem_value[i];
+				cdb_result_is_valid1	= 1;
+				cdb_rob_idx1			= lq1_rob_idx[i];
+				lq1_free_en[i]			= 1;
+			end
 		end
-		else if (lq2_is_ready[lq_head2]) begin
-			cdb_dest_tag1			= lq2_dest_tag[lq_head2];
-			cdb_result_out1			= lq2_mem_value;
-			cdb_result_is_valid1	= 1;
-			cdb_rob_idx1			= lq2_rob_idx;
-			out1_is_lq2				= 1;
-			lq2_free_en[lq_head2]	= 1;
+		else if (lq2_is_ready != 0) begin
+			for (j = 0; j < `LQ_SIZE; j++) begin
+				cdb_dest_tag1			= lq2_dest_tag[j];
+				cdb_result_out1			= lq2_mem_value[j];
+				cdb_result_is_valid1	= 1;
+				cdb_rob_idx1			= lq2_rob_idx[j];
+				lq1_free_en[j]			= 1;
+			end
 		end
 		else if (sq1_is_ready[sq_head1]) begin
 			cdb_dest_tag1			= sq1_dest_tag[sq_head1];
@@ -550,21 +551,23 @@ module lsq(
 			cdb_result_is_valid2	= 1;
 			cdb_rob_idx2			= lda2_rob_idx;
 		end
-		else if (lq1_is_ready[lq_head1+out1_is_lq1]) begin
-			cdb_dest_tag2			= lq1_dest_tag[lq_head1+out1_is_lq1];
-			cdb_result_out2			= lq1_mem_value;
-			cdb_result_is_valid2	= 1;
-			cdb_rob_idx2			= lq1_rob_idx;
-			out2_is_lq1				= 1;
-			lq1_free_en[lq_head1+out1_is_lq1]	= 1;
+		else if (lq1_is_ready != 0) begin
+			for (; i < `LQ_SIZE; i++) begin
+				cdb_dest_tag2			= lq1_dest_tag[i];
+				cdb_result_out2			= lq1_mem_value[i];
+				cdb_result_is_valid2	= 1;
+				cdb_rob_idx2			= lq1_rob_idx[i];
+				lq1_free_en[i]			= 1;
+			end
 		end
-		else if (lq2_is_ready[lq_head2+out1_is_lq2]) begin
-			cdb_dest_tag2			= lq2_dest_tag[lq_head2+out1_is_lq2];
-			cdb_result_out2			= lq2_mem_value;
-			cdb_result_is_valid2	= 1;
-			cdb_rob_idx2			= lq2_rob_idx;
-			out2_is_lq2				= 1;
-			lq2_free_en[lq_head2+out1_is_lq2]	= 1;
+		else if (lq2_is_ready != 0) begin
+			for (; j < `LQ_SIZE; j++) begin
+				cdb_dest_tag2			= lq2_dest_tag[j];
+				cdb_result_out2			= lq2_mem_value[j];
+				cdb_result_is_valid2	= 1;
+				cdb_rob_idx2			= lq2_rob_idx[j];
+				lq1_free_en[j]			= 1;
+			end
 		end
 		else if (sq1_is_ready[sq_head1+out1_is_sq1]) begin
 			cdb_dest_tag2			= sq1_dest_tag[sq_head1+out1_is_sq1];
@@ -582,8 +585,6 @@ module lsq(
 			out2_is_sq2				= 1;
 			sq2_free_en[sq_head2+out1_is_sq2]	= 1;
 		end
-		n_lq_head1 = lq_head1+out1_is_lq1+out2_is_lq1;
-		n_lq_head2 = lq_head2+out1_is_lq2+out2_is_lq2;
 		n_sq_head1 = sq_head1+out1_is_sq1+out2_is_sq1;
 		n_sq_head2 = sq_head2+out1_is_sq2+out2_is_sq2;
 	end
@@ -594,24 +595,30 @@ module lsq(
 		mem_address_out		= 0;
 		current_mem_inst	= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		if ((mem_response_in || cache_hit)) begin
-			if (lq1_addr_valid[lq_head1] && ~lq1_is_ready[lq_head1] && (lq1_pc[lq_head1] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
-				current_mem_inst	= {1'b0,1'b0,lq_head1};
-				mem_address_out		= lq1_opa[lq_head1] + lq1_opb[lq_head1];
-				lsq2Dcache_command	= BUS_LOAD;
+		if (mem_response_in || cache_hit) begin
+			for (int i = 0; i < `LQ_SIZE; i++) begin
+				if (~lq1_requested[i] && lq1_addr_valid[i] && (lq1_pc[i] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
+					lq1_request2mem[i]	= 1;
+					current_mem_inst	= {1'b0,1'b0,i};
+					mem_address_out		= lq1_opa[i] + lq1_opb[i];
+					lsq2Dcache_command	= BUS_LOAD;
+					break;
+				end
+				else if (~lq2_requested[i] && lq1_addr_valid[i] && (lq2_pc[i] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
+					lq2_request2mem[i]	= 1;
+					current_mem_inst	= {1'b1,1'b0,i};
+					mem_address_out		= lq2_opa[i] + lq2_opb[i];
+					lsq2Dcache_command	= BUS_LOAD;
+					break;
+				end
 			end
-			else if (lq2_addr_valid[lq_head2] && ~lq2_is_ready[lq_head2] && (lq2_pc[lq_head2] < sq2_pc[sq_head2] || sq2_is_available[sq_head2]) && mem_response_in) begin
-				current_mem_inst	= {1'b1,1'b0,lq_head2};
-				mem_address_out		= lq2_opa[lq_head2] + lq2_opb[lq_head2];
-				lsq2Dcache_command	= BUS_LOAD;
-			end
-			else if (sq1_is_ready[sq_head1] && ({1'b0,t1_head} == sq1_rob_idx || {1'b0,t1_head} == sq1_rob_idx)) begin
+			if (sq1_is_ready[sq_head1] && ({1'b0,t1_head} == sq1_rob_idx || {1'b0,t1_head} == sq1_rob_idx)) begin
 				current_mem_inst	= {1'b0,1'b1,sq_head1};
 				mem_data_out 		= sq1_store_data;
 				mem_address_out		= sq1_opa[sq_head1] + sq1_opb[sq_head1];
 				lsq2Dcache_command	= BUS_STORE;
 			end
-			else if (sq1_is_ready[sq_head2] && ({1'b0,t2_head} == sq2_rob_idx || {1'b0,t2_head} == sq2_rob_idx)) begin
+			else if (sq2_is_ready[sq_head2] && ({1'b0,t2_head} == sq2_rob_idx || {1'b0,t2_head} == sq2_rob_idx)) begin
 				current_mem_inst	= {1'b1,1'b1,sq_head2};
 				mem_data_out 		= sq2_store_data;
 				mem_address_out		= sq2_opa[sq_head1] + sq2_opb[sq_head1];
@@ -712,20 +719,12 @@ module lsq(
 			sq_tail1	<= #1 0;
 			sq_head2	<= #1 0;
 			sq_tail2	<= #1 0;
-			lq_head1	<= #1 0;
-			lq_tail1	<= #1 0;
-			lq_head2	<= #1 0;
-			lq_tail2	<= #1 0;
 		end
 		else begin
 			sq_head1	<= #1 n_sq_head1;
 			sq_tail1	<= #1 n_sq_tail1;
 			sq_head2	<= #1 n_sq_head2;
 			sq_tail2	<= #1 n_sq_tail2;
-			lq_head1	<= #1 n_lq_head1;
-			lq_tail1	<= #1 n_lq_tail1;
-			lq_head2	<= #1 n_lq_head2;
-			lq_tail2	<= #1 n_lq_tail2;
 		end
 	end
 endmodule

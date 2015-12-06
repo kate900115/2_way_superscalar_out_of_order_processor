@@ -4,6 +4,7 @@ module lq_one_entry(
 
 	input							lq_clean,	
 	input							lq_free_enable,
+	input							lq_request2mem,
 	
 	//inst1
 	input							lq_mem_in1,
@@ -46,7 +47,8 @@ module lq_one_entry(
 	output logic	[$clog2(`ROB_SIZE):0]	lq_rob_idx,
 	output logic	[$clog2(`PRF_SIZE)-1:0] lq_dest_tag,
 	output logic	[63:0]					lq_mem_value,
-	output logic							lq_mem_value_valid
+	output logic							lq_mem_value_valid,
+	output logic							lq_requested
 );
 
 	logic							inuse, next_inuse;
@@ -59,6 +61,7 @@ module lq_one_entry(
 	logic	[$clog2(`PRF_SIZE)-1:0]	next_lq_dest_tag;
 	logic	[63:0]					next_lq_mem_value;
 	logic							next_lq_mem_value_valid;
+	logic							next_lq_requested;
 	
 	assign lq_is_available 	= lq_is_ready ? lq_free_enable : ~inuse;
 	assign lq_is_ready		= inuse && lq_addr_valid && lq_mem_value_valid;//(inuse || next_inuse) && (lq_addr_valid || next_lq_addr_valid) && (lq_mem_value_valid || next_lq_mem_value_valid);
@@ -75,6 +78,7 @@ module lq_one_entry(
 			lq_dest_tag 	<= #1 0;
 			lq_mem_value	<= #1 0;
 			lq_mem_value_valid	<= #1 0;
+			lq_requested	<= #1 0;
 		end
 		else begin
 			inuse			<= #1 next_inuse;
@@ -87,6 +91,7 @@ module lq_one_entry(
 			lq_dest_tag 	<= #1 next_lq_dest_tag;
 			lq_mem_value	<= #1 next_lq_mem_value;
 			lq_mem_value_valid	<= #1 next_lq_mem_value_valid;
+			lq_requested	<= #1 next_lq_requested;
 		end
 	end
 
@@ -101,6 +106,7 @@ module lq_one_entry(
 		next_lq_dest_tag	= lq_dest_tag;
 		next_lq_mem_value	= lq_mem_value;
 		next_lq_mem_value_valid	= lq_mem_value_valid;
+		next_lq_requested	= 0;
 		if (lq_clean) begin
 			next_inuse		= 0;
 		end
@@ -163,6 +169,9 @@ module lq_one_entry(
 			if (~lq_mem_value_valid && lq_mem_data_in_valid && inuse) begin
 				next_lq_mem_value = lq_mem_data_in;
 				next_lq_mem_value_valid = 1;
+			end
+			if (lq_requested) begin
+				next_lq_requested = 1;
 			end
 		end
 	end
