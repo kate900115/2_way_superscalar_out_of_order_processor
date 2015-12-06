@@ -1,21 +1,15 @@
 # Begin_DVE_Session_Save_Info
 # DVE restart session
-# Saved on Fri Dec 4 23:41:18 2015
+# Saved on Sat Dec 5 23:50:09 2015
 # Designs open: 1
-#   Sim: /home/tianmili/classes/eecs470/projects/project4/p4backup/two_threads/dve
-# Toplevel windows open: 4
+#   Sim: /home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/dve
+# Toplevel windows open: 2
 # 	TopLevel.1
 # 	TopLevel.2
-# 	TopLevel.3
-# 	TopLevel.4
 #   Source.1: _vcs_unit__2649932360
-#   Wave.1: 55 signals
-#   Wave.2: 24 signals
-#   Wave.3: 2 signals
-#   Group count = 3
-#   Group Group1 signal count = 55
-#   Group Group2 signal count = 24
-#   Group Group3 signal count = 2
+#   Wave.1: 48 signals
+#   Group count = 1
+#   Group Group1 signal count = 48
 # End_DVE_Session_Save_Info
 
 # DVE version: K-2015.09_Full64
@@ -47,7 +41,6 @@ set Hier.1 Hier.1
 set DLPane.1 DLPane.1
 set Data.1 Data.1
 set Console.1 Console.1
-set DriverLoad.1 DriverLoad.1
 gui_sync_global -id ${TopLevel.1} -option true
 
 # MDI window settings
@@ -66,35 +59,7 @@ gui_sync_global -id ${TopLevel.2} -option true
 
 # MDI window settings
 set Wave.1 Wave.1
-gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 744} {child_wave_right 1810} {child_wave_colname 386} {child_wave_colvalue 354} {child_wave_col1 0} {child_wave_col2 1}}
-
-# End MDI window settings
-
-
-# Create and position top-level window: TopLevel.3
-
-set TopLevel.3 TopLevel.3
-
-# Docked window settings
-gui_sync_global -id ${TopLevel.3} -option true
-
-# MDI window settings
-set Wave.2 Wave.2
-gui_update_layout -id ${Wave.2} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 725} {child_wave_right 1768} {child_wave_colname 360} {child_wave_colvalue 361} {child_wave_col1 0} {child_wave_col2 1}}
-
-# End MDI window settings
-
-
-# Create and position top-level window: TopLevel.4
-
-set TopLevel.4 TopLevel.4
-
-# Docked window settings
-gui_sync_global -id ${TopLevel.4} -option true
-
-# MDI window settings
-set Wave.3 Wave.3
-gui_update_layout -id ${Wave.3} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 725} {child_wave_right 1768} {child_wave_colname 360} {child_wave_colvalue 361} {child_wave_col1 0} {child_wave_col2 1}}
+gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 725} {child_wave_right 1768} {child_wave_colname 360} {child_wave_colvalue 361} {child_wave_col1 0} {child_wave_col2 1}}
 
 # End MDI window settings
 
@@ -121,38 +86,18 @@ gui_set_time_units 100ps
 # Global: Signal Compare
 
 # Global: Signal Groups
-gui_load_child_values {testbench.processor_0.pc}
-gui_load_child_values {testbench.processor_0.rob1.rob2[12]}
-gui_load_child_values {testbench.processor_0.rob1.rob2[14]}
-gui_load_child_values {testbench.processor_0.pc.pc1}
+gui_load_child_values {testbench.processor_0.prf1}
 gui_load_child_values {testbench.processor_0.rob1}
-gui_load_child_values {testbench.processor_0.pc.pc2}
-gui_load_child_values {testbench.processor_0.rob1.rob2[13]}
-gui_load_child_values {testbench.processor_0.cdb1}
 gui_load_child_values {testbench.processor_0}
-gui_load_child_values {testbench.processor_0.rob1.rob2[15]}
 
 
-set _session_group_22 Group1
-gui_sg_create "$_session_group_22"
-set Group1 "$_session_group_22"
+set _session_group_1 Group1
+gui_sg_create "$_session_group_1"
+set Group1 "$_session_group_1"
 
-gui_sg_addsignal -group "$_session_group_22" { testbench.processor_0.pc.thread2_inst_out testbench.processor_0.pc.thread1_inst_out testbench.processor_0.pc.Imem2proc_valid testbench.processor_0.pc.Imem2proc_data testbench.processor_0.pc.pc1.if_address_minused testbench.processor_0.pc.pc1.proc2Imem_addr testbench.processor_0.pc.proc2Imem_addr testbench.processor_0.pc.Imem2proc_data testbench.processor_0.pc.pc1.Imem2proc_data testbench.processor_0.pc.pc1.rob_stall testbench.processor_0.pc.pc1.inst1_is_valid_current testbench.processor_0.pc.pc1.inst2_is_valid_current testbench.processor_0.pc.pc1.PC_reg testbench.processor_0.pc.pc2.PC_reg testbench.processor_0.pc.pc1.PC_stall testbench.processor_0.pc.clock testbench.processor_0.pc.thread1_inst_is_valid testbench.processor_0.pc.thread2_inst_is_valid testbench.processor_0.pc.thread1_is_available testbench.processor_0.pc.proc2Imem_addr_previous testbench.processor_0.pc.current_thread_state testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.t2_head testbench.processor_0.rob1.t2_tail testbench.processor_0.rob1.commit1_arn_dest_out testbench.processor_0.rob1.commit1_prn_dest_out testbench.processor_0.rob1.commit1_pc_out testbench.processor_0.rob1.commit2_pc_out testbench.processor_0.rob1.commit2_arn_dest_out testbench.processor_0.rob1.commit2_prn_dest_out {testbench.processor_0.rrat2.rrat_reg[1]} {testbench.processor_0.rob1.rob2[14].arn_dest} {testbench.processor_0.rob1.rob2[14].prn_dest} {testbench.processor_0.rob1.rob2[14].is_executed} {testbench.processor_0.rob1.rob2[15].arn_dest} {testbench.processor_0.rob1.rob2[15].prn_dest} {testbench.processor_0.rob1.rob2[15].is_executed} testbench.processor_0.PRF_writeback_value1 testbench.processor_0.PRF_writeback_value2 testbench.processor_0.rob1.commit1_is_thread1 testbench.processor_0.rob1.commit2_is_thread1 testbench.processor_0.rob1.commit1_valid testbench.processor_0.rob1.commit2_valid testbench.processor_0.rob1.commit1_mispredict_out testbench.processor_0.rob1.commit2_mispredict_out {testbench.processor_0.rrat2.rrat_reg[12]} {testbench.processor_0.rat2.rat_reg[12]} {testbench.processor_0.rat2.rat_reg[1]} testbench.processor_0.cdb1.cdb1_valid testbench.processor_0.cdb1.cdb1_tag testbench.processor_0.cdb1.cdb1_out testbench.processor_0.cdb1.cdb2_valid testbench.processor_0.cdb1.cdb2_tag testbench.processor_0.cdb1.cdb2_out }
-
-set _session_group_23 Group2
-gui_sg_create "$_session_group_23"
-set Group2 "$_session_group_23"
-
-gui_sg_addsignal -group "$_session_group_23" { {testbench.processor_0.prf1.prf2[40].write_prf_enable} {testbench.processor_0.prf1.prf2[40].value_next} {testbench.processor_0.prf1.prf2[40].value} {testbench.processor_0.prf1.prf2[40].reset} {testbench.processor_0.prf1.prf2[40].prf_ready} {testbench.processor_0.prf1.prf2[40].prf_is_valid_next} {testbench.processor_0.prf1.prf2[40].prf_is_valid} {testbench.processor_0.prf1.prf2[40].prf_in_use_next} {testbench.processor_0.prf1.prf2[40].prf_in_use} {testbench.processor_0.prf1.prf2[40].prf_available} {testbench.processor_0.prf1.prf2[40].free_this_entry} {testbench.processor_0.prf1.prf2[40].data_out} {testbench.processor_0.prf1.prf2[40].data_in} {testbench.processor_0.prf1.prf2[40].clock} {testbench.processor_0.prf1.prf2[40].assign_a_free_reg} {testbench.processor_0.rob1.rob2[12].prn_dest} {testbench.processor_0.rob1.rob2[12].arn_dest} {testbench.processor_0.rob1.rob2[13].prn_dest} {testbench.processor_0.rob1.rob2[13].arn_dest} {testbench.processor_0.rob1.rob2[12].inuse} testbench.processor_0.prf1.allocate_new_prf testbench.processor_0.prf1.internal_assign_a_free_reg1 testbench.processor_0.prf1.internal_assign_a_free_reg2 {testbench.processor_0.prf1.prf2[40].prf_in_use} }
-
-set _session_group_24 Group3
-gui_sg_create "$_session_group_24"
-set Group3 "$_session_group_24"
-
-gui_sg_addsignal -group "$_session_group_24" { testbench.processor_0.prf1.rrat2_prf2_free_idx testbench.processor_0.prf1.rrat2_prf1_free_idx }
+gui_sg_addsignal -group "$_session_group_1" { testbench.processor_0.prf1.clock testbench.processor_0.PC_proc2Imem_addr_previous testbench.processor_0.PC_inst1 testbench.processor_0.PC_inst2 testbench.processor_0.PC_inst1_valid testbench.processor_0.PC_inst2_valid testbench.processor_0.PC_thread1_is_available testbench.processor_0.prf1.rat1_allocate_new_prf1 testbench.processor_0.prf1.rat1_allocate_new_prf2 testbench.processor_0.prf1.rat2_allocate_new_prf1 testbench.processor_0.prf1.rat2_allocate_new_prf2 testbench.processor_0.prf1.rat1_prf1_rename_valid_out testbench.processor_0.prf1.rat1_prf2_rename_valid_out testbench.processor_0.prf1.rat2_prf1_rename_valid_out testbench.processor_0.prf1.rat2_prf2_rename_valid_out testbench.processor_0.prf1.rat1_prf1_rename_idx_out testbench.processor_0.prf1.rat1_prf2_rename_idx_out testbench.processor_0.prf1.rat2_prf1_rename_idx_out testbench.processor_0.prf1.rat2_prf2_rename_idx_out testbench.processor_0.prf1.internal_assign_a_free_reg1 testbench.processor_0.prf1.internal_prf_available testbench.processor_0.prf1.internal_free_this_entry testbench.processor_0.prf1.rrat1_branch_mistaken_free_valid testbench.processor_0.prf1.rrat2_branch_mistaken_free_valid testbench.processor_0.prf1.rrat1_prf1_free_idx testbench.processor_0.prf1.rrat1_prf2_free_idx testbench.processor_0.prf1.rrat2_prf1_free_idx testbench.processor_0.prf1.rrat2_prf2_free_idx testbench.processor_0.rob1.commit1_pc_out testbench.processor_0.rob1.commit1_valid testbench.processor_0.rob1.commit2_pc_out testbench.processor_0.rob1.commit2_valid testbench.processor_0.rob1.commit1_is_thread1 testbench.processor_0.rrat1.RoB_ARF_idx1 testbench.processor_0.rrat1.RoB_ARF_idx2 testbench.processor_0.rrat1.RoB_PRF_idx1 testbench.processor_0.rrat1.RoB_PRF_idx2 testbench.processor_0.rrat1.RoB_retire_in1 testbench.processor_0.rrat1.RoB_retire_in2 testbench.processor_0.rrat1.inst1_enable testbench.processor_0.rrat1.inst2_enable {testbench.processor_0.rrat1.n_rrat_reg[3]} {testbench.processor_0.prf1.prf2[0].free_this_entry} {testbench.processor_0.prf1.prf2[0].data_in} {testbench.processor_0.prf1.prf2[0].write_prf_enable} {testbench.processor_0.prf1.prf2[0].prf_in_use} {testbench.processor_0.prf1.prf2[0].value} {testbench.processor_0.prf1.prf2[0].value_next} }
 
 # Global: Highlighting
-gui_highlight_signals -color #00ff00 {{testbench.processor_0.prf1.prf2[40].prf_in_use_next}}
 
 # Global: Stack
 gui_change_stack_mode -mode list
@@ -181,42 +126,45 @@ gui_list_set_filter -id ${Hier.1} -text {*}
 gui_change_design -id ${Hier.1} -design Sim
 catch {gui_list_expand -id ${Hier.1} testbench}
 catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
-catch {gui_list_select -id ${Hier.1} {testbench.processor_0.prf1}}
-gui_view_scroll -id ${Hier.1} -vertical -set 0
+catch {gui_list_expand -id ${Hier.1} testbench.processor_0.prf1}
+catch {gui_list_select -id ${Hier.1} {{testbench.processor_0.prf1.prf2[0]}}}
+gui_view_scroll -id ${Hier.1} -vertical -set 176
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Data 'Data.1'
 gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
-gui_list_set_filter -id ${Data.1} -text {rrat2_prf1_free_idx}
-gui_list_show_data -id ${Data.1} {testbench.processor_0.prf1}
+gui_list_set_filter -id ${Data.1} -text {*}
+gui_list_show_data -id ${Data.1} {testbench.processor_0.prf1.prf2[0]}
 gui_show_window -window ${Data.1}
-catch { gui_list_select -id ${Data.1} {testbench.processor_0.prf1.rrat2_prf1_free_idx }}
+catch { gui_list_select -id ${Data.1} {{testbench.processor_0.prf1.prf2[0].free_this_entry} {testbench.processor_0.prf1.prf2[0].data_in} {testbench.processor_0.prf1.prf2[0].write_prf_enable} {testbench.processor_0.prf1.prf2[0].prf_in_use} {testbench.processor_0.prf1.prf2[0].value} {testbench.processor_0.prf1.prf2[0].value_next} }}
 gui_view_scroll -id ${Data.1} -vertical -set 0
 gui_view_scroll -id ${Data.1} -horizontal -set 0
-gui_view_scroll -id ${Hier.1} -vertical -set 0
+gui_view_scroll -id ${Hier.1} -vertical -set 176
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Source 'Source.1'
 gui_src_value_annotate -id ${Source.1} -switch false
 gui_set_env TOGGLE::VALUEANNOTATE 0
-gui_open_source -id ${Source.1}  -replace -active _vcs_unit__2649932360 /home/tianmili/classes/eecs470/projects/project4/p4backup/two_threads/sys_defs.vh
+gui_open_source -id ${Source.1}  -replace -active _vcs_unit__2649932360 /home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/sys_defs.vh
 gui_view_scroll -id ${Source.1} -vertical -set 0
 gui_src_set_reusable -id ${Source.1}
 
 # View 'Wave.1'
-gui_wv_sync -id ${Wave.1} -switch true
+gui_wv_sync -id ${Wave.1} -switch false
 set groupExD [gui_get_pref_value -category Wave -key exclusiveSG]
 gui_set_pref_value -category Wave -key exclusiveSG -value {false}
 set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
 gui_list_set_height -id Wave -height 25
 set origGroupCreationState [gui_list_create_group_when_add -wave]
 gui_list_create_group_when_add -wave -disable
-gui_wv_zoom_timerange -id ${Wave.1} 499939 500779
+gui_wv_zoom_timerange -id ${Wave.1} 59632 60215
 gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
-gui_list_select -id ${Wave.1} {{testbench.processor_0.rrat2.rrat_reg[12]} }
+gui_list_select -id ${Wave.1} {testbench.processor_0.rrat1.inst1_enable }
 gui_seek_criteria -id ${Wave.1} {Any Edge}
 
 
+
+gui_set_env TOGGLE::DEFAULT_WAVE_WINDOW ${Wave.1}
 gui_set_pref_value -category Wave -key exclusiveSG -value $groupExD
 gui_list_set_height -id Wave -height $origWaveHeight
 if {$origGroupCreationState} {
@@ -227,91 +175,20 @@ if { $groupExD } {
 }
 gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Wave.1} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -item testbench.processor_0.rob1.commit1_is_thread1 -position below
+gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -item {testbench.processor_0.prf1.prf2[0].value_next[63:0]} -position below
 
-gui_view_scroll -id ${Wave.1} -vertical -set 256
+gui_view_scroll -id ${Wave.1} -vertical -set 105
 gui_show_grid -id ${Wave.1} -enable false
-
-# View 'Wave.2'
-gui_wv_sync -id ${Wave.2} -switch false
-set groupExD [gui_get_pref_value -category Wave -key exclusiveSG]
-gui_set_pref_value -category Wave -key exclusiveSG -value {false}
-set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
-gui_list_set_height -id Wave -height 25
-set origGroupCreationState [gui_list_create_group_when_add -wave]
-gui_list_create_group_when_add -wave -disable
-gui_wv_zoom_timerange -id ${Wave.2} 500065 500656
-gui_list_add_group -id ${Wave.2} -after {New Group} {Group2}
-gui_list_expand -id ${Wave.2} testbench.processor_0.prf1.allocate_new_prf
-gui_list_select -id ${Wave.2} {{testbench.processor_0.prf1.prf2[40].prf_in_use} }
-gui_seek_criteria -id ${Wave.2} {Any Edge}
-
-
-gui_set_pref_value -category Wave -key exclusiveSG -value $groupExD
-gui_list_set_height -id Wave -height $origWaveHeight
-if {$origGroupCreationState} {
-	gui_list_create_group_when_add -wave -enable
-}
-if { $groupExD } {
- gui_msg_report -code DVWW028
-}
-gui_list_set_filter -id ${Wave.2} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
-gui_list_set_filter -id ${Wave.2} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.2} -group Group2  -position in
-
-gui_view_scroll -id ${Wave.2} -vertical -set 0
-gui_show_grid -id ${Wave.2} -enable false
-
-# DriverLoad 'DriverLoad.1'
-gui_get_drivers -session -id ${DriverLoad.1} -signal {testbench.processor_0.prf1.prf2[40].prf_in_use} -time 3360 -starttime 3396
-
-# View 'Wave.3'
-gui_wv_sync -id ${Wave.3} -switch false
-set groupExD [gui_get_pref_value -category Wave -key exclusiveSG]
-gui_set_pref_value -category Wave -key exclusiveSG -value {false}
-set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
-gui_list_set_height -id Wave -height 25
-set origGroupCreationState [gui_list_create_group_when_add -wave]
-gui_list_create_group_when_add -wave -disable
-gui_wv_zoom_timerange -id ${Wave.3} 500068 500651
-gui_list_add_group -id ${Wave.3} -after {New Group} {Group3}
-gui_seek_criteria -id ${Wave.3} {Any Edge}
-
-
-
-gui_set_env TOGGLE::DEFAULT_WAVE_WINDOW ${Wave.3}
-gui_set_pref_value -category Wave -key exclusiveSG -value $groupExD
-gui_list_set_height -id Wave -height $origWaveHeight
-if {$origGroupCreationState} {
-	gui_list_create_group_when_add -wave -enable
-}
-if { $groupExD } {
- gui_msg_report -code DVWW028
-}
-gui_list_set_filter -id ${Wave.3} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
-gui_list_set_filter -id ${Wave.3} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.3} -group Group3  -position in
-
-gui_view_scroll -id ${Wave.3} -vertical -set 0
-gui_show_grid -id ${Wave.3} -enable false
 # Restore toplevel window zorder
 # The toplevel window could be closed if it has no view/pane
-if {[gui_exist_window -window ${TopLevel.2}]} {
-	gui_set_active_window -window ${TopLevel.2}
-	gui_set_active_window -window ${Wave.1}
-}
 if {[gui_exist_window -window ${TopLevel.1}]} {
 	gui_set_active_window -window ${TopLevel.1}
 	gui_set_active_window -window ${Source.1}
 	gui_set_active_window -window ${DLPane.1}
 }
-if {[gui_exist_window -window ${TopLevel.3}]} {
-	gui_set_active_window -window ${TopLevel.3}
-	gui_set_active_window -window ${Wave.2}
-}
-if {[gui_exist_window -window ${TopLevel.4}]} {
-	gui_set_active_window -window ${TopLevel.4}
-	gui_set_active_window -window ${Wave.3}
+if {[gui_exist_window -window ${TopLevel.2}]} {
+	gui_set_active_window -window ${TopLevel.2}
+	gui_set_active_window -window ${Wave.1}
 }
 #</Session>
 
