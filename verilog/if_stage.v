@@ -27,7 +27,8 @@ module if_stage(
 	input				is_two_threads,		
 
 
-	output logic [63:0]	proc2Imem_addr,					// Address sent to Instruction memory
+	output logic [63:0]	proc2Imem_addr_mem,					// Address sent to Instruction memory
+	output BUS_COMMAND	proc2Icache_command,
 	output logic [63:0] next_PC_out,
 	output logic [31:0] thread1_inst_out,
 	output logic [31:0] thread2_inst_out,
@@ -40,13 +41,13 @@ module if_stage(
 	output logic 		is_next_thread1
 	);
 	
-	
+	BUS_COMMAND  		proc2Icache_command1,proc2Icache_command2;
 	logic 				pc_enable1;
 	logic 				pc_enable2;
 	logic [63:0]		next_PC_out1;
 	logic [63:0]		next_PC_out2;
-	logic [63:0]		proc2Imem_addr1;
-	logic [63:0]		proc2Imem_addr2;
+	logic [63:0]		proc2Imem_addr_mem1;
+	logic [63:0]		proc2Imem_addr_mem2;
 
  	logic [31:0] 		thread1_inst1_out;
 	logic [31:0] 		thread1_inst2_out;
@@ -66,64 +67,66 @@ module if_stage(
 	assign thread1_is_available = current_thread_state[0];
 
 	pc pc1(
-			//input
-			.clock(clock),                   	
-			.reset(reset),                   	
+		//input
+		.clock(clock),                   	
+		.reset(reset),                   	
 
-			.branch_is_taken(thread1_branch_is_taken),      
-			.fu_target_pc(thread1_target_pc),        
-			.Imem2proc_data(Imem2proc_data),  
-			.Imem2proc_valid(Imem2proc_valid),        	
-			.rs_stall(rs_stall),		 	
-			.rob_stall(rob1_stall),	
-			.rat_stall(rat_stall),	 	
-			.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
-			.pc_enable(pc_enable1),	
-			.current_thread_state(current_thread_state),	
-			.is_thread1pc(1'b1),	
-			.is_two_threads(is_two_threads), 		
+		.branch_is_taken(thread1_branch_is_taken),      
+		.fu_target_pc(thread1_target_pc),        
+		.Imem2proc_data(Imem2proc_data),  
+		.Imem2proc_valid(Imem2proc_valid),        	
+		.rs_stall(rs_stall),		 	
+		.rob_stall(rob1_stall),	
+		.rat_stall(rat_stall),	 	
+		.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
+		.pc_enable(pc_enable1),	
+		.current_thread_state(current_thread_state),	
+		.is_thread1pc(1),	
+		.is_two_threads(is_two_threads), 		
 
-			//output
-			.proc2Imem_addr(proc2Imem_addr1),    	 	
-			.inst1_out(thread1_inst1_out),        	 			// fetched instruction out
-			.inst2_out(thread1_inst2_out), 
-			.inst1_is_valid_current(thread1_inst1_is_valid),  		 	// when low, instruction is garbage
-			.inst2_is_valid_current(thread1_inst2_is_valid),  
+		//output
+		.proc2Imem_addr_mem(proc2Imem_addr_mem1),  
+		.proc2Icache_command(proc2Icache_command1),  	 	
+		.inst1_out(thread1_inst1_out),        	 			// fetched instruction out
+		.inst2_out(thread1_inst2_out), 
+		.inst1_is_valid_current(thread1_inst1_is_valid),  		 	// when low, instruction is garbage
+		.inst2_is_valid_current(thread1_inst2_is_valid),  
 		
-			// for debug
-			.proc2Imem_addr_previous(proc2Imem_addr_previous1),	
-			.next_PC_out(next_PC_out1)        	 				// PC of instruction after fetched (PC+8).	 	
+		// for debug
+		.proc2Imem_addr_previous(proc2Imem_addr_previous1),	
+		.next_PC_out(next_PC_out1)        	 				// PC of instruction after fetched (PC+8).	 	
   		);
 
 
 	pc pc2(
 		//input
-			.clock(clock),                   	
-			.reset(reset),                   	
+		.clock(clock),                   	
+		.reset(reset),                   	
 	
-			.branch_is_taken(thread2_branch_is_taken),      
-			.fu_target_pc(thread2_target_pc),        
-			.Imem2proc_data(Imem2proc_data), 
-			.Imem2proc_valid(Imem2proc_valid),         	
-			.rs_stall(rs_stall),		 	
-			.rob_stall(rob2_stall),	
-			.rat_stall(rat_stall),	 	
-			.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
-			.pc_enable(pc_enable2),	
-			.current_thread_state(current_thread_state),	
-			.is_thread1pc(1'b0),
-			.is_two_threads(is_two_threads), 	 		
+		.branch_is_taken(thread2_branch_is_taken),      
+		.fu_target_pc(thread2_target_pc),        
+		.Imem2proc_data(Imem2proc_data), 
+		.Imem2proc_valid(Imem2proc_valid),         	
+		.rs_stall(rs_stall),		 	
+		.rob_stall(rob2_stall),	
+		.rat_stall(rat_stall),	 	
+		.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
+		.pc_enable(pc_enable2),	
+		.current_thread_state(current_thread_state),	
+		.is_thread1pc(0),
+		.is_two_threads(is_two_threads), 	 		
 	
-			//output
-			.proc2Imem_addr(proc2Imem_addr2),    	 	      	 	
-			.inst1_out(thread2_inst1_out),        	 	
-			.inst2_out(thread2_inst2_out), 
-			.inst1_is_valid_current(thread2_inst1_is_valid),  		 	
-			.inst2_is_valid_current(thread2_inst2_is_valid),
+		//output
+		.proc2Imem_addr_mem(proc2Imem_addr_mem2), 
+		.proc2Icache_command(proc2Icache_command2),     	 	      	 	
+		.inst1_out(thread2_inst1_out),        	 	
+		.inst2_out(thread2_inst2_out), 
+		.inst1_is_valid_current(thread2_inst1_is_valid),  		 	
+		.inst2_is_valid_current(thread2_inst2_is_valid),
 		
-			// for debug
-			.proc2Imem_addr_previous(proc2Imem_addr_previous2),	
-			.next_PC_out(next_PC_out2)        	 				 	  		 	
+		// for debug
+		.proc2Imem_addr_previous(proc2Imem_addr_previous2),	
+		.next_PC_out(next_PC_out2)        	 				 	  		 	
   		);	
   	
   	always_ff@(posedge clock)
@@ -147,7 +150,8 @@ module if_stage(
 		begin
 			pc_enable1			  		    = 1'b1;
 			pc_enable2			  		    = 1'b0;
-			proc2Imem_addr				    = proc2Imem_addr1;
+			proc2Imem_addr_mem				= proc2Imem_addr_mem1;
+			proc2Icache_command				= proc2Icache_command1;
 			next_PC_out 		 		    = next_PC_out1;
 			thread1_inst_out 	 		    = thread1_inst1_out;
 			thread2_inst_out 	 		    = thread1_inst2_out;
@@ -164,7 +168,8 @@ module if_stage(
 				begin
 					pc_enable1			    = 1'b0;
 					pc_enable2			    = 1'b1;
-					proc2Imem_addr		    = proc2Imem_addr2;	//should be 2******
+					proc2Imem_addr_mem	    = proc2Imem_addr_mem2;	//should be 2******
+					proc2Icache_command		= proc2Icache_command2; 
 					next_PC_out 		    = next_PC_out2;
 					thread1_inst_out 	    = thread1_inst1_out;
 					thread2_inst_out 	    = thread1_inst2_out;
@@ -178,7 +183,8 @@ module if_stage(
 				begin
 					pc_enable1			    = 1'b0;
 					pc_enable2			    = 1'b1;
-					proc2Imem_addr		    = proc2Imem_addr2;	//should be 2******
+					proc2Imem_addr_mem	    = proc2Imem_addr_mem2;	//should be 2******
+					proc2Icache_command		= proc2Icache_command2; 
 					next_PC_out 		    = next_PC_out2;
 					thread1_inst_out 	    = thread1_inst1_out;
 					thread2_inst_out 	    = thread1_inst2_out;
@@ -192,7 +198,8 @@ module if_stage(
 				begin
 					pc_enable1			    = 1'b1;
 					pc_enable2			    = 1'b0;
-					proc2Imem_addr		    = proc2Imem_addr1;	//****** should be 1
+					proc2Imem_addr_mem		= proc2Imem_addr_mem1;	//****** should be 1
+					proc2Icache_command		= proc2Icache_command1; 
 					next_PC_out 		    = next_PC_out1;
 					thread1_inst_out 	    = thread2_inst1_out;
 					thread2_inst_out 	    = thread2_inst2_out;
@@ -206,7 +213,8 @@ module if_stage(
 				begin
 					pc_enable1			    = 1'b0;
 					pc_enable2			    = 1'b0;
-					proc2Imem_addr		    = 0;
+					proc2Imem_addr_mem	    = 0;
+					proc2Icache_command		= BUS_NONE;
 					next_PC_out 		    = 0;
 					thread1_inst_out 	    = 0;
 					thread2_inst_out 	    = 0;
