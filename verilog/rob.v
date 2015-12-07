@@ -440,7 +440,7 @@ module rob(
 		next_t2_tail = t2_tail;
 		t1_is_full = 0;
 		t2_is_full = 0;
-		if(inst1_load_in && inst2_load_in)
+		if(inst1_load_in && inst2_load_in)//*************************************
 		begin
 			if (is_thread1)
 			begin
@@ -475,7 +475,7 @@ module rob(
 		begin
 			next_t2_tail = next_t2_head;
 		end
-		if ((t1_tail + 4'b1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))				//**************************** 
+		if ((t1_tail + 4'b1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))
 		begin
 			t1_is_full = 1;
 		end
