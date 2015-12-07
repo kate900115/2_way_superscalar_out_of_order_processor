@@ -36,7 +36,7 @@ module processor(
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
     output logic [63:0]						PRF_writeback_value2,
-    output ERROR_CODE   pipeline_error_status,
+    output ERROR_CODE  						pipeline_error_status,
     
     // Outputs from IF-Stage 
     output logic [63:0]						PC_proc2Imem_addr,
@@ -101,8 +101,8 @@ logic			ID_inst1_is_halt;
 logic			ID_inst2_is_halt;
 logic			ID_inst1_is_illegal;
 logic			ID_inst2_is_illegal;
-logic [4:0]			ID_rega_inst1;
-logic [4:0]			ID_rega_inst2;
+logic [4:0]		ID_rega_inst1;
+logic [4:0]		ID_rega_inst2;
 
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
@@ -197,8 +197,8 @@ logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
 logic							ROB_commit1_branch_taken;
 logic 							ROB_commit2_branch_taken;
-logic [$clog2(`ROB_SIZE):0]		ROB_t1_head;
-logic [$clog2(`ROB_SIZE):0]		ROB_t2_head;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t1_head;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t2_head;
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
@@ -209,6 +209,18 @@ logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
 logic [5:0]					RS_EX_out_valid;
 logic [5:0] [1:0]			RS_EX_branch_out;
 logic						RS_full;
+
+//lsq output
+logic [$clog2(`PRF_SIZE)-1:0]	LSQ_CDB_dest_tag1;
+logic [63:0]					LSQ_CDB_result_out1;
+logic							LSQ_CDB_result_is_valid1;
+logic [$clog2(`ROB_SIZE):0]		LSQ_CDB_rob_idx1;
+logic [$clog2(`PRF_SIZE)-1:0]	LSQ_CDB_dest_tag2;
+logic [63:0]					LSQ_CDB_result_out2;
+logic							LSQ_CDB_result_is_valid2;
+logic [$clog2(`ROB_SIZE):0]		LSQ_CDB_rob_idx2;
+logic							LSQ_is_full;
+logic [63:0]					LSQ2Dcache_data;
 
 //ex output
 //logic [5:0]							EX_RS_fu_is_available;
@@ -264,10 +276,20 @@ logic [3:0]								Icache2proc_tag;
 logic [63:0]							Icache2proc_addr;
 BUS_COMMAND  							Icache2proc_command;
 
-logic Imem2proc_valid;
-BUS_COMMAND	LSQ2Dcache_command;
-logic [63:0]		LSQ_address_out;
-assign proc2mem_command	= (LSQ2Dcache_command == BUS_NONE) ? Icache2proc_command : LSQ2Dcache_command;
+// Dcache
+// the following signals are all given and received by LSQ
+logic [63:0]			Dcache2proc_data;
+logic [3:0]				Dcache2proc_tag;
+logic [3:0]				Dcache2proc_response;
+logic 					Dcache_data_hit;
+BUS_COMMAND				Dcache2mem_command;
+logic [63:0]			Dcache2mem_addr;
+logic [63:0]			Dcache2mem_data;
+
+logic 					Imem2proc_valid;
+BUS_COMMAND				LSQ2Dcache_command;
+logic [63:0]			LSQ_address_out;
+assign proc2mem_command	= (LSQ2Dcache_command == BUS_NONE) ? Icache2proc_command : Dcache2mem_command;
 assign proc2mem_addr 	= (LSQ2Dcache_command == BUS_NONE) ? Icache2proc_addr : LSQ_address_out;
 							
 always_comb begin
@@ -1087,7 +1109,7 @@ cdb cdb1(
 		.mem_data_in(mem2proc_data),		//when no forwarding possible, load from memory
 		.mem_response_in(mem2proc_response),
 		.mem_tag_in(mem2proc_tag),
-		.cache_hit(1),
+		.cache_hit(1'b1),
 	
 	//retired store idx
 		.t1_head(ROB_t1_head),
@@ -1106,10 +1128,40 @@ cdb cdb1(
 		.cdb_result_is_valid2(LSQ_CDB_result_is_valid2),
 		.cdb_rob_idx2(LSQ_CDB_rob_idx2),
 	//mem
-		.mem_data_out(proc2mem_data),
+		.mem_data_out(LSQ2Dcache_data),
 		.mem_address_out(LSQ_address_out),
 		.lsq2Dcache_command(LSQ2Dcache_command),
 	//full
 		.lsq_is_full(LSQ_is_full)
 	);
+
+//////////////////////////////////
+//								//
+//			 DCACHE				//
+//								//
+//////////////////////////////////
+dcache dca(
+	.clock(clock),
+	.reset(reset),
+	// input from Mem.v
+	.Dmem2proc_response(mem2proc_response),
+	.Dmem2proc_tag(mem2proc_tag),
+	.Dmem2proc_data(mem2proc_data),
+	
+	// input from processor.v
+	.proc2Dcache_addr(LSQ_address_out),
+	.proc2Dcache_command(LSQ2Dcache_command),
+	.proc2Dcache_data(LSQ2Dcache_data),
+	
+	// output to mem.v
+	.proc2Dmem_command(Dcache2mem_command),
+	.proc2Dmem_addr(Dcache2mem_addr),
+	.proc2Dmem_data(Dcache2mem_data),
+	
+	// output to processor.v
+	.Dcache2proc_data(Dcache2proc_data),	 
+	.Dcache2proc_tag(Dcache2proc_tag),	 	
+	.Dcache2proc_response(Dcache2proc_response),
+	.Dcache_data_hit(Dcache_data_hit)
+);
 endmodule
