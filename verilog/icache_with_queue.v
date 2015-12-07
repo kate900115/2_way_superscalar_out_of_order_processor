@@ -107,7 +107,7 @@ module icache_with_queue(
 				instruction_in[buffer_tail] = Icache_data_out;
 				in_use_in[buffer_tail]		= 1'b1;
 				valid_in[buffer_tail]		= 1'b1;
-				buffer_tail_next			= buffer_tail+1;
+				buffer_tail_next			= buffer_tail+4'b1;
 			end
 			else
 			begin
@@ -115,7 +115,7 @@ module icache_with_queue(
 				PC_address_in[buffer_tail]  = proc2Icache_addr;
 				in_use_in[buffer_tail]		= 1'b1;
 				valid_in[buffer_tail]		= 1'b0;
-				buffer_tail_next			= buffer_tail+1;
+				buffer_tail_next			= buffer_tail+4'b1;
 			end
 		end
 		
