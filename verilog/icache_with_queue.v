@@ -50,10 +50,10 @@ module icache_with_queue(
 	logic [15:0]							in_use_in;
 	logic [15:0]							valid_in;
 	
-	logic [4:0]								buffer_head;
-	logic [4:0]								buffer_tail;
-	logic [4:0]								buffer_head_next;
-	logic [4:0]								buffer_tail_next;	
+	logic [3:0]								buffer_head;
+	logic [3:0]								buffer_tail;
+	logic [3:0]								buffer_head_next;
+	logic [3:0]								buffer_tail_next;	
 	
 	always_ff@(posedge clock)
 	begin
