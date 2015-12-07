@@ -36,7 +36,7 @@ module processor(
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
     output logic [63:0]						PRF_writeback_value2,
-    output ERROR_CODE   pipeline_error_status,
+    output ERROR_CODE  						pipeline_error_status,
     
     // Outputs from IF-Stage 
     output logic [63:0]						PC_proc2Imem_addr,

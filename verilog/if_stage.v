@@ -81,7 +81,7 @@ module if_stage(
 		.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
 		.pc_enable(pc_enable1),	
 		.current_thread_state(current_thread_state),	
-		.is_thread1pc(1),	
+		.is_thread1pc(1'b1),	
 		.is_two_threads(is_two_threads), 		
 
 		//output
@@ -113,7 +113,7 @@ module if_stage(
 		.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
 		.pc_enable(pc_enable2),	
 		.current_thread_state(current_thread_state),	
-		.is_thread1pc(0),
+		.is_thread1pc(1'b0),
 		.is_two_threads(is_two_threads), 	 		
 	
 		//output
