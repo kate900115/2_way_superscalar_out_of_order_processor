@@ -125,8 +125,8 @@ module lsq(
 	MEM_INST_TYPE	inst2_type;
 	logic	inst1_is_lq1, inst1_is_lq2, inst1_is_sq1, inst1_is_sq2;
 	logic	inst2_is_lq1, inst2_is_lq2, inst2_is_sq1, inst2_is_sq2;
-	logic	out1_is_lq1, out1_is_lq2, out1_is_sq1, out1_is_sq2;
-	logic	out2_is_lq1, out2_is_lq2, out2_is_sq1, out2_is_sq2;
+	logic	out1_is_sq1, out1_is_sq2;
+	logic	out2_is_sq1, out2_is_sq2;
 	
 	//tag table
 	logic	[$clog2(`SQ_SIZE)+1:0]			current_mem_inst;//{thread,load/store,queue_idx}
@@ -468,23 +468,37 @@ module lsq(
 	
 	//lda
 	always_ff @ (posedge clock) begin
-		if (lda1_valid) begin
+		if (reset) begin
 			lda1_valid		<= `SD 0;
-		end
-		if (lda2_valid) begin
 			lda2_valid		<= `SD 0;
+			lda1_dest_tag	<= `SD 0;
+			lda1_result		<= `SD 0;
+			lda1_valid		<= `SD 0;
+			lda1_rob_idx	<= `SD 0;
+			lda2_dest_tag	<= `SD 0;
+			lda2_result		<= `SD 0;
+			lda2_valid		<= `SD 0;
+			lda2_rob_idx	<= `SD 0;
 		end
-		if (inst1_type == IS_LDA_INST) begin
-			lda1_dest_tag	<= `SD dest_reg_idx1;
-			lda1_result		<= `SD lsq_opa_in1 + lsq_opb_in1;
-			lda1_valid		<= `SD 1;
-			lda1_rob_idx	<= `SD lsq_rob_idx_in1;
-		end
-		if (inst2_type == IS_LDA_INST) begin
-			lda2_dest_tag	<= `SD dest_reg_idx2;
-			lda2_result		<= `SD lsq_opa_in2 + lsq_opb_in2;
-			lda2_valid		<= `SD 1;
-			lda2_rob_idx	<= `SD lsq_rob_idx_in2;
+		else begin
+			if (lda1_valid) begin
+				lda1_valid		<= `SD 0;
+			end
+			if (lda2_valid) begin
+				lda2_valid		<= `SD 0;
+			end
+			if (inst1_type == IS_LDA_INST) begin
+				lda1_dest_tag	<= `SD dest_reg_idx1;
+				lda1_result		<= `SD lsq_opa_in1 + lsq_opb_in1;
+				lda1_valid		<= `SD 1;
+				lda1_rob_idx	<= `SD lsq_rob_idx_in1;
+			end
+			if (inst2_type == IS_LDA_INST) begin
+				lda2_dest_tag	<= `SD dest_reg_idx2;
+				lda2_result		<= `SD lsq_opa_in2 + lsq_opb_in2;
+				lda2_valid		<= `SD 1;
+				lda2_rob_idx	<= `SD lsq_rob_idx_in2;
+			end
 		end
 	end
 	
@@ -514,20 +528,24 @@ module lsq(
 		end
 		else if (lq1_is_ready != 0) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
-				cdb_dest_tag1			= lq1_dest_tag[i];
-				cdb_result_out1			= lq1_mem_value[i];
-				cdb_result_is_valid1	= 1;
-				cdb_rob_idx1			= lq1_rob_idx[i];
-				lq1_free_en[i]			= 1;
+				if (lq1_is_ready[i]) begin
+					cdb_dest_tag1			= lq1_dest_tag[i];
+					cdb_result_out1			= lq1_mem_value[i];
+					cdb_result_is_valid1	= 1;
+					cdb_rob_idx1			= lq1_rob_idx[i];
+					lq1_free_en[i]			= 1;
+				end
 			end
 		end
 		else if (lq2_is_ready != 0) begin
 			for (int j = 0; j < `LQ_SIZE; j++) begin
-				cdb_dest_tag1			= lq2_dest_tag[j];
-				cdb_result_out1			= lq2_mem_value[j];
-				cdb_result_is_valid1	= 1;
-				cdb_rob_idx1			= lq2_rob_idx[j];
-				lq1_free_en[j]			= 1;
+				if (lq2_is_ready[j]) begin
+					cdb_dest_tag1			= lq2_dest_tag[j];
+					cdb_result_out1			= lq2_mem_value[j];
+					cdb_result_is_valid1	= 1;
+					cdb_rob_idx1			= lq2_rob_idx[j];
+					lq1_free_en[j]			= 1;
+				end
 			end
 		end
 		else if (sq1_is_ready[sq_head1]) begin
@@ -555,7 +573,7 @@ module lsq(
 		end
 		else if (lq1_is_ready != 0) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
-				if (lq1_free_en[i] != 0) begin
+				if (lq1_free_en[i] != 0 && lq1_is_ready[i]) begin
 					cdb_dest_tag2			= lq1_dest_tag[i];
 					cdb_result_out2			= lq1_mem_value[i];
 					cdb_result_is_valid2	= 1;
@@ -566,7 +584,7 @@ module lsq(
 		end
 		else if (lq2_is_ready != 0) begin
 			for (int j = 0; j < `LQ_SIZE; j++) begin
-				if (lq2_free_en[j] != 0) begin
+				if (lq2_free_en[j] != 0 && lq2_is_ready[j]) begin
 					cdb_dest_tag2			= lq2_dest_tag[j];
 					cdb_result_out2			= lq2_mem_value[j];
 					cdb_result_is_valid2	= 1;
@@ -637,7 +655,7 @@ module lsq(
 		end
 	end
 	
-	//cdb
+	//cdb_in
 	always_comb begin
 		inst1_opb			= lsq_opb_in1;
 		inst1_opb_valid		= lsq_opb_valid1;
@@ -701,9 +719,9 @@ module lsq(
 		end
 		else begin
 			if (~tag_table[$clog2(`LQ_SIZE)+1] && ~tag_table[$clog2(`LQ_SIZE)])
-				lq1_mem_data_in_valid[tag_table[$clog2(`SQ_SIZE)-1:0]] = 1;
+				lq1_mem_data_in_valid[tag_table[mem_tag_in]] = 1;
 			else if (tag_table[$clog2(`LQ_SIZE)+1] && ~tag_table[$clog2(`LQ_SIZE)])
-				lq2_mem_data_in_valid[tag_table[$clog2(`SQ_SIZE)-1:0]] = 1;
+				lq2_mem_data_in_valid[tag_table[mem_tag_in]] = 1;
 		end
 	end
 	
