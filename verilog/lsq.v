@@ -45,8 +45,8 @@ module lsq(
 	input	[$clog2(`PRF_SIZE)-1:0]				dest_reg_idx2,
 	//from mem
 	input	[63:0]								mem_data_in,		//when no forwarding possible, load from memory
-	input	[4:0]								mem_response_in,
-	input	[4:0]								mem_tag_in,
+	input	[3:0]								mem_response_in,
+	input	[3:0]								mem_tag_in,
 	input										cache_hit,
 	
 	//retired store idx
