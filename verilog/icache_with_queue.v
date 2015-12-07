@@ -1,4 +1,4 @@
-module icache_prefetch(
+module icache_with_queue(
 	input									clock,
 	input									reset,
 	
