@@ -59,7 +59,6 @@ module pc(
 	logic 	[63:0]					PC_current;
 	logic 	[63:0]					proc2Imem_addr;
 	logic							if_address_minused;
-	logic reset_reg, next_reset_reg;
 	logic PC_change, next_PC_change;
 	assign inst1_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst1_is_valid_one : inst1_is_valid_two;
 	assign inst2_is_valid_current  = PC_stall? 0 : (~is_two_threads) ? inst2_is_valid_one : inst2_is_valid_two;
@@ -83,11 +82,9 @@ module pc(
   	// the next sequential PC (PC+8) if no branch
   	// halting is handled with the enable PC_enable;
 
-	assign next_reset_reg = reset;
   	// The take-branch signal must override stalling (otherwise it may be lost)
 	always_ff @(posedge clock) begin
-		reset_reg <= `SD next_reset_reg;
-		if(branch_is_taken || (reset_reg ==1 && reset ==0))
+		if(reset||branch_is_taken)
 			PC_change <= `SD 1;
 		else
 			PC_change <= `SD next_PC_change;
@@ -142,8 +139,8 @@ module pc(
 
 	always_comb
 	begin
-		current_inst1	= Imem2proc_valid?Imem2proc_data[31:0]:0;
-		current_inst2	= Imem2proc_valid?Imem2proc_data[63:32]:0;
+		current_inst1	= Imem2proc_data[31:0];
+		current_inst2	= Imem2proc_data[63:32];
 		if (branch_is_taken)
 		begin
 			next_PC = fu_target_pc + 4;

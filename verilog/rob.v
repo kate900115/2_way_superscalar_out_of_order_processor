@@ -280,10 +280,10 @@ module rob(
 				rob2_internal_target_pc_in[j] = target_pc_in2;
 			end
 		end
-		if (rob1_internal_is_halt_out[t1_head])
+		/*if (rob1_internal_is_halt_out[t1_head])
 			rob1_internal_is_ex_in[t1_head] = 1;
 		if (rob2_internal_is_halt_out[t1_head])
-			rob2_internal_is_ex_in[t1_head] = 1;
+			rob2_internal_is_ex_in[t1_head] = 1;*/
 	end
 	
 	//commit									

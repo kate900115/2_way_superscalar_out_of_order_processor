@@ -16,7 +16,8 @@ module icachemem(
 	output logic									data_is_miss,
 	output logic									cache_is_full,
 	//output logic [`ICACHE_BLOCK_SIZE-1:0]			data_out
-	output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data
+	output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data,
+	output logic load_valid
 	);
 	
 	// internal registers
@@ -73,7 +74,7 @@ module icachemem(
 		data_is_miss							= 1'b0;
 		read_data								= load_data_in;
 		cache_is_full							= 1'b0;
-		
+		load_valid = 0;
 		// for read
 		if (read_enable)
 		begin
@@ -133,7 +134,8 @@ module icachemem(
 					internal_data_in[i][j] 			= load_data_in;
 					internal_valid_in[i][j]			= 1'b1;
 					internal_response_in[i][j]		= 0;
-					read_data						= load_data_in;
+					load_valid 						=0;
+					//read_data						= load_data_in;
 					//internal_way_next[i]			= ~j;
 					break;
 				end
