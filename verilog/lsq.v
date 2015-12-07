@@ -645,7 +645,7 @@ module lsq(
 				mem_address_out		= sq1_opa[sq_head1] + sq1_opb[sq_head1];
 				lsq2Dcache_command	= BUS_STORE;
 			end
-			else if (sq2_is_ready[sq_head2] && ({1'b0,t2_head} == sq2_rob_idx || {1'b0,t2_head} == sq2_rob_idx)) begin
+			else if (sq2_is_ready[sq_head2] && ({1'b1,t2_head} == sq2_rob_idx || {1'b1,t2_head} == sq2_rob_idx)) begin
 				//sq2_request2mem[sq_head2]	= 1;
 				current_mem_inst	= {1'b1,1'b1,sq_head2};
 				mem_data_out 		= sq2_store_data;

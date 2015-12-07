@@ -177,10 +177,10 @@ logic ROB_t1_is_full;
 logic ROB_t2_is_full;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
 //logic							ROB_commit1_if_rename_out;
-logic 					ROB_commit1_is_valid;	
+logic 							ROB_commit1_is_valid;	
 logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
 //logic							ROB_commit2_if_rename_out;
-logic 					ROB_commit2_is_valid;
+logic 							ROB_commit2_is_valid;
 logic							cdb1_branch_taken;
 logic							cdb2_branch_taken;
 logic [63:0]					ROB_commit1_target_pc;
@@ -197,6 +197,8 @@ logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
 logic							ROB_commit1_branch_taken;
 logic 							ROB_commit2_branch_taken;
+logic [$clog2(`ROB_SIZE):0]		ROB_t1_head;
+logic [$clog2(`ROB_SIZE):0]		ROB_t2_head;
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
 logic [5:0][63:0]		RS_EX_opb;
@@ -769,6 +771,8 @@ rob rob1(
 	.mispredict_in2(cdb2_branch_taken),
 	.target_pc_in2(cdb2_value),
 
+	.t1_head(ROB_t1_head),
+	.t2_head(ROB_t2_head),
 	.inst1_mispredict_sig(inst1_mispredict && inst1_mispredict_valid),
 	.inst2_mispredict_sig(inst2_mispredict && inst2_mispredict_valid),
 //output
