@@ -73,6 +73,7 @@ logic	thread1_branch_is_taken;  //for flush
 logic	thread2_branch_is_taken;
 //pc output
 logic			PC_thread1_is_available;
+BUS_COMMAND	 proc2Icache_command;
 //decoder
 logic [63:0]	ID_inst1_opa;
 logic [63:0]	ID_inst1_opb;
@@ -352,7 +353,8 @@ if_stage pc(
 	.Imem2proc_valid(Icache2proc_valid),				// 
 	.is_two_threads(1'b0),
 //output
-	.proc2Imem_addr(PC_proc2Imem_addr),
+	.proc2Imem_addr_mem(PC_proc2Imem_addr),  //this address send to mem
+	.proc2Icache_command(proc2Icache_command),
 	//.next_PC_out(,
 	.thread1_inst_out(PC_inst1),
 	.thread2_inst_out(PC_inst2),
@@ -374,7 +376,7 @@ icache ica(
 	
 	// input from processor.v
 	.proc2Icache_addr(PC_proc2Imem_addr),	
-	.proc2Icache_command(BUS_LOAD),
+	.proc2Icache_command(proc2Icache_command),
 	
 	// input from memory
 	.Imem2proc_response(mem2proc_response),
@@ -767,8 +769,8 @@ rob rob1(
 	.mispredict_in2(cdb2_branch_taken),
 	.target_pc_in2(cdb2_value),
 
-	//.inst1_mispredict_sig(inst1_mispredict && inst1_mispredict_valid),
-	//.inst2_mispredict_sig(inst2_mispredict && inst2_mispredict_valid),
+	.inst1_mispredict_sig(inst1_mispredict && inst1_mispredict_valid),
+	.inst2_mispredict_sig(inst2_mispredict && inst2_mispredict_valid),
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
