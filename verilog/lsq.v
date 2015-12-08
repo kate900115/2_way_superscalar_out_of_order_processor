@@ -368,35 +368,35 @@ module lsq(
 	//read inst
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load1(                                  
 		.req(lq1_is_available),
-		.en(inst1_valid),
+		.en(1'b1),
 		.gnt_bus(lq1_mem_in_temp1_1)
 	);
 	
-	assign lq1_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in1[$clog2(`ROB_SIZE)] ? lq1_mem_in_temp1_1 : 0;
+	assign lq1_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in1[$clog2(`ROB_SIZE)] && inst1_valid ? lq1_mem_in_temp1_1 : 0;
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load2(                                  
 		.req(~lq1_mem_in_temp1 & lq1_is_available),
-		.en(inst2_valid),
+		.en(1'b1),
 		.gnt_bus(lq1_mem_in_temp2_2)
 	);
-	assign lq1_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in2[$clog2(`ROB_SIZE)] ? lq1_mem_in_temp2_2 : 0;
+	assign lq1_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in2[$clog2(`ROB_SIZE)] && inst2_valid ? lq1_mem_in_temp2_2 : 0;
 	
 	assign lq_mem_in1 = lq1_mem_in_temp1 | lq1_mem_in_temp2;
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load1(                                  
 		.req(lq2_is_available),
-		.en(inst1_valid),
+		.en(1'b1),
 		.gnt_bus(lq2_mem_in_temp1_1)
 	);
 	
-	assign lq2_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in1[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp1_1 : 0;
+	assign lq2_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in1[$clog2(`ROB_SIZE)] && inst1_valid ? lq2_mem_in_temp1_1 : 0;
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load2(                                  
 		.req(~lq2_mem_in_temp1 & lq2_is_available),
-		.en(inst2_valid),
+		.en(1'b1),
 		.gnt_bus(lq2_mem_in_temp2_2)
 	);
-	assign lq2_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in2[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp2_2 : 0;
+	assign lq2_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in2[$clog2(`ROB_SIZE)] && inst2_valid ? lq2_mem_in_temp2_2 : 0;
 	
 	assign lq_mem_in2 = lq2_mem_in_temp1 | lq2_mem_in_temp2;
 	
@@ -645,7 +645,8 @@ module lsq(
 					lsq2Dcache_command	= BUS_LOAD;
 					next_next_mem_valid	= 0;
 				end
-			else
+			end
+			else begin
 				next_next_mem_valid		= next_mem_valid;
 				next_next_mem_inst		= next_mem_inst;
 				if (~next_mem_inst[$clog2(`LQ_SIZE)+1] && ~next_mem_inst[$clog2(`LQ_SIZE)]) begin
