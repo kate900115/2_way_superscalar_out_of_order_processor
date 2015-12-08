@@ -636,31 +636,28 @@ module lsq(
 					current_mem_inst	= next_mem_inst;
 					mem_address_out		= lq1_opa[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] + lq1_opb[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
 					lsq2Dcache_command	= BUS_LOAD;
+					next_next_mem_valid	= 0;
 				end
 				else if (next_mem_inst[$clog2(`LQ_SIZE)+1] && ~next_mem_inst[$clog2(`LQ_SIZE)]) begin
 					lq2_request2mem[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] = 1;
 					current_mem_inst	= next_mem_inst;
 					mem_address_out		= lq2_opa[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] + lq2_opb[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
 					lsq2Dcache_command	= BUS_LOAD;
+					next_next_mem_valid	= 0;
 				end
 			else
-				for (int i = 0; i < `LQ_SIZE; i++) begin
-					if (~lq1_requested[i] && lq1_addr_valid[i] && (lq1_pc[i] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
-						next_next_mem_inst	= {1'b0,1'b0,sq_head1};
-						next_next_mem_valid	= 1'b1;
-						mem_address_out		= lq1_opa[i] + lq1_opb[i];
-						lsq2Dcache_command	= BUS_LOAD;
-						break;
-					end
-					else if (~lq2_requested[i] && lq2_addr_valid[i] && (lq2_pc[i] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
-						next_next_mem_inst	= {1'b1,1'b0,sq_head2};
-						next_next_mem_valid	= 1'b1;
-						mem_address_out		= lq2_opa[i] + lq2_opb[i];
-						lsq2Dcache_command	= BUS_LOAD;
-						break;
-					end
+				next_next_mem_valid		= next_mem_valid;
+				next_next_mem_inst		= next_mem_inst;
+				if (~next_mem_inst[$clog2(`LQ_SIZE)+1] && ~next_mem_inst[$clog2(`LQ_SIZE)]) begin
+					mem_address_out		= lq1_opa[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] + lq1_opb[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
+					lsq2Dcache_command	= BUS_LOAD;
+				end
+				else if (next_mem_inst[$clog2(`LQ_SIZE)+1] && ~next_mem_inst[$clog2(`LQ_SIZE)]) begin
+					mem_address_out		= lq2_opa[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] + lq2_opb[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
+					lsq2Dcache_command	= BUS_LOAD;
 				end
 			end
+		end
 		else if (mem_response_in || cache_hit) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
 				if (~lq1_requested[i] && lq1_addr_valid[i] && (lq1_pc[i] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
@@ -691,17 +688,17 @@ module lsq(
 				lsq2Dcache_command	= BUS_STORE;
 			end
 		end
-		else
+		else begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
 				if (~lq1_requested[i] && lq1_addr_valid[i] && (lq1_pc[i] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
-					next_next_mem_inst	= {1'b0,1'b0,sq_head1};
+					next_next_mem_inst	= {1'b0,1'b0,i};
 					next_next_mem_valid	= 1'b1;
 					mem_address_out		= lq1_opa[i] + lq1_opb[i];
 					lsq2Dcache_command	= BUS_LOAD;
 					break;
 				end
 				else if (~lq2_requested[i] && lq2_addr_valid[i] && (lq2_pc[i] < sq2_pc[sq_head2] || sq2_is_available[sq_head2])) begin
-					next_next_mem_inst	= {1'b1,1'b0,sq_head2};
+					next_next_mem_inst	= {1'b1,1'b0,i};
 					next_next_mem_valid	= 1'b1;
 					mem_address_out		= lq2_opa[i] + lq2_opb[i];
 					lsq2Dcache_command	= BUS_LOAD;
@@ -710,7 +707,7 @@ module lsq(
 			end
 		end
 	end
-	
+
 	always_ff @ (posedge clock) begin
 		if (reset) begin
 			next_mem_valid	<= #1 0;
