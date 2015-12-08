@@ -62,8 +62,9 @@ module processor(
 	output logic [63:0]						ROB_commit1_pc,
 	output logic [63:0]						ROB_commit2_pc,
 	output logic [31:0]						ROB_commit1_inst_out,
-	output logic [31:0]						ROB_commit2_inst_out
-
+	output logic [31:0]						ROB_commit2_inst_out,
+	output logic							ROB_commit1_is_halt,
+	output logic							ROB_commit2_is_halt
 );
 
 logic	thread1_branch_is_taken_pc;  //for pc to change addr
@@ -191,9 +192,9 @@ logic 							ROB_commit1_is_thread1;
 logic 							ROB_commit1_is_branch;
 logic 							ROB_commit2_is_thread1;
 logic							ROB_commit2_is_branch;
-logic							ROB_commit1_is_halt;
+//logic							ROB_commit1_is_halt;
 logic							ROB_commit1_is_illegal;
-logic							ROB_commit2_is_halt;
+//logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
 logic							ROB_commit1_branch_taken;
 logic 							ROB_commit2_branch_taken;
@@ -310,7 +311,7 @@ always_comb begin
   	else if (BTB_target_inst2_valid)
  		thread1_target_pc = BTB_target_inst2_pc;
  	else 
-		thread1_target_pc =0;
+		thread1_target_pc = 0;
 end
 
 always_comb begin
@@ -1109,7 +1110,7 @@ cdb cdb1(
 		.mem_data_in(mem2proc_data),		//when no forwarding possible, load from memory
 		.mem_response_in(mem2proc_response),
 		.mem_tag_in(mem2proc_tag),
-		.cache_hit(1'b1),
+		.cache_hit(Dcache_data_hit),
 	
 	//retired store idx
 		.t1_head(ROB_t1_head),
