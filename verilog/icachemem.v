@@ -140,7 +140,7 @@ module icachemem(
 	always_comb begin
 		data_is_valid							= 1'b0;
 		read_data								= load_data_in;
-
+		data_is_miss							= 1'b1;
 		if (read_enable)
 		begin
 			// is data miss?
@@ -157,7 +157,7 @@ module icachemem(
 				begin
 				//here assume the mem give back in order. need to set to 0 if mispredict
 					read_data	 		  		= load_data_in;
-					data_is_valid 		  		= 1'b0;
+					data_is_valid 		  		= 1'b1;
 					data_is_miss  		  		= 1'b1;
 				end
 			end 

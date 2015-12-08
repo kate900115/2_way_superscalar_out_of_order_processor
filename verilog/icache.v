@@ -41,7 +41,7 @@ module icache(
 	logic [4:0]	pc_counter, n_pc_counter;
 	logic pre_enable;
 	BUS_COMMAND pre_command;
-	
+	logic Icache2proc_valid_out;
 	always_ff @(posedge clock) begin
 		if (reset) begin
 			pc_address						<= `SD 0;
@@ -59,7 +59,7 @@ module icache(
 	
 	assign pre_enable = (pc_counter != 8);
 	assign pre_command = (pre_enable)?BUS_LOAD: BUS_NONE;
-	
+	assign Icache2proc_valid = Icache2proc_valid_out && !branch_mispredict;
 	always_comb begin
 		if(!pre_enable && Imem2proc_tag==0) begin  //not eligible to prefetch and this cc no release no use
 			n_pc_counter = pc_counter;
@@ -102,7 +102,7 @@ module icache(
 		.proc2Imem_addr(proc2Imem_addr),
 		// output to processor.v
 		.Icache_data_out(Icache2proc_data),
-		.Icache_data_valid(Icache_valid_out),
+		.Icache_data_valid(Icache2proc_valid_out),
 		// output to Icache.v
 		.index(index),
 		.index_pref(index_pref),
