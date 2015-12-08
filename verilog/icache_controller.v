@@ -38,8 +38,8 @@ module icache_controller(
 	output logic							read_enable,    
 	output logic [3:0]						mem_tag            // when inst look for data
 );
-	assign 	read_enable 		    	 = (proc2Icache_command==BUS_LOAD);
-	assign 	read_enable_pref 	    	 = (pref2Icache_command==BUS_LOAD);
+	assign 	read_enable 		    	 = (proc2Icache_command==BUS_LOAD && Imem2proc_tag !=0);
+	assign 	read_enable_pref 	    	 = (pref2Icache_command==BUS_LOAD && Imem2proc_tag !=0);
 	// output to Icache.v
 	assign {tag, index} 			= proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
 	assign {tag_pref, index_pref} 	= pref2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
@@ -97,7 +97,7 @@ module icache_controller(
 	always_comb
 	begin
 		Icache_data_valid		 = cachemem_valid;
-		Icache_data_out  		 = cachemem_data;
+		Icache_data_out  		 = (cachemem_valid==0)?0:cachemem_data;
 	end	
 endmodule
 
