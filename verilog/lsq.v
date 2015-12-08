@@ -579,7 +579,7 @@ module lsq(
 		end
 		else if (lq1_is_ready != 0) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
-				if (lq1_free_en[i] != 0 && lq1_is_ready[i]) begin
+				if (lq1_free_en[i] == 0 && lq1_is_ready[i]) begin
 					cdb_dest_tag2			= lq1_dest_tag[i];
 					cdb_result_out2			= lq1_mem_value[i];
 					cdb_result_is_valid2	= 1;
@@ -590,7 +590,7 @@ module lsq(
 		end
 		else if (lq2_is_ready != 0) begin
 			for (int j = 0; j < `LQ_SIZE; j++) begin
-				if (lq2_free_en[j] != 0 && lq2_is_ready[j]) begin
+				if (lq2_free_en[j] == 0 && lq2_is_ready[j]) begin
 					cdb_dest_tag2			= lq2_dest_tag[j];
 					cdb_result_out2			= lq2_mem_value[j];
 					cdb_result_is_valid2	= 1;
