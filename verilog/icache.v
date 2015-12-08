@@ -28,7 +28,7 @@ module icache(
 	logic									cachemem_is_full;
 	logic									cachemem_is_miss;
 	logic									cachemem_is_miss_pref;
-	logic	[63:0]							Icache_data_out;	
+	//logic	[63:0]							Icache_data_out;	
 	// output to Icachemem.v
 	logic [`ICACHE_INDEX_SIZE-1:0]  		index,index_pref;
 	logic [`ICACHE_TAG_SIZE-1:0]			tag, tag_pref; 
@@ -42,6 +42,7 @@ module icache(
 	logic pre_enable;
 	BUS_COMMAND pre_command;
 	logic Icache2proc_valid_out;
+	logic mem_finish;
 	always_ff @(posedge clock) begin
 		if (reset) begin
 			pc_address						<= `SD 0;
@@ -57,15 +58,15 @@ module icache(
 			end
 	end
 	
-	assign pre_enable = (pc_counter != 8);
+	assign pre_enable = (!reset && pc_counter != 8);
 	assign pre_command = (pre_enable)?BUS_LOAD: BUS_NONE;
 	assign Icache2proc_valid = Icache2proc_valid_out && !branch_mispredict;
 	always_comb begin
-		if(!pre_enable && Imem2proc_tag==0) begin  //not eligible to prefetch and this cc no release no use
+		if((!pre_enable || Imem2proc_data ==64'h00000555) && Imem2proc_tag==0) begin  //not eligible to prefetch and this cc no release no use
 			n_pc_counter = pc_counter;
 			n_pc_address = pc_address;
 		end
-		else if(!pre_enable && Imem2proc_tag) begin //this clock cycle not prefetch, this cc release no use
+		else if((!pre_enable || Imem2proc_data ==64'h00000555) && Imem2proc_tag) begin //this clock cycle not prefetch, this cc release no use
 			n_pc_counter = pc_counter - 1;
 			n_pc_address = pc_address;
 		end
@@ -85,6 +86,7 @@ module icache(
 		// input from Mem.v									
 		.Imem2proc_response(Imem2proc_response),
 		.Imem2proc_tag(Imem2proc_tag),
+		.Imem2proc_data(Imem2proc_data),
 		// input from processor.v
 		.pref2Icache_addr(pc_address),	
 		.pref2Icache_command(pre_command),

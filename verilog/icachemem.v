@@ -7,7 +7,6 @@ module icachemem(
 	input											read_enable_pref,
 	input [`ICACHE_INDEX_SIZE-1:0]					index_in,
 	input [`ICACHE_TAG_SIZE-1:0]     				tag_in,
-	input [`ICACHE_INDEX_SIZE-1:0]					index_pref,
 	input											read_enable,
 	input [3:0]										mem_response,
 	input [3:0]										mem_tag,						
@@ -21,8 +20,7 @@ module icachemem(
 	output logic									pref_is_miss,
 	output logic									cache_is_full,
 	//output logic [`ICACHE_BLOCK_SIZE-1:0]			data_out
-	output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data,
-	output logic load_valid
+	output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data
 	);
 	
 	// internal registers
@@ -45,7 +43,7 @@ module icachemem(
 	
 					
 	
-	always_ff@(negedge clock)
+	always_ff@(posedge clock)
 	begin
 		if (reset)
 		begin
@@ -73,7 +71,7 @@ module icachemem(
 		internal_tag_in  						= internal_tag;
 		internal_response_in					= internal_response;
 		internal_way_next						= internal_way;
-		pref_is_miss							= 1'b0;
+		pref_is_miss							= 1'b1;
 		internal_data_in 						= internal_data;
 		internal_valid_in						= internal_valid;
 		cache_is_full							= 1'b0;
@@ -83,13 +81,17 @@ module icachemem(
 			// is data miss?
 			for (int j=0; j<`ICACHE_WAY; j++)
 			begin
-				if ((tag_in_pref==internal_tag[index_in_pref][j]) && (internal_valid[index_in_pref][j]))
+				if ((tag_in_pref==internal_tag[index_in_pref][j]) && (internal_valid[index_in_pref][j]==1))
 				begin
 					internal_way_next[index_in_pref]	= ~j;
 					pref_is_miss  		  		= 1'b0;
 					break;
 				end
-				else
+				else if((tag_in_pref==internal_tag[index_in_pref][j])&& (internal_valid[index_in_pref][j]==0))
+				begin
+					internal_way_next[index_in_pref]	= ~j;
+					pref_is_miss  		  		= 1'b1;
+				end
 				begin
 					internal_way_next[index_in_pref]	= internal_way[index_in_pref];
 					pref_is_miss  		  		= 1'b1;
@@ -138,12 +140,11 @@ module icachemem(
 	end
 	
 	always_comb begin
-		data_is_valid							= 1'b0;
+		data_is_valid							= 1'b1;
 		read_data								= load_data_in;
 		data_is_miss							= 1'b1;
 		if (read_enable)
 		begin
-			// is data miss?
 			for (int j=0; j<`ICACHE_WAY; j++)
 			begin
 				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
