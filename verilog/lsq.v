@@ -368,7 +368,7 @@ module lsq(
 	//read inst
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load1(                                  
 		.req(lq1_is_available),
-		.en(1'b1),
+		.en(inst1_in),
 		.gnt_bus(lq1_mem_in_temp1_1)
 	);
 	
@@ -376,7 +376,7 @@ module lsq(
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq1_load2(                                  
 		.req(~lq1_mem_in_temp1 & lq1_is_available),
-		.en(1'b1),
+		.en(inst2_in),
 		.gnt_bus(lq1_mem_in_temp2_2)
 	);
 	assign lq1_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in2[$clog2(`ROB_SIZE)] ? lq1_mem_in_temp2_2 : 0;
@@ -385,18 +385,18 @@ module lsq(
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load1(                                  
 		.req(lq2_is_available),
-		.en(1'b1),
+		.en(inst1_in),
 		.gnt_bus(lq2_mem_in_temp1_1)
 	);
 	
-	assign lq2_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in1[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp1_1 : 0;
+	assign lq2_mem_in_temp1 = (inst1_type == IS_LDQ_INST || inst1_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in1[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp1_1 : 0;
 	
 	priority_selector #(.REQS(1),.WIDTH(`LQ_SIZE)) lq2_load2(                                  
 		.req(~lq2_mem_in_temp1 & lq2_is_available),
-		.en(1'b1),
+		.en(inst2_in),
 		.gnt_bus(lq2_mem_in_temp2_2)
 	);
-	assign lq2_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && ~lsq_rob_idx_in2[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp2_2 : 0;
+	assign lq2_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread1_mispredict && lsq_rob_idx_in2[$clog2(`ROB_SIZE)] ? lq2_mem_in_temp2_2 : 0;
 	
 	assign lq_mem_in2 = lq2_mem_in_temp1 | lq2_mem_in_temp2;
 	
@@ -718,7 +718,6 @@ module lsq(
 			next_mem_inst	<= #1 next_next_mem_inst;
 		end
 	end
-	/////////////////////////////////////////////
 	//cdb_in
 	always_comb begin
 		inst1_opb			= lsq_opb_in1;
