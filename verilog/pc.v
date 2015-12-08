@@ -144,6 +144,8 @@ module pc(
 	begin
 		current_inst1	= Imem2proc_valid?Imem2proc_data[31:0]:0;
 		current_inst2	= Imem2proc_valid?Imem2proc_data[63:32]:0;
+		inst1_is_valid_one	= 1'b0;
+		inst2_is_valid_one	= 1'b0;
 		if (branch_is_taken)
 		begin
 			next_PC = fu_target_pc + 4;
@@ -189,6 +191,8 @@ module pc(
 
 	always_comb
 	begin
+	inst1_is_valid_reg		= 1'b0;
+	inst2_is_valid_reg		= 1'b0;
 		if (branch_is_taken)
 		begin
 			inst1_is_valid_reg		= 1'b1;
