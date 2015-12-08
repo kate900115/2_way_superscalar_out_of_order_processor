@@ -2,8 +2,12 @@ module icachemem(
 	input 											clock,
 	input											reset,
 	// input from icache_controller.v
+	input [`ICACHE_INDEX_SIZE-1:0]					index_in_pref,
+	input [`ICACHE_TAG_SIZE-1:0]     				tag_in_pref,
+	input											read_enable_pref,
 	input [`ICACHE_INDEX_SIZE-1:0]					index_in,
 	input [`ICACHE_TAG_SIZE-1:0]     				tag_in,
+	input [`ICACHE_INDEX_SIZE-1:0]					index_pref,
 	input											read_enable,
 	input [3:0]										mem_response,
 	input [3:0]										mem_tag,						
@@ -14,6 +18,7 @@ module icachemem(
 	// output to icache_controller.v
 	output logic									data_is_valid,
 	output logic									data_is_miss,
+	output logic									pref_is_miss,
 	output logic									cache_is_full,
 	//output logic [`ICACHE_BLOCK_SIZE-1:0]			data_out
 	output logic [`ICACHE_BLOCK_SIZE-1:0]			read_data,
@@ -62,69 +67,61 @@ module icachemem(
 		end
 	end
 	
-	
+//notice!!! only pref is a real load!!! so only the prefetch change the internal_way!!!	
 	always_comb
 	begin	
-		internal_data_in 						= internal_data;
 		internal_tag_in  						= internal_tag;
-		internal_valid_in						= internal_valid;
 		internal_response_in					= internal_response;
 		internal_way_next						= internal_way;
-		data_is_valid							= 1'b0;
-		data_is_miss							= 1'b0;
-		read_data								= load_data_in;
+		pref_is_miss							= 1'b0;
+		internal_data_in 						= internal_data;
+		internal_valid_in						= internal_valid;
 		cache_is_full							= 1'b0;
-		load_valid = 0;
 		// for read
-		if (read_enable)
+		if (read_enable_pref)
 		begin
 			// is data miss?
 			for (int j=0; j<`ICACHE_WAY; j++)
 			begin
-				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
+				if ((tag_in_pref==internal_tag[index_in_pref][j]) && (internal_valid[index_in_pref][j]))
 				begin
-					read_data	 		  		= internal_data[index_in][j];
-					internal_way_next[index_in]	= ~j;
-					data_is_valid 		  		= 1'b1;
-					data_is_miss  		  		= 1'b0;
+					internal_way_next[index_in_pref]	= ~j;
+					pref_is_miss  		  		= 1'b0;
 					break;
 				end
 				else
 				begin
-					//read_data	 		  		= load_data_in;
-					internal_way_next[index_in]	= internal_way[index_in];
-					data_is_valid 		  		= 1'b0;
-					data_is_miss  		  		= 1'b1;
+					internal_way_next[index_in_pref]	= internal_way[index_in_pref];
+					pref_is_miss  		  		= 1'b1;
 				end
 			end 
 			
 			// if miss, is it dirty?
-			if (data_is_miss)
+			if (pref_is_miss)
 			begin
-				if (((internal_way[index_in]==0) && (internal_response[index_in][0]!=0))||
-				   ((internal_way[index_in]==1) && (internal_response[index_in][1]!=0)))
+				if (((internal_way[index_in_pref]==0) && (internal_response[index_in_pref][0]!=0))||
+				   ((internal_way[index_in_pref]==1) && (internal_response[index_in_pref][1]!=0)))
 				begin
 					cache_is_full						= 1'b1;
 				end
 
-				if (internal_way[index_in]==0)
+				if (internal_way[index_in_pref]==0)
 				begin
-					internal_way_next[index_in]			= 1'b1;
-					internal_response_in[index_in][0]	= mem_response;
-					internal_tag_in[index_in][0]		= tag_in;
-					internal_valid_in[index_in][0] 		= 1'b0;
+					internal_way_next[index_in_pref]			= 1'b1;
+					internal_response_in[index_in_pref][0]	= mem_response;
+					internal_tag_in[index_in_pref][0]		= tag_in_pref;
+					internal_valid_in[index_in_pref][0] 		= 1'b0;
 				end
-				else  if (internal_way[index_in]==1)
+				else  if (internal_way[index_in_pref]==1)
 				begin
-					internal_way_next[index_in]			= 1'b0;
-					internal_response_in[index_in][1]	= mem_response;
-					internal_tag_in[index_in][1]		= tag_in;
-					internal_valid_in[index_in][1] 		= 1'b0;
+					internal_way_next[index_in_pref]			= 1'b0;
+					internal_response_in[index_in_pref][1]	= mem_response;
+					internal_tag_in[index_in_pref][1]		= tag_in_pref;
+					internal_valid_in[index_in_pref][1] 		= 1'b0;
 				end
 			end
 		end
-		
-		// load from memory
+			
 		for (int i=0; i<`ICACHE_ENTRY_NUM; i++)
 		begin
 			for (int j=0; j<`ICACHE_WAY; j++)
@@ -134,12 +131,40 @@ module icachemem(
 					internal_data_in[i][j] 			= load_data_in;
 					internal_valid_in[i][j]			= 1'b1;
 					internal_response_in[i][j]		= 0;
-					load_valid 						=0;
-					//read_data						= load_data_in;
-					//internal_way_next[i]			= ~j;
 					break;
 				end
 			end
 		end
 	end
+	
+	always_comb begin
+		data_is_valid							= 1'b0;
+		read_data								= load_data_in;
+
+		if (read_enable)
+		begin
+			// is data miss?
+			for (int j=0; j<`ICACHE_WAY; j++)
+			begin
+				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
+				begin
+					read_data	 		  		= internal_data[index_in][j];
+					data_is_valid 		  		= 1'b1;
+					data_is_miss  		  		= 1'b0;
+					break;
+				end
+				else
+				begin
+				//here assume the mem give back in order. need to set to 0 if mispredict
+					read_data	 		  		= load_data_in;
+					data_is_valid 		  		= 1'b0;
+					data_is_miss  		  		= 1'b1;
+				end
+			end 
+			
+			// if miss, write to the cache_mem to wait for be filled
+		end
+	end //DEAL WITH INST_PC!
+	
 endmodule
+
