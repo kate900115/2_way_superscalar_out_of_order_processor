@@ -84,7 +84,8 @@ module testbench;
 		logic [63:0]					ROB_commit2_pc;
 		logic [31:0]					ROB_commit1_inst_out;
 		logic [31:0]					ROB_commit2_inst_out;
-    	
+    	logic							ROB_commit1_is_halt;
+    	logic							ROB_commit1_is_halt;
 
 	processor processor_0(
 			//input
@@ -146,7 +147,9 @@ module testbench;
 			.ROB_commit1_pc(ROB_commit1_pc),
 			.ROB_commit2_pc(ROB_commit2_pc),
 			.ROB_commit1_inst_out(ROB_commit1_inst_out),
-			.ROB_commit2_inst_out(ROB_commit2_inst_out)
+			.ROB_commit2_inst_out(ROB_commit2_inst_out),
+			.ROB_commit1_is_halt(ROB_commit1_is_halt),
+			.ROB_commit2_is_halt(ROB_commit2_is_halt)
 	);
 
 	// Instantiate the Data Memory
@@ -232,23 +235,23 @@ module testbench;
     	`SD;
     	// This reset is at an odd time to avoid the pos & neg clock edges
 	
-    	reset = 1'b0;
-		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
-   
-    	wb_fileno = $fopen("writeback.out");
+	    	reset = 1'b0;
+			$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
+	    	wb_fileno = $fopen("writeback.out");
 
-		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
     		
-			#151515151515151515151515151515500;
-		$display("@@@\n@@");
-		show_clk_count;
-		//print_close(); // close the pipe_print output file
-		
-    	
-    		$fclose(wb_fileno);
+			while(!(ROB_commit1_is_halt || ROB_commit2_is_halt) && ($time < 30000)) begin
+				#1;
+			end
+			$display("@@@\n@@");
+			show_clk_count;
+			print_close(); // close the pipe_print output file
+			if (!(ROB_commit1_is_halt || ROB_commit2_is_halt))
+				$display("@@@ WARNING: END WITHOUT HALT");
+	   		$fclose(wb_fileno);
 			$finish;
   		end
 
@@ -283,8 +286,8 @@ module testbench;
 						$realtime);
 		else
 		begin
-		  `SD;
-		  `SD;
+		`SD;
+		`SD;
 
        // print the piepline stuff via c code to the pipeline.out
        print_cycles();
@@ -343,7 +346,6 @@ module testbench;
 				end
       		end
       		
-
 			//show_clk_count;
 			//$fclose(wb_fileno);
 
@@ -384,30 +386,5 @@ module testbench;
 				//#100 $finish;
 			end
 		end// if(reset) 
-    	end  
-
+   	end  
 endmodule  // module testbench
-
-/*$monitor (" @@@ time:%d, \
-			reset:%h, \
-			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\n\
-			ROB_commit1_pc:%h, \n\
-			clock:%h,\n\
-			mem2proc_tag:%h, \n\
-			PC_inst1:%h, \n\
-    		PC_inst2:%h,\n\
-    		ID_inst1_opa:%h,\n\
-    		ID_inst2_opa:%h,\n\
-    		RAT1_PRF_opa_idx1:%h,\n\
-   			RAT1_PRF_opa_idx2:%h, \n\
-   			ROB_t1_is_full: %h, \n\
-   			ROB_t2_is_full:%h, \n\
-   			PC_inst1_valid:%h, \n\
-   			mem2proc_response:%h, \n\
-   			PRF_is_full:%h, \n\
-   			Imem2proc_valid:%h, \n\
-   			fu_next_inst_pc_out0:%h\n\
-   			RS_full:%h\n\
-   			RS_EX_op_type[0]:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);*/
