@@ -1110,7 +1110,7 @@ cdb cdb1(
 		.mem_data_in(mem2proc_data),		//when no forwarding possible, load from memory
 		.mem_response_in(mem2proc_response),
 		.mem_tag_in(mem2proc_tag),
-		.cache_hit(1'b1),
+		.cache_hit(Dcache_data_hit),
 	
 	//retired store idx
 		.t1_head(ROB_t1_head),
