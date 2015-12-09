@@ -434,8 +434,9 @@ module test_lsq();
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
 		
-		$display("@@@ memory send the 5th response in and the 3rd tag in ! ");
+		
 		@(negedge clock);
+		$display("@@@ memory send the 5th response in and the 3rd tag in ! ");
 		mem_data_in			= 64'h666;			
 		mem_response_in		= 4'b0111;
 		mem_tag_in			= 4'b0010;
@@ -487,11 +488,10 @@ module test_lsq();
 		mem_tag_in			= 4'b0111;
 		
 		
-		@(negedge clock);
+		@(posedge clock);
 		$display("@@@ the request for the 4th instruction send in again!");
 		$display("@@@ the 9th instructions in! opb is invalid");
 		$display("@@@ CDB send the 9th result at the same time");
-		$display("@@@ memory send  4th response in");
 		$display("@@@ the 5th result is ready!");
 		lsq_cdb1_in			= 64'h0;
 		lsq_cdb1_tag		= 6'h0;
@@ -529,6 +529,12 @@ module test_lsq();
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
+		
+		@(negedge clock);
+		$display("@@@ memory send  4th response in");
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0101;
+		mem_tag_in			= 4'b0000;
 		
 		@(negedge clock);
 		$display("@@@ the 10th instructions and 11th instrution in! opbs are both invalid");
