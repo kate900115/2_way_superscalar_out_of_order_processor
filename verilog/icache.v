@@ -42,7 +42,6 @@ module icache(
 	logic pre_enable;
 	BUS_COMMAND pre_command;
 	logic Icache2proc_valid_out;
-	logic mem_finish;
 	always_ff @(posedge clock) begin
 		if (reset) begin
 			pc_address						<= `SD 0;
