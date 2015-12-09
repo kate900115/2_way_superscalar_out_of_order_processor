@@ -50,13 +50,14 @@ module testbench;
     	logic [63:0]  proc2mem_addr;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
-    	BUS_COMMAND   proc2mem_command1;    		// command sent to memory
+  	BUS_COMMAND   proc2mem_command1;    		// command sent to memory
     	logic [63:0]  proc2mem_addr1;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data1;      		// Data sent to memory
-
+/*
     	BUS_COMMAND   proc2mem_command2;    		// command sent to memory
     	logic [63:0]  proc2mem_addr2;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data2;      		// Data sent to memory
+*/
 
     	logic [3:0]   pipeline_completed_insts;
     	logic [3:0]   pipeline_error_status;
@@ -108,7 +109,9 @@ module testbench;
 
 		logic						is_next_thread1;
 
-	
+		logic							ROB_commit1_is_halt;
+		logic							ROB_commit2_is_halt;
+		logic [1:0]						count;
     	
 
 	processor processor_0(
@@ -174,9 +177,12 @@ module testbench;
 			.ROB_commit2_inst_out(ROB_commit2_inst_out),
 			.is_next_thread1(is_next_thread1),
 			.ROB_commit1_is_thread1(ROB_commit1_is_thread1),
-			.ROB_commit2_is_thread1(ROB_commit2_is_thread1)
+			.ROB_commit2_is_thread1(ROB_commit2_is_thread1),
+			
+			.ROB_commit1_is_halt(ROB_commit1_is_halt),
+			.ROB_commit2_is_halt(ROB_commit2_is_halt)
 	);
-
+/*
 	// Instantiate the Data Memory
 	mem memory_thread1(
 			// Inputs
@@ -209,7 +215,7 @@ module testbench;
 		if(is_next_thread1)					//*************************************** multicycle need to change
 		begin
 			proc2mem_command1=proc2mem_command;
-			proc2mem_addr1=proc2mem_addr;
+			proc2mem_addr1=proc2mem_addr+100;
 			proc2mem_data1=proc2mem_data;
 			proc2mem_command2=BUS_NONE;
 			proc2mem_addr2=proc2mem_addr;
@@ -221,7 +227,7 @@ module testbench;
 		else 
 		begin
 			proc2mem_command1=BUS_NONE;
-			proc2mem_addr1=proc2mem_addr;
+			proc2mem_addr1=proc2mem_addr+100;
 			proc2mem_data1=proc2mem_data;
 			proc2mem_command2=proc2mem_command;
 			proc2mem_addr2=proc2mem_addr;
@@ -233,6 +239,23 @@ module testbench;
 	end
 
 
+*/
+
+
+	end
+	mem memory(
+			// Inputs
+			.clock               (clock),
+			.proc2mem_command  (proc2mem_command),
+			.proc2mem_addr     (proc2mem_addr),
+			.proc2mem_data     (proc2mem_data),
+
+			 // Outputs
+			.mem2proc_response (mem2proc_response),
+			.mem2proc_data     (mem2proc_data),
+			.mem2proc_tag      (mem2proc_tag)
+		   );
+//										***************************************************************************************
 	// Generate System Clock
 	always
 	begin
@@ -290,7 +313,7 @@ module testbench;
 		*/
     		clock = 1'b0;
     		reset = 1'b0;
-	
+			count = 0;
 		//#10
    		// Pulse the reset signal
 			
@@ -299,8 +322,10 @@ module testbench;
     		@(posedge clock);
     		@(posedge clock);
 		
-		$readmemh("program1.mem", memory_thread1.unified_memory);
-		$readmemh("program2.mem", memory_thread2.unified_memory);
+		//$readmemh("program1.mem", memory_thread1.unified_memory,100,`MEM_64BIT_LINES-1);
+		//$readmemh("program2.mem", memory_thread2.unified_memory,0,`MEM_64BIT_LINES-1); //[100:`MEM_64BIT_LINES-1]					*****************************************************************
+		$readmemh("program1.mem", memory.unified_memory,20000,21000);
+		$readmemh("program2.mem", memory.unified_memory,0,1000);
 	
 		@(posedge clock);
     	@(posedge clock);
@@ -318,7 +343,10 @@ module testbench;
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
     		
-    		#6500;
+    		while (count < 1 && clock_count < 5000) begin
+    			count = count + (ROB_commit1_is_halt + ROB_commit2_is_halt);
+    			#1;
+    		end
 		$display("@@@\n@@");
 		show_clk_count;
 		//print_close(); // close the pipe_print output file

@@ -12,7 +12,7 @@
 module if_stage(
 	input 				clock,							// system clock
 	input 				reset, 							// system reset
-	input 				thread1_branch_is_taken,
+	input 				thread1_branch_is_taken,///////////////////////////////////////////
 	input 				thread2_branch_is_taken,
 	input [63:0]		thread1_target_pc,
 	input [63:0]		thread2_target_pc,
@@ -22,17 +22,20 @@ module if_stage(
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				thread1_structure_hazard_stall,	// If data and instruction want to use memory at the same time
 	input				thread2_structure_hazard_stall,	// If data and instruction want to use memory at the same time
-	input [63:0]		Imem2proc_data,					// Data coming back from instruction-memory
-	input			    Imem2proc_valid,				// 
+	input [63:0]		Icache2proc_data,				// Data coming back from instruction-memory
+	input [3:0]		    Icache2proc_tag,
+	input [3:0]		    Icache2proc_response,
+	input			    Icache_hit,
 	input				is_two_threads,		
 
 
-	output logic [63:0]	proc2Imem_addr,					// Address sent to Instruction memory
+	output logic [63:0]	proc2Icache_addr,					// Address sent to Instruction memory
+	output BUS_COMMAND	proc2Icache_command,
 	output logic [63:0] next_PC_out,
-	output logic [31:0] thread1_inst_out,
-	output logic [31:0] thread2_inst_out,
-	output logic	 	thread1_inst_is_valid,
-	output logic	 	thread2_inst_is_valid,
+	output logic [31:0] inst1_out,
+	output logic [31:0] inst2_out,
+	output logic	 	inst1_is_valid,
+	output logic	 	inst2_is_valid,
 	output logic		thread1_is_available,
 	
 	//for debug
@@ -40,234 +43,189 @@ module if_stage(
 	output logic 		is_next_thread1
 	);
 	
+	logic [63:0]		PC_reg1;
+	logic [63:0]		PC_reg2;
+	logic [63:0]		next_PC1;
+	logic [63:0]		next_PC2;
+
+	logic [63:0]		current_inst1, next_current_inst1;
+	logic [63:0]		current_inst2, next_current_inst2;
+	logic				pc1_stall;
+	logic				pc2_stall;
+	logic				next_t1;
+	logic				thread1_is_done, next_t1_done;
+	logic				thread2_is_done, next_t2_done;
+	BUS_COMMAND			next_command;
+	logic				start;
 	
-	logic 				pc_enable1;
-	logic 				pc_enable2;
-	logic [63:0]		next_PC_out1;
-	logic [63:0]		next_PC_out2;
-	logic [63:0]		proc2Imem_addr1;
-	logic [63:0]		proc2Imem_addr2;
-
- 	logic [31:0] 		thread1_inst1_out;
-	logic [31:0] 		thread1_inst2_out;
-	logic [31:0] 		thread2_inst1_out;
-	logic [31:0] 		thread2_inst2_out;
-	logic	 	 		thread1_inst1_is_valid;
-	logic	 	 		thread1_inst2_is_valid;
-	logic	 	 		thread2_inst1_is_valid;
-	logic	 	 		thread2_inst2_is_valid;
-	logic [63:0]		proc2Imem_addr_previous1;
-	logic [63:0]		proc2Imem_addr_previous2;
-	
-	CURRENT_THREAD_STATE current_thread_state;
-	CURRENT_THREAD_STATE next_thread_state;
-	logic 			t1_halt;
-	logic			t2_halt;
-	logic 			t1_halt_next;
-	logic			t2_halt_next;
-
-	always_comb
-	begin
-		if( (thread1_inst_out[31:0] == 32'h0000_0555 || thread2_inst_out[63:32] == 32'h0000_0555) && current_thread_state== THREAD1_IS_EX)
-		begin
-			t1_halt_next=1;
+	assign pc1_stall = rs_stall || rob1_stall || rat_stall || thread1_structure_hazard_stall || (Icache2proc_response == 0);
+	assign pc2_stall = rs_stall || rob2_stall || rat_stall || thread2_structure_hazard_stall || (Icache2proc_response == 0);
+  	assign proc2Imem_addr_previous = next_PC_out - 8;
+  	always_ff @ (posedge clock) begin
+  		if (reset) begin
+			PC_reg1					<= `SD 0;
+  			PC_reg2					<= `SD 0;
+			thread1_is_available	<= `SD 0;
+			thread1_is_done			<= `SD 0;
+			thread2_is_done			<= `SD 0;
+			proc2Icache_command		<= `SD BUS_NONE;
+			current_inst1			<= `SD 0;
+			current_inst2			<= `SD 0;
+			start					<= `SD 0;
 		end
-		else 
-		begin
-			t1_halt_next=0;
-		end
-
-		if( (thread1_inst_out[31:0] == 32'h0000_0555 || thread2_inst_out[63:32] == 32'h0000_0555) && current_thread_state== THREAD2_IS_EX)
-		begin
-			t2_halt_next=1;
-		end
-		else
-		begin
-			t2_halt_next=0;
-		end
-	end
-
-  	always_ff@(posedge clock)
-  	begin
-		if (reset)
-  		begin
-			t1_halt <= `SD 0;
-			t2_halt <= `SD 0;		
-  		end
-		else
-		begin
-			
-			if(thread1_branch_is_taken)
-				t1_halt <= `SD 0;
-			else if(t1_halt)
-				t1_halt <= `SD 1;
-			else
-				t1_halt <= `SD t1_halt_next;
-			if(thread2_branch_is_taken)
-				t2_halt <= `SD 0;
-			else if(t2_halt)
-				t2_halt <= `SD 1;
-			else
-				t2_halt <= `SD t2_halt_next;
-		end
-	end
-	
-
-	assign thread1_is_available = current_thread_state[0];
-
-	pc pc1(
-		//input
-		.clock(clock),                   	
-		.reset(reset),                   	
-
-		.branch_is_taken(thread1_branch_is_taken),      
-		.fu_target_pc(thread1_target_pc),        
-		.Imem2proc_data(Imem2proc_data),  
-		.Imem2proc_valid(Imem2proc_valid),        	
-		.rs_stall(rs_stall),		 	
-		.rob_stall(rob1_stall),	
-		.rat_stall(rat_stall),	 	
-		.memory_structure_hazard_stall(thread1_structure_hazard_stall),  
-		.pc_enable(pc_enable1),	
-		.current_thread_state(current_thread_state),	
-		.is_thread1pc(1),	
-		.is_two_threads(is_two_threads), 		
-
-		//output
-		.proc2Imem_addr(proc2Imem_addr1),    	 	
-		.inst1_out(thread1_inst1_out),        	 			// fetched instruction out
-		.inst2_out(thread1_inst2_out), 
-		.inst1_is_valid_current(thread1_inst1_is_valid),  		 	// when low, instruction is garbage
-		.inst2_is_valid_current(thread1_inst2_is_valid),  
-		
-		// for debug
-		.proc2Imem_addr_previous(proc2Imem_addr_previous1),	
-		.next_PC_out(next_PC_out1)        	 				// PC of instruction after fetched (PC+8).	 	
-  		);
-
-
-	pc pc2(
-		//input
-		.clock(clock),                   	
-		.reset(reset),                   	
-	
-		.branch_is_taken(thread2_branch_is_taken),      
-		.fu_target_pc(thread2_target_pc),        
-		.Imem2proc_data(Imem2proc_data), 
-		.Imem2proc_valid(Imem2proc_valid),         	
-		.rs_stall(rs_stall),		 	
-		.rob_stall(rob2_stall),	
-		.rat_stall(rat_stall),	 	
-		.memory_structure_hazard_stall(thread2_structure_hazard_stall),  
-		.pc_enable(pc_enable2),	
-		.current_thread_state(current_thread_state),	
-		.is_thread1pc(0),
-		.is_two_threads(is_two_threads), 	 		
-	
-		//output
-		.proc2Imem_addr(proc2Imem_addr2),    	 	      	 	
-		.inst1_out(thread2_inst1_out),        	 	
-		.inst2_out(thread2_inst2_out), 
-		.inst1_is_valid_current(thread2_inst1_is_valid),  		 	
-		.inst2_is_valid_current(thread2_inst2_is_valid),
-		
-		// for debug
-		.proc2Imem_addr_previous(proc2Imem_addr_previous2),	
-		.next_PC_out(next_PC_out2)        	 				 	  		 	
-  		);	
-  	
-  	always_ff@(posedge clock)
-  	begin
-  		if (reset)
-  		begin
-			current_thread_state <= `SD PROGRAM_START;		
-  		end
-  		else
-		begin
-			if(Imem2proc_valid)
-			begin
-  			current_thread_state <= `SD next_thread_state;
-			end
+  		else begin
+	  		PC_reg1					<= `SD next_PC1;
+  			PC_reg2					<= `SD next_PC2;
+			thread1_is_available	<= `SD next_t1;
+			thread1_is_done			<= `SD next_t1_done;
+			thread2_is_done			<= `SD next_t2_done;
+			proc2Icache_command		<= `SD next_command;
+			current_inst1			<= `SD next_current_inst1;
+			current_inst2			<= `SD next_current_inst2;
+			start					<= `SD 1;
 		end
   	end
 
-	always_comb
-	begin
-		if (!is_two_threads)
-		begin
-			pc_enable1			  		    = 1'b1;
-			pc_enable2			  		    = 1'b0;
-			proc2Imem_addr				    = proc2Imem_addr1;
-			next_PC_out 		 		    = next_PC_out1;
-			thread1_inst_out 	 		    = thread1_inst1_out;
-			thread2_inst_out 	 		    = thread1_inst2_out;
-			thread1_inst_is_valid		    = thread1_inst1_is_valid;
-			thread2_inst_is_valid		    = thread1_inst2_is_valid;
-			proc2Imem_addr_previous		    = proc2Imem_addr_previous1;
-			next_thread_state			    = THREAD1_IS_EX;
-			is_next_thread1				    =1'b1 ;
+	always_comb begin
+		inst1_out = 0;
+		inst2_out = 0;
+		if (thread1_is_available) begin
+			if (inst1_is_valid) begin
+				inst1_out = current_inst1[31:0];
+			end
+			if (inst2_is_valid) begin
+				inst2_out = current_inst1[63:32];
+			end
 		end
-		else
-		begin
-			case (current_thread_state)
-				PROGRAM_START:
-				begin
-					pc_enable1			    = 1'b0;
-					pc_enable2			    = 1'b0;
-					proc2Imem_addr		    = proc2Imem_addr2;	//should be 2******
-					next_PC_out 		    = next_PC_out2;
-					thread1_inst_out 	    = thread1_inst1_out;
-					thread2_inst_out 	    = thread1_inst2_out;
-					thread1_inst_is_valid   = thread1_inst1_is_valid;
-					thread2_inst_is_valid   = thread1_inst2_is_valid;
-					proc2Imem_addr_previous = proc2Imem_addr_previous1;
-					next_thread_state       = THREAD2_IS_EX;
-					is_next_thread1		= 1'b0 ;
-				end
-				THREAD1_IS_EX:
-				begin
-					pc_enable1			    = 1'b1;
-					pc_enable2			    = 1'b0;
-					proc2Imem_addr		    = proc2Imem_addr2;	//should be 2******
-					next_PC_out 		    = next_PC_out2;
-					thread1_inst_out 	    = thread1_inst1_out;
-					thread2_inst_out 	    = thread1_inst2_out;
-					thread1_inst_is_valid   = thread1_inst1_is_valid;
-					thread2_inst_is_valid   = thread1_inst2_is_valid;
-					proc2Imem_addr_previous	= proc2Imem_addr_previous1;
-					next_thread_state       = t2_halt? THREAD1_IS_EX : THREAD2_IS_EX;
-					is_next_thread1		=t2_halt? 1'b1 :1'b0 ;
-				end
-				THREAD2_IS_EX:
-				begin
-					pc_enable1			    = 1'b0;
-					pc_enable2			    = 1'b1;
-					proc2Imem_addr		    = proc2Imem_addr1;	//****** should be 1
-					next_PC_out 		    = next_PC_out1;
-					thread1_inst_out 	    = thread2_inst1_out;
-					thread2_inst_out 	    = thread2_inst2_out;
-					thread1_inst_is_valid   = thread2_inst1_is_valid;
-					thread2_inst_is_valid   = thread2_inst2_is_valid;
-					proc2Imem_addr_previous = proc2Imem_addr_previous2;
-					next_thread_state 	    = t1_halt? THREAD2_IS_EX : THREAD1_IS_EX;
-					is_next_thread1		=t1_halt? 1'b0 : 1'b1 ;
-				end
-				default:
-				begin
-					pc_enable1			    = 1'b0;
-					pc_enable2			    = 1'b0;
-					proc2Imem_addr		    = 0;
-					next_PC_out 		    = 0;
-					thread1_inst_out 	    = 0;
-					thread2_inst_out 	    = 0;
-					thread1_inst_is_valid   = 0;
-					thread2_inst_is_valid   = 0;
-					proc2Imem_addr_previous = 0;
-					next_thread_state       = NO_ONE_IS_EX;
-					is_next_thread1		=1'b1 ;
-				end
-			endcase
+		else begin
+			if (inst1_is_valid) begin
+				inst1_out = current_inst2[31:0];
+			end
+			if (inst2_is_valid) begin
+				inst2_out = current_inst2[63:32];
+			end
 		end
-			//$display("Imem2proc_data:%h", Imem2proc_data);
-	end	
+	end
+	
+	always_comb begin
+		next_command		= BUS_NONE;
+		if (start == 0) next_command = BUS_LOAD;
+		next_current_inst1	= current_inst1;
+		next_current_inst2	= current_inst2;
+		proc2Icache_addr	= 0;
+		next_PC1			= PC_reg1;
+		next_PC2			= PC_reg2;
+		if (thread1_is_done || thread2_is_done) begin
+			if (thread2_is_done) begin
+				next_PC_out		= PC_reg1;
+				next_t1			= 1;
+				if (Icache2proc_tag != 0) begin
+					next_current_inst1	= Icache2proc_data;
+					proc2Icache_addr	= PC_reg1;
+					next_command		= BUS_LOAD;
+					next_PC1			= PC_reg1 + 8;
+				end
+				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
+					next_command	 	= BUS_LOAD;
+					next_PC_out			= PC_reg1;
+				end*/
+			end
+			else if (thread1_is_done) begin
+				next_PC_out		= PC_reg2;
+				next_t1			= 0;
+				if (Icache2proc_tag != 0) begin
+					next_current_inst2	= Icache2proc_data;
+					next_command		= BUS_LOAD;
+					proc2Icache_addr	= PC_reg2;
+					next_PC2			= PC_reg2 + 8;
+				end
+				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
+					next_command	 	= BUS_LOAD;
+					next_PC_out			= PC_reg2;
+				end*/
+			end
+		end
+		else begin
+			if (thread1_is_available) begin
+				next_PC_out			= PC_reg1;
+				next_t1				= 1;
+				if (Icache2proc_tag != 0) begin
+					next_current_inst1	= Icache2proc_data;
+					proc2Icache_addr	= PC_reg1;
+					next_command		= BUS_LOAD;
+					next_PC1			= PC_reg1 + 8;
+					next_t1				= 0;
+				end
+				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
+					next_command	 	= BUS_LOAD;
+					next_PC_out			= PC_reg1;
+				end*/
+			end
+			else begin
+				next_PC_out			= PC_reg2;
+				next_t1				= 0;
+				if (Icache2proc_tag != 0) begin
+					next_current_inst2	= Icache2proc_data;
+					proc2Icache_addr	= PC_reg2;
+					next_command	 	= BUS_LOAD;
+					next_PC2			= PC_reg2 + 8;
+					next_t1				= 1;
+				end
+				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
+					next_command	 	= BUS_LOAD;
+					next_PC_out			= PC_reg2;
+				end*/
+			end
+		end
+		next_t1_done = thread1_is_done;
+		next_t2_done = thread2_is_done;
+		/*if (thread1_is_available) begin
+			if (inst1_out == 32'h555 && inst1_is_valid) begin
+				next_t1_done = 1;
+			end
+			else if (inst2_out == 32'h555 && inst2_is_valid) begin
+				next_t1_done = 1;
+			end
+		end
+		else begin	
+			if (inst1_out == 32'h555 && inst1_is_valid) begin
+				next_t2_done = 1;
+			end
+			else if (inst2_out == 32'h555 && inst2_is_valid) begin
+				next_t2_done = 1;
+			end
+		end*/
+		if (thread1_branch_is_taken) begin
+			next_PC1	= thread1_target_pc - 4;
+			next_t1_done= 0;
+		end
+		if (thread2_branch_is_taken) begin
+			next_PC2	= thread2_target_pc - 4;
+			next_t2_done= 0;
+		end
+	end
+
+	//inst valid 
+	always_comb begin
+		if (thread1_is_available) begin
+			if (pc1_stall) begin
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
+		else begin
+			if (pc2_stall) begin
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
+	end
 endmodule

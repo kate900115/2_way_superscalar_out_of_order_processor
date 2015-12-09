@@ -50,13 +50,14 @@ module testbench;
     	logic [63:0]  proc2mem_addr;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
-    	BUS_COMMAND   proc2mem_command1;    		// command sent to memory
+  	BUS_COMMAND   proc2mem_command1;    		// command sent to memory
     	logic [63:0]  proc2mem_addr1;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data1;      		// Data sent to memory
-
+/*
     	BUS_COMMAND   proc2mem_command2;    		// command sent to memory
     	logic [63:0]  proc2mem_addr2;      		// Address sent to memory
   	 	logic [63:0]  proc2mem_data2;      		// Data sent to memory
+*/
 
     	logic [3:0]   pipeline_completed_insts;
     	logic [3:0]   pipeline_error_status;
@@ -181,7 +182,7 @@ module testbench;
 			.ROB_commit1_is_halt(ROB_commit1_is_halt),
 			.ROB_commit2_is_halt(ROB_commit2_is_halt)
 	);
-
+/*
 	// Instantiate the Data Memory
 	mem memory_thread1(
 			// Inputs
@@ -214,7 +215,7 @@ module testbench;
 		if(is_next_thread1)					//*************************************** multicycle need to change
 		begin
 			proc2mem_command1=proc2mem_command;
-			proc2mem_addr1=proc2mem_addr;
+			proc2mem_addr1=proc2mem_addr+100;
 			proc2mem_data1=proc2mem_data;
 			proc2mem_command2=BUS_NONE;
 			proc2mem_addr2=proc2mem_addr;
@@ -226,7 +227,7 @@ module testbench;
 		else 
 		begin
 			proc2mem_command1=BUS_NONE;
-			proc2mem_addr1=proc2mem_addr;
+			proc2mem_addr1=proc2mem_addr+100;
 			proc2mem_data1=proc2mem_data;
 			proc2mem_command2=proc2mem_command;
 			proc2mem_addr2=proc2mem_addr;
@@ -238,6 +239,37 @@ module testbench;
 	end
 
 
+*/
+
+always_comb
+	begin
+		if(is_next_thread1)					//*************************************** multicycle need to change
+		begin
+			proc2mem_command1=proc2mem_command;
+			proc2mem_addr1=proc2mem_addr+20000;
+			proc2mem_data1=proc2mem_data;
+		end
+		else 
+		begin
+			proc2mem_command1=proc2mem_command;
+			proc2mem_addr1=proc2mem_addr;
+			proc2mem_data1=proc2mem_data;
+		end
+
+	end
+	mem memory(
+			// Inputs
+			.clock               (clock),
+			.proc2mem_command  (proc2mem_command1),
+			.proc2mem_addr     (proc2mem_addr1),
+			.proc2mem_data     (proc2mem_data1),
+
+			 // Outputs
+			.mem2proc_response (mem2proc_response),
+			.mem2proc_data     (mem2proc_data),
+			.mem2proc_tag      (mem2proc_tag)
+		   );
+//										***************************************************************************************
 	// Generate System Clock
 	always
 	begin
@@ -304,8 +336,10 @@ module testbench;
     		@(posedge clock);
     		@(posedge clock);
 		
-		$readmemh("program1.mem", memory_thread1.unified_memory);
-		$readmemh("program2.mem", memory_thread2.unified_memory);
+		//$readmemh("program1.mem", memory_thread1.unified_memory,100,`MEM_64BIT_LINES-1);
+		//$readmemh("program2.mem", memory_thread2.unified_memory,0,`MEM_64BIT_LINES-1); //[100:`MEM_64BIT_LINES-1]					*****************************************************************
+		$readmemh("program1.mem", memory.unified_memory,20000,21000);
+		$readmemh("program2.mem", memory.unified_memory,0,1000);
 	
 		@(posedge clock);
     	@(posedge clock);
