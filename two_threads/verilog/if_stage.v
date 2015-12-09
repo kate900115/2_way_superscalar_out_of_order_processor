@@ -195,6 +195,30 @@ module if_stage(
 				next_t2_done = 1;
 			end
 		end*/
+		if (thread1_is_available) begin
+			if (pc1_stall) begin
+				next_PC1 = PC_reg1;
+				next_PC2 = PC_reg2;
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
+		else begin
+			if (pc2_stall) begin
+				next_PC1 = PC_reg1;
+				next_PC2 = PC_reg2;
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
 		if (thread1_branch_is_taken) begin
 			next_PC1	= thread1_target_pc - 4;
 			next_t1_done= 0;
@@ -207,25 +231,6 @@ module if_stage(
 
 	//inst valid 
 	always_comb begin
-		if (thread1_is_available) begin
-			if (pc1_stall) begin
-				inst1_is_valid = 0;
-				inst2_is_valid = 0;
-			end
-			else begin
-				inst1_is_valid = 1;
-				inst2_is_valid = 1;
-			end
-		end
-		else begin
-			if (pc2_stall) begin
-				inst1_is_valid = 0;
-				inst2_is_valid = 0;
-			end
-			else begin
-				inst1_is_valid = 1;
-				inst2_is_valid = 1;
-			end
-		end
+		
 	end
 endmodule
