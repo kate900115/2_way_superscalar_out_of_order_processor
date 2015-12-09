@@ -162,7 +162,7 @@ assign request2 = inst2_enable? dest_rename_sig2 : 0;
 
 	    	for(int i=0; i<`ARF_SIZE; i++) begin
 			if(i==dest_ARF_idx2) begin
-	    		n_rat_reg[i] 	= PRF_rename_idx2;
+	    		n_rat_reg[i] 	= PRF_rename_idx1;
 	    		break;
 			end
 			else begin

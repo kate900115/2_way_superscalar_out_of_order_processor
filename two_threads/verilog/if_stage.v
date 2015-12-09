@@ -57,9 +57,11 @@ module if_stage(
 	logic				thread2_is_done, next_t2_done;
 	BUS_COMMAND			next_command;
 	logic				start;
+	logic [3:0]			PC1_tag, next_PC1_tag;
+	logic [3:0]			PC2_tag, next_PC2_tag;
 	
-	assign pc1_stall = rs_stall || rob1_stall || rat_stall || thread1_structure_hazard_stall || (Icache2proc_response == 0);
-	assign pc2_stall = rs_stall || rob2_stall || rat_stall || thread2_structure_hazard_stall || (Icache2proc_response == 0);
+	assign pc1_stall = rs_stall || rob1_stall || rat_stall || thread1_structure_hazard_stall || (Icache2proc_response == 0) || ((Icache2proc_response != 0) && (PC1_tag != Icache2proc_response));
+	assign pc2_stall = rs_stall || rob2_stall || rat_stall || thread2_structure_hazard_stall || (Icache2proc_response == 0) || ((Icache2proc_response != 0) && (PC2_tag != Icache2proc_response));
   	assign proc2Imem_addr_previous = next_PC_out - 8;
   	always_ff @ (posedge clock) begin
   		if (reset) begin
@@ -72,6 +74,8 @@ module if_stage(
 			current_inst1			<= `SD 0;
 			current_inst2			<= `SD 0;
 			start					<= `SD 0;
+			PC1_tag					<= `SD 0;
+			PC2_tag					<= `SD 0;
 		end
   		else begin
 	  		PC_reg1					<= `SD next_PC1;
@@ -83,6 +87,8 @@ module if_stage(
 			current_inst1			<= `SD next_current_inst1;
 			current_inst2			<= `SD next_current_inst2;
 			start					<= `SD 1;
+			PC1_tag					<= `SD next_PC1_tag;
+			PC2_tag					<= `SD next_PC2_tag;
 		end
   	end
 
@@ -115,16 +121,20 @@ module if_stage(
 		proc2Icache_addr	= 0;
 		next_PC1			= PC_reg1;
 		next_PC2			= PC_reg2;
+		next_PC1_tag		= PC1_tag;
+		next_PC2_tag		= PC2_tag;
 		if (thread1_is_done || thread2_is_done) begin
 			if (thread2_is_done) begin
 				next_PC_out		= PC_reg1;
 				next_t1			= 1;
-				if (Icache2proc_tag != 0) begin
+				if (Icache2proc_tag != 0 && PC1_tag == Icache2proc_tag) begin
 					next_current_inst1	= Icache2proc_data;
 					proc2Icache_addr	= PC_reg1;
 					next_command		= BUS_LOAD;
 					next_PC1			= PC_reg1 + 8;
 				end
+				if (proc2Icache_command == BUS_LOAD)
+					next_PC1_tag		= Icache2proc_response;
 				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
 					next_command	 	= BUS_LOAD;
 					next_PC_out			= PC_reg1;
@@ -133,12 +143,14 @@ module if_stage(
 			else if (thread1_is_done) begin
 				next_PC_out		= PC_reg2;
 				next_t1			= 0;
-				if (Icache2proc_tag != 0) begin
+				if (Icache2proc_tag != 0 && PC2_tag == Icache2proc_tag) begin
 					next_current_inst2	= Icache2proc_data;
 					next_command		= BUS_LOAD;
 					proc2Icache_addr	= PC_reg2;
 					next_PC2			= PC_reg2 + 8;
 				end
+				if (proc2Icache_command == BUS_LOAD)
+					next_PC2_tag		= Icache2proc_response;
 				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
 					next_command	 	= BUS_LOAD;
 					next_PC_out			= PC_reg2;
@@ -149,13 +161,15 @@ module if_stage(
 			if (thread1_is_available) begin
 				next_PC_out			= PC_reg1;
 				next_t1				= 1;
-				if (Icache2proc_tag != 0) begin
+				if (Icache2proc_tag != 0 && PC1_tag == Icache2proc_tag) begin
 					next_current_inst1	= Icache2proc_data;
 					proc2Icache_addr	= PC_reg1;
 					next_command		= BUS_LOAD;
 					next_PC1			= PC_reg1 + 8;
 					next_t1				= 0;
 				end
+				if (proc2Icache_command == BUS_LOAD)
+					next_PC1_tag		= Icache2proc_response;
 				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
 					next_command	 	= BUS_LOAD;
 					next_PC_out			= PC_reg1;
@@ -164,13 +178,15 @@ module if_stage(
 			else begin
 				next_PC_out			= PC_reg2;
 				next_t1				= 0;
-				if (Icache2proc_tag != 0) begin
+				if (Icache2proc_tag != 0 && PC2_tag == Icache2proc_tag) begin
 					next_current_inst2	= Icache2proc_data;
 					proc2Icache_addr	= PC_reg2;
 					next_command	 	= BUS_LOAD;
 					next_PC2			= PC_reg2 + 8;
 					next_t1				= 1;
 				end
+				if (proc2Icache_command == BUS_LOAD)
+					next_PC2_tag		= Icache2proc_response;
 				/*if (Icache2proc_response == 0 && proc2Icache_command == BUS_LOAD) begin
 					next_command	 	= BUS_LOAD;
 					next_PC_out			= PC_reg2;
@@ -195,30 +211,6 @@ module if_stage(
 				next_t2_done = 1;
 			end
 		end*/
-		if (thread1_is_available) begin
-			if (pc1_stall) begin
-				next_PC1 = PC_reg1;
-				next_PC2 = PC_reg2;
-				inst1_is_valid = 0;
-				inst2_is_valid = 0;
-			end
-			else begin
-				inst1_is_valid = 1;
-				inst2_is_valid = 1;
-			end
-		end
-		else begin
-			if (pc2_stall) begin
-				next_PC1 = PC_reg1;
-				next_PC2 = PC_reg2;
-				inst1_is_valid = 0;
-				inst2_is_valid = 0;
-			end
-			else begin
-				inst1_is_valid = 1;
-				inst2_is_valid = 1;
-			end
-		end
 		if (thread1_branch_is_taken) begin
 			next_PC1	= thread1_target_pc - 4;
 			next_t1_done= 0;
@@ -231,6 +223,25 @@ module if_stage(
 
 	//inst valid 
 	always_comb begin
-		
+		if (thread1_is_available) begin
+			if (pc1_stall) begin
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
+		else begin
+			if (pc2_stall) begin
+				inst1_is_valid = 0;
+				inst2_is_valid = 0;
+			end
+			else begin
+				inst1_is_valid = 1;
+				inst2_is_valid = 1;
+			end
+		end
 	end
 endmodule
