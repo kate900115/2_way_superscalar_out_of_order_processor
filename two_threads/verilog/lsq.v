@@ -627,10 +627,10 @@ module lsq(
 		lq1_request2mem		= 0;
 		lq2_request2mem		= 0;
 		lsq2Dcache_command	= BUS_NONE;
-		next_next_mem_inst	= 0;
-		next_next_mem_valid	= 0;
+		next_next_mem_inst	= next_mem_inst;
+		next_next_mem_valid	= next_mem_valid;
 		if (next_mem_valid) begin
-			if (mem_response_in || cache_hit) begin
+			if ((mem_response_in != 0) || cache_hit) begin
 				if (~next_mem_inst[$clog2(`LQ_SIZE)+1] && ~next_mem_inst[$clog2(`LQ_SIZE)]) begin
 					lq1_request2mem[next_mem_inst[$clog2(`SQ_SIZE)-1:0]] = 1;
 					current_mem_inst	= next_mem_inst;
@@ -659,7 +659,7 @@ module lsq(
 				end
 			end
 		end
-		else if (mem_response_in || cache_hit) begin
+		else if ((mem_response_in != 0) || cache_hit) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
 				if (~lq1_requested[i] && lq1_addr_valid[i] && (lq1_pc[i] < sq1_pc[sq_head1] || sq1_is_available[sq_head1])) begin
 					lq1_request2mem[i]	= 1;
