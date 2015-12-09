@@ -1,10 +1,10 @@
 
 Note-[RT_BS] Larger stack needed
-  Note: Bumping stack limit from 8192 to 8193 Kbytes.
+  Note: Bumping stack limit from 8192 to 8194 Kbytes.
 
 Chronologic VCS simulator copyright 1991-2015
 Contains Synopsys proprietary information.
-Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  9 00:36 2015
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  9 01:23 2015
 @@
 @@
 @@                     0  Asserting System reset......
@@ -31,7 +31,7 @@ test_bench/twothreads_testbench_pr.v, 339
 @@
 @@@
 @@
-@@  5001 cycles / 556 instrs = 8.994604 CPI
+@@  5001 cycles / 1308 instrs = 3.823394 CPI
 @@
 @@  150000.00 ns total time to execute
 @@
@@ -64,5 +64,5 @@ $finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
 $finish at simulation time              1501070
            V C S   S i m u l a t i o n   R e p o r t 
 Time: 150107000 ps
-CPU Time:      1.230 seconds;       Data structure size:   0.5Mb
-Wed Dec  9 00:36:53 2015
+CPU Time:      1.810 seconds;       Data structure size:   0.5Mb
+Wed Dec  9 01:23:20 2015
