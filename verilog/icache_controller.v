@@ -94,19 +94,14 @@ module icache_controller(
 	end	
 			
 //output to processor	
-	always_comb
-	begin if(Imem2proc_response ==0) begin
-		Icache_data_valid		 = 0;
-		Icache_data_out  		 = 0;
-		end 
-		else  if(cachemem_data!=0 && Imem2proc_tag!= 0)
-		begin
+	always_comb begin
+	if(cachemem_valid && cachemem_data!=0) begin
 		Icache_data_valid		 = 1;
 		Icache_data_out  		 = cachemem_data;
-		end	
-	else 		begin
+		end
+	else 	begin
 		Icache_data_valid		 = 0;
-		Icache_data_out  		 = cachemem_data;
+		Icache_data_out  		 = 0;
 		end	
 	end
 endmodule
