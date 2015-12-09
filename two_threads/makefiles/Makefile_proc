@@ -42,6 +42,7 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/rrat.v	\
 			verilog/rs.v	\
 			verilog/rs_one_entry.v	\
+			verilog/rs_one_entry.v
 			 
 
 SYNFILES = processor.vg 

@@ -32,11 +32,10 @@
 `define MEM_64BIT_LINES        (`MEM_SIZE_IN_BYTES/8)
 
 `define VIRTUAL_CLOCK_PERIOD   30.0
-`define VERILOG_CLOCK_PERIOD   10.0
+`define VERILOG_CLOCK_PERIOD   30.0
 // probably not a good idea to change this second one
-	
-//`define MEM_LATENCY_IN_CYCLES (100.0/`VERILOG_CLOCK_PERIOD+0.49999)
-`define MEM_LATENCY_IN_CYCLES 0
+`define MEM_LATENCY_IN_CYCLES (100.0/`VERILOG_CLOCK_PERIOD+0.49999)
+//`define MEM_LATENCY_IN_CYCLES 0
 // the 0.49999 is to force ceiling(100/period).  The default behavior for
 // float to integer conversion is rounding to nearest
 
@@ -67,6 +66,9 @@ typedef enum logic [1:0] {
   NO_IDEA				=2'h3
 } LSQ_DEP_CODE;
 
+
+`define SQ_SIZE 8
+`define LQ_SIZE 8
 //
 // ALU opA input mux selects
 //
@@ -332,31 +334,43 @@ typedef enum logic[1:0] {
 	PROGRAM_START  = 2'b00,
 	THREAD1_IS_EX  = 2'b01,			
   	THREAD2_IS_EX  = 2'b10,
-  	NO_ONE_IS_EX   = 2'b11			
+  	NO_ONE_IS_EX   = 2'b11
 } CURRENT_THREAD_STATE;
 
 `define ICACHE_SIZE			2048 									//bit
 `define ICACHE_BLOCK_SIZE	64	 									//bit
-`define	ICACHE_INDEX_SIZE	$clog2(`ICACHE_SIZE/`ICACHE_BLOCK_SIZE)	//bit
-`define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE) 				//bit
-`define ICACHE_TAG_SIZE		64-`DCACHE_BLOCK_SIZE-`INDEX_SIZE		//bit
+`define	ICACHE_INDEX_SIZE	$clog2(`ICACHE_SIZE/(`ICACHE_BLOCK_SIZE*`ICACHE_WAY))	//bit
+`define ICACHE_BLOCK_OFFSET	$clog2(`ICACHE_BLOCK_SIZE/8) 				//bit
+`define ICACHE_TAG_SIZE		64-`ICACHE_BLOCK_OFFSET-`ICACHE_INDEX_SIZE		//bit
+`define ICACHE_ENTRY_NUM	`ICACHE_SIZE/(`ICACHE_BLOCK_SIZE*`ICACHE_WAY)
+`define ICACHE_WAY			2
 
-`define DCACHE_SIZE			2048 //bits size
-`define DCACHE_BLOCK_SIZE	64	 //bits size
-`define DCACHE_WAY			2	
-`define	DCACHE_INDEX_SIZE	$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//bit
-`define DCACHE_BLOCK_OFFSET	$clog2(`DCACHE_BLOCK_SIZE) 								//bit
-`define DCACHE_TAG_SIZE		64-`DCACHE_BLOCK_SIZE-`DCACHE_INDEX_SIZE						//bit
+`define DCACHE_SIZE					2048 //bits size
+`define DCACHE_BLOCK_SIZE			64	 //bits size
+`define DCACHE_WAY					2
+`define DCACHE_INDEX_ENTRY_SIZE 	`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY)
+`define	DCACHE_INDEX_SIZE			$clog2(`DCACHE_SIZE/(`DCACHE_BLOCK_SIZE*`DCACHE_WAY))	//4 bits
+`define DCACHE_BLOCK_OFFSET			$clog2(`DCACHE_BLOCK_SIZE/8) 								//6 bits
+`define DCACHE_TAG_SIZE				64-`DCACHE_BLOCK_OFFSET-`DCACHE_INDEX_SIZE				//54 bits
 
 
 //for loadl_link and store_cond
 `define LLSC_SIZE	8
 
+//for predictor
+`define LHISTORY_SIZE  64
+`define LOCALTAB_SIZE  4
+
+//for BTB
+`define BTB_SIZE      16
+
+
 typedef enum logic[2:0] {
 	NO_INST			= 3'b000,
-	IS_LDL_INST		= 3'b001,
+	IS_LDQ_L_INST	= 3'b001,
 	IS_STQ_C_INST	= 3'b010,			
-  	IS_LD_INST		= 3'b011,
-  	IS_STQ_INST		= 3'b100
+  	IS_LDQ_INST		= 3'b011,
+  	IS_STQ_INST		= 3'b100,
+  	IS_LDA_INST		= 3'b101
 } MEM_INST_TYPE;
 `endif
