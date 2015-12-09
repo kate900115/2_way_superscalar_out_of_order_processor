@@ -10,7 +10,7 @@
 #/* new design                                              */
 #/***********************************************************/
 set search_path [ list "./" "/afs/umich.edu/class/eecs470/lib/synopsys/"]
-analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v" "./verilog/cdb_one_entry.v" "./verilog/ex_stage.v" "./verilog/id_stage.v" "./verilog/if_stage.v" "./verilog/mult_stage.v" "./verilog/pc.v" "./verilog/pipe_mult.v" "./verilog/prf.v" "./verilog/prf_one_entry.v" "./verilog/priority_selector.v" "./verilog/processor.v"  "./verilog/rat.v" "./verilog/rob.v" "./verilog/rob_one_entry.v" "./verilog/rrat.v" "./verilog/rs.v" "./verilog/rs_one_entry.v"]
+analyze -f sverilog [list "sys_defs.vh" "./verilog/cdb.v" "./verilog/cdb_one_entry.v" "./verilog/ex_stage.v" "./verilog/id_stage.v" "./verilog/if_stage.v" "./verilog/mult_stage.v" "./verilog/pc.v" "./verilog/pipe_mult.v" "./verilog/prf.v" "./verilog/prf_one_entry.v" "./verilog/priority_selector.v" "./verilog/processor.v"  "./verilog/rat.v" "./verilog/rob.v" "./verilog/rob_one_entry.v" "./verilog/rrat.v" "./verilog/rs.v" "./verilog/rs_one_entry.v" "./verilog/dcache.v" "./verilog/dcache_mem.v" "./verilog/dcache_controller.v"]
 elaborate processor
 set design_name processor
 set clock_name clock

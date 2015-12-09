@@ -45,6 +45,9 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/lq_one_entry.v	\
 			verilog/sq_one_entry.v	\
 			verilog/lsq.v	\
+			verilog/dcache.v	\
+			verilog/dcache_mem.v	\
+			verilog/dcache_controller.v	\
 			 
 
 SYNFILES = processor.vg 
