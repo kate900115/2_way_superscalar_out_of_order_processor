@@ -199,6 +199,8 @@ logic 							ROB_commit1_is_branch;
 logic							ROB_commit2_is_branch;
 logic							ROB_commit1_is_illegal;
 logic							ROB_commit2_is_illegal;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t1_head;
+logic [$clog2(`ROB_SIZE)-1:0]	ROB_t2_head;
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -687,6 +689,9 @@ rob rob1(
 	.fu_rob_idx2(cdb2_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
 	.mispredict_in2(cdb2_branch_taken),
 	.target_pc_in2(cdb2_value),
+	
+	.t1_head(ROB_t1_head),
+	.t2_head(ROB_t2_head),
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
