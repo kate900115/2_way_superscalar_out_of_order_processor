@@ -1,0 +1,142 @@
+{
+    "cdb": [
+        "cdb",
+        "JqSQt",
+        "module"
+    ],
+    "_vcs_unit__497791245": [
+        "_vcs_unit__497791245",
+        "PKZ3h",
+        "module"
+    ],
+    "rs_one_entry": [
+        "rs_one_entry",
+        "vRLff",
+        "module"
+    ],
+    "processor": [
+        "processor",
+        "FAtab",
+        "module"
+    ],
+    "decoder": [
+        "decoder",
+        "zf0bY",
+        "module"
+    ],
+    "std": [
+        "std",
+        "reYIK",
+        "module"
+    ],
+    "alu": [
+        "alu",
+        "C26kq",
+        "module"
+    ],
+    "testbench": [
+        "testbench",
+        "iAVhC",
+        "module"
+    ],
+    "prf_one_entry": [
+        "prf_one_entry",
+        "MJYMx",
+        "module"
+    ],
+    "ex_stage": [
+        "ex_stage",
+        "hFhh0",
+        "module"
+    ],
+    "mem": [
+        "mem",
+        "FSbWZ",
+        "module"
+    ],
+    "id_stage": [
+        "id_stage",
+        "PnDPB",
+        "module"
+    ],
+    "pc": [
+        "pc",
+        "EJdGq",
+        "module"
+    ],
+    "wand_sel_0001": [
+        "wand_sel_0001",
+        "ci1CE",
+        "module"
+    ],
+    "priority_selector_0000": [
+        "priority_selector_0000",
+        "tJRNL",
+        "module"
+    ],
+    "cdb_one_entry": [
+        "cdb_one_entry",
+        "ekD33",
+        "module"
+    ],
+    "mult": [
+        "mult",
+        "SRUFi",
+        "module"
+    ],
+    "prf": [
+        "prf",
+        "d5SKF",
+        "module"
+    ],
+    "priority_selector_0001": [
+        "priority_selector_0001",
+        "WfHY7",
+        "module"
+    ],
+    "rs": [
+        "rs",
+        "vJKs8",
+        "module"
+    ],
+    "priority_selector_0002": [
+        "priority_selector_0002",
+        "fSTpM",
+        "module"
+    ],
+    "rrat": [
+        "rrat",
+        "BaH3Z",
+        "module"
+    ],
+    "priority_selector_0003": [
+        "priority_selector_0003",
+        "VJgFK",
+        "module"
+    ],
+    "rat": [
+        "rat",
+        "CQHA8",
+        "module"
+    ],
+    "rob_one_entry": [
+        "rob_one_entry",
+        "wnjK2",
+        "module"
+    ],
+    "...MASTER...": [
+        "SIM",
+        "amcQw",
+        "module"
+    ],
+    "lq_one_entry": [
+        "lq_one_entry",
+        "iFvbc",
+        "module"
+    ],
+    "sq_one_entry": [
+        "sq_one_entry",
+        "ARVpk",
+        "module"
+    ]
+}

@@ -1,0 +1,142 @@
+0 
+50
++define+
++vc
+-Mamsrun=
+-Masflags=
+-Mcc=gcc
+-Mcfl= -pipe -fPIC -O -I/usr/caen/vcs-2015.09/include
+-Mcplusplus=g++
+-Mcrt0=
+-Mcrtn=
+-Mcsrc=test_bench/pipe_print.c
+-Mexternalobj=
+-Mldflags= -rdynamic
+-Mobjects= /usr/caen/vcs-2015.09/linux64/lib/libvirsim.so /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so /usr/caen/vcs-2015.09/linux64/lib/libsnpsmalloc.so
+-Mout=simv
+-Msaverestoreobj=/usr/caen/vcs-2015.09/linux64/lib/vcs_save_restore_new.o
+-Msyslibs=-ldl
+-Mupdate
+-Mvcsaceobjs=
+-Mxcflags= -pipe -fPIC -I/usr/caen/vcs-2015.09/include
+-full64
+-gen_obj
+-line
+-o simv
+-picarchive
+-sverilog
+/usr/caen/vcs-2015.09/linux64/bin/vcs1
+sys_defs.vh
+test_bench/mem.v
+test_bench/twothreads_testbench_pr.v
+verilog/cdb.v
+verilog/cdb_one_entry.v
+verilog/ex_stage.v
+verilog/id_stage.v
+verilog/if_stage.v
+verilog/lq_one_entry.v
+verilog/lsq.v
+verilog/mult_stage.v
+verilog/pc.v
+verilog/pipe_mult.v
+verilog/prf.v
+verilog/prf_one_entry.v
+verilog/priority_selector.v
+verilog/processor.v
+verilog/rat.v
+verilog/rob.v
+verilog/rob_one_entry.v
+verilog/rrat.v
+verilog/rs.v
+verilog/rs_one_entry.v
+verilog/sq_one_entry.v
+56
+sysc_uni_pwd=/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads
+_LMFILES_=/usr/caen/misc/modules/vcs/2015.09
+XMODIFIERS=@im=none
+XDG_VTNR=1
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SESSION_ID=1
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SEAT=seat0
+XDG_RUNTIME_DIR=/run/user/99483440
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/tianmili
+XDG_CURRENT_DESKTOP=X-Cinnamon;
+XAUTHORITY=/var/run/lightdm/tianmili/xauthority
+VTE_VERSION=3406
+VMR_MODE_FLAG=64
+VCS_MODE_FLAG=64
+VCS_HOME=/usr/caen/vcs-2015.09
+VCS_DEPTH=0
+VCS_ARG_ADDED_FOR_TMP=1
+VCS_ARCH=linux64
+UNAME=/bin/uname
+TOOL_HOME=/usr/caen/vcs-2015.09/linux64
+SW_VCS=2015.09
+SSH_AUTH_SOCK=/run/user/99483440/keyring-lp0sCW/ssh
+SSH_AGENT_PID=3112
+SNPSLMD_LICENSE_FILE=/usr/caen/vcs-2015.09/license.dat
+SESSION_MANAGER=local/unix:@/tmp/.ICE-unix/2970,unix/unix:/tmp/.ICE-unix/2970
+SCRNAME=vcs
+SCRIPT_NAME=vcs
+QT_PLUGIN_PATH=/usr/lib64/kde4/plugins:/usr/lib/kde4/plugins
+QT_IM_MODULE=xim
+QT_GRAPHICSSYSTEM_CHECKED=1
+QTLIB=/usr/lib64/qt-3.3/lib
+QTINC=/usr/lib64/qt-3.3/include
+QTDIR=/usr/lib64/qt-3.3
+OVA_UUM=0
+MODULESHOME=/usr/share/Modules
+MODULEPATH=/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/caen/misc/modules:/afs/umich.edu/class/coe/modules
+MFLAGS=
+MAKELEVEL=1
+MAKEFLAGS=
+LOADEDMODULES=vcs/2015.09
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LC_ALL=C
+KRB5CCNAME=FILE:/tmp/krb5cc_99483440_2341Hv
+KDEDIRS=/usr
+IMSETTINGS_MODULE=none
+IMSETTINGS_INTEGRATE_DESKTOP=yes
+HISTCONTROL=ignoredups
+GPG_AGENT_INFO=/run/user/99483440/keyring-lp0sCW/gpg:0:1
+GNOME_KEYRING_CONTROL=/run/user/99483440/keyring-lp0sCW
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GDMSESSION=cinnamon
+DESKTOP_SESSION=cinnamon
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-G8IyNX3NTH,guid=0dbe509913c4bf07103030bb56676df2
+COLORTERM=gnome-terminal
+BASH_FUNC_module()=() {  eval `/usr/bin/modulecmd bash $*`_}
+0
+24
+1449637988 verilog/lsq.v
+1449628366 verilog/sq_one_entry.v
+1449628366 verilog/lq_one_entry.v
+1449628366 verilog/rs_one_entry.v
+1449628366 verilog/rs.v
+1449628366 verilog/rrat.v
+1449628366 verilog/rob_one_entry.v
+1449638928 verilog/rob.v
+1449628366 verilog/rat.v
+1449638928 verilog/processor.v
+1449628366 verilog/priority_selector.v
+1449628366 verilog/prf_one_entry.v
+1449628366 verilog/prf.v
+1449628366 verilog/pipe_mult.v
+1449628366 verilog/pc.v
+1449628366 verilog/mult_stage.v
+1449632694 verilog/if_stage.v
+1449628366 verilog/id_stage.v
+1449628366 verilog/ex_stage.v
+1449628366 verilog/cdb_one_entry.v
+1449628366 verilog/cdb.v
+1449628366 test_bench/mem.v
+1449635527 test_bench/twothreads_testbench_pr.v
+1449628924 sys_defs.vh
+5
+1449628366 test_bench/pipe_print.c
+0 
+1440563255 /usr/caen/vcs-2015.09/linux64/lib/libvirsim.so
+1440562843 /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+1440562824 /usr/caen/vcs-2015.09/linux64/lib/libsnpsmalloc.so
+1449639035 simv.daidir

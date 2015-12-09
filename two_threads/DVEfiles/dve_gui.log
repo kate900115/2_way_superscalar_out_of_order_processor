@@ -1,0 +1,336 @@
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:34 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:37 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:38 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:40 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:51 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:53 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec  8 23:56 2015
+VCD+ Writer K-2015.09_Full64 Copyright (c) 1991-2015 by Synopsys Inc.
+The file '/home/tianmili/classes/eecs470/projects/project4/group7f15/two_threads/inter.vpd' was opened successfully.
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+
+Warning-[STASKW_RMIEAFL] Illegal entry
+test_bench/twothreads_testbench_pr.v, 339
+  Illegal entry found at file program1.mem line 1 while executing $readmem.
+  Please ensure that the file has proper entries.
+
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  5001 cycles / 8 instrs = 625.125000 CPI
+@@
+@@  150000.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f006420bf0001 : 2323576362792583169
+@@@ mem[    8] = 40a03405b4a10000 : 4656779213811023872
+@@@ mem[   16] = a4c10004b4a10000 : 11871770112935657472
+@@@ mem[   24] = a5210004a5010004 : 11898791710437736452
+@@@ mem[   32] = 00000555a5410004 : 5865402859524
+@@@
+@@@
+$finish called from file "test_bench/twothreads_testbench_pr.v", line 371.
+$finish at simulation time              1501070
+Simulation complete, time is 150107000 ps.

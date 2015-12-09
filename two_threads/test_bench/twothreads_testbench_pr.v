@@ -292,7 +292,7 @@ always_comb
 	endtask  // task show_clk_count 
 
   // Show contents of a range of Unified Memory, in both hex and decimal
-/*	task show_mem_with_decimal;
+	task show_mem_with_decimal;
 		input [31:0] start_addr;
 		input [31:0] end_addr;
 		int showing_data;
@@ -314,8 +314,6 @@ always_comb
 			$display("@@@");
 		end
 	endtask  // task show_mem_with_decimal
-
-*/
 
   	initial begin
   		/*
@@ -368,6 +366,8 @@ always_comb
     	
     		$fclose(wb_fileno1);
 		$fclose(wb_fileno2);
+$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
+							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
 			$finish;
   		end
 
@@ -498,8 +498,8 @@ always_comb
 			// deal with any halting conditions
 			if(pipeline_error_status!=NO_ERROR)
 			begin
-				/*$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
-							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); */
+				$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
+							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
 				// 8Bytes per line, 16kB total
 
 				$display("@@  %t : System halted\n@@", $realtime);
