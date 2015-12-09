@@ -140,11 +140,6 @@ module icachemem(
 	end
 	
 	always_comb begin
-		data_is_valid							= 1'b1;
-		read_data								= load_data_in;
-		data_is_miss							= 1'b1;
-		if (read_enable)
-		begin
 			for (int j=0; j<`ICACHE_WAY; j++)
 			begin
 				if ((tag_in==internal_tag[index_in][j]) && (internal_valid[index_in][j]))
@@ -157,15 +152,14 @@ module icachemem(
 				else
 				begin
 				//here assume the mem give back in order. need to set to 0 if mispredict
-					read_data	 		  		= load_data_in;
-					data_is_valid 		  		= 1'b1;
+					read_data	 		  		= 0;
+					data_is_valid 		  		= 0;
 					data_is_miss  		  		= 1'b1;
 				end
 			end 
 			
 			// if miss, write to the cache_mem to wait for be filled
-		end
-	end //DEAL WITH INST_PC!
-	
+			//DEAL WITH INST_PC!
+	end
 endmodule
 
