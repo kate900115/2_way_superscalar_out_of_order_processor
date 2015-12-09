@@ -63,10 +63,13 @@ module processor(
 	output logic [63:0]						ROB_commit2_pc,
 	output logic [31:0]						ROB_commit1_inst_out,
 	output logic [31:0]						ROB_commit2_inst_out,
-	output logic 						is_next_thread1,
-	output logic						ROB_commit1_is_thread1,
-	output logic						ROB_commit2_is_thread1
+	output logic 							is_next_thread1,
+	output logic							ROB_commit1_is_thread1,
+	output logic							ROB_commit2_is_thread1,
 	
+	output logic							ROB_commit1_is_halt,
+	output logic							ROB_commit2_is_halt
+
 );
 
 
@@ -192,11 +195,8 @@ logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
 
 logic 							ROB_commit1_is_branch;
-
 logic							ROB_commit2_is_branch;
-logic							ROB_commit1_is_halt;
 logic							ROB_commit1_is_illegal;
-logic							ROB_commit2_is_halt;
 logic							ROB_commit2_is_illegal;
 
 //rs output
@@ -242,7 +242,7 @@ logic [63:0]	thread2_target_pc;
 
 
 logic Imem2proc_valid;
-assign proc2mem_command = BUS_LOAD;
+//assign proc2mem_command = BUS_LOAD;
        //(proc2Dmem_command == BUS_NONE) ? BUS_LOAD : proc2Dmem_command;
 assign proc2mem_addr = PC_proc2Imem_addr;
        //(proc2Dmem_command == BUS_NONE) ? PC_proc2Imem_addr : proc2Dmem_addr;
@@ -257,11 +257,12 @@ assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_IL
                                 ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
                                 ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
                                 ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
-                                (mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
                                 NO_ERROR;
+                                //(mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
+
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
-assign Imem2proc_valid = !(mem2proc_tag == 0);
+assign Imem2proc_valid = (mem2proc_tag != 0);
 
 assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
 //////////////////////////////////
@@ -278,26 +279,30 @@ if_stage pc(
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
-	.rob1_stall(ROB_t1_is_full),		 				// when RoB1 is full, we need to stop PC1
-	.rob2_stall(ROB_t2_is_full),						// when RoB2 is full, we need to stop PC2
-	.rat_stall(PRF_is_full),						// when the freelist of PRF is empty, RAT generate a stall signal
+	.rob1_stall(ROB_t1_is_full),		 	// when RoB1 is full, we need to stop PC1
+	.rob2_stall(ROB_t2_is_full),			// when RoB2 is full, we need to stop PC2
+	.rat_stall(PRF_is_full),				// when the freelist of PRF is empty, RAT generate a stall signal
 	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
 	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	.Imem2proc_data(mem2proc_data),					// Data coming back from instruction-memory
-	.Imem2proc_valid(Imem2proc_valid),				// 
+	.Icache2proc_data(mem2proc_data),			// Data coming back from instruction-memory
+	.Icache_hit(Imem2proc_valid),			//
+	.Icache2proc_tag(mem2proc_tag),
+	.Icache2proc_response(mem2proc_response),
 	.is_two_threads(1'b1),
 //output
-	.proc2Imem_addr(PC_proc2Imem_addr),
+	.proc2Icache_addr(PC_proc2Imem_addr),
+	.proc2Icache_command(proc2mem_command),
 	//.next_PC_out(,
-	.thread1_inst_out(PC_inst1),
-	.thread2_inst_out(PC_inst2),
-	.thread1_inst_is_valid(PC_inst1_valid),
-	.thread2_inst_is_valid(PC_inst2_valid),
+	.inst1_out(PC_inst1),
+	.inst2_out(PC_inst2),
+	.inst1_is_valid(PC_inst1_valid),
+	.inst2_is_valid(PC_inst2_valid),
 	.thread1_is_available(PC_thread1_is_available),
 	//for debug
 	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
 	.is_next_thread1(is_next_thread1)
 	);
+
 //////////////////////////////////
 //								//
 //			Decoder				//

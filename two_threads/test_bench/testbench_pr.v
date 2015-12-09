@@ -84,7 +84,10 @@ module testbench;
 		logic [63:0]					ROB_commit2_pc;
 		logic [31:0]					ROB_commit1_inst_out;
 		logic [31:0]					ROB_commit2_inst_out;
-    	
+		
+		logic							ROB_commit1_is_halt;
+		logic							ROB_commit2_is_halt;
+		logic [1:0]						count;
 
 	processor processor_0(
 			//input
@@ -146,7 +149,10 @@ module testbench;
 			.ROB_commit1_pc(ROB_commit1_pc),
 			.ROB_commit2_pc(ROB_commit2_pc),
 			.ROB_commit1_inst_out(ROB_commit1_inst_out),
-			.ROB_commit2_inst_out(ROB_commit2_inst_out)
+			.ROB_commit2_inst_out(ROB_commit2_inst_out),
+			
+			.ROB_commit1_is_halt(ROB_commit1_is_halt),
+			.ROB_commit2_is_halt(ROB_commit2_is_halt)
 	);
 
 	// Instantiate the Data Memory
@@ -216,7 +222,7 @@ module testbench;
 		`endif
     		clock = 1'b0;
     		reset = 1'b0;
-	
+			count = 0;
 		//#10
    		// Pulse the reset signal
 			
@@ -242,12 +248,13 @@ module testbench;
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
     		
-    		#6500;
+    		while (count < 1 && clock_count < 1500) begin
+				count = count + (ROB_commit1_is_halt + ROB_commit2_is_halt);
+    			#1
+    		end
 		$display("@@@\n@@");
 		show_clk_count;
 		//print_close(); // close the pipe_print output file
-		
-    	
     		$fclose(wb_fileno);
 			$finish;
   		end
@@ -379,7 +386,7 @@ module testbench;
 				endcase
 				$display("@@@\n@@");
 				show_clk_count;
-				print_close(); // close the pipe_print output file
+				//print_close(); // close the pipe_print output file
 				//$fclose(wb_fileno);
 				//#100 $finish;
 			end
