@@ -166,7 +166,7 @@ module test_lsq();
 		#5
 		@(negedge clock);
 		reset 				= 0;
-		
+		@(posedge clock)
 		$display("@@@ stop reset!");
 		$display("@@@ the first instruction in! opb_invalid");
 		$display("@@@ load! waiting for CDB calculate the address!");
@@ -199,8 +199,6 @@ module test_lsq();
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 0;
 		mem_data_in			= 64'h0;			
-		mem_response_in		= 4'b0;
-		mem_tag_in			= 4'b0;
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
@@ -208,8 +206,14 @@ module test_lsq();
 		cache_hit			= 0;
 		
 		@(negedge clock);
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0;
+		mem_tag_in			= 4'b0;
+		
+		@(posedge clock);
 		$display("@@@ the 2nd instruction in! opb invalid");
 		$display("@@@ load! CDB send the 1st instruction result in!");
+
 		lsq_cdb1_in			= 64'h0000_0000_0000_0100;
 		lsq_cdb1_tag		= 6'h4;
 		lsq_cdb1_valid		= 1;
@@ -238,9 +242,7 @@ module test_lsq();
 		lsq_opb_valid2		= 0;
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 0;
-		mem_data_in			= 64'h0;			
-		mem_response_in		= 4'b0;
-		mem_tag_in			= 4'b0;
+		mem_data_in			= 0;			
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
@@ -248,9 +250,15 @@ module test_lsq();
 		cache_hit			= 0;
 		
 		@(negedge clock);
-		$display("@@@ the 3rd instruction in! opb invalid");
+		mem_data_in			= 0;			
+		mem_response_in		= 4'b0;
+		mem_tag_in			= 4'b0;
+		
+		@(posedge clock);
+		$display("@@@ the 1st instruction send address out");
+		$display("@@@ the 1st instruction cache hit!");
 		$display("@@@ load! CDB send the 2nd instruction result in!");
-		$display("@@@ memory send the 1st result in! cache doesn't miss");
+		$display("@@@ the 3rd instruction in! opb invalid");
 		lsq_cdb1_in			= 64'h0000_0000_0000_0123;
 		lsq_cdb1_tag		= 6'h9;
 		lsq_cdb1_valid		= 1;
@@ -280,19 +288,23 @@ module test_lsq();
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 0;
 		mem_data_in			= 64'h5696;			
-		mem_response_in		= 4'b0;
-		mem_tag_in			= 4'b0000;
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 1;
+			
+		@(negedge clock);	
+		mem_data_in			= 64'h5696;			
+		mem_response_in		= 4'b0;
+		mem_tag_in			= 4'b0000;
 		
 		
-		@(negedge clock);
+		@(posedge clock);
 		$display("@@@ the 4th instruction in! 4th opb valid");
 		$display("@@@ load! CDB send the 3rd instruction result in!");
 		$display("@@@ the first load broadcast!");
+		$display("@@@ the 2nd instruction send the address out!");
 		$display("@@@ memory send the 2nd response in! cache miss");
 		lsq_cdb1_in			= 64'h0000_0000_0000_0193;
 		lsq_cdb1_tag		= 6'h1;
@@ -323,17 +335,22 @@ module test_lsq();
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 0;
 		mem_data_in			= 64'h0;			
-		mem_response_in		= 4'b0001;
-		mem_tag_in			= 4'b0000;
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
 		
-		@(negedge clock);
+		@(negedge clock);	
+		$display("@@@ memory send the 2nd response in! cache miss");
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0001;
+		mem_tag_in			= 4'b0000;
+		
+		@(posedge clock);
 		$display("@@@ the 5th and 6th instructions in! 5th opb is valid, 6th opb is not valid");
-		$display("@@@ memory send the 2nd tag in and 3rd response in! cache miss");
+		$display("@@@ 3rd instruction send out the address");
+
 		lsq_cdb1_in			= 64'h0000_0000_0000_0000;
 		lsq_cdb1_tag		= 6'h0;
 		lsq_cdb1_valid		= 0;
@@ -362,19 +379,24 @@ module test_lsq();
 		lsq_opb_valid2		= 0;
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 6'h13;
-		mem_data_in			= 64'h789;			
-		mem_response_in		= 4'b0010;
-		mem_tag_in			= 4'b0001;
+		mem_data_in			= 64'h0;			
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
 		
-		@(negedge clock);
+		
+		@(negedge clock)
+		$display("@@@ memory send the 2nd tag in and 3rd response in! cache miss");
+		mem_data_in			= 64'h789;			
+		mem_response_in		= 4'b0010;
+		mem_tag_in			= 4'b0001;
+		
+		@(posedge clock);
 		$display("@@@ the 7th instructions in! opb valid");
 		$display("@@@ CDB send the 6th opb in!");
-		$display("@@@ memory send the 5th response in and the 3rd tag in ! ");
+		$display("@@@ 5th address sent out! ");
 		$display("@@@ the 2nd result is broadcast!");
 		lsq_cdb1_in			= 64'h0000_0000_0000_7777;
 		lsq_cdb1_tag		= 6'h7;
@@ -405,9 +427,7 @@ module test_lsq();
 		lsq_opb_valid2		= 1;
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 6'h13;
-		mem_data_in			= 64'h666;			
-		mem_response_in		= 4'b0111;
-		mem_tag_in			= 4'b0010;
+		mem_data_in			= 0;			
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
@@ -415,11 +435,17 @@ module test_lsq();
 		cache_hit			= 0;
 		
 		
-		
 		@(negedge clock);
+		$display("@@@ memory send the 5th response in and the 3rd tag in ! ");
+		mem_data_in			= 64'h666;			
+		mem_response_in		= 4'b0111;
+		mem_tag_in			= 4'b0010;
+		
+		
+		@(posedge clock);
 		$display("@@@ the 8th instructions in! opb is valid");
-		$display("@@@ memory send the 5th tag in !4th instruction cache miss! response = 0(dirty)");
 		$display("@@@ the 3rd result is broadcast!");
+		$display("@@@ the 4th address out!");
 		lsq_cdb1_in			= 64'h0;
 		lsq_cdb1_tag		= 6'h0;
 		lsq_cdb1_valid		= 0;
@@ -449,20 +475,23 @@ module test_lsq();
 		lsq_rob_idx_in2		= 0;
 		dest_reg_idx2		= 6'h13;
 		mem_data_in			= 64'h345;			
-		mem_response_in		= 4'b0000;
-		mem_tag_in			= 4'b0111;
 		t1_head				= 0;
 		t2_head				= 0;
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
 		
-		
 		@(negedge clock);
+		$display("@@@ memory send the 5th tag in !4th instruction cache miss! response = 0(dirty)");
+		mem_data_in			= 64'h345;			
+		mem_response_in		= 4'b0000;
+		mem_tag_in			= 4'b0111;
+		
+		
+		@(posedge clock);
 		$display("@@@ the request for the 4th instruction send in again!");
 		$display("@@@ the 9th instructions in! opb is invalid");
 		$display("@@@ CDB send the 9th result at the same time");
-		$display("@@@ memory send  4th response in");
 		$display("@@@ the 5th result is ready!");
 		lsq_cdb1_in			= 64'h0;
 		lsq_cdb1_tag		= 6'h0;
@@ -500,6 +529,12 @@ module test_lsq();
 		thread1_mispredict	= 0;
 		thread2_mispredict	= 0;
 		cache_hit			= 0;
+		
+		@(negedge clock);
+		$display("@@@ memory send  4th response in");
+		mem_data_in			= 64'h0;			
+		mem_response_in		= 4'b0101;
+		mem_tag_in			= 4'b0000;
 		
 		@(negedge clock);
 		$display("@@@ the 10th instructions and 11th instrution in! opbs are both invalid");

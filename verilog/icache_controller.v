@@ -2,6 +2,7 @@ module icache_controller(
 	// input from Mem.v										
 	input	[3:0]							Imem2proc_response,   //
 	input	[3:0]							Imem2proc_tag,
+	input	[`ICACHE_BLOCK_SIZE-1:0]		Imem2proc_data,
 	
 	// input from processor.v
 	input	[63:0]							proc2Icache_addr,	
@@ -38,21 +39,20 @@ module icache_controller(
 	output logic							read_enable,    
 	output logic [3:0]						mem_tag            // when inst look for data
 );
-	assign 	read_enable 		    	 = (proc2Icache_command==BUS_LOAD && Imem2proc_tag !=0);
-	assign 	read_enable_pref 	    	 = (pref2Icache_command==BUS_LOAD && Imem2proc_tag !=0);
+	assign 	read_enable 		    	 = (proc2Icache_command==BUS_LOAD);
+	assign 	read_enable_pref 	    	 = (pref2Icache_command==BUS_LOAD);
 	// output to Icache.v
 	assign {tag, index} 			= proc2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
 	assign {tag_pref, index_pref} 	= pref2Icache_addr[63:`ICACHE_BLOCK_OFFSET];
 	assign mem_tag			  		= Imem2proc_tag;
 	//only tag, index, read_enable are needed to get miss
-	
 	//input to mem.v
 	always_comb begin
 		case(pref2Icache_command)
 			BUS_LOAD:
 				begin
 					// to icache.v
-					if (cachemem_is_miss_pref && cachemem_is_full) 
+					if (cachemem_is_miss_pref && (cachemem_is_full) && (Imem2proc_data==64'h0000_0555)) 
 					begin
 						proc2Imem_command 		 = BUS_NONE;
 						proc2Imem_addr 	 		 = 0;
@@ -94,10 +94,15 @@ module icache_controller(
 	end	
 			
 //output to processor	
-	always_comb
-	begin
-		Icache_data_valid		 = cachemem_valid;
-		Icache_data_out  		 = (cachemem_valid==0)?0:cachemem_data;
-	end	
+	always_comb begin
+	if(cachemem_valid && cachemem_data!=0) begin
+		Icache_data_valid		 = 1;
+		Icache_data_out  		 = cachemem_data;
+		end
+	else 	begin
+		Icache_data_valid		 = 0;
+		Icache_data_out  		 = 0;
+		end	
+	end
 endmodule
 
