@@ -34,8 +34,8 @@
 `define VIRTUAL_CLOCK_PERIOD   30.0
 `define VERILOG_CLOCK_PERIOD   30.0
 // probably not a good idea to change this second one
-//`define MEM_LATENCY_IN_CYCLES (100.0/`VERILOG_CLOCK_PERIOD+0.49999)
-`define MEM_LATENCY_IN_CYCLES 10
+`define MEM_LATENCY_IN_CYCLES (100.0/`VERILOG_CLOCK_PERIOD+0.49999)
+//`define MEM_LATENCY_IN_CYCLES 0
 // the 0.49999 is to force ceiling(100/period).  The default behavior for
 // float to integer conversion is rounding to nearest
 
@@ -311,7 +311,7 @@ typedef enum logic [4:0] {
 // new system define
 
 `define RS_SIZE 	10
-`define PRF_SIZE 	48
+`define PRF_SIZE 	88
 `define ROB_SIZE	16
 `define ARF_SIZE    32
 `define MEM_SIZE	64
@@ -334,7 +334,7 @@ typedef enum logic[1:0] {
 	PROGRAM_START  = 2'b00,
 	THREAD1_IS_EX  = 2'b01,			
   	THREAD2_IS_EX  = 2'b10,
-  	NO_ONE_IS_EX   = 2'b11			
+  	NO_ONE_IS_EX   = 2'b11
 } CURRENT_THREAD_STATE;
 
 `define ICACHE_SIZE			2048 									//bit
