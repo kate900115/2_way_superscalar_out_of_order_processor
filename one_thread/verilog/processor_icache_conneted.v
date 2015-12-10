@@ -388,7 +388,7 @@ icache ica(
 	.Imem2proc_tag(mem2proc_tag),
 	.Imem2proc_data(mem2proc_data),
 	
-	.branch_mispredict(thread1_branch_is_taken_pc),
+	.branch_mispredict(thread1_branch_is_taken),
 	.pc_target(thread1_target_pc),
 	
 	// output to mem.v
