@@ -1,15 +1,15 @@
 # Begin_DVE_Session_Save_Info
 # DVE restart session
-# Saved on Thu Dec 10 04:59:47 2015
+# Saved on Thu Dec 10 09:46:36 2015
 # Designs open: 1
 #   Sim: /home/tianmili/classes/eecs470/projects/project4/one_thread/dve
 # Toplevel windows open: 2
 # 	TopLevel.1
 # 	TopLevel.2
 #   Source.1: _vcs_unit__533683499
-#   Wave.1: 25 signals
+#   Wave.1: 34 signals
 #   Group count = 1
-#   Group Group1 signal count = 25
+#   Group Group1 signal count = 34
 # End_DVE_Session_Save_Info
 
 # DVE version: K-2015.09_Full64
@@ -60,7 +60,7 @@ gui_sync_global -id ${TopLevel.2} -option true
 
 # MDI window settings
 set Wave.1 Wave.1
-gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 723} {child_wave_right 1764} {child_wave_colname 359} {child_wave_colvalue 360} {child_wave_col1 0} {child_wave_col2 1}}
+gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 721} {child_wave_right 1758} {child_wave_colname 358} {child_wave_colvalue 359} {child_wave_col1 0} {child_wave_col2 1}}
 
 # End MDI window settings
 
@@ -87,17 +87,16 @@ gui_set_time_units 100ps
 # Global: Signal Compare
 
 # Global: Signal Groups
-gui_load_child_values {testbench.processor_0.pc}
-gui_load_child_values {testbench.processor_0.ica.im}
 
 
-set _session_group_4 Group1
-gui_sg_create "$_session_group_4"
-set Group1 "$_session_group_4"
+set _session_group_3 Group1
+gui_sg_create "$_session_group_3"
+set Group1 "$_session_group_3"
 
-gui_sg_addsignal -group "$_session_group_4" { testbench.processor_0.ica.im.index_in_pref testbench.processor_0.ica.im.tag_in_pref testbench.processor_0.ica.im.index_in testbench.processor_0.ica.im.tag_in testbench.processor_0.ica.im.internal_data testbench.processor_0.ica.im.internal_tag testbench.processor_0.ica.im.internal_valid testbench.processor_0.ica.im.internal_response testbench.processor_0.ica.im.clock testbench.processor_0.ica.im.reset testbench.processor_0.pc.inst1_out testbench.processor_0.pc.inst2_out testbench.processor_0.pc.inst1_is_valid testbench.processor_0.pc.inst2_is_valid testbench.processor_0.pc.PC_reg testbench.memory.mem2proc_data testbench.memory.mem2proc_tag testbench.processor_0.ica.im.load_data_in testbench.processor_0.ica.im.internal_data_in testbench.processor_0.ica.im.internal_response_in testbench.memory.proc2mem_addr testbench.memory.proc2mem_command testbench.memory.mem2proc_response testbench.processor_0.ica.ic.proc2Icache_addr testbench.processor_0.ica.ic.pref2Icache_addr }
+gui_sg_addsignal -group "$_session_group_3" { testbench.processor_0.pc.clock testbench.processor_0.pc.reset testbench.processor_0.pc.mispredict testbench.processor_0.pc.target_pc testbench.processor_0.pc.rs_stall testbench.processor_0.pc.rob1_stall testbench.processor_0.pc.rat_stall testbench.processor_0.pc.structure_hazard_stall testbench.processor_0.pc.Icache2proc_data testbench.processor_0.pc.Icache_hit testbench.processor_0.pc.is_two_threads testbench.processor_0.pc.proc2Icache_addr testbench.processor_0.pc.proc2Icache_command testbench.processor_0.pc.inst1_out testbench.processor_0.pc.inst2_out testbench.processor_0.pc.inst1_is_valid testbench.processor_0.pc.inst2_is_valid testbench.processor_0.pc.thread1_is_available testbench.processor_0.pc.PC_out testbench.processor_0.pc.PC_reg testbench.processor_0.pc.next_PC testbench.processor_0.pc.current_inst1 testbench.processor_0.pc.current_inst2 testbench.processor_0.pc.pc_stall testbench.processor_0.pc.next_command testbench.processor_0.rob1.commit1_pc_out testbench.processor_0.rob1.commit1_arn_dest_out testbench.processor_0.rob1.commit1_valid testbench.processor_0.rob1.commit2_pc_out testbench.processor_0.rob1.commit2_arn_dest_out testbench.processor_0.rob1.commit2_valid testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.rob1_internal_available_out }
 
 # Global: Highlighting
+gui_highlight_signals -color #00ff00 {{testbench.processor_0.pc.Icache2proc_data[63:32]} {testbench.processor_0.pc.Icache2proc_data[63:0]}}
 
 # Global: Stack
 gui_change_stack_mode -mode list
@@ -126,18 +125,17 @@ gui_list_set_filter -id ${Hier.1} -text {*}
 gui_change_design -id ${Hier.1} -design Sim
 catch {gui_list_expand -id ${Hier.1} testbench}
 catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
-catch {gui_list_expand -id ${Hier.1} testbench.processor_0.ica}
-catch {gui_list_select -id ${Hier.1} {testbench.processor_0.ica.ic}}
+catch {gui_list_select -id ${Hier.1} {testbench.processor_0.rob1}}
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Data 'Data.1'
 gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Data.1} -text {*}
-gui_list_show_data -id ${Data.1} {testbench.processor_0.ica.ic}
+gui_list_show_data -id ${Data.1} {testbench.processor_0.rob1}
 gui_show_window -window ${Data.1}
-catch { gui_list_select -id ${Data.1} {testbench.processor_0.ica.ic.proc2Icache_addr testbench.processor_0.ica.ic.pref2Icache_addr }}
-gui_view_scroll -id ${Data.1} -vertical -set 0
+catch { gui_list_select -id ${Data.1} {testbench.processor_0.rob1.rob1_internal_available_out }}
+gui_view_scroll -id ${Data.1} -vertical -set 960
 gui_view_scroll -id ${Data.1} -horizontal -set 0
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
@@ -157,12 +155,9 @@ set origWaveHeight [gui_get_pref_value -category Wave -key waveRowHeight]
 gui_list_set_height -id Wave -height 25
 set origGroupCreationState [gui_list_create_group_when_add -wave]
 gui_list_create_group_when_add -wave -disable
-gui_wv_zoom_timerange -id ${Wave.1} 7275 8441
+gui_wv_zoom_timerange -id ${Wave.1} 20087 21247
 gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
-gui_list_expand -id ${Wave.1} testbench.processor_0.ica.im.internal_response
-gui_list_expand -id ${Wave.1} {testbench.processor_0.ica.im.internal_response[11]}
-gui_list_expand -id ${Wave.1} {testbench.processor_0.ica.im.internal_response[10]}
-gui_list_select -id ${Wave.1} {{testbench.processor_0.ica.im.internal_response[10]} }
+gui_list_select -id ${Wave.1} {testbench.processor_0.pc.current_inst2 }
 gui_seek_criteria -id ${Wave.1} {Any Edge}
 
 
@@ -180,11 +175,13 @@ gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linka
 gui_list_set_filter -id ${Wave.1} -text {*}
 gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -position in
 
-gui_view_scroll -id ${Wave.1} -vertical -set 36
+gui_view_scroll -id ${Wave.1} -vertical -set 0
 gui_show_grid -id ${Wave.1} -enable false
 
 # DriverLoad 'DriverLoad.1'
-gui_get_drivers -session -id ${DriverLoad.1} -signal {testbench.processor_0.ica.im.internal_valid[15:0][1:0]} -time 7660 -starttime 7850
+gui_get_drivers -session -id ${DriverLoad.1} -signal testbench.processor_0.pc.rs_stall -time 160 -starttime 20735
+gui_get_drivers -session -id ${DriverLoad.1} -signal testbench.processor_0.pc.pc_stall -time 4360 -starttime 4488
+gui_get_drivers -session -id ${DriverLoad.1} -signal {testbench.processor_0.pc.current_inst2[63:0]} -time 18160 -starttime 19134
 # Restore toplevel window zorder
 # The toplevel window could be closed if it has no view/pane
 if {[gui_exist_window -window ${TopLevel.1}]} {

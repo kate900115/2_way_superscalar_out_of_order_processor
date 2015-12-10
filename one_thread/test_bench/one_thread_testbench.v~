@@ -258,6 +258,9 @@ module testbench;
 		show_clk_count;
 		//print_close(); // close the pipe_print output file
     		$fclose(wb_fileno);
+
+$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
+							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
 			$finish;
   		end
 

@@ -706,7 +706,7 @@ module lsq(
 				mem_data_out 		= sq1_store_data[sq_head1];
 				mem_address_out		= sq1_opa[sq_head1] + sq1_opb[sq_head1];
 				sq1_free_en[sq_head1]	= 1;	
-				n_sq_head1		=sq_head1 +1;														//**************************************************************
+				n_sq_head1		=sq_head1 +1														//**************************************************************
 				if ((mem_response_in != 0) || cache_hit) begin
 					current_mem_inst	= {1'b0,1'b1,sq_head1};
 				end
@@ -720,7 +720,6 @@ module lsq(
 				mem_data_out 		= sq2_store_data[sq_head2];
 				mem_address_out		= sq2_opa[sq_head2] + sq2_opb[sq_head2];
 				sq2_free_en[sq_head2]	= 1;
-				n_sq_head2		=sq_head2 +1;
 				if ((mem_response_in != 0) || cache_hit) begin
 					current_mem_inst	= {1'b1,1'b1,sq_head2};
 				end
