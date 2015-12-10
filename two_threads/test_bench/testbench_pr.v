@@ -394,27 +394,3 @@ module testbench;
     	end  
 
 endmodule  // module testbench
-
-/*$monitor (" @@@ time:%d, \
-			reset:%h, \
-			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\n\
-			ROB_commit1_pc:%h, \n\
-			clock:%h,\n\
-			mem2proc_tag:%h, \n\
-			PC_inst1:%h, \n\
-    		PC_inst2:%h,\n\
-    		ID_inst1_opa:%h,\n\
-    		ID_inst2_opa:%h,\n\
-    		RAT1_PRF_opa_idx1:%h,\n\
-   			RAT1_PRF_opa_idx2:%h, \n\
-   			ROB_t1_is_full: %h, \n\
-   			ROB_t2_is_full:%h, \n\
-   			PC_inst1_valid:%h, \n\
-   			mem2proc_response:%h, \n\
-   			PRF_is_full:%h, \n\
-   			Imem2proc_valid:%h, \n\
-   			fu_next_inst_pc_out0:%h\n\
-   			RS_full:%h\n\
-   			RS_EX_op_type[0]:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);*/

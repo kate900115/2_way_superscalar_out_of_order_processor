@@ -356,14 +356,14 @@ always_comb
 		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
    
     	wb_fileno1 = $fopen("writeback1.out");
-	wb_fileno2 = $fopen("writeback2.out");
+		wb_fileno2 = $fopen("writeback2.out");
 
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
     		
-    		while (count < 1 && clock_count < 5000) begin
+    		while (count < 4 && clock_count < 500) begin
     			count = count + (ROB_commit1_is_halt + ROB_commit2_is_halt);
     			#1;
     		end
@@ -372,9 +372,9 @@ always_comb
 		//print_close(); // close the pipe_print output file
 		
     	
-    		$fclose(wb_fileno1);
+    	$fclose(wb_fileno1);
 		$fclose(wb_fileno2);
-$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
+		$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
 			$finish;
   		end
@@ -546,7 +546,7 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 				endcase
 				$display("@@@\n@@");
 				show_clk_count;
-				print_close(); // close the pipe_print output file
+				//print_close(); // close the pipe_print output file
 				//$fclose(wb_fileno);
 				//#1000;
 				//$finish;
@@ -555,27 +555,3 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
     	end  
 
 endmodule  // module testbench
-
-/*$monitor (" @@@ time:%d, \
-			reset:%h, \
-			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\n\
-			ROB_commit1_pc:%h, \n\
-			clock:%h,\n\
-			mem2proc_tag:%h, \n\
-			PC_inst1:%h, \n\
-    		PC_inst2:%h,\n\
-    		ID_inst1_opa:%h,\n\
-    		ID_inst2_opa:%h,\n\
-    		RAT1_PRF_opa_idx1:%h,\n\
-   			RAT1_PRF_opa_idx2:%h, \n\
-   			ROB_t1_is_full: %h, \n\
-   			ROB_t2_is_full:%h, \n\
-   			PC_inst1_valid:%h, \n\
-   			mem2proc_response:%h, \n\
-   			PRF_is_full:%h, \n\
-   			Imem2proc_valid:%h, \n\
-   			fu_next_inst_pc_out0:%h\n\
-   			RS_full:%h\n\
-   			RS_EX_op_type[0]:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);*/
