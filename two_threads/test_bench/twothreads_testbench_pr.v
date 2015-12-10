@@ -548,8 +548,8 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 				show_clk_count;
 				print_close(); // close the pipe_print output file
 				//$fclose(wb_fileno);
-				#1000;
-				$finish;
+				//#1000;
+				//$finish;
 			end
 		end// if(reset) 
     	end  
