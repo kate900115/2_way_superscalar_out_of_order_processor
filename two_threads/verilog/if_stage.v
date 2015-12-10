@@ -59,7 +59,9 @@ module if_stage(
 	logic				start;
 	logic [3:0]			PC1_tag, next_PC1_tag;
 	logic [3:0]			PC2_tag, next_PC2_tag;
-	
+	logic [63:0]		PC1_pre, next_PC1_pre;
+	logic [63:0]		PC2_pre, next_PC2_pre;
+
 	assign pc1_stall = rs_stall || rob1_stall || rat_stall || thread1_structure_hazard_stall || (Icache2proc_response == 0) || ((Icache2proc_response != 0) && (PC1_tag != Icache2proc_response));
 	assign pc2_stall = rs_stall || rob2_stall || rat_stall || thread2_structure_hazard_stall || (Icache2proc_response == 0) || ((Icache2proc_response != 0) && (PC2_tag != Icache2proc_response));
   	assign proc2Imem_addr_previous = next_PC_out - 8;
@@ -76,6 +78,8 @@ module if_stage(
 			start					<= `SD 0;
 			PC1_tag					<= `SD 0;
 			PC2_tag					<= `SD 0;
+			PC1_pre					<= `SD 0;
+			PC2_pre					<= `SD 0;
 		end
   		else begin
 	  		PC_reg1					<= `SD next_PC1;
@@ -89,6 +93,8 @@ module if_stage(
 			start					<= `SD 1;
 			PC1_tag					<= `SD next_PC1_tag;
 			PC2_tag					<= `SD next_PC2_tag;
+			PC1_pre					<= `SD next_PC1_pre;
+			PC2_pre					<= `SD next_PC2_pre;
 		end
   	end
 
@@ -219,12 +225,16 @@ module if_stage(
 			next_PC2	= thread2_target_pc - 4;
 			next_t2_done= 0;
 		end
-	end
-
-	//inst valid 
-	always_comb begin
+		
+	//inst valid
+		next_PC1_pre = PC_reg1 - 8;
+		next_PC2_pre = PC_reg2 - 8;
 		if (thread1_is_available) begin
 			if (pc1_stall) begin
+				/*if (Icache2proc_tag != 0 && PC1_tag == Icache2proc_tag) begin
+					next_PC1_pre	= PC1_pre;
+					next_PC1		= PC1_pre;
+				end*/
 				inst1_is_valid = 0;
 				inst2_is_valid = 0;
 			end
@@ -235,6 +245,10 @@ module if_stage(
 		end
 		else begin
 			if (pc2_stall) begin
+				/*if (Icache2proc_tag != 0 && PC2_tag == Icache2proc_tag) begin
+					next_PC2_pre	= PC2_pre;
+					next_PC2		= PC2_pre;
+				end*/
 				inst1_is_valid = 0;
 				inst2_is_valid = 0;
 			end
