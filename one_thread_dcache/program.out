@@ -1,0 +1,56 @@
+
+Note-[RT_BS] Larger stack needed
+  Note: Bumping stack limit from 8192 to 8194 Kbytes.
+
+Chronologic VCS simulator copyright 1991-2015
+Contains Synopsys proprietary information.
+Compiler version K-2015.09_Full64; Runtime version K-2015.09_Full64;  Dec 10 13:26 2015
+@@
+@@
+@@                     0  Asserting System reset......
+@@
+@@                     0 : System STILL at reset, can't show anything
+@@
+@@
+@@                   300 : System STILL at reset, can't show anything
+@@
+@@
+@@                   600 : System STILL at reset, can't show anything
+@@
+@@
+@@                   900 : System STILL at reset, can't show anything
+@@
+@@                  1060  Deasserting System reset......
+@@
+@@
+@@@
+@@
+@@  3334 cycles / 3 instrs = 1111.333333 CPI
+@@
+@@  99990.00 ns total time to execute
+@@
+
+@@@ Unified Memory contents hex on left, decimal on right: 
+@@@
+@@@ mem[    0] = 203f138820bf0001 : 2323597408132333569
+@@@ mem[    8] = a4c10000b4a10000 : 11871770095755788288
+@@@ mem[   16] = b4a1000040a03405 : 13015684399161684997
+@@@ mem[   24] = 40a03405a4c10000 : 4656779213544685568
+@@@ mem[   32] = a4c10000b4a10000 : 11871770095755788288
+@@@ mem[   40] = b4a1000040a03405 : 13015684399161684997
+@@@ mem[   48] = 40a03405a4c10000 : 4656779213544685568
+@@@ mem[   56] = a4c10000b4a10000 : 11871770095755788288
+@@@ mem[   64] = b4a1000040a03405 : 13015684399161684997
+@@@ mem[   72] = 40a03405a4c10000 : 4656779213544685568
+@@@ mem[   80] = 40a0340540a03405 : 4656779211864814597
+@@@ mem[   88] = 40a0340540a03405 : 4656779211864814597
+@@@ mem[   96] = 40a0340540a03405 : 4656779211864814597
+@@@ mem[  104] = 0000000000000555 : 1365
+@@@
+@@@
+$finish called from file "test_bench/one_thread_testbench.v", line 264.
+$finish at simulation time              1001060
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 100106000 ps
+CPU Time:      0.260 seconds;       Data structure size:   0.6Mb
+Thu Dec 10 13:26:12 2015

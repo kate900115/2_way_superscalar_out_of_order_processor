@@ -1,0 +1,162 @@
+{
+    "rob": [
+        "rob",
+        "vtxDx",
+        "module"
+    ],
+    "decoder": [
+        "decoder",
+        "zf0bY",
+        "module"
+    ],
+    "...MASTER...": [
+        "SIM",
+        "amcQw",
+        "module"
+    ],
+    "predictor": [
+        "predictor",
+        "Mc2Np",
+        "module"
+    ],
+    "sq_one_entry": [
+        "sq_one_entry",
+        "ARVpk",
+        "module"
+    ],
+    "_vcs_unit__2200562257": [
+        "_vcs_unit__2200562257",
+        "WKbYi",
+        "module"
+    ],
+    "std": [
+        "std",
+        "reYIK",
+        "module"
+    ],
+    "testbench": [
+        "testbench",
+        "iAVhC",
+        "module"
+    ],
+    "mem": [
+        "mem",
+        "FSbWZ",
+        "module"
+    ],
+    "ex_stage": [
+        "ex_stage",
+        "hFhh0",
+        "module"
+    ],
+    "rs": [
+        "rs",
+        "vJKs8",
+        "module"
+    ],
+    "rrat": [
+        "rrat",
+        "BaH3Z",
+        "module"
+    ],
+    "cdb_one_entry": [
+        "cdb_one_entry",
+        "ekD33",
+        "module"
+    ],
+    "priority_selector_0000": [
+        "priority_selector_0000",
+        "tJRNL",
+        "module"
+    ],
+    "cdb": [
+        "cdb",
+        "JqSQt",
+        "module"
+    ],
+    "rs_one_entry": [
+        "rs_one_entry",
+        "vRLff",
+        "module"
+    ],
+    "alu": [
+        "alu",
+        "C26kq",
+        "module"
+    ],
+    "id_stage": [
+        "id_stage",
+        "PnDPB",
+        "module"
+    ],
+    "pc": [
+        "pc",
+        "EJdGq",
+        "module"
+    ],
+    "mult": [
+        "mult",
+        "SRUFi",
+        "module"
+    ],
+    "prf_one_entry": [
+        "prf_one_entry",
+        "MJYMx",
+        "module"
+    ],
+    "priority_selector_0001": [
+        "priority_selector_0001",
+        "WfHY7",
+        "module"
+    ],
+    "prf": [
+        "prf",
+        "d5SKF",
+        "module"
+    ],
+    "lq_one_entry": [
+        "lq_one_entry",
+        "iFvbc",
+        "module"
+    ],
+    "rob_one_entry": [
+        "rob_one_entry",
+        "wnjK2",
+        "module"
+    ],
+    "wand_sel_0001": [
+        "wand_sel_0001",
+        "ci1CE",
+        "module"
+    ],
+    "priority_selector_0003": [
+        "priority_selector_0003",
+        "VJgFK",
+        "module"
+    ],
+    "priority_selector_0002": [
+        "priority_selector_0002",
+        "fSTpM",
+        "module"
+    ],
+    "processor": [
+        "processor",
+        "FAtab",
+        "module"
+    ],
+    "rat": [
+        "rat",
+        "CQHA8",
+        "module"
+    ],
+    "dcache": [
+        "dcache",
+        "W975R",
+        "module"
+    ],
+    "BTB": [
+        "BTB",
+        "uWZsk",
+        "module"
+    ]
+}
