@@ -64,7 +64,7 @@ module lq_one_entry(
 	logic							next_lq_requested;
 	
 	assign lq_is_available 	= lq_is_ready ? lq_free_enable : ~inuse;
-	assign lq_is_ready		= inuse && lq_addr_valid && lq_mem_value_valid;//(inuse || next_inuse) && (lq_addr_valid || next_lq_addr_valid) && (lq_mem_value_valid || next_lq_mem_value_valid);
+	assign lq_is_ready		= inuse && lq_addr_valid && lq_requested && lq_mem_value_valid;//(inuse || next_inuse) && (lq_addr_valid || next_lq_addr_valid) && (lq_mem_value_valid || next_lq_mem_value_valid);
 	
 	always_ff @(posedge clock) begin
 		if(reset) begin
@@ -134,6 +134,9 @@ module lq_one_entry(
 		end
 		else if (lq_free_enable) begin
 			next_inuse			= 0;
+			next_lq_addr_valid	= 0;
+			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
 		end
 		else if (lq_mem_in1) begin
 			next_inuse			= 1;
@@ -170,7 +173,7 @@ module lq_one_entry(
 				next_lq_mem_value = lq_mem_data_in;
 				next_lq_mem_value_valid = 1;
 			end
-			if (lq_requested) begin
+			if (lq_request2mem) begin
 				next_lq_requested = 1;
 			end
 		end
