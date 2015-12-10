@@ -31,8 +31,11 @@ module testbench;
     	logic         reset;                    // System reset
 		logic [31:0]  clock_count;
 		logic [31:0]  instr_count;
+		logic [31:0]  rob_commit_0_inst;
+		logic [31:0]  rob_commit_1_inst;
+		logic [31:0]  rob_commit_2_inst;
     	int           wb_fileno1;
-	int 	      wb_fileno2;
+		int 	      wb_fileno2;
 	
     	logic [3:0]   mem2proc_response;        // Tag from memory about current request
     	logic [63:0]  mem2proc_data;            // Data coming back from memory
@@ -277,8 +280,7 @@ always_comb
 		clock = ~clock;
 	end
 
-	// Task to display # of elapsed clock edges
-	task show_clk_count;
+		task show_clk_count;
 		real cpi;
 
 		begin
@@ -287,6 +289,12 @@ always_comb
 			clock_count+1, instr_count, cpi);
 			$display("@@  %4.2f ns total time to execute\n@@\n",
 			clock_count*`VIRTUAL_CLOCK_PERIOD);
+			$display("@@ %d cycles ROB commit 2 insts\n@@",
+			rob_commit_2_inst);
+			$display("@@ %d cycles ROB commit 1 insts\n@@",
+			rob_commit_1_inst);
+			$display("@@ %d cycles ROB commit 0 insts\n@@",
+			rob_commit_0_inst);
 		end
 		
 	endtask  // task show_clk_count 
@@ -380,20 +388,37 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 	always @(posedge clock or posedge reset)
 	begin
 		if(reset)
-			begin
-			clock_count <= `SD 0;
-			instr_count <= `SD 0;
-			end
+		begin
+			clock_count       <= `SD 0;
+			instr_count 	  <= `SD 0;
+			rob_commit_0_inst <= `SD 0;
+			rob_commit_1_inst <= `SD 0;
+			rob_commit_2_inst <= `SD 0;
+		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
-			end
+		begin
+			clock_count 	  <= `SD (clock_count + 1);
+			instr_count 	  <= `SD (instr_count + 2*pipeline_completed_insts);
+			rob_commit_2_inst <= `SD (rob_commit_2_inst+1);
+			rob_commit_1_inst <= `SD (rob_commit_1_inst+0);
+			rob_commit_0_inst <= `SD (rob_commit_0_inst+0);
+		end
+		else if (!ROB_commit1_valid && !ROB_commit2_valid)
+		begin
+			clock_count 	  <= `SD (clock_count + 1);
+			instr_count 	  <= `SD (instr_count + 0*pipeline_completed_insts);
+			rob_commit_0_inst <= `SD (rob_commit_0_inst+1);
+			rob_commit_2_inst <= `SD (rob_commit_2_inst+0);
+			rob_commit_1_inst <= `SD (rob_commit_1_inst+0);
+		end
 		else
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + pipeline_completed_insts);
-			end
+		begin
+			clock_count 	  <= `SD (clock_count + 1);
+			instr_count 	  <= `SD (instr_count + pipeline_completed_insts);
+			rob_commit_1_inst <= `SD (rob_commit_1_inst+1);
+			rob_commit_0_inst <= `SD (rob_commit_0_inst+0);
+			rob_commit_2_inst <= `SD (rob_commit_2_inst+0);
+		end
 	end  
 
   	always @(negedge clock) begin
@@ -523,7 +548,8 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 				show_clk_count;
 				print_close(); // close the pipe_print output file
 				//$fclose(wb_fileno);
-				//#100 $finish;
+				#1000;
+				$finish;
 			end
 		end// if(reset) 
     	end  
