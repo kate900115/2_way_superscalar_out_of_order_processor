@@ -35,7 +35,7 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/prf.v	\
 			verilog/prf_one_entry.v	\
 			verilog/priority_selector.v	\
-			verilog/processor_icache_conneted.v	\
+			verilog/processor.v	\
 			verilog/rat.v	\
 			verilog/rob.v	\
 			verilog/rob_one_entry.v	\
@@ -49,13 +49,16 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/icachemem.v \
 			verilog/icache.v \
 			verilog/predictor.v \
-			verilog/BTB.v 			 
+			verilog/BTB.v		\
+			verilog/dcache.v	\
+			verilog/dcache_mem.v	\
+			verilog/dcache_controller.v	\
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
 # For visual debugger
-VISTESTBENCH = $(TESTBENCH:twothreads_testbench_pr.v=visual_testbench_pr.v) \
+VISTESTBENCH = $(TESTBENCH:one_thread_testbench.v=visual_testbench_pr.v) \
 		test_bench/visual_c_hooks.c
 
 processor.vg:	$(SIMFILES) tcl_files/processor.tcl 
