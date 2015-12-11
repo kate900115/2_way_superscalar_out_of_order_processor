@@ -2,7 +2,9 @@
 	lda	$r1,5000
 	stq	$r5,0($r1)
 	addq    $r5,1,$r5
-	stq	$r5,0($r1)
+	stq	$r5,64($r1)
+	stq	$r5,128($r1)
+	stq	$r5,192($r1)
 	addq    $r5,1,$r5
 	addq    $r5,1,$r5
 	addq    $r5,1,$r5
