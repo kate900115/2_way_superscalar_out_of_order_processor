@@ -410,26 +410,7 @@ module rob(
 				commit1_valid = 1;
 			end
 		end
-	end
-	
-	//the head move 
-	always_ff @(posedge clock)
-	begin
-		if (reset)
-		begin
-			t1_head <= `SD 0;
-			t2_head <= `SD 0;	
-		end
-		else
-		begin
-			t1_head <= `SD next_t1_head;
-			t2_head <= `SD next_t2_head;
-		end
-	end
-
 	//tail_behavior is to determine how many of the two instructions are for thread1 
-	always_comb
-	begin
 		rob1_internal_inst1_rob_load_in = 0;
 		rob1_internal_inst2_rob_load_in = 0;
 		rob2_internal_inst1_rob_load_in = 0;
@@ -462,18 +443,30 @@ module rob(
 		if (commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
 		begin
 			next_t1_tail = next_t1_head;
+			for (int i = 0; i < `ROB_SIZE; i++) begin
+				rob1_internal_if_committed[i] = 1;
+			end
 		end
 		else if (~commit1_is_thread1 && commit1_is_branch_out && inst1_mispredict_sig)
 		begin
 			next_t2_tail = next_t2_head;
+			for (int j = 0; j < `ROB_SIZE; j++) begin
+				rob2_internal_if_committed[j] = 1;
+			end
 		end
 		else if (commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
 		begin
 			next_t1_tail = next_t1_head;
+			for (int k = 0; k < `ROB_SIZE; k++) begin
+				rob1_internal_if_committed[k] = 1;
+			end
 		end
 		else if (~commit2_is_thread1 && commit2_is_branch_out && inst2_mispredict_sig)
 		begin
 			next_t2_tail = next_t2_head;
+			for (int m = 0; m < `ROB_SIZE; m++) begin
+				rob2_internal_if_committed[m] = 1;
+			end
 		end
 		if ((t1_tail + 4'b1 == t1_head) || (t1_tail == t1_head && !rob1_internal_available_out[t1_tail]))
 		begin
@@ -485,6 +478,20 @@ module rob(
 		end
 	end
 	
+	//the head move 
+	always_ff @(posedge clock)
+	begin
+		if (reset)
+		begin
+			t1_head <= `SD 0;
+			t2_head <= `SD 0;	
+		end
+		else
+		begin
+			t1_head <= `SD next_t1_head;
+			t2_head <= `SD next_t2_head;
+		end
+	end
 	//the tail move		
 	always_ff @(posedge clock)
 	begin
@@ -499,5 +506,4 @@ module rob(
 			t2_tail <= `SD next_t2_tail;
 		end
 	end
-
 endmodule
