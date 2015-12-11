@@ -199,7 +199,7 @@ module testbench;
 			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
 			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
 			Dcache_miss_rate = (1.0-(Dcache_miss_times*1.0/LSQ_request_times))*100.0;
-			$display("@@ dcache miss rate: %f%%\n@@",Dcache_miss_rate);
+			$display("@@ dcache hit rate: %f%%\n@@",Dcache_miss_rate);
 		end
 		
 	endtask  // task show_clk_count 
