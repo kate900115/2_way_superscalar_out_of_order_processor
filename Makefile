@@ -35,9 +35,9 @@ SIMFILES = 	one_thread/verilog/cdb.v	\
 			one_thread/verilog/prf.v	\
 			one_thread/verilog/prf_one_entry.v	\
 			one_thread/verilog/priority_selector.v	\
-			one_thread/verilog/processor_icache_connected.v	\
-			one_thread/verilog/rat.v	\
-			one_thread/verilog/rob.v	\
+			one_thread/verilog/processor.v	\
+			one_thread/verilog/rat.v \
+			one_thread/verilog/rob.v \
 			one_thread/verilog/rob_one_entry.v	\
 			one_thread/verilog/rrat.v	\
 			one_thread/verilog/rs.v	\
@@ -49,7 +49,10 @@ SIMFILES = 	one_thread/verilog/cdb.v	\
 			one_thread/verilog/icachemem.v \
 			one_thread/verilog/icache.v \
 			one_thread/verilog/predictor.v \
-			one_thread/verilog/BTB.v 			 
+			one_thread/verilog/BTB.v \
+			one_thread/verilog/dcache.v	\
+			one_thread/verilog/dcache_mem.v	\
+			one_thread/verilog/dcache_controller.v \
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v

@@ -222,7 +222,7 @@ module dcache_controller(
 						Dcache_data_hit			 = 0;
 						// for previous instruction
 						Dcache_data_out  		 = cachemem_data;
-						Dcache2proc_tag  		 = Dmem2proc_tag;
+						Dcache2proc_tag  		 = 0;
 				end
 			default:
 				begin
