@@ -419,14 +419,14 @@ module lsq(
 		//mispredict
 		if (thread1_mispredict || thread2_mispredict) begin
 			if (thread1_mispredict) begin
-				n_sq_tail1 = sq_head1;
+				n_sq_tail1 = n_sq_head1;
 				for (int i = 0; i < `SQ_SIZE; i++) begin
 					lq1_clean[i] = 1;
 					sq1_clean[i] = 1;
 				end
 			end
 			if (thread2_mispredict) begin
-				n_sq_tail2 = sq_head2;
+				n_sq_tail2 = n_sq_head2;
 				for (int i = 0; i < `SQ_SIZE; i++) begin
 					lq2_clean[i] = 1;
 					sq2_clean[i] = 1;
@@ -523,8 +523,8 @@ module lsq(
 	
 	//cdb output
 	always_comb begin
-		out1_is_sq1 = 0;
-		out1_is_sq2 = 0;
+		out1_is_sq1 	= 0;
+		out1_is_sq2 	= 0;
 		lq1_free_en		= 0;
 		lq2_free_en		= 0;
 		sq1_free_en		= 0;
@@ -598,6 +598,7 @@ module lsq(
 					cdb_result_is_valid2	= 1;
 					cdb_rob_idx2			= lq1_rob_idx[i];
 					lq1_free_en[i]			= 1;
+					break;
 				end
 			end
 		end
@@ -609,6 +610,7 @@ module lsq(
 					cdb_result_is_valid2	= 1;
 					cdb_rob_idx2			= lq2_rob_idx[j];
 					lq2_free_en[j]			= 1;
+					break;
 				end
 			end
 		end
