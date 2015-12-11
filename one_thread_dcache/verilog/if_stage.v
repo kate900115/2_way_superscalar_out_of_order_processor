@@ -48,6 +48,7 @@ module if_stage(
 	logic [63:0]		current_inst2;
 	logic			pc_stall;
 	BUS_COMMAND		next_command;
+	logic				reset_reg;
 
 	assign thread1_is_available = ~is_two_threads;
 	assign PC_out =  PC_reg;
@@ -64,11 +65,13 @@ module if_stage(
 		begin
 			PC_reg	<=	`SD 0;
 			proc2Icache_command <= `SD BUS_NONE;
+			reset_reg <= `SD 1;
 		end
 		else
 		begin
 			proc2Icache_command <= `SD next_command;
 			PC_reg		    <= `SD next_PC;
+			reset_reg <= `SD 0;
 		end
 	end
 
@@ -97,6 +100,15 @@ module if_stage(
 				inst2_out	= current_inst2;
 				end
 			end
+			else if(reset_reg)
+			begin
+				next_command	= BUS_LOAD;
+				next_PC		= PC_reg;
+				inst1_is_valid 	= 0;
+				inst2_is_valid 	= 0;
+				inst1_out	= current_inst1;
+				inst2_out	= current_inst2;
+			end
 			else if(Icache_hit && ~pc_stall )
 			begin
 				next_command	= BUS_LOAD;
@@ -115,9 +127,18 @@ module if_stage(
 				inst1_out	= 0;
 				inst2_out	= 0;
 			end
-			else if(~Icache_hit)
+			else if(~Icache_hit && pc_stall )
 			begin
-				next_command	= BUS_LOAD;
+				next_command	= BUS_NONE;
+				next_PC		= PC_reg;
+				inst1_is_valid 	= 0;
+				inst2_is_valid 	= 0;
+				inst1_out	= 0;
+				inst2_out	= 0;
+			end
+			else if(~Icache_hit && ~pc_stall )
+			begin
+				next_command	= BUS_NONE;
 				next_PC		= PC_reg;
 				inst1_is_valid 	= 0;
 				inst2_is_valid 	= 0;
