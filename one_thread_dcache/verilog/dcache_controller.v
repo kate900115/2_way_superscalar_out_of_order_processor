@@ -183,7 +183,7 @@ module dcache_controller(
 						// for current instruction
 						// when Dcache2proc_response=0 and Dcache_data_hit are both 0, 
 						// lsq will send the data, tag and index again 
-						Dcache2proc_response 	 = Dmem2proc_response;
+						Dcache2proc_response 	 = 0;
 						Dcache_data_hit		 	 = 0;
 						// for previous instruction
 						Dcache_data_out  		 = cachemem_data;
