@@ -35,7 +35,7 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/prf.v	\
 			verilog/prf_one_entry.v	\
 			verilog/priority_selector.v	\
-			verilog/processor_icache_conneted.v	\
+			verilog/processor.v	\
 			verilog/rat.v	\
 			verilog/rob.v	\
 			verilog/rob_one_entry.v	\
