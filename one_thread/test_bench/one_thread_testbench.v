@@ -92,6 +92,9 @@ module testbench;
 		logic [31:0]					ROB_commit_0_inst;
 		logic [31:0]					ROB_commit_1_inst;
 		logic [31:0]					ROB_commit_2_inst;
+		
+		logic [31:0]					Dcache_miss_times;
+		logic [31:0]					LSQ_request_times;
 
 	processor processor_0(
 			//input
@@ -194,6 +197,7 @@ module testbench;
 			$display("@@ %d cycles RoB commits 2 instructions\n@@",ROB_commit_2_inst);
 			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
 			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
+			//$display("@@ %d times dcache miss\n@@",Dcache_miss_times);
 		end
 		
 	endtask  // task show_clk_count 
@@ -267,37 +271,62 @@ module testbench;
 	always @(posedge clock or posedge reset)
 	begin
 		if(reset)
-			begin
+		begin
 			clock_count 		<= `SD 0;
 			instr_count 		<= `SD 0;
 			ROB_commit_0_inst	<= `SD 0;
 			ROB_commit_1_inst	<= `SD 0;
 			ROB_commit_2_inst	<= `SD 0;
-			end
+			Dcache_miss_times   <= `SD 0;
+		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
+		begin
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + 2*pipeline_completed_insts);
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst+1;
+			if (processor_0.dca.dm.data_is_miss)
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
 			end
+			else
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			end
+		end
 		else if(!ROB_commit1_valid && !ROB_commit2_valid)
 		begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + 0);
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + 0);
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst+1;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
+			if (processor_0.dca.dm.data_is_miss)
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
+			end
+			else
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			end
 		end
 		else
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + pipeline_completed_insts);
+		begin
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + pipeline_completed_insts);
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst+1;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
+			if (processor_0.dca.dm.data_is_miss)
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
 			end
+			else
+			begin
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			end
+		end
 	end  
 
   	always @(negedge clock) begin
