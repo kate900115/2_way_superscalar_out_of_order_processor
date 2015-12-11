@@ -88,6 +88,10 @@ module testbench;
 		logic							ROB_commit1_is_halt;
 		logic							ROB_commit2_is_halt;
 		logic [1:0]						count;
+		
+		logic [31:0]					ROB_commit_0_inst;
+		logic [31:0]					ROB_commit_1_inst;
+		logic [31:0]					ROB_commit_2_inst;
 
 	processor processor_0(
 			//input
@@ -187,6 +191,9 @@ module testbench;
 			clock_count+1, instr_count, cpi);
 			$display("@@  %4.2f ns total time to execute\n@@\n",
 			clock_count*`VIRTUAL_CLOCK_PERIOD);
+			$display("@@ %d cycles RoB commits 2 instructions\n@@",ROB_commit_2_inst);
+			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
+			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
 		end
 		
 	endtask  // task show_clk_count 
@@ -261,18 +268,35 @@ module testbench;
 	begin
 		if(reset)
 			begin
-			clock_count <= `SD 0;
-			instr_count <= `SD 0;
+			clock_count 		<= `SD 0;
+			instr_count 		<= `SD 0;
+			ROB_commit_0_inst	<= `SD 0;
+			ROB_commit_1_inst	<= `SD 0;
+			ROB_commit_2_inst	<= `SD 0;
 			end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
 			begin
 			clock_count <= `SD (clock_count + 1);
 			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst+1;
 			end
+		else if(!ROB_commit1_valid && !ROB_commit2_valid)
+		begin
+			clock_count <= `SD (clock_count + 1);
+			instr_count <= `SD (instr_count + 0);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst+1;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
+		end
 		else
 			begin
 			clock_count <= `SD (clock_count + 1);
 			instr_count <= `SD (instr_count + pipeline_completed_insts);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst+1;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
 			end
 	end  
 
