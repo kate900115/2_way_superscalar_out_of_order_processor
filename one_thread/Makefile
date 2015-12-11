@@ -52,6 +52,7 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/dcache.v	\
 			verilog/dcache_mem.v	\
 			verilog/dcache_controller.v	\
+			verilog/llsc.v	\
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
