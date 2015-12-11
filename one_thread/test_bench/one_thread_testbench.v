@@ -95,6 +95,8 @@ module testbench;
 		
 		logic [31:0]					Dcache_miss_times;
 		logic [31:0]					LSQ_request_times;
+		logic [31:0]					Icache_miss_times;
+		logic [31:0]					PC_request_times;
 
 	processor processor_0(
 			//input
@@ -187,7 +189,8 @@ module testbench;
 	// Task to display # of elapsed clock edges
 	task show_clk_count;
 		real cpi;
-		real Dcache_miss_rate;
+		real Dcache_hit_rate;
+		real Icache_hit_rate;
 
 		begin
 			cpi = (clock_count + 1.0) / instr_count;
@@ -198,8 +201,10 @@ module testbench;
 			$display("@@ %d cycles RoB commits 2 instructions\n@@",ROB_commit_2_inst);
 			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
 			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
-			Dcache_miss_rate = (1.0-(Dcache_miss_times*1.0/LSQ_request_times))*100.0;
-			$display("@@ dcache hit rate: %f%%\n@@",Dcache_miss_rate);
+			Dcache_hit_rate = (1.0-(Dcache_miss_times*1.0/LSQ_request_times))*100.0;
+			$display("@@ dcache hit rate: %f%%\n@@",Dcache_hit_rate);
+			Icache_hit_rate = (1.0-(Icache_miss_times*1.0/PC_request_times))*100.0;
+			$display("@@ icache hit rate: %f%%\n@@",Icache_hit_rate);
 		end
 		
 	endtask  // task show_clk_count 
@@ -281,6 +286,8 @@ module testbench;
 			ROB_commit_2_inst	<= `SD 0;
 			Dcache_miss_times   <= `SD 0;
 			LSQ_request_times	<= `SD 0; 
+			Icache_miss_times	<= `SD 0;
+			PC_request_times	<= `SD 0;
 		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
 		begin
@@ -297,6 +304,14 @@ module testbench;
 				LSQ_request_times<= `SD LSQ_request_times+1;
 			else
 				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
 		end
 		else if(!ROB_commit1_valid && !ROB_commit2_valid)
 		begin
@@ -313,6 +328,14 @@ module testbench;
 				LSQ_request_times<= `SD LSQ_request_times+1;
 			else
 				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
 		end
 		else
 		begin
@@ -329,6 +352,14 @@ module testbench;
 				LSQ_request_times<= `SD LSQ_request_times+1;
 			else
 				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
 		end
 	end  
 
