@@ -12,7 +12,7 @@ for file in `ls test_progs`; do
 	cp ./processor.out ./output/$file.pipeline.out
 	cp ./writeback.out ./output/$file.writeback.out
 	# What files do you want to save?
-	if diff ./output/$file.writeback.out ../../../project3/project3_ori/output/$file.writeback.out
+	if diff ./output/$file.writeback.out ./output_truth/$file.writeback.out
 	then
 		echo "$file.writeback.out pass!"
 	else
