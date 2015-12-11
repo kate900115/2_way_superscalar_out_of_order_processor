@@ -136,6 +136,7 @@ module dcache_mem(
 					internal_response_in[index_in][0]	= 0; 
 					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
 					internal_valid_in[index_in][0]      = internal_valid[index_in][0];
+					internal_dirty_in[index_in][0]		= 0; 
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][0]	= 1'b1;
 					internal_store_inst_in[index_in][0]	= 1'b0;
@@ -144,9 +145,9 @@ module dcache_mem(
 				else if ((internal_way[index_in]==1)&&(internal_dirty[index_in][1]))
 				begin
 					internal_way_next[index_in]			= internal_way[index_in];
-					internal_response_in[index_in][1]	= 0; 
 					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
 					internal_valid_in[index_in][1] 		= internal_valid[index_in][1];
+					internal_dirty_in[index_in][1]		= 0; 
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][1]	= 1'b1;
 					internal_store_inst_in[index_in][1]	= 1'b0;
