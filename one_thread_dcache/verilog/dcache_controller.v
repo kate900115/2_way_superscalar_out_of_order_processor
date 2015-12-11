@@ -9,6 +9,7 @@ module dcache_controller(
 	input									cachemem_is_dirty,
 	input									cachemem_is_miss,
 	input									cachemem_is_full,
+	input  [63:0]							writeback_address,
 	
 	// input from processor.v
 	input  [63:0]							proc2Dcache_addr,
@@ -48,7 +49,7 @@ module dcache_controller(
 					// to dcache.v
 					read_enable 		    	 = 1'b1;
 					write_enable			 	 = 0;   
-					if (cachemem_is_miss && cachemem_is_full) 
+					if (cachemem_is_full) 
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_NONE;
@@ -88,7 +89,7 @@ module dcache_controller(
 					begin
 						// to mem.v
 						proc2Dmem_command		 = BUS_STORE;
-						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:0],3'b0};
+						proc2Dmem_addr 	 		 = writeback_address;
 						// to dcache.v
 						mem_response			 = Dmem2proc_response;
 						mem_tag			  		 = Dmem2proc_tag;
@@ -137,7 +138,7 @@ module dcache_controller(
 				begin
 					read_enable 		    	 = 0;
 					write_enable			 	 = 1'b1;    
-					if (cachemem_is_miss && cachemem_is_full) 
+					if (cachemem_is_full) 
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_NONE;
@@ -159,7 +160,7 @@ module dcache_controller(
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_LOAD;
-						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:0],3'b0};
+						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:3],3'b0};
 						// to dcache.v
 						mem_response	  		 = Dmem2proc_response;
 						mem_tag			  	 	 = Dmem2proc_tag;
@@ -175,7 +176,7 @@ module dcache_controller(
 					begin
 						// to mem.v
 						proc2Dmem_command 		 = BUS_STORE;
-						proc2Dmem_addr 	 		 = {proc2Dcache_addr[63:0],3'b0};
+						proc2Dmem_addr 	 		 = writeback_address;
 						// to dcache.v
 						mem_response	  		 = Dmem2proc_response;
 						mem_tag			  	 	 = Dmem2proc_tag;
@@ -188,6 +189,22 @@ module dcache_controller(
 						// for previous instruction
 						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
+					end
+					else if (!cachemem_is_miss && cachemem_is_dirty)
+					begin
+						// to mem.v
+						proc2Dmem_command		 = BUS_STORE;
+						proc2Dmem_addr 	 		 = writeback_address;
+						// to dcache.v
+						mem_response			 = Dmem2proc_response;
+						mem_tag			  		 = Dmem2proc_tag;
+						// to proc.v
+						// for current instruction
+						Dcache2proc_response 	 = Dmem2proc_response;
+						Dcache_data_hit			 = 1;
+						// for previous instruction
+						Dcache_data_out  		 = cachemem_data;
+						Dcache2proc_tag  		 = 0;
 					end
 					else 
 					begin
