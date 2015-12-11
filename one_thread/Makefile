@@ -21,7 +21,7 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-				test_bench/one_thread_testbench.v	\
+				test_bench/testbench_pr.v	\
 				test_bench/mem.v		\
 				test_bench/pipe_print.c
 SIMFILES = 	verilog/cdb.v	\
@@ -30,7 +30,6 @@ SIMFILES = 	verilog/cdb.v	\
 			verilog/id_stage.v	\
 			verilog/if_stage.v	\
 			verilog/mult_stage.v	\
-			verilog/pc.v	\
 			verilog/pipe_mult.v	\
 			verilog/prf.v	\
 			verilog/prf_one_entry.v	\
@@ -58,7 +57,7 @@ SYNFILES = processor.vg
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
 # For visual debugger
-VISTESTBENCH = $(TESTBENCH:one_thread_testbench.v=visual_testbench_pr.v) \
+VISTESTBENCH = $(TESTBENCH:testbench_pr.v=visual_testbench_pr.v) \
 		test_bench/visual_c_hooks.c
 
 processor.vg:	$(SIMFILES) tcl_files/processor.tcl 
