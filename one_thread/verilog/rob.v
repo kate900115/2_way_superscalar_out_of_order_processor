@@ -440,6 +440,21 @@ module rob(
 				next_t2_tail = t2_tail + 4'h2;
 			end
 		end
+		else if(inst1_load_in && ~inst2_load_in)//*************************************
+		begin
+			if (is_thread1)
+			begin
+				rob1_internal_inst1_rob_load_in[t1_tail] = 1;
+				inst1_rs_rob_idx_in = {1'b0,t1_tail};
+				next_t1_tail = t1_tail + 4'h1;
+			end
+			else
+			begin
+				rob2_internal_inst1_rob_load_in[t2_tail] = 1;
+				inst1_rs_rob_idx_in = {1'b1,t2_tail};
+				next_t2_tail = t2_tail + 4'h1;
+			end
+		end
 		if (commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
 		begin
 			next_t1_tail = next_t1_head;
