@@ -662,6 +662,7 @@ module lsq(
 				if ((mem_response_in != 0) || cache_hit) begin
 					sq1_request2mem[sq_head1]	= 1;
 					current_mem_inst			= {1'b0,1'b1,sq_head1};
+					next_next_mem_valid			= 0;
 				end
 				else begin
 					next_next_mem_inst	= {1'b0,1'b1,sq_head1};
@@ -675,6 +676,7 @@ module lsq(
 				if ((mem_response_in != 0) || cache_hit) begin
 					sq2_request2mem[sq_head2]	= 1;
 					current_mem_inst			= {1'b1,1'b1,sq_head2};
+					next_next_mem_valid			= 0;
 				end
 				else begin
 					next_next_mem_inst	= {1'b1,1'b1,sq_head2};
