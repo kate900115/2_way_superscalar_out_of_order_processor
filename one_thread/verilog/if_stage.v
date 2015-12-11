@@ -85,7 +85,7 @@ module if_stage(
 			inst2_out	= 0;
 			if (mispredict)					// might not be right;
 			begin
-				next_PC		= target_pc +4 ;
+				next_PC		= target_pc + 4;
 				next_command	= BUS_LOAD;
 				inst1_is_valid 	= 0;
 				inst1_is_valid 	= 0;
@@ -117,6 +117,15 @@ module if_stage(
 				inst2_is_valid 	= 1;
 				inst1_out	= current_inst1;
 				inst2_out	= current_inst2;
+				if(PC_reg[2]==1)			//if pc == 8 n +4, we need to only load in the second instruction ,and and pc with 4 next time
+				begin
+				next_command	= BUS_LOAD;
+				next_PC		= PC_reg+4;
+				inst1_is_valid 	= 1;
+				inst2_is_valid 	= 0;
+				inst1_out	= current_inst2;
+				inst2_out	= 0;
+				end
 			end
 			else if(Icache_hit && pc_stall )
 			begin
@@ -146,14 +155,4 @@ module if_stage(
 				inst2_out	= 0;
 			end
 	end
-
-
-
-
-
-
-
-
-
-  	
 endmodule
