@@ -187,6 +187,7 @@ module testbench;
 	// Task to display # of elapsed clock edges
 	task show_clk_count;
 		real cpi;
+		real Dcache_miss_rate;
 
 		begin
 			cpi = (clock_count + 1.0) / instr_count;
@@ -197,7 +198,8 @@ module testbench;
 			$display("@@ %d cycles RoB commits 2 instructions\n@@",ROB_commit_2_inst);
 			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
 			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
-			//$display("@@ %d times dcache miss\n@@",Dcache_miss_times);
+			Dcache_miss_rate = (1.0-(Dcache_miss_times*1.0/LSQ_request_times))*100.0;
+			$display("@@ dcache miss rate: %f%%\n@@",Dcache_miss_rate);
 		end
 		
 	endtask  // task show_clk_count 
@@ -278,6 +280,7 @@ module testbench;
 			ROB_commit_1_inst	<= `SD 0;
 			ROB_commit_2_inst	<= `SD 0;
 			Dcache_miss_times   <= `SD 0;
+			LSQ_request_times	<= `SD 0; 
 		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
 		begin
@@ -286,14 +289,14 @@ module testbench;
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst+1;
-			if (processor_0.dca.dm.data_is_miss)
-			begin
+			if (processor_0.dca.dm.true_miss)
 				Dcache_miss_times<= `SD Dcache_miss_times+1;
-			end
 			else
-			begin
 				Dcache_miss_times<= `SD Dcache_miss_times+0;
-			end
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
 		end
 		else if(!ROB_commit1_valid && !ROB_commit2_valid)
 		begin
@@ -302,14 +305,14 @@ module testbench;
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst+1;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
-			if (processor_0.dca.dm.data_is_miss)
-			begin
+			if (processor_0.dca.dm.true_miss)
 				Dcache_miss_times<= `SD Dcache_miss_times+1;
-			end
 			else
-			begin
 				Dcache_miss_times<= `SD Dcache_miss_times+0;
-			end
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
 		end
 		else
 		begin
@@ -318,14 +321,14 @@ module testbench;
 			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst	<= `SD ROB_commit_1_inst+1;
 			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
-			if (processor_0.dca.dm.data_is_miss)
-			begin
+			if (processor_0.dca.dm.true_miss)
 				Dcache_miss_times<= `SD Dcache_miss_times+1;
-			end
 			else
-			begin
 				Dcache_miss_times<= `SD Dcache_miss_times+0;
-			end
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
 		end
 	end  
 
