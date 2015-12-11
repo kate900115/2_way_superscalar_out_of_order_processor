@@ -51,6 +51,9 @@ module dcache_mem(
 	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way;
 	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way_next;
 	
+	logic 																			true_miss;
+	
+	
 	assign data_out			 = read_data;	
 	
 	always_ff@(posedge clock)
@@ -99,6 +102,7 @@ module dcache_mem(
 		read_data								= load_data_in;
 		cache_is_full							= 1'b0;
 		writeback_address 						= 0;
+		true_miss								= 1'b0;
 		
 		// for read
 		if (read_enable)
@@ -112,6 +116,7 @@ module dcache_mem(
 					internal_way_next[index_in]	= ~j;
 					data_is_valid 		  		= 1'b1;
 					data_is_miss  		  		= 1'b0;
+					true_miss					= 1'b0;
 					break;
 				end
 				else
@@ -120,6 +125,7 @@ module dcache_mem(
 					internal_way_next[index_in]	= internal_way[index_in];
 					data_is_valid 		  		= 1'b0;
 					data_is_miss  		  		= 1'b1;
+					true_miss					= 1'b1;
 				end
 			end 
 			
@@ -194,12 +200,14 @@ module dcache_mem(
 					internal_way_next[index_in]		= ~j;
 					data_is_valid 		    		= 1'b1;
 					data_is_miss  		  			= 1'b0;
+					true_miss						= 1'b0;
 					break;
 				end
 				else
 				begin
 					data_is_valid 		 			= 1'b0;
 					data_is_miss  		 			= 1'b1;
+					true_miss						= 1'b1;
 				end
 			end
 			
