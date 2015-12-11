@@ -92,7 +92,10 @@ module testbench;
 		logic [31:0]					ROB_commit_0_inst;
 		logic [31:0]					ROB_commit_1_inst;
 		logic [31:0]					ROB_commit_2_inst;
-
+		
+		logic [31:0]					Dcache_hit_counts;
+		logic [31:0]					memory_requests;
+		
 	processor processor_0(
 			//input
     		.clock(clock),                    					// System clock
@@ -184,7 +187,7 @@ module testbench;
 	// Task to display # of elapsed clock edges
 	task show_clk_count;
 		real cpi;
-
+		real hitrate;
 		begin
 			cpi = (clock_count + 1.0) / instr_count;
 			$display("@@  %0d cycles / %0d instrs = %f CPI\n@@",
@@ -194,6 +197,8 @@ module testbench;
 			$display("@@  %d cycles RoB commits 2 insts;\n@@",ROB_commit_2_inst );
 			$display("@@  %d cycles RoB commits 1 inst;\n@@",ROB_commit_1_inst );
 			$display("@@  %d cycles RoB commits 0 inst;\n@@",ROB_commit_0_inst );
+			hitrate = 100.0*Dcache_hit_counts*1.0 / memory_requests ;
+			$display("@@  Dcache load hit rate %f %% @@", hitrate );
 		end
 		
 	endtask  // task show_clk_count 
@@ -286,6 +291,8 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 			ROB_commit_0_inst <= `SD 0;
 			ROB_commit_1_inst <= `SD 0;
 			ROB_commit_2_inst <= `SD 0;
+			Dcache_hit_counts <= `SD 0;
+			memory_requests   <= `SD 0;
 		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
 		begin
@@ -294,6 +301,23 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 			ROB_commit_0_inst <= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst <= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst <= `SD ROB_commit_2_inst+1;
+			
+			if (processor_0.dca.Dcache_data_hit)
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
+			end
+			else
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts;
+			end
+			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
+			begin
+				memory_requests   <= `SD memory_requests+1;
+			end
+			else
+			begin
+				memory_requests   <= `SD memory_requests;
+			end
 		end
 		else if (!ROB_commit1_valid && !ROB_commit2_valid)
 		begin
@@ -302,6 +326,22 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 			ROB_commit_0_inst <= `SD ROB_commit_0_inst+1;
 			ROB_commit_1_inst <= `SD ROB_commit_1_inst;
 			ROB_commit_2_inst <= `SD ROB_commit_2_inst;
+			if (processor_0.dca.Dcache_data_hit)
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
+			end
+			else
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts;
+			end
+			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
+			begin
+				memory_requests   <= `SD memory_requests+1;
+			end
+			else
+			begin
+				memory_requests   <= `SD memory_requests;
+			end
 		end
 		else
 		begin
@@ -310,6 +350,22 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 			ROB_commit_0_inst <= `SD ROB_commit_0_inst;
 			ROB_commit_1_inst <= `SD ROB_commit_1_inst+1;
 			ROB_commit_2_inst <= `SD ROB_commit_2_inst;
+			if (processor_0.dca.Dcache_data_hit)
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
+			end
+			else
+			begin
+				Dcache_hit_counts <= `SD Dcache_hit_counts;
+			end
+			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
+			begin
+				memory_requests   <= `SD memory_requests+1;
+			end
+			else
+			begin
+				memory_requests   <= `SD memory_requests;
+			end
 		end
 	end  
 
