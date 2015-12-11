@@ -1,7 +1,0 @@
-DirectC print_header 
-DirectC print_cycles 
-DirectC print_stage 
-DirectC print_stage_fu 
-DirectC print_reg 
-DirectC print_membus 
-DirectC print_close 
