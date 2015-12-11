@@ -4,6 +4,7 @@ module sq_one_entry(
 	
 	input							sq_clean,
 	input							sq_free_enable,
+	input							sq_request2mem,
 	
 	//for instruction1
 	input							sq_mem_in1,
@@ -40,6 +41,7 @@ module sq_one_entry(
 	
 	output logic							sq_is_available,
 	output logic							sq_is_ready,
+	output logic							sq_requested,
 	output logic	[63:0]					sq_pc,
 	output logic	[31:0]					sq_inst,
 	output logic	[63:0]					sq_opa,
@@ -59,6 +61,7 @@ module sq_one_entry(
 	logic	[63:0]					next_sq_store_data;
 	logic	[$clog2(`PRF_SIZE)-1:0]	next_sq_dest_tag;
 	logic							sq_store_data_valid, next_sq_store_data_valid;
+	logic							next_sq_requested;
 	
 	assign sq_is_available 	= ~inuse;
 	assign sq_is_ready		= inuse && sq_addr_valid && sq_store_data_valid; //(inuse || next_inuse) && (sq_addr_valid || next_sq_addr_valid);
@@ -75,7 +78,7 @@ module sq_one_entry(
 			sq_store_data	<= #1 0;
 			sq_dest_tag		<= #1 0;
 			sq_store_data_valid <= `SD 0;
-			
+			sq_requested	<= #1 0;
 		end
 		else begin
 			inuse			<= #1 next_inuse;
@@ -87,7 +90,8 @@ module sq_one_entry(
 			sq_rob_idx 		<= #1 next_sq_rob_idx;
 			sq_store_data	<= #1 next_sq_store_data;
 			sq_dest_tag		<= #1 next_sq_dest_tag;
-		        sq_store_data_valid <= `SD next_sq_store_data_valid;
+			sq_store_data_valid <= `SD next_sq_store_data_valid;
+			sq_requested	<= #1 next_sq_requested;
 		end
 	end
 
@@ -102,7 +106,10 @@ module sq_one_entry(
 		next_sq_dest_tag	= sq_dest_tag;
 		next_sq_store_data	= sq_store_data;
 		next_sq_store_data_valid = sq_store_data_valid;
-		if (sq_free_enable && sq_mem_in1) begin
+		next_sq_requested	= sq_requested;
+		if(sq_clean)
+			next_inuse	=0;
+		else if (sq_free_enable && sq_mem_in1) begin
 			next_inuse			= 1;
 			next_sq_pc			= sq_pc_in1;
 			next_sq_inst		= sq_inst1_in;
@@ -128,6 +135,8 @@ module sq_one_entry(
 		end
 		else if (sq_free_enable) begin
 			next_inuse = 0;
+			next_sq_requested	= 0;
+			next_sq_addr_valid	= 0;
 		end
 		else if (sq_mem_in1) begin
 			next_inuse			= 1;
@@ -163,12 +172,15 @@ module sq_one_entry(
 				next_sq_addr_valid	= 1;
 			end
 			if (~sq_store_data_valid && (sq_store_data[$clog2(`PRF_SIZE)-1:0] == sq_cdb1_tag) && inuse && sq_cdb1_valid) begin
-				next_sq_store_data			= sq_cdb1_in;
+				next_sq_store_data	= sq_cdb1_in;
 				next_sq_store_data_valid	= 1;
 			end
 			if (~sq_store_data_valid && (sq_store_data[$clog2(`PRF_SIZE)-1:0] == sq_cdb2_tag) && inuse && sq_cdb2_valid) begin
-				next_sq_store_data			= sq_cdb2_in;
+				next_sq_store_data	= sq_cdb2_in;
 				next_sq_store_data_valid	= 1;
+			end
+			if (sq_request2mem) begin
+				next_sq_requested	= 1;
 			end
 		end
 	end

@@ -107,7 +107,9 @@ module sq_one_entry(
 		next_sq_store_data	= sq_store_data;
 		next_sq_store_data_valid = sq_store_data_valid;
 		next_sq_requested	= sq_requested;
-		if (sq_free_enable && sq_mem_in1) begin
+		if (sq_clean)
+			next_inuse = 0;
+		else if (sq_free_enable && sq_mem_in1) begin
 			next_inuse			= 1;
 			next_sq_pc			= sq_pc_in1;
 			next_sq_inst		= sq_inst1_in;
