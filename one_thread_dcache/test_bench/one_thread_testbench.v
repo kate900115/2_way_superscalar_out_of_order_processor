@@ -41,7 +41,7 @@ module testbench;
   	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
     	logic [3:0]   pipeline_completed_insts;
-    	logic [3:0]   pipeline_error_status;
+    	ERROR_CODE   pipeline_error_status;
 
     	// testing hooks (these must be exported so we can test
     	// the synthesized version) data is tested by looking at
@@ -88,14 +88,7 @@ module testbench;
 		logic							ROB_commit1_is_halt;
 		logic							ROB_commit2_is_halt;
 		logic [1:0]						count;
-		
-		logic [31:0]					ROB_commit_0_inst;
-		logic [31:0]					ROB_commit_1_inst;
-		logic [31:0]					ROB_commit_2_inst;
-		
-		logic [31:0]					Dcache_hit_counts;
-		logic [31:0]					memory_requests;
-		
+
 	processor processor_0(
 			//input
     		.clock(clock),                    					// System clock
@@ -187,18 +180,13 @@ module testbench;
 	// Task to display # of elapsed clock edges
 	task show_clk_count;
 		real cpi;
-		real hitrate;
+
 		begin
 			cpi = (clock_count + 1.0) / instr_count;
 			$display("@@  %0d cycles / %0d instrs = %f CPI\n@@",
 			clock_count+1, instr_count, cpi);
 			$display("@@  %4.2f ns total time to execute\n@@\n",
 			clock_count*`VIRTUAL_CLOCK_PERIOD);
-			$display("@@  %d cycles RoB commits 2 insts;\n@@",ROB_commit_2_inst );
-			$display("@@  %d cycles RoB commits 1 inst;\n@@",ROB_commit_1_inst );
-			$display("@@  %d cycles RoB commits 0 inst;\n@@",ROB_commit_0_inst );
-			hitrate = 100.0*Dcache_hit_counts*1.0 / memory_requests ;
-			$display("@@  Dcache load hit rate %f %% @@", hitrate );
 		end
 		
 	endtask  // task show_clk_count 
@@ -260,20 +248,7 @@ module testbench;
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
-    		
-    		/*while (count < 1 && clock_count < 3000) begin
-				count = count + (ROB_commit1_is_halt + ROB_commit2_is_halt);
-    			#1;
-    		end*/
-		#100000;
-		$display("@@@\n@@");
-		show_clk_count;
-		//print_close(); // close the pipe_print output file
-    		$fclose(wb_fileno);
-
-$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
-							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
-			$finish;
+    
   		end
 
 
@@ -285,88 +260,20 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 	always @(posedge clock or posedge reset)
 	begin
 		if(reset)
-		begin
-			clock_count 	  <= `SD 0;
-			instr_count 	  <= `SD 0;
-			ROB_commit_0_inst <= `SD 0;
-			ROB_commit_1_inst <= `SD 0;
-			ROB_commit_2_inst <= `SD 0;
-			Dcache_hit_counts <= `SD 0;
-			memory_requests   <= `SD 0;
-		end
+			begin
+			clock_count <= `SD 0;
+			instr_count <= `SD 0;
+			end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
-		begin
+			begin
 			clock_count <= `SD (clock_count + 1);
 			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
-			ROB_commit_0_inst <= `SD ROB_commit_0_inst;
-			ROB_commit_1_inst <= `SD ROB_commit_1_inst;
-			ROB_commit_2_inst <= `SD ROB_commit_2_inst+1;
-			
-			if (processor_0.dca.Dcache_data_hit)
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
 			end
-			else
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts;
-			end
-			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
-			begin
-				memory_requests   <= `SD memory_requests+1;
-			end
-			else
-			begin
-				memory_requests   <= `SD memory_requests;
-			end
-		end
-		else if (!ROB_commit1_valid && !ROB_commit2_valid)
-		begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count);
-			ROB_commit_0_inst <= `SD ROB_commit_0_inst+1;
-			ROB_commit_1_inst <= `SD ROB_commit_1_inst;
-			ROB_commit_2_inst <= `SD ROB_commit_2_inst;
-			if (processor_0.dca.Dcache_data_hit)
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
-			end
-			else
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts;
-			end
-			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
-			begin
-				memory_requests   <= `SD memory_requests+1;
-			end
-			else
-			begin
-				memory_requests   <= `SD memory_requests;
-			end
-		end
 		else
-		begin
+			begin
 			clock_count <= `SD (clock_count + 1);
 			instr_count <= `SD (instr_count + pipeline_completed_insts);
-			ROB_commit_0_inst <= `SD ROB_commit_0_inst;
-			ROB_commit_1_inst <= `SD ROB_commit_1_inst+1;
-			ROB_commit_2_inst <= `SD ROB_commit_2_inst;
-			if (processor_0.dca.Dcache_data_hit)
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts+1;
 			end
-			else
-			begin
-				Dcache_hit_counts <= `SD Dcache_hit_counts;
-			end
-			if((processor_0.LSQ2Dcache_command==BUS_LOAD)||(processor_0.LSQ2Dcache_command==BUS_STORE))
-			begin
-				memory_requests   <= `SD memory_requests+1;
-			end
-			else
-			begin
-				memory_requests   <= `SD memory_requests;
-			end
-		end
 	end  
 
   	always @(negedge clock) begin
@@ -436,15 +343,7 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
       		end
       		
 
-			//show_clk_count;
-			//$fclose(wb_fileno);
 
-      		// deal with any halting conditions
-     		/*if(pipeline_error_status != NO_ERROR) begin
-        	print_close(); // close the pipe_print output file
-        	$fclose(wb_fileno);
-        	#100 $finish;
-      		end*/
 			// deal with any halting conditions
 			if(pipeline_error_status!=NO_ERROR)
 			begin
@@ -472,34 +371,11 @@ $display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 				$display("@@@\n@@");
 				show_clk_count;
 				print_close(); // close the pipe_print output file
-				//$fclose(wb_fileno);
-				//#100 $finish;
+				$fclose(wb_fileno);
+				#100 $finish;
 			end
 		end// if(reset) 
     	end  
 
 endmodule  // module testbench
 
-/*$monitor (" @@@ time:%d, \
-			reset:%h, \
-			pipeline_error_status:%h, \
-			ROB_commit1_valid:%h,\n\
-			ROB_commit1_pc:%h, \n\
-			clock:%h,\n\
-			mem2proc_tag:%h, \n\
-			PC_inst1:%h, \n\
-    		PC_inst2:%h,\n\
-    		ID_inst1_opa:%h,\n\
-    		ID_inst2_opa:%h,\n\
-    		RAT1_PRF_opa_idx1:%h,\n\
-   			RAT1_PRF_opa_idx2:%h, \n\
-   			ROB_t1_is_full: %h, \n\
-   			ROB_t2_is_full:%h, \n\
-   			PC_inst1_valid:%h, \n\
-   			mem2proc_response:%h, \n\
-   			PRF_is_full:%h, \n\
-   			Imem2proc_valid:%h, \n\
-   			fu_next_inst_pc_out0:%h\n\
-   			RS_full:%h\n\
-   			RS_EX_op_type[0]:%h",
-			$time, reset, pipeline_error_status, ROB_commit1_valid, ROB_commit1_pc, clock, mem2proc_tag, processor.PC_inst1, processor.PC_inst2, processor.ID_inst1_opa, processor.ID_inst2_opa, processor.RAT1_PRF_opa_idx1, processor.RAT1_PRF_opa_idx2, processor.ROB_t1_is_full, processor.ROB_t2_is_full, processor.PC_inst1_valid, mem2proc_response, processor.PRF_is_full, processor.Imem2proc_valid, fu_next_inst_pc_out[0],processor.RS_full,RS_EX_op_type[0]);*/
