@@ -21,39 +21,41 @@ all:    simv
 #####
 
 TESTBENCH = 	sys_defs.vh	\
-				test_bench/testbench_pr.v	\
-				test_bench/mem.v		\
-				test_bench/pipe_print.c
-SIMFILES = 	verilog/cdb.v	\
-			verilog/cdb_one_entry.v	\
-			verilog/ex_stage.v	\
-			verilog/id_stage.v	\
-			verilog/if_stage.v	\
-			verilog/mult_stage.v	\
-			verilog/pc.v	\
-			verilog/pipe_mult.v	\
-			verilog/prf.v	\
-			verilog/prf_one_entry.v	\
-			verilog/priority_selector.v	\
-			verilog/processor_ppp.v	\
-			verilog/rat.v	\
-			verilog/rob.v	\
-			verilog/rob_one_entry.v	\
-			verilog/rrat.v	\
-			verilog/rs.v	\
-			verilog/rs_one_entry.v	\
-			verilog/icache_controller.v \
-			verilog/icachemem.v \
-			verilog/icache.v \
-			verilog/BTB.v \
-			verilog/predictor.v \
-			 
+				one_thread/test_bench/one_thread_testbench.v	\
+				one_thread/test_bench/mem.v		\
+				one_thread/test_bench/pipe_print.c
+SIMFILES = 	one_thread/verilog/cdb.v	\
+			one_thread/verilog/cdb_one_entry.v	\
+			one_thread/verilog/ex_stage.v	\
+			one_thread/verilog/id_stage.v	\
+			one_thread/verilog/if_stage.v	\
+			one_thread/verilog/mult_stage.v	\
+			one_thread/verilog/pc.v	\
+			one_thread/verilog/pipe_mult.v	\
+			one_thread/verilog/prf.v	\
+			one_thread/verilog/prf_one_entry.v	\
+			one_thread/verilog/priority_selector.v	\
+			one_thread/verilog/processor_icache_connected.v	\
+			one_thread/verilog/rat.v	\
+			one_thread/verilog/rob.v	\
+			one_thread/verilog/rob_one_entry.v	\
+			one_thread/verilog/rrat.v	\
+			one_thread/verilog/rs.v	\
+			one_thread/verilog/rs_one_entry.v	\
+			one_thread/verilog/lq_one_entry.v	\
+			one_thread/verilog/sq_one_entry.v	\
+			one_thread/verilog/lsq.v	\
+			one_thread/verilog/icache_controller.v \
+			one_thread/verilog/icachemem.v \
+			one_thread/verilog/icache.v \
+			one_thread/verilog/predictor.v \
+			one_thread/verilog/BTB.v 			 
 
 SYNFILES = processor.vg 
 LIB = /afs/umich.edu/class/eecs470/lib/verilog/lec25dscc25.v
 
 # For visual debugger
-VISTESTBENCH = $(TESTBENCH:testbench_pr.v=visual_testbench_pr.v) \
+VISTESTBENCH = $(TESTBENCH:twothreads_testbench_pr.v=visual_testbench_pr.v) \
 		test_bench/visual_c_hooks.c
 
 processor.vg:	$(SIMFILES) tcl_files/processor.tcl 
