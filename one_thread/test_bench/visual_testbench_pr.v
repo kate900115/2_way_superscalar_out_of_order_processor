@@ -49,6 +49,7 @@ module testbench;
     	//pc output
 		logic [31:0]	PC_inst1;
 		logic [31:0]	PC_inst2;
+		logic [63:0]	current_pc;
 		logic			PC_inst1_valid;
 		logic			PC_inst2_valid;
 		logic [63:0]	PC_proc2Imem_addr;
@@ -241,7 +242,7 @@ module testbench;
     		.PRF_writeback_value2(PRF_writeback_value2),
     		
     		.PC_proc2Imem_addr(PC_proc2Imem_addr),
-			.PC_proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
+			.current_pc(current_pc),
 			.PC_inst1(PC_inst1),
 			.PC_inst2(PC_inst2),
 			.PC_inst1_valid(PC_inst1_valid),
@@ -435,8 +436,8 @@ module testbench;
     // g: IF/ID   h: ID/EX  i: EX/MEM  j: MEM/WB
 
     // PC signals (6) - prefix 'f'
-    $display("fPC1 16:%h",          			processor_0.PC_proc2Imem_addr_previous);
-    $display("fPC2 16:%h",          			processor_0.PC_proc2Imem_addr_previous+4);
+    $display("fPC1 16:%h",          			processor_0.current_pc);
+    $display("fPC2 16:%h",          			processor_0.current_pc+4);
     $display("finst1 16:%h",          			processor_0.PC_inst1);
     $display("finst2 16:%h",          			processor_0.PC_inst2);
     $display("fPC_inst1_valid 1:%h",    		processor_0.PC_inst1_valid);
