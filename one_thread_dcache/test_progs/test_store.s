@@ -3,11 +3,12 @@
 	stq	$r5,0($r1)
 	addq    $r5,1,$r5
 	stq	$r5,64($r1)
+	addq    $r5,1,$r5
 	stq	$r5,128($r1)
+	addq    $r5,1,$r5
 	stq	$r5,192($r1)
 	addq    $r5,1,$r5
-	addq    $r5,1,$r5
-	addq    $r5,1,$r5
-	addq    $r5,1,$r5
-	addq    $r5,1,$r5
+	ldq $r5,64($r1)
+	ldq $r5,128($r1)
+	ldq $r5,192($r1)
 	call_pal    0x555

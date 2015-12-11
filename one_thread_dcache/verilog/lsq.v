@@ -402,12 +402,8 @@ module lsq(
 	assign lq2_mem_in_temp2 = (inst2_type == IS_LDQ_INST || inst2_type == IS_LDQ_L_INST) && ~thread2_mispredict && lsq_rob_idx_in2[$clog2(`ROB_SIZE)] && inst2_valid ? lq2_mem_in_temp2_2 : 0;
 	
 	always_comb begin
-		inst1_is_lq1 = 0;
-		inst1_is_lq2 = 0;
 		inst1_is_sq1 = 0;
 		inst1_is_sq2 = 0;
-		inst2_is_lq1 = 0;
-		inst2_is_lq2 = 0;
 		inst2_is_sq1 = 0;
 		inst2_is_sq2 = 0;
 		n_sq_tail1	= sq_tail1;
@@ -444,7 +440,7 @@ module lsq(
 				else if (lsq_rob_idx_in1[$clog2(`ROB_SIZE)] == 1)
 					inst1_is_sq2 = 1;
 			end
-			else if (inst2_type == IS_STQ_INST || inst2_type == IS_STQ_C_INST) begin
+			if (inst2_type == IS_STQ_INST || inst2_type == IS_STQ_C_INST) begin
 				if (lsq_rob_idx_in2[$clog2(`ROB_SIZE)] == 0)
 					inst2_is_sq1 = 1;
 				else if (lsq_rob_idx_in2[$clog2(`ROB_SIZE)] == 1)
@@ -455,12 +451,12 @@ module lsq(
 			begin
 				sq1_mem_in1[sq_tail1] = 1;
 				if (inst2_is_sq1)
-				sq1_mem_in2[sq_tail1+1] = 1;
+					sq1_mem_in2[sq_tail1+1] = 1;
 			end
 			else
 			begin
 				if (inst2_is_sq1)
-				sq1_mem_in2[sq_tail1] = 1;
+					sq1_mem_in2[sq_tail1] = 1;
 			end
 
 			if (inst1_is_sq2)
