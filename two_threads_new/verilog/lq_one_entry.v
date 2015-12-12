@@ -8,6 +8,7 @@ module lq_one_entry(
 	
 	//inst1
 	input							lq_mem_in1,
+	input	[5:0]					lq_inst_op_type1,
 	input	[63:0]					lq_pc_in1,
 	input	[31:0]					lq_inst1_in,
 	input	[63:0] 					lq_opa_in1,      	// Operand a from Rename  data
@@ -18,6 +19,7 @@ module lq_one_entry(
 
     //for instruction2
    	input							lq_mem_in2,    		//ldq
+   	input	[5:0]					lq_inst_op_type2,
 	input	[63:0]					lq_pc_in2,
 	input	[31:0]					lq_inst2_in,
 	input	[63:0] 					lq_opa_in2,      	// Operand a from Rename  data
@@ -39,6 +41,7 @@ module lq_one_entry(
 
 	output logic							lq_is_available,
 	output logic							lq_is_ready,
+	output logic	[5:0]					lq_inst_op_type,
 	output logic	[63:0]					lq_pc,
 	output logic	[31:0]					lq_inst,
 	output logic	[63:0]					lq_opa,
@@ -62,6 +65,7 @@ module lq_one_entry(
 	logic	[63:0]					next_lq_mem_value;
 	logic							next_lq_mem_value_valid;
 	logic							next_lq_requested;
+	logic	[5:0]					next_lq_inst_op_type;
 	
 	assign lq_is_available 	= lq_is_ready ? lq_free_enable : ~inuse;
 	assign lq_is_ready		= inuse && lq_addr_valid && lq_requested && lq_mem_value_valid;//(inuse || next_inuse) && (lq_addr_valid || next_lq_addr_valid) && (lq_mem_value_valid || next_lq_mem_value_valid);
@@ -69,6 +73,7 @@ module lq_one_entry(
 	always_ff @(posedge clock) begin
 		if(reset) begin
 			inuse			<= #1 0;
+			lq_inst_op_type	<= #1 0;
 			lq_pc			<= #1 0;
 			lq_inst			<= #1 0;
 			lq_opa 			<= #1 0;
@@ -82,6 +87,7 @@ module lq_one_entry(
 		end
 		else begin
 			inuse			<= #1 next_inuse;
+			lq_inst_op_type	<= #1 next_lq_inst_op_type;
 			lq_pc			<= #1 next_lq_pc;
 			lq_inst			<= #1 next_lq_inst;
 			lq_opa 			<= #1 next_lq_opa;
@@ -107,11 +113,24 @@ module lq_one_entry(
 		next_lq_mem_value	= lq_mem_value;
 		next_lq_mem_value_valid	= lq_mem_value_valid;
 		next_lq_requested	= lq_requested;
+		next_lq_inst_op_type= lq_inst_op_type;
 		if (lq_clean) begin
-			next_inuse		= 0;
+			next_inuse			= 0;
+			next_lq_addr_valid	= 0;
+			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
+			next_lq_pc			= 0;
+			next_lq_inst		= 0;
+			next_lq_opa			= 0;
+			next_lq_opb			= 0;
+			next_lq_rob_idx 	= 0;
+			next_lq_dest_tag	= 0;
+			next_lq_mem_value	= 0;
+			next_lq_inst_op_type= 0;
 		end
 		else if (lq_free_enable && lq_mem_in1) begin
 			next_inuse			= 1;
+			next_lq_inst_op_type= lq_inst_op_type1;
 			next_lq_pc			= lq_pc_in1;
 			next_lq_inst		= lq_inst1_in;
 			next_lq_opa			= lq_opa_in1;
@@ -123,6 +142,7 @@ module lq_one_entry(
 		end
 		else if (lq_free_enable && lq_mem_in2) begin
 			next_inuse			= 1;
+			next_lq_inst_op_type= lq_inst_op_type2;
 			next_lq_pc			= lq_pc_in2;
 			next_lq_inst		= lq_inst2_in;
 			next_lq_opa			= lq_opa_in2;
@@ -137,9 +157,18 @@ module lq_one_entry(
 			next_lq_addr_valid	= 0;
 			next_lq_mem_value_valid = 0;
 			next_lq_requested	= 0;
+			next_lq_pc			= 0;
+			next_lq_inst		= 0;
+			next_lq_opa			= 0;
+			next_lq_opb			= 0;
+			next_lq_rob_idx 	= 0;
+			next_lq_dest_tag	= 0;
+			next_lq_mem_value	= 0;
+			next_lq_inst_op_type= 0;
 		end
 		else if (lq_mem_in1) begin
 			next_inuse			= 1;
+			next_lq_inst_op_type= lq_inst_op_type1;
 			next_lq_pc			= lq_pc_in1;
 			next_lq_inst		= lq_inst1_in;
 			next_lq_opa			= lq_opa_in1;
@@ -151,6 +180,7 @@ module lq_one_entry(
 		end
 		else if (lq_mem_in2) begin
 			next_inuse			= 1;
+			next_lq_inst_op_type= lq_inst_op_type2;
 			next_lq_pc			= lq_pc_in2;
 			next_lq_inst		= lq_inst2_in;
 			next_lq_opa			= lq_opa_in2;
