@@ -207,7 +207,7 @@ assign request2 = inst2_enable? dest_rename_sig2 : 0;
 		opb_PRF_idx1 	= (~inst1_enable)? 0 : (opb_valid_in1) ? 0: (opb_ARF_idx1==5'h1f)? `PRF_SIZE:rat_reg[opb_ARF_idx1];
 
 		rega_prf_inst1  = (~inst1_enable)? 0 : (rega_arf_inst1 == 5'h1f)? `PRF_SIZE:rat_reg[rega_arf_inst1];
-		rega_prf_inst2  = (~inst2_enable)? 0 : (rega_arf_inst2 == 5'h1f)? `PRF_SIZE:rat_reg[rega_arf_inst2];
+		rega_prf_inst2  = (~inst2_enable)? 0 : (dest_ARF_idx1 == rega_arf_inst2) ? PRF_rename_idx1 : (rega_arf_inst2 == 5'h1f)? `PRF_SIZE:rat_reg[rega_arf_inst2];
 
 
 	for(int i=0; i<`ARF_SIZE; i++) begin

@@ -30,7 +30,8 @@ module testbench;
     	logic         reset;                    // System reset
 		logic [31:0]  clock_count;
 		logic [31:0]  instr_count;
-    	int           wb_fileno;
+    	int           wb_fileno1;
+   	int           wb_fileno2;
 	
     	logic [3:0]   mem2proc_response;        // Tag from memory about current request
     	logic [63:0]  mem2proc_data;            // Data coming back from memory
@@ -41,7 +42,7 @@ module testbench;
   	 	logic [63:0]  proc2mem_data;      		// Data sent to memory
 
     	logic [3:0]   pipeline_completed_insts;
-    	logic [3:0]   pipeline_error_status;
+    	ERROR_CODE   pipeline_error_status;
 
     	// testing hooks (these must be exported so we can test
     	// the synthesized version) data is tested by looking at
@@ -50,6 +51,8 @@ module testbench;
  		//output
     	// Outputs from IF-Stage 
     	//Output from rob
+	logic						ROB_commit1_is_thread1;
+	logic						ROB_commit2_is_thread1;
     	logic							ROB_commit1_valid;
     	logic [63:0]					PRF_writeback_value1;
     	logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit1_arn_dest;
@@ -61,7 +64,7 @@ module testbench;
 
     	//output from IF-stage
 		logic [63:0]					PC_proc2Imem_addr;
-		logic [63:0]					PC_proc2Imem_addr_previous;
+		logic [63:0]					current_pc;
 		logic [31:0]					PC_inst1;
 		logic [31:0]					PC_inst2;
 		logic							PC_inst1_valid;
@@ -88,6 +91,15 @@ module testbench;
 		logic							ROB_commit1_is_halt;
 		logic							ROB_commit2_is_halt;
 		logic [1:0]						count;
+		
+		logic [31:0]					ROB_commit_0_inst;
+		logic [31:0]					ROB_commit_1_inst;
+		logic [31:0]					ROB_commit_2_inst;
+		
+		logic [31:0]					Dcache_miss_times;
+		logic [31:0]					LSQ_request_times;
+		logic [31:0]					Icache_miss_times;
+		logic [31:0]					PC_request_times;
 
 	processor processor_0(
 			//input
@@ -96,6 +108,7 @@ module testbench;
     		.mem2proc_response(mem2proc_response),        		// Tag from memory about current request
     		.mem2proc_data(mem2proc_data),            			// Data coming back from memory
     		.mem2proc_tag(mem2proc_tag),              			// Tag from memory about current reply
+		.is_two_threads(1),																	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5 one thread
 
 			//output
     		.proc2mem_command(proc2mem_command),    			// command sent to memory
@@ -127,7 +140,7 @@ module testbench;
     		.PRF_writeback_value2(PRF_writeback_value2),
     		
     		.PC_proc2Imem_addr(PC_proc2Imem_addr),
-			.PC_proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
+			.current_pc(current_pc),
 			.PC_inst1(PC_inst1),
 			.PC_inst2(PC_inst2),
 			.PC_inst1_valid(PC_inst1_valid),
@@ -151,6 +164,8 @@ module testbench;
 			.ROB_commit1_inst_out(ROB_commit1_inst_out),
 			.ROB_commit2_inst_out(ROB_commit2_inst_out),
 			
+			.ROB_commit1_is_thread1(ROB_commit1_is_thread1),
+			.ROB_commit2_is_thread1(ROB_commit2_is_thread1),
 			.ROB_commit1_is_halt(ROB_commit1_is_halt),
 			.ROB_commit2_is_halt(ROB_commit2_is_halt)
 	);
@@ -179,6 +194,8 @@ module testbench;
 	// Task to display # of elapsed clock edges
 	task show_clk_count;
 		real cpi;
+		real Dcache_hit_rate;
+		real Icache_hit_rate;
 
 		begin
 			cpi = (clock_count + 1.0) / instr_count;
@@ -186,6 +203,13 @@ module testbench;
 			clock_count+1, instr_count, cpi);
 			$display("@@  %4.2f ns total time to execute\n@@\n",
 			clock_count*`VIRTUAL_CLOCK_PERIOD);
+			$display("@@ %d cycles RoB commits 2 instructions\n@@",ROB_commit_2_inst);
+			$display("@@ %d cycles RoB commits 1 instruction\n@@",ROB_commit_1_inst);
+			$display("@@ %d cycles RoB commits 0 instruction\n@@",ROB_commit_0_inst);
+			Dcache_hit_rate = (1.0-(Dcache_miss_times*1.0/LSQ_request_times))*100.0;
+			$display("@@       dcache hit rate: %f%%\n@@",Dcache_hit_rate);
+			Icache_hit_rate = (1.0-(Icache_miss_times*1.0/PC_request_times))*100.0;
+			$display("@@       icache hit rate: %f%%\n@@",Icache_hit_rate);
 		end
 		
 	endtask  // task show_clk_count 
@@ -241,22 +265,14 @@ module testbench;
     	reset = 1'b0;
 		$display("@@  %t  Deasserting System reset......\n@@\n@@", $realtime);
    
-    	wb_fileno = $fopen("writeback.out");
+      	wb_fileno1 = $fopen("writeback1.out");
+		wb_fileno2 = $fopen("writeback2.out");
 
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            																													D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
-    		
-    		while (count < 1 && clock_count < 1500) begin
-				count = count + (ROB_commit1_is_halt + ROB_commit2_is_halt);
-    			#1
-    		end
-		$display("@@@\n@@");
-		show_clk_count;
-		//print_close(); // close the pipe_print output file
-    		$fclose(wb_fileno);
-			$finish;
+    
   		end
 
 
@@ -268,20 +284,89 @@ module testbench;
 	always @(posedge clock or posedge reset)
 	begin
 		if(reset)
-			begin
-			clock_count <= `SD 0;
-			instr_count <= `SD 0;
-			end
+		begin
+			clock_count 		<= `SD 0;
+			instr_count 		<= `SD 0;
+			ROB_commit_0_inst	<= `SD 0;
+			ROB_commit_1_inst	<= `SD 0;
+			ROB_commit_2_inst	<= `SD 0;
+			Dcache_miss_times   <= `SD 0;
+			LSQ_request_times	<= `SD 0; 
+			Icache_miss_times	<= `SD 0;
+			PC_request_times	<= `SD 0;
+		end
 		else if(ROB_commit1_valid && ROB_commit2_valid)
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + 2*pipeline_completed_insts);
-			end
+		begin
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + 2*pipeline_completed_insts);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst+1;
+			if (processor_0.dca.dm.true_miss)
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
+			else
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
+		end
+		else if(!ROB_commit1_valid && !ROB_commit2_valid)
+		begin
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + 0);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst+1;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
+			if (processor_0.dca.dm.true_miss)
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
+			else
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
+		end
 		else
-			begin
-			clock_count <= `SD (clock_count + 1);
-			instr_count <= `SD (instr_count + pipeline_completed_insts);
-			end
+		begin
+			clock_count 		<= `SD (clock_count + 1);
+			instr_count 		<= `SD (instr_count + pipeline_completed_insts);
+			ROB_commit_0_inst	<= `SD ROB_commit_0_inst;
+			ROB_commit_1_inst	<= `SD ROB_commit_1_inst+1;
+			ROB_commit_2_inst	<= `SD ROB_commit_2_inst;
+			if (processor_0.dca.dm.true_miss)
+				Dcache_miss_times<= `SD Dcache_miss_times+1;
+			else
+				Dcache_miss_times<= `SD Dcache_miss_times+0;
+			if(processor_0.LSQ2Dcache_command==BUS_LOAD||processor_0.LSQ2Dcache_command==BUS_STORE)
+				LSQ_request_times<= `SD LSQ_request_times+1;
+			else
+				LSQ_request_times<= `SD LSQ_request_times;
+			if (processor_0.ica.im.data_is_miss)
+				Icache_miss_times<= `SD Icache_miss_times+1;
+			else
+				Icache_miss_times<= `SD Icache_miss_times;
+			if (processor_0.proc2Icache_command==BUS_LOAD)
+				PC_request_times	<= `SD PC_request_times+1;
+			else
+				PC_request_times	<= `SD PC_request_times;
+		end
 	end  
 
   	always @(negedge clock) begin
@@ -296,8 +381,8 @@ module testbench;
        // print the piepline stuff via c code to the pipeline.out
        print_cycles();
        //IF
-       print_stage(" ", PC_inst1, PC_proc2Imem_addr_previous[31:0], {31'b0,PC_inst1_valid});
-       print_stage(" ", PC_inst2, PC_proc2Imem_addr_previous[31:0]+4, {31'b0,PC_inst2_valid});
+       print_stage(" ", PC_inst1, current_pc[31:0], {31'b0,PC_inst1_valid});
+       print_stage(" ", PC_inst2, current_pc[31:0]+4, {31'b0,PC_inst2_valid});
        
        //RS
        print_stage_fu(" ", fu_next_inst_pc_out[0][63:0],RS_EX_op_type[0],1);
@@ -327,39 +412,55 @@ module testbench;
     	// print the writeback information to writeback.out
 		// for writeback.out we need pipeline_completed_insts pipeline_commit_wr_en
 		// pipeline_commit_NPC  pipeline_commit_wr_idx pipeline_commit_wr_data
-       			if(pipeline_completed_insts>0) begin
-         			if(ROB_commit1_valid&&ROB_commit1_wr_en)
-           				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
+       		if(pipeline_completed_insts>0) begin
+         			if(ROB_commit1_valid&&ROB_commit1_wr_en &&ROB_commit1_is_thread1)
+           				$fdisplay(wb_fileno1, "PC=%x, REG[%d]=%x",
                      				ROB_commit1_pc,
                      				ROB_commit1_arn_dest,
                      				PRF_writeback_value1);
         			else begin
-					if(ROB_commit1_valid)
-          				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit1_pc);
+					if(ROB_commit1_valid &&ROB_commit1_is_thread1)
+          				$fdisplay(wb_fileno1, "PC=%x, ---",ROB_commit1_pc);
 
 				end
-				if(ROB_commit2_valid&&ROB_commit2_wr_en)
-           				$fdisplay(wb_fileno, "PC=%x, REG[%d]=%x",
+				if(ROB_commit2_valid&&ROB_commit2_wr_en &&ROB_commit2_is_thread1)
+           				$fdisplay(wb_fileno1, "PC=%x, REG[%d]=%x",
                      				ROB_commit2_pc,
                      				ROB_commit2_arn_dest,
                      				PRF_writeback_value2);
         			else begin
-					if(ROB_commit2_valid)
-        				$fdisplay(wb_fileno, "PC=%x, ---",ROB_commit2_pc);
+					if(ROB_commit2_valid &&ROB_commit2_is_thread1)
+        				$fdisplay(wb_fileno1, "PC=%x, ---",ROB_commit2_pc);
 
 				end
-      		end
+			end
+
+			if(pipeline_completed_insts>0) begin
+         			if(ROB_commit1_valid&&ROB_commit1_wr_en && ~ROB_commit1_is_thread1)
+           				$fdisplay(wb_fileno2, "PC=%x, REG[%d]=%x",
+                     				ROB_commit1_pc,
+                     				ROB_commit1_arn_dest,
+                     				PRF_writeback_value1);
+        			else begin
+					if(ROB_commit1_valid && ~ROB_commit1_is_thread1)
+          				$fdisplay(wb_fileno2, "PC=%x, ---",ROB_commit1_pc);
+
+				end
+				if(ROB_commit2_valid&&ROB_commit2_wr_en && ~ROB_commit2_is_thread1)
+           				$fdisplay(wb_fileno2, "PC=%x, REG[%d]=%x",
+                     				ROB_commit2_pc,
+                     				ROB_commit2_arn_dest,
+                     				PRF_writeback_value2);
+        			else begin
+					if(ROB_commit2_valid && ~ROB_commit2_is_thread1)
+        				$fdisplay(wb_fileno2, "PC=%x, ---",ROB_commit2_pc);
+
+				end
+      			end
+      		
       		
 
-			//show_clk_count;
-			//$fclose(wb_fileno);
 
-      		// deal with any halting conditions
-     		/*if(pipeline_error_status != NO_ERROR) begin
-        	print_close(); // close the pipe_print output file
-        	$fclose(wb_fileno);
-        	#100 $finish;
-      		end*/
 			// deal with any halting conditions
 			if(pipeline_error_status!=NO_ERROR)
 			begin
@@ -372,25 +473,29 @@ module testbench;
 				case(pipeline_error_status)
 					HALTED_ON_MEMORY_ERROR:  
 						$display(	"@@@ System halted on memory error");
-					HALTED_ON_HALT_I1:          
+					/*HALTED_ON_HALT_I1:          
 						$display(	"@@@ System halted on HALT_I1 instruction");
 					HALTED_ON_HALT_I2:          
-						$display(	"@@@ System halted on HALT_I2 instruction");
+						$display(	"@@@ System halted on HALT_I2 instruction");*/
 					HALTED_ON_ILLEGAL_I1:
 						$display(	"@@@ System halted on illegal_I1 instruction");
 					HALTED_ON_ILLEGAL_I2:
 						$display(	"@@@ System halted on illegal_I2 instruction");
+					TERMINATE_NORMALLY:
+						$display(	"@@@ System halted normally");
 					default: 
 						$display(	"@@@ System halted on unknown error code %x",
 									pipeline_error_status);
 				endcase
 				$display("@@@\n@@");
 				show_clk_count;
-				//print_close(); // close the pipe_print output file
-				//$fclose(wb_fileno);
-				//#100 $finish;
+				print_close(); // close the pipe_print output file
+				$fclose(wb_fileno1);
+				$fclose(wb_fileno2);
+				#100 $finish;
 			end
 		end// if(reset) 
     	end  
 
 endmodule  // module testbench
+

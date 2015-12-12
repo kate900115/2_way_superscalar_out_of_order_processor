@@ -1,0 +1,11 @@
+	lda	$r5,1
+	lda	$r1,5000
+	stq	$r5,0($r1)
+	addq    $r5,1,$r5
+	stq	$r5,0($r1)
+	addq    $r5,1,$r5
+	addq    $r5,1,$r5
+	addq    $r5,1,$r5
+	addq    $r5,1,$r5
+	addq    $r5,1,$r5
+	call_pal    0x555

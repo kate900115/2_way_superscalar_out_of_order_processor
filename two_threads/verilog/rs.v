@@ -142,6 +142,7 @@ module rs(
 	
 	logic 	[`RS_SIZE-1:0]						inst1_internal_rs_load_in_temp;
 	logic   [`RS_SIZE-1:0]						inst2_internal_rs_load_in_temp;
+	logic   [`RS_SIZE-1:0]						inst1_internal_rs_load_in_temp_load1;
 	
 	// for debug
 	logic	[`RS_SIZE-1:0][63:0]				internal_rs_inst_pc_out;
@@ -304,9 +305,44 @@ module rs(
 		.en(inst1_rs_load_in && inst2_rs_load_in),
 		.gnt_bus({inst1_internal_rs_load_in_temp, inst2_internal_rs_load_in_temp})
 	);
+
+	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps2(                                  
+		.req(internal_rs_available_out),                                                 
+		.en(inst1_rs_load_in),
+		.gnt_bus({inst1_internal_rs_load_in_temp_load1})
+	);
 	
-	assign 	inst1_internal_rs_load_in = inst1_is_halt? 0 : inst1_internal_rs_load_in_temp;
-	assign 	inst2_internal_rs_load_in = inst2_is_halt? 0 : inst2_internal_rs_load_in_temp;
+	//assign 	inst1_internal_rs_load_in = inst1_is_halt? 0 : inst1_internal_rs_load_in_temp;
+	//assign 	inst2_internal_rs_load_in = inst2_is_halt? 0 : inst2_internal_rs_load_in_temp;
+
+	always_comb begin
+		inst1_internal_rs_load_in = 0;
+		inst2_internal_rs_load_in = 0;
+
+		if(inst1_is_halt)
+		begin
+			inst1_internal_rs_load_in =0;
+		end
+		else if (inst1_rs_load_in && ~inst2_rs_load_in)
+		begin
+			inst1_internal_rs_load_in =inst1_internal_rs_load_in_temp_load1;
+		end
+		else if(inst1_rs_load_in && inst2_rs_load_in)
+		begin
+			inst1_internal_rs_load_in =inst1_internal_rs_load_in_temp;
+		end
+
+		if(inst2_is_halt)
+		begin
+			inst2_internal_rs_load_in =0;
+		end
+		else if(inst1_rs_load_in && inst2_rs_load_in)
+		begin
+			inst2_internal_rs_load_in =inst2_internal_rs_load_in_temp;
+		end
+
+
+	end
 
 	//during the wake-up rs entries , we want to select two to the two FU. 
 	//but for example: only one adder is available, 

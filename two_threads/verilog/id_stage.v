@@ -30,7 +30,8 @@ module decoder(
     output logic rd_mem, wr_mem, cond_branch, uncond_branch,
     output logic halt,      // non-zero on a halt
     output logic illegal,    // non-zero on an illegal instruction
-    output logic valid_inst  // for counting valid instructions executed
+    output logic valid_inst,  
+    output logic        if_FBEQ// for counting valid instructions executed
                             // and for making the fetch stage die on halts/
                             // keeping track of when to allow the next
                             // instruction out of fetch
@@ -57,6 +58,7 @@ module decoder(
     uncond_branch = `FALSE;
     halt = `FALSE;
     illegal = `FALSE;
+    if_FBEQ =0;
     if(valid_inst_in) begin
       case ({inst[31:29], 3'b0})
         6'h0:
@@ -163,12 +165,17 @@ module decoder(
           opb_select = ALU_OPB_IS_BR_DISP;
           alu_func = ALU_ADDQ;
           case (inst[31:26])
-            `FBEQ_INST, `FBLT_INST, `FBLE_INST,
+            `FBLT_INST, `FBLE_INST,
             `FBNE_INST, `FBGE_INST, `FBGT_INST:
             begin
               // FP conditionals not implemented
               illegal = `TRUE;
             end
+	    `FBEQ_INST:
+	    begin
+		if_FBEQ =1;
+	        cond_branch = `TRUE;
+	    end
 
             `BR_INST, `BSR_INST:
             begin
@@ -247,7 +254,9 @@ module id_stage(
 				output logic        id_illegal_out2,
 				output logic        id_valid_inst_out2,     // is inst a valid instruction to be
 				output logic [4:0]  id_rega_inst1, 
-				output logic [4:0]  id_rega_inst2
+				output logic [4:0]  id_rega_inst2,
+				output logic        if_FBEQ1,
+				output logic        if_FBEQ2
 );
    
 	DEST_REG_SEL dest_reg_select1;
@@ -388,7 +397,8 @@ module id_stage(
 					 .halt(id_halt_out1),
 					 //.cpuid(id_cpuid_out1),
 					 .illegal(id_illegal_out1),
-					 .valid_inst(id_valid_inst_out1)
+					 .valid_inst(id_valid_inst_out1),
+					 .if_FBEQ(if_FBEQ1)
 					);
 
 	decoder decode_2 (// Input
@@ -409,7 +419,8 @@ module id_stage(
 					 .halt(id_halt_out2),
 					 //.cpuid(id_cpuid_out2),
 					 .illegal(id_illegal_out2),
-					 .valid_inst(id_valid_inst_out2)
+					 .valid_inst(id_valid_inst_out2),
+					 .if_FBEQ(if_FBEQ2)
 					);
 	// mux to generate dest_reg_idx based on
 	// the dest_reg_select output from decoder

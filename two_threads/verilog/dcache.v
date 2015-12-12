@@ -38,6 +38,7 @@ module dcache(
 	logic [`DCACHE_BLOCK_SIZE-1:0]			write_data_to_Dcache;	// data that send to dcache.v
 	logic [3:0]								mem_response;
 	logic [3:0]								mem_tag;
+	logic [63:0]							writeback_address;
 	
 	dcache_controller dc(
 		// input from Mem.v
@@ -49,6 +50,7 @@ module dcache(
 		.cachemem_is_dirty(cachemem_is_dirty),
 		.cachemem_is_miss(cachemem_is_miss),
 		.cachemem_is_full(cachemem_is_full),
+		.writeback_address(writeback_address),
 		// input from processor.v
 		.proc2Dcache_addr(proc2Dcache_addr),
 		.proc2Dcache_command(proc2Dcache_command),
@@ -91,7 +93,8 @@ module dcache(
 		.data_is_dirty(cachemem_is_dirty),  // data which need to be replaced is dirty
 		.data_is_miss(cachemem_is_miss),
 		.cache_is_full(cachemem_is_full),
-		.data_out(cachemem_data)
+		.data_out(cachemem_data),
+		.writeback_address(writeback_address)
 	);
 	
 endmodule
