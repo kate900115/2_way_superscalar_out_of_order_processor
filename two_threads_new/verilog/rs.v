@@ -32,15 +32,15 @@ module rs(
 	input  	     								inst1_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         								inst1_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT)
 
-	input  [63:0]                                                           inst1_rs_opc_in,
-	input 									inst1_rs_opc_valid,
+	input  [63:0]								inst1_rs_opc_in,
+	input										inst1_rs_opc_valid,
 	
 	input  [$clog2(`ROB_SIZE):0]				inst1_rs_rob_idx_in,  	// The rob index of instruction 1
 	input  ALU_FUNC								inst1_rs_alu_func,    	// ALU function type from decoder
 	input  [5:0]	      						inst1_rs_op_type_in,  	// Instruction type from decoder
 	input  FU_SELECT							inst1_rs_fu_select_in,
 	input  		        						inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  [1:0]                                                            inst1_rs_branch_in,
+	input  [1:0]                                inst1_rs_branch_in,
         
         //for instruction2
 	input  [63:0] 								inst2_rs_opa_in,      	// Operand a from Rename  
@@ -48,17 +48,17 @@ module rs(
 	input  	     								inst2_rs_opa_valid,   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	input         								inst2_rs_opb_valid,   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 
-	input  [63:0]                                                           inst2_rs_opc_in,
-	input 									inst2_rs_opc_valid,
+	input  [63:0]								inst2_rs_opc_in,
+	input										inst2_rs_opc_valid,
 
 	input  [$clog2(`ROB_SIZE):0]				inst2_rs_rob_idx_in,  	// The rob index of instruction 2
 	input  ALU_FUNC								inst2_rs_alu_func,    	// ALU function type from decoder
 	input  [5:0]	      						inst2_rs_op_type_in,  	// Instruction type from decoder
 	input  FU_SELECT        					inst2_rs_fu_select_in,
 	input  		        						inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  [1:0]                                                            inst2_rs_branch_in,
+	input  [1:0]                                inst2_rs_branch_in,
 
-	input  [5:0]								fu_is_available,		//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
+	input  [3:0]								fu_is_available,		//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
 	
 	input										thread1_branch_is_taken,// when a branch of thread1 is taken, we need to flush all the instructions of thread1 in RS
 	input										thread2_branch_is_taken,// when a branch of thread2 is taken, we need to flush all the instructions of thread2 in RS
@@ -66,32 +66,31 @@ module rs(
 	input										inst1_is_halt,
 	input										inst2_is_halt,
 	
-
   
  	//output
-	output logic [5:0][63:0]					fu_rs_opa_out,       	// This RS' opa 
-	output logic [5:0][63:0]					fu_rs_opb_out,       	// This RS' opb 
+	output logic [3:0][63:0]					fu_rs_opa_out,       	// This RS' opa 
+	output logic [3:0][63:0]					fu_rs_opb_out,       	// This RS' opb 
 
-	output logic [5:0][63:0]					fu_rs_opc_out,
-	output logic [5:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag
-	output logic [5:0][$clog2(`ROB_SIZE):0]		fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
-	output logic [5:0][5:0]						fu_rs_op_type_out,     	// This RS' operation type
-	output ALU_FUNC [5:0]						fu_alu_func_out,
+	output logic [3:0][63:0]					fu_rs_opc_out,
+	output logic [3:0][$clog2(`PRF_SIZE)-1:0]	fu_rs_dest_tag_out,  	// This RS' destination tag
+	output logic [3:0][$clog2(`ROB_SIZE):0]		fu_rs_rob_idx_out,   	// This RS' corresponding ROB index
+	output logic [3:0][5:0]						fu_rs_op_type_out,     	// This RS' operation type
+	output ALU_FUNC [3:0]						fu_alu_func_out,
 	
-	output logic [5:0]							fu_rs_out_valid,			// RS output is valid
-	output logic [5:0] [1:0]                                                fu_rs_branch_out, 
+	output logic [3:0]							fu_rs_out_valid,			// RS output is valid
+	output logic [3:0] [1:0]                                                fu_rs_branch_out, 
 
 	output										rs_full,					// RS is full now
 	
 	// for debug
 	input  [63:0]								inst1_rs_pc_in,
 	input  [63:0]								inst2_rs_pc_in,
-	output logic [5:0][63:0]					fu_inst_pc_out								
+	output logic [3:0][63:0]					fu_inst_pc_out								
 );
 
 	
 	//input of one entry
-	//logic [2*`RS_SIZE-1:0]						internal_rs_load_in;			//instruction1 go to the entries according to this,
+	//logic [2*`RS_SIZE-1:0]					internal_rs_load_in;			//instruction1 go to the entries according to this,
 	logic [`RS_SIZE-1:0] 						inst1_internal_rs_load_in;		//when dispatching two instructions it tell us the address of entries to load each instructions
 	logic [`RS_SIZE-1:0] 						inst2_internal_rs_load_in;		//instruction2 go to the entries according to this
 
@@ -242,9 +241,9 @@ module rs(
 
  	.rs1_cdb1_in(rs_cdb1_in),
 	.rs1_cdb1_tag(rs_cdb1_tag),
-	.rs1_cdb1_valid(rs_cdb1_valid),  	
+	.rs1_cdb1_valid(rs_cdb1_valid),
 	.rs1_cdb2_in(rs_cdb2_in),
-	.rs1_cdb2_tag(rs_cdb2_tag),    	
+	.rs1_cdb2_tag(rs_cdb2_tag),
 	.rs1_cdb2_valid(rs_cdb2_valid),
  
 	.inst1_rs1_opa_in(inst1_OPa),
@@ -300,48 +299,47 @@ module rs(
 	//when dispatching, two instruction comes in, 
 	//this selector can help us to find two available entries in rs, 
 	//then make the load of the two entries to be 1
-	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) tsps1(                                  
+	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps1(                                  
 		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in && inst2_rs_load_in),
-		.gnt_bus({inst1_internal_rs_load_in_temp, inst2_internal_rs_load_in_temp})
+		.en(inst1_rs_load_in),
+		.gnt_bus(inst1_internal_rs_load_in_temp)
 	);
 
 	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps2(                                  
-		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in),
-		.gnt_bus({inst1_internal_rs_load_in_temp_load1})
+		.req(~inst1_internal_rs_load_in_temp & internal_rs_available_out),                                                 
+		.en(inst2_rs_load_in),
+		.gnt_bus(inst2_internal_rs_load_in_temp)
 	);
 	
-	//assign 	inst1_internal_rs_load_in = inst1_is_halt? 0 : inst1_internal_rs_load_in_temp;
-	//assign 	inst2_internal_rs_load_in = inst2_is_halt? 0 : inst2_internal_rs_load_in_temp;
-
 	always_comb begin
 		inst1_internal_rs_load_in = 0;
 		inst2_internal_rs_load_in = 0;
 
 		if(inst1_is_halt)
 		begin
-			inst1_internal_rs_load_in =0;
+			inst1_internal_rs_load_in = 0;
 		end
-		else if (inst1_rs_load_in && ~inst2_rs_load_in)
+		else if (inst1_rs_fu_select_in == USE_MEMORY)
 		begin
-			inst1_internal_rs_load_in =inst1_internal_rs_load_in_temp_load1;
+			inst1_internal_rs_load_in = 0;
 		end
-		else if(inst1_rs_load_in && inst2_rs_load_in)
+		else if(inst1_rs_load_in)
 		begin
-			inst1_internal_rs_load_in =inst1_internal_rs_load_in_temp;
+			inst1_internal_rs_load_in = inst1_internal_rs_load_in_temp;
 		end
 
 		if(inst2_is_halt)
 		begin
-			inst2_internal_rs_load_in =0;
+			inst2_internal_rs_load_in = 0;
 		end
-		else if(inst1_rs_load_in && inst2_rs_load_in)
+		else if(inst2_rs_fu_select_in == USE_MEMORY)
 		begin
-			inst2_internal_rs_load_in =inst2_internal_rs_load_in_temp;
+			inst2_internal_rs_load_in = 0;
 		end
-
-
+		else if(inst2_rs_load_in)
+		begin
+			inst2_internal_rs_load_in = inst2_internal_rs_load_in_temp;
+		end
 	end
 
 	//during the wake-up rs entries , we want to select two to the two FU. 
@@ -351,22 +349,21 @@ module rs(
 	//if this condition happans, 
 	//we have to forbid selecting two instructions both using adder.
 	always_comb begin
-	//$display("internal_rs_available_out:%b", internal_rs_available_out);
 		for (int i = 0; i < `RS_SIZE; i++) begin
 			internal_rs_free_enable_fu[i]		= 0;
 		end
-		
-		for (int i = 0; i < 6; i++) begin
+
+		for (int i = 0; i < 4; i++) begin
 			fu_rs_out_valid[i]		= 0;
 			fu_rs_opa_out[i]		= 0;
 			fu_rs_opb_out[i]		= 0;
-			fu_rs_opc_out[i]                = 0;
+			fu_rs_opc_out[i]        = 0;
 			fu_rs_dest_tag_out[i]	= 0;
 			fu_rs_rob_idx_out[i]	= 0;
 			fu_rs_op_type_out[i]	= 0;
 			fu_alu_func_out[i]		= ALU_DEFAULT;
-			fu_rs_branch_out[i]        =0;
-			fu_inst_pc_out[i]          =0;
+			fu_rs_branch_out[i]     = 0;
+			fu_inst_pc_out[i]       = 0;
 		end
 
 		if (fu_is_available[0]) begin
@@ -376,13 +373,13 @@ module rs(
 						internal_rs_free_enable_fu[i] 	= 1;
 						fu_rs_opa_out[0]		= internal_rs_opa_out[i];
 						fu_rs_opb_out[0]		= internal_rs_opb_out[i];
-						fu_rs_opc_out[0]                = internal_rs_opc_out[i];
+						fu_rs_opc_out[0]		= internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[0]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[0]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[0]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[0]		= 1'b1;
 						fu_alu_func_out[0]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[0]             = internal_rs_branch_sig[i];
+						fu_rs_branch_out[0]		= internal_rs_branch_sig[i];
 						fu_inst_pc_out[0]		= internal_rs_inst_pc_out[i];
 						break;
 					end
@@ -397,13 +394,13 @@ module rs(
 						internal_rs_free_enable_fu[i]		= 1;
 						fu_rs_opa_out[1]		= internal_rs_opa_out[i];
 						fu_rs_opb_out[1]		= internal_rs_opb_out[i];
-						fu_rs_opc_out[1]                = internal_rs_opc_out[i];
+						fu_rs_opc_out[1]        = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[1]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[1]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[1]	= internal_rs_op_type_out[i];
 						fu_rs_out_valid[1]		= 1'b1;
 						fu_alu_func_out[1]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[1]             = internal_rs_branch_sig[i];
+						fu_rs_branch_out[1]     = internal_rs_branch_sig[i];
 						fu_inst_pc_out[1]		= internal_rs_inst_pc_out[i];
 						break;
 					end
@@ -416,15 +413,15 @@ module rs(
 				if (internal_rs_ready_out[i] && internal_rs_fu_select_reg_out[i] == USE_MULTIPLIER) begin
 					if (!internal_rs_free_enable_fu[i]) begin
 						internal_rs_free_enable_fu[i]	= 1;
-						fu_rs_opa_out[2]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[2]	= internal_rs_opb_out[i];
-						fu_rs_opc_out[2]                = internal_rs_opc_out[i];
+						fu_rs_opa_out[2]		= internal_rs_opa_out[i];
+						fu_rs_opb_out[2]		= internal_rs_opb_out[i];
+						fu_rs_opc_out[2]        = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[2]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[2]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[2]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[2]	= 1'b1;
+						fu_rs_out_valid[2]		= 1'b1;
 						fu_alu_func_out[2]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[2]             = internal_rs_branch_sig[i];
+						fu_rs_branch_out[2]     = internal_rs_branch_sig[i];
 						fu_inst_pc_out[2]		= internal_rs_inst_pc_out[i];
 						break;
 					end
@@ -437,64 +434,21 @@ module rs(
 				if (internal_rs_ready_out[i] && internal_rs_fu_select_reg_out[i] == USE_ADDER) begin
 					if (!internal_rs_free_enable_fu[i]) begin
 						internal_rs_free_enable_fu[i]	= 1;
-						fu_rs_opa_out[3]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[3]	= internal_rs_opb_out[i];
-						fu_rs_opc_out[3]                = internal_rs_opc_out[i];
+						fu_rs_opa_out[3]		= internal_rs_opa_out[i];
+						fu_rs_opb_out[3]		= internal_rs_opb_out[i];
+						fu_rs_opc_out[3]        = internal_rs_opc_out[i];
 						fu_rs_dest_tag_out[3]	= internal_rs_dest_tag_out[i];
 						fu_rs_rob_idx_out[3]	= internal_rs_rob_idx_out[i];
 						fu_rs_op_type_out[3]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[3]	= 1'b1;
+						fu_rs_out_valid[3]		= 1'b1;
 						fu_alu_func_out[3]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[3]             = internal_rs_branch_sig[i];
+						fu_rs_branch_out[3]     = internal_rs_branch_sig[i];
 						fu_inst_pc_out[3]		= internal_rs_inst_pc_out[i];
 						break;
 					end
 				end
 			end
 		end
-
-		if (fu_is_available[4]) begin
-			for (int i = 0; i < `RS_SIZE; i++) begin
-				if (internal_rs_ready_out[i] && internal_rs_fu_select_reg_out[i] == USE_MEMORY) begin
-					if (!internal_rs_free_enable_fu[i]) begin
-						internal_rs_free_enable_fu[i]	= 1;
-						fu_rs_opa_out[4]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[4]	= internal_rs_opb_out[i];
-						fu_rs_opc_out[4]                = internal_rs_opc_out[i];
-						fu_rs_dest_tag_out[4]	= internal_rs_dest_tag_out[i];
-						fu_rs_rob_idx_out[4]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[4]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[4]	= 1'b1;
-						fu_alu_func_out[4]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[4]             = internal_rs_branch_sig[i];
-						fu_inst_pc_out[4]		= internal_rs_inst_pc_out[i];
-						break;
-					end
-				end
-			end
-		end
-
-		if (fu_is_available[5]) begin
-			for (int i = 0; i < `RS_SIZE; i++) begin
-				if (internal_rs_ready_out[i] && internal_rs_fu_select_reg_out[i] == USE_MEMORY) begin
-					if (!internal_rs_free_enable_fu[i]) begin
-						internal_rs_free_enable_fu[i]	= 1;
-						fu_rs_opa_out[5]	= internal_rs_opa_out[i];
-						fu_rs_opb_out[5]	= internal_rs_opb_out[i];
-						fu_rs_opc_out[5]                = internal_rs_opc_out[i];
-						fu_rs_dest_tag_out[5]	= internal_rs_dest_tag_out[i];
-						fu_rs_rob_idx_out[5]	= internal_rs_rob_idx_out[i];
-						fu_rs_op_type_out[5]	= internal_rs_op_type_out[i];
-						fu_rs_out_valid[5]	= 1'b1;
-						fu_alu_func_out[5]		= internal_rs_alu_func_out[i];
-						fu_rs_branch_out[5]             = internal_rs_branch_sig[i];
-						fu_inst_pc_out[5]		= internal_rs_inst_pc_out[i];
-						break;
-					end
-				end
-			end
-		end
-					//	$display("fu_rs_dest_tag_out:%h", fu_rs_dest_tag_out);
 	end
 
 	//to test how many RS_one_entry(s) are available
@@ -551,5 +505,4 @@ module rs(
 			internal_rs_free = 0;
 		end
 	end
-	
 endmodule

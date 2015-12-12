@@ -23,6 +23,7 @@ module rob(
 	input	[4:0]								inst1_arn_dest_in,					//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0]				inst1_prn_dest_in,					//the prf number of the destination of this instruction
 	input										inst1_is_branch_in,					//if this instruction is a branch
+	input										inst1_is_uncond_branch_in,
 	input										inst1_is_halt_in,
 	input										inst1_is_illegal_in,
 	input 										inst1_load_in,						//tell rob if instruction1 is valid
@@ -32,6 +33,7 @@ module rob(
 	input	[4:0]								inst2_arn_dest_in,					//the arf number of the destinaion of the instruction
 	input	[$clog2(`PRF_SIZE)-1:0] 			inst2_prn_dest_in,      		    //the prf number of the destination of this instruction
 	input										inst2_is_branch_in,					//if this instruction is a branch
+	input										inst2_is_uncond_branch_in,
 	input										inst2_is_halt_in,
 	input										inst2_is_illegal_in,
 	input 										inst2_load_in,		    		   	//tell rob if instruction2 is valid
@@ -57,6 +59,7 @@ module rob(
 	output	logic	[63:0]						commit1_pc_out,
 	output  logic	[63:0]						commit1_target_pc_out,
 	output	logic								commit1_is_branch_out,				//if this instruction is a branch
+	output	logic								commit1_is_uncond_branch_out,
 	output	logic								commit1_mispredict_out,		       	//if this instrucion is mispredicted
 	output	logic	[4:0]						commit1_arn_dest_out,               //the architected register number of the destination of this instruction
 	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit1_prn_dest_out,				//the prf number of the destination of this instruction
@@ -69,6 +72,7 @@ module rob(
 	output  logic	[63:0]						commit2_pc_out,
 	output  logic	[63:0]						commit2_target_pc_out,
 	output	logic								commit2_is_branch_out,				//if this instruction is a branch
+	output	logic								commit2_is_uncond_branch_out,
 	output	logic								commit2_mispredict_out,				//if this instrucion is mispredicted
 	output	logic	[4:0]						commit2_arn_dest_out,				//the architected register number of the destination of this instruction
 	output	logic	[$clog2(`PRF_SIZE)-1:0]		commit2_prn_dest_out,				//the prf number of the destination of this instruction
@@ -102,6 +106,7 @@ module rob(
 	logic	[`ROB_SIZE-1:0][63:0]					rob1_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_thread1_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_is_branch_out;
+	logic	[`ROB_SIZE-1:0]							rob1_internal_is_uncond_branch_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_available_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_mispredict_out;
 	logic	[`ROB_SIZE-1:0]							rob1_internal_mispredict_in;
@@ -122,6 +127,7 @@ module rob(
 	logic	[`ROB_SIZE-1:0][63:0]					rob2_internal_pc_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_thread1_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_is_branch_out;
+	logic	[`ROB_SIZE-1:0]							rob2_internal_is_uncond_branch_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_available_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_mispredict_out;
 	logic	[`ROB_SIZE-1:0]							rob2_internal_mispredict_in;
@@ -156,6 +162,7 @@ module rob(
 	.inst1_arn_dest_in(inst1_arn_dest_in),
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
+	.inst1_is_uncond_branch_in(inst1_is_uncond_branch_in),
 	.inst1_rob_load_in(rob1_internal_inst1_rob_load_in),
 	.inst1_halt_in(inst1_is_halt_in),
 	.inst1_illegal_in(inst1_is_illegal_in),
@@ -164,6 +171,7 @@ module rob(
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
+	.inst2_is_uncond_branch_in(inst2_is_uncond_branch_in),
 	.inst2_rob_load_in(rob1_internal_inst2_rob_load_in),
 	.inst2_halt_in(inst2_is_halt_in),
 	.inst2_illegal_in(inst2_is_illegal_in),
@@ -177,7 +185,8 @@ module rob(
 	.pc_out(rob1_internal_pc_out),
 	.is_thread1_out(rob1_internal_is_thread1_out),
 	.is_ex_out(rob1_internal_is_ex_out),
-	.is_branch_out(rob1_internal_is_branch_out), 
+	.is_branch_out(rob1_internal_is_branch_out),
+	.is_uncond_branch_out(rob1_internal_is_uncond_branch_out),
 	.available_out(rob1_internal_available_out),
 	.mispredict_out(rob1_internal_mispredict_out),
 	.target_pc_out(rob1_internal_target_pc_out),
@@ -207,6 +216,7 @@ module rob(
 	.inst1_arn_dest_in(inst1_arn_dest_in),
 	.inst1_prn_dest_in(inst1_prn_dest_in),
 	.inst1_is_branch_in(inst1_is_branch_in),
+	.inst1_is_uncond_branch_in(inst1_is_uncond_branch_in),
 	.inst1_rob_load_in(rob2_internal_inst1_rob_load_in),
 	.inst1_halt_in(inst1_is_halt_in),
 	.inst1_illegal_in(inst1_is_illegal_in),
@@ -215,6 +225,7 @@ module rob(
 	.inst2_arn_dest_in(inst2_arn_dest_in),
 	.inst2_prn_dest_in(inst2_prn_dest_in),
 	.inst2_is_branch_in(inst2_is_branch_in),
+	.inst2_is_uncond_branch_in(inst2_is_uncond_branch_in),
 	.inst2_rob_load_in(rob2_internal_inst2_rob_load_in),
 	.inst2_halt_in(inst2_is_halt_in),
 	.inst2_illegal_in(inst2_is_illegal_in),
@@ -228,7 +239,8 @@ module rob(
 	.pc_out(rob2_internal_pc_out),
 	.is_thread1_out(rob2_internal_is_thread1_out),
 	.is_ex_out(rob2_internal_is_ex_out),
-	.is_branch_out(rob2_internal_is_branch_out), 
+	.is_branch_out(rob2_internal_is_branch_out),
+	.is_uncond_branch_out(rob2_internal_is_uncond_branch_out),
 	.available_out(rob2_internal_available_out),
 	.mispredict_out(rob2_internal_mispredict_out),
 	.target_pc_out(rob2_internal_target_pc_out),
@@ -322,6 +334,7 @@ module rob(
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
 			commit1_target_pc_out	= rob1_internal_target_pc_out[t1_head];
 			commit1_is_branch_out	= rob1_internal_is_branch_out[t1_head];
+			commit1_is_uncond_branch_out	= rob1_internal_is_uncond_branch_out[t1_head];
 			commit1_mispredict_out	= rob1_internal_mispredict_out[t1_head];
 			commit1_arn_dest_out	= rob1_internal_arn_dest_out[t1_head];
 			commit1_prn_dest_out	= rob1_internal_prn_dest_out[t1_head];
@@ -336,6 +349,7 @@ module rob(
 				commit2_pc_out			= rob1_internal_pc_out[t1_head+4'b1];
 				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+4'b1];
 				commit2_is_branch_out	= rob1_internal_is_branch_out[t1_head+4'b1];
+				commit2_is_uncond_branch_out	= rob1_internal_is_uncond_branch_out[t1_head+4'b1];
 				commit2_mispredict_out	= rob1_internal_mispredict_out[t1_head+4'b1];
 				commit2_arn_dest_out	= rob1_internal_arn_dest_out[t1_head+4'b1];
 				commit2_prn_dest_out	= rob1_internal_prn_dest_out[t1_head+4'b1];
@@ -354,6 +368,7 @@ module rob(
 				commit2_pc_out			= rob2_internal_pc_out[t2_head];
 				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head];
+				commit2_is_uncond_branch_out	= rob2_internal_is_uncond_branch_out[t2_head];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
 				commit2_prn_dest_out	= rob2_internal_prn_dest_out[t2_head];
@@ -378,6 +393,7 @@ module rob(
 			commit1_pc_out			= rob2_internal_pc_out[t2_head];
 			commit1_target_pc_out	= rob2_internal_target_pc_out[t2_head];
 			commit1_is_branch_out	= rob2_internal_is_branch_out[t2_head];
+			commit1_is_uncond_branch_out	= rob2_internal_is_uncond_branch_out[t2_head];
 			commit1_mispredict_out	= rob2_internal_mispredict_out[t2_head];
 			commit1_arn_dest_out	= rob2_internal_arn_dest_out[t2_head];
 			commit1_prn_dest_out	= rob2_internal_prn_dest_out[t2_head];
@@ -392,6 +408,7 @@ module rob(
 				commit2_pc_out			= rob2_internal_pc_out[t2_head+4'b1];
 				commit2_target_pc_out	= rob2_internal_target_pc_out[t2_head+4'b1];
 				commit2_is_branch_out	= rob2_internal_is_branch_out[t2_head+4'b1];
+				commit2_is_uncond_branch_out	= rob2_internal_is_uncond_branch_out[t2_head+4'b1];
 				commit2_mispredict_out	= rob2_internal_mispredict_out[t2_head+4'b1];
 				commit2_arn_dest_out	= rob2_internal_arn_dest_out[t2_head+4'b1];
 				commit2_prn_dest_out	= rob2_internal_prn_dest_out[t2_head+4'b1];

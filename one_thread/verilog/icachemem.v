@@ -58,11 +58,7 @@ module icachemem(
 			n_last_load_response = 0;
 			n_last_load_miss = 0;
 		end
-		else if(!data_is_miss && last_load_miss && (mem_tag!= last_load_response || mem_tag==0)) begin
-			n_last_load_response = last_load_response;
-			n_last_load_miss = last_load_miss;
-		end
-		else if(!data_is_miss && !last_load_miss) begin
+		else begin
 			n_last_load_response = last_load_response;
 			n_last_load_miss = last_load_miss;
 		end
@@ -71,12 +67,12 @@ module icachemem(
 	always_ff @(posedge clock) begin
 		if(reset)
 		begin
-			last_load_miss = 0;
-			last_load_response = 0;
+			last_load_miss <= `SD 0;
+			last_load_response <= `SD 0;
 			end
 		else begin
-			last_load_miss = n_last_load_miss;
-			last_load_response = n_last_load_response;
+			last_load_miss <= `SD n_last_load_miss;
+			last_load_response <= `SD n_last_load_response;
 		end
 	end
 	assign read_enable_load = read_enable_pref || read_enable;
@@ -180,12 +176,12 @@ module icachemem(
 	end
 	
 	always_comb begin
-			if(!read_enable && !(mem_tag == last_load_response && mem_tag!=0)) begin
+			//if(!read_enable && !(mem_tag == last_load_response && mem_tag!=0)) begin
 					read_data	 		  		= 0;
 					data_is_valid 		  		= 0;
 					data_is_miss  		  		= 0;			
-			end
-			else if(mem_tag == last_load_response && mem_tag!=0) begin
+			//end
+			if(mem_tag == last_load_response && mem_tag!=0) begin
 					read_data 					= load_data_in;
 					data_is_valid				= 1;
 					data_is_miss				= 0;

@@ -25,6 +25,7 @@ module rob_one_entry(
 	input	[4:0]		inst1_arn_dest_in,              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst1_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst1_is_branch_in,             //if this instruction is a branch
+	input				inst1_is_uncond_branch_in,
 	input 				inst1_rob_load_in,				//tell this entry if we want to load this instruction
 	input				inst1_halt_in,
 	input				inst1_illegal_in,
@@ -33,6 +34,7 @@ module rob_one_entry(
 	input	[4:0]		inst2_arn_dest_in,              //the architected register number of the destination of this instruction
 	input	[$clog2(`PRF_SIZE)-1:0] inst2_prn_dest_in,              //the prf number assigned to the destination of this instruction
 	input				inst2_is_branch_in,             //if this instruction is a branch
+	input				inst2_is_uncond_branch_in,
 	input 				inst2_rob_load_in,				//tell this entry if we want to load this instruction
 	input				inst2_halt_in,
 	input				inst2_illegal_in,
@@ -50,6 +52,7 @@ module rob_one_entry(
 	output				is_thread1_out,
 	output				is_ex_out,
 	output				is_branch_out,				       	//if this instruction is a branch
+	output				is_uncond_branch_out,
 	output				available_out,				       	//if this rob entry is available
 	output				mispredict_out,				       	//if this instrucion is mispredicted
 	output	[63:0]		target_pc_out,
@@ -72,6 +75,7 @@ module rob_one_entry(
 	logic	[4:0]		arn_dest;                   //the architected register number of the destination of this instruction stored in this entry
 	logic	[$clog2(`PRF_SIZE)-1:0] prn_dest;                   //the prf number assigned to the destination of this instruction
 	logic				is_branch;                  //if this instruction stored in this entry is a branch
+	logic				is_uncond_branch;
 	logic				is_executed;				//if this instruction stored in this entry has been executed
 	logic				mispredict;                 //if this instrucion has was mispredicted
 	logic				inuse;                      //if this entry is in use
@@ -84,6 +88,7 @@ module rob_one_entry(
 	logic	[4:0]		next_arn_dest;              //the architected register number of the destination of this instruction stored in this entry
 	logic	[$clog2(`PRF_SIZE)-1:0] next_prn_dest;  //the prf number assigned to the destination of this instruction
 	logic				next_is_branch;             //if this instruction stored in this entry is a branch
+	logic				next_is_uncond_branch;
 	logic				next_is_executed;			//if this instruction stored in this entry has been executed
 	logic				next_mispredict;            //if this instrucion has was mispredicted
 	logic				next_inuse;                 //if this entry is in use
@@ -98,13 +103,14 @@ module rob_one_entry(
 //describe the output function
 	assign is_thread1_out = if_committed ? thread : 0;
 	assign is_branch_out  = if_committed ? is_branch : 0;
+	assign is_uncond_branch_out	= if_committed ? is_uncond_branch : 0;
 	assign mispredict_out = if_committed ? mispredict : 0;
 	assign arn_dest_out   = if_committed ? arn_dest : 0;
 	assign prn_dest_out   = if_committed ? prn_dest : 0;
 	assign target_pc_out  = if_committed ? target_pc : 0;
 	assign if_rename_out  = if_committed;						//if this entry is committed the output information is important
 	assign is_ex_out      = is_executed || halt;
-	assign available_out  = ~inuse;			//if this entry is not in use, it is available
+	assign available_out  = ~inuse;								//if this entry is not in use, it is available
 	assign halt_out       = if_committed? halt : 0;
 	assign illegal_out    = if_committed? illegal : 0;
 	assign pc_out	      = if_committed? pc : 0;
@@ -117,6 +123,7 @@ module rob_one_entry(
 		next_arn_dest		= arn_dest;
 		next_prn_dest		= prn_dest;
 		next_is_branch		= is_branch;
+		next_is_uncond_branch	= is_uncond_branch;
 		next_is_executed	= is_executed;
 		next_mispredict		= mispredict;
 		next_inuse			= inuse;
@@ -131,6 +138,7 @@ module rob_one_entry(
 			next_arn_dest		= inst1_arn_dest_in;
 			next_prn_dest		= inst1_prn_dest_in;
 			next_is_branch		= inst1_is_branch_in;
+			next_is_uncond_branch	= inst1_is_uncond_branch_in;
 			next_is_executed	= 0;
 			next_mispredict		= 0;
 			next_inuse			= 1'b1;
@@ -145,6 +153,7 @@ module rob_one_entry(
 			next_arn_dest		= inst2_arn_dest_in;
 			next_prn_dest		= inst2_prn_dest_in;
 			next_is_branch		= inst2_is_branch_in;
+			next_is_uncond_branch	= inst2_is_uncond_branch_in;
 			next_is_executed	= 0;
 			next_mispredict		= 0;
 			next_inuse			= 1'b1;
@@ -159,7 +168,19 @@ module rob_one_entry(
 		end
 		else if (if_committed)
 		begin
-			next_inuse		= 1'b0;	//if committed, the next clock period we set inuse to be 0
+			next_inuse			= 1'b0;	//if committed, the next clock period we set inuse to be 0
+			next_thread			= 0;
+			next_pc				= 0;
+			next_arn_dest		= 0;
+			next_prn_dest		= 0;
+			next_is_branch		= 0;
+			next_is_uncond_branch	= 0;
+			next_is_executed	= 0;
+			next_mispredict		= 0;
+			next_target_pc		= 0;
+			next_halt			= 0;
+			next_illegal		= 0;
+			next_rob_inst		= 0;
 		end
 	end
 	always_ff @(posedge clock)
@@ -172,6 +193,7 @@ module rob_one_entry(
 			arn_dest	<=	`SD 0;
 			prn_dest	<=	`SD 0;
 			is_branch	<= 	`SD 0;
+			is_uncond_branch	<= 	`SD 0;
 			is_executed	<=	`SD 0;
 			mispredict	<=	`SD 0;
 			inuse		<=	`SD 0;
@@ -188,6 +210,7 @@ module rob_one_entry(
 			arn_dest	<=	`SD next_arn_dest;
 			prn_dest	<=	`SD next_prn_dest;
 			is_branch	<= 	`SD next_is_branch;
+			is_uncond_branch	<= 	`SD next_is_uncond_branch;
 			is_executed	<=	`SD next_is_executed;
 			mispredict	<=	`SD next_mispredict;
 			inuse		<=	`SD next_inuse;
