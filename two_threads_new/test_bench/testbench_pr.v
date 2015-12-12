@@ -237,6 +237,33 @@ module testbench;
 			$display("@@@");
 		end
 	endtask  // task show_mem_with_decimal
+	
+	task show_dcache_with_decimal;
+		input [63:0] start_addr;
+		input [63:0] end_addr;
+		logic [3:0]b;
+		logic [63:0]c;
+		logic [63:0]a;
+		begin
+			for (int k = start_addr; k<=end_addr; k=k+1)
+			begin
+				for (int i=0; i<`DCACHE_INDEX_ENTRY_SIZE; i++)
+				begin
+					for (int j=0; j<`DCACHE_WAY; j++)
+					begin
+						b = i;
+						c = {processor_0.dca.dm.internal_tag[i][j],b,3'b0};
+						a = k;
+						if ((processor_0.dca.dm.internal_dirty[i][j])&&(a==c))
+						begin					
+							$display("@@@ mem[%5d] = %x : %0d",c, processor_0.dca.dm.internal_data[i][j], processor_0.dca.dm.internal_data[i][j]);
+						end
+					end
+				end
+			end
+			$display("@@@");
+		end
+	endtask  // task show_dcache_with_decimal
 
   	initial begin
   		`ifdef DUMP
@@ -458,14 +485,13 @@ module testbench;
 				end
       			end
       		
-      		
-
 
 			// deal with any halting conditions
 			if(pipeline_error_status!=NO_ERROR)
 			begin
 				$display(	"@@@ Unified Memory contents hex on left, decimal on right: ");
 							show_mem_with_decimal(0,`MEM_64BIT_LINES - 1); 
+							show_dcache_with_decimal(0,`MEM_64BIT_LINES - 1); 
 				// 8Bytes per line, 16kB total
 
 				$display("@@  %t : System halted\n@@", $realtime);
