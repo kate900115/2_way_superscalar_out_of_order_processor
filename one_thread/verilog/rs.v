@@ -299,16 +299,16 @@ module rs(
 	//when dispatching, two instruction comes in, 
 	//this selector can help us to find two available entries in rs, 
 	//then make the load of the two entries to be 1
-	priority_selector #(.REQS(2),.WIDTH(`RS_SIZE)) tsps1(                                  
+	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps1(                                  
 		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in && inst2_rs_load_in),
-		.gnt_bus({inst1_internal_rs_load_in_temp, inst2_internal_rs_load_in_temp})
+		.en(inst1_rs_load_in),
+		.gnt_bus(inst1_internal_rs_load_in_temp)
 	);
 
 	priority_selector #(.REQS(1),.WIDTH(`RS_SIZE)) tsps2(                                  
-		.req(internal_rs_available_out),                                                 
-		.en(inst1_rs_load_in),
-		.gnt_bus({inst1_internal_rs_load_in_temp_load1})
+		.req(~inst1_internal_rs_load_in_temp & internal_rs_available_out),                                                 
+		.en(inst2_rs_load_in),
+		.gnt_bus(inst2_internal_rs_load_in_temp)
 	);
 	
 	always_comb begin
@@ -319,11 +319,11 @@ module rs(
 		begin
 			inst1_internal_rs_load_in = 0;
 		end
-		else if (inst1_rs_load_in && ~inst2_rs_load_in)
+		else if (inst1_rs_fu_select_in == USE_MEMORY)
 		begin
-			inst1_internal_rs_load_in = inst1_internal_rs_load_in_temp_load1;
+			inst1_internal_rs_load_in = 0;
 		end
-		else if(inst1_rs_load_in && inst2_rs_load_in)
+		else if(inst1_rs_load_in)
 		begin
 			inst1_internal_rs_load_in = inst1_internal_rs_load_in_temp;
 		end
@@ -332,9 +332,13 @@ module rs(
 		begin
 			inst2_internal_rs_load_in = 0;
 		end
-		else if(inst1_rs_load_in && inst2_rs_load_in)
+		else if(inst2_rs_fu_select_in == USE_MEMORY)
 		begin
-			inst2_internal_rs_load_in =inst2_internal_rs_load_in_temp;
+			inst2_internal_rs_load_in = 0;
+		end
+		else if(inst2_rs_load_in)
+		begin
+			inst2_internal_rs_load_in = inst2_internal_rs_load_in_temp;
 		end
 	end
 
