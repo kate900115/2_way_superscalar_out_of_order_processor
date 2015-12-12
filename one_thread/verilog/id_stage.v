@@ -130,7 +130,7 @@ module decoder(
             `FTPI_GRP:       illegal = `TRUE;       // unimplemented
           endcase // case(inst[31:26])
          
-        6'h08, 6'h20, 6'h28:
+        6'h08, 6'h20, 6'h28, 6'h2b, 6'h2f:
         begin
           opa_select = ALU_OPA_IS_MEM_DISP;
           opb_select = ALU_OPB_IS_REGB;
@@ -138,21 +138,25 @@ module decoder(
           dest_reg = DEST_IS_REGA;
           case (inst[31:26])
             `LDA_INST:  /* defaults are OK */					//************************************************** need to change
-		begin
-		dest_reg = DEST_IS_REGA;					//**********changed
-		opa_select = ALU_OPA_IS_MEM_DISP;
-          	opb_select = ALU_OPB_IS_REGB;
-		end
-            `LDQ_INST:
-              begin
+			begin
+				dest_reg = DEST_IS_REGA;					//**********changed
+				opa_select = ALU_OPA_IS_MEM_DISP;
+        	  	opb_select = ALU_OPB_IS_REGB;
+			end
+         	`LDQ_INST, `LDQ_L_INST:
+            begin
                 rd_mem = `TRUE;
                 dest_reg = DEST_IS_REGA;
-              end // case: `LDQ_INST
+            end // case: `LDQ_INST
             `STQ_INST:
-              begin
+            begin
                 wr_mem = `TRUE;
                 dest_reg = DEST_NONE;
-              end // case: `STQ_INST
+            end // case: `STQ_INST
+            `STQ_C_INST:
+            begin
+            	wr_mem = `TRUE;
+            end
             default:       illegal = `TRUE;
           endcase // case(inst[31:26])
         end
@@ -164,12 +168,17 @@ module decoder(
           alu_func = ALU_ADDQ;
           case (inst[31:26])
             `FBEQ_INST, `FBLT_INST, `FBLE_INST,
-            `FBNE_INST, `FBGE_INST, `FBGT_INST:
+            `FBGE_INST, `FBGT_INST:
             begin
               // FP conditionals not implemented
               illegal = `TRUE;
             end
-
+			`FBNE_INST:
+			begin
+				opa_select = ALU_OPA_IS_NPC;
+          opb_select = ALU_OPB_IS_BR_DISP;
+          alu_func = ALU_ADDQ;
+			end
             `BR_INST, `BSR_INST:
             begin
               dest_reg = DEST_IS_REGA;

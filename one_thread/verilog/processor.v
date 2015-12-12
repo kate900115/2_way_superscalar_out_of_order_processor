@@ -78,7 +78,8 @@ logic	thread2_branch_is_taken_pc;
 
 logic	thread1_branch_is_taken;  //for flush
 logic	thread2_branch_is_taken;
-logic 	[3:0]	ROB_t1_head;
+logic 	[$clog2(`ROB_SIZE)-1:0]	ROB_t1_head;
+logic 	[$clog2(`ROB_SIZE)-1:0]	ROB_t2_head;
 
 //pc output
 logic			PC_thread1_is_available;
@@ -110,8 +111,8 @@ logic			ID_inst1_is_halt;
 logic			ID_inst2_is_halt;
 logic			ID_inst1_is_illegal;
 logic			ID_inst2_is_illegal;
-logic [4:0]			ID_rega_inst1;
-logic [4:0]			ID_rega_inst2;
+logic [4:0]		ID_rega_inst1;
+logic [4:0]		ID_rega_inst2;
 
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
