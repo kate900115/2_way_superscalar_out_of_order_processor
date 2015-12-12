@@ -250,7 +250,7 @@ module testbench;
 						b = i;
 						c = {processor_0.dca.dm.internal_tag[i][j],b,3'b0};
 						a = k;
-						if ((~processor_0.dca.dm.internal_dirty[i][j])&&(a==c))
+						if ((processor_0.dca.dm.internal_dirty[i][j])&&(a==c))
 						begin					
 							$display("@@@ mem[%5d] = %x : %0d",c, processor_0.dca.dm.internal_data[i][j], processor_0.dca.dm.internal_data[i][j]);
 						end
