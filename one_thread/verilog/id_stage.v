@@ -30,7 +30,8 @@ module decoder(
     output logic rd_mem, wr_mem, cond_branch, uncond_branch,
     output logic halt,      // non-zero on a halt
     output logic illegal,    // non-zero on an illegal instruction
-    output logic valid_inst  // for counting valid instructions executed
+    output logic valid_inst,  
+    output logic        if_FBEQ// for counting valid instructions executed
                             // and for making the fetch stage die on halts/
                             // keeping track of when to allow the next
                             // instruction out of fetch
@@ -57,6 +58,7 @@ module decoder(
     uncond_branch = `FALSE;
     halt = `FALSE;
     illegal = `FALSE;
+    if_FBEQ =0;
     if(valid_inst_in) begin
       case ({inst[31:29], 3'b0})
         6'h0:
@@ -130,7 +132,7 @@ module decoder(
             `FTPI_GRP:       illegal = `TRUE;       // unimplemented
           endcase // case(inst[31:26])
          
-        6'h08, 6'h20, 6'h28, 6'h2b, 6'h2f:
+        6'h08, 6'h20, 6'h28:
         begin
           opa_select = ALU_OPA_IS_MEM_DISP;
           opb_select = ALU_OPB_IS_REGB;
@@ -138,25 +140,21 @@ module decoder(
           dest_reg = DEST_IS_REGA;
           case (inst[31:26])
             `LDA_INST:  /* defaults are OK */					//************************************************** need to change
-			begin
-				dest_reg = DEST_IS_REGA;					//**********changed
-				opa_select = ALU_OPA_IS_MEM_DISP;
-        	  	opb_select = ALU_OPB_IS_REGB;
-			end
-         	`LDQ_INST, `LDQ_L_INST:
-            begin
+		begin
+		dest_reg = DEST_IS_REGA;					//**********changed
+		opa_select = ALU_OPA_IS_MEM_DISP;
+          	opb_select = ALU_OPB_IS_REGB;
+		end
+            `LDQ_INST:
+              begin
                 rd_mem = `TRUE;
                 dest_reg = DEST_IS_REGA;
-            end // case: `LDQ_INST
+              end // case: `LDQ_INST
             `STQ_INST:
-            begin
+              begin
                 wr_mem = `TRUE;
                 dest_reg = DEST_NONE;
-            end // case: `STQ_INST
-            `STQ_C_INST:
-            begin
-            	wr_mem = `TRUE;
-            end
+              end // case: `STQ_INST
             default:       illegal = `TRUE;
           endcase // case(inst[31:26])
         end
@@ -167,18 +165,18 @@ module decoder(
           opb_select = ALU_OPB_IS_BR_DISP;
           alu_func = ALU_ADDQ;
           case (inst[31:26])
-            `FBEQ_INST, `FBLT_INST, `FBLE_INST,
-            `FBGE_INST, `FBGT_INST:
+            `FBLT_INST, `FBLE_INST,
+            `FBNE_INST, `FBGE_INST, `FBGT_INST:
             begin
               // FP conditionals not implemented
               illegal = `TRUE;
             end
-			`FBNE_INST:
-			begin
-				opa_select = ALU_OPA_IS_NPC;
-      		    opb_select = ALU_OPB_IS_BR_DISP;
-				alu_func = ALU_ADDQ;
-			end
+	    `FBEQ_INST:
+	    begin
+		if_FBEQ =1;
+	        cond_branch = `TRUE;
+	    end
+
             `BR_INST, `BSR_INST:
             begin
               dest_reg = DEST_IS_REGA;
@@ -197,58 +195,68 @@ endmodule // decoder
 
 
 module id_stage(
-		input         clock,                // system clock
-		input         reset,                // system reset
-		input  [31:0] if_id_IR1,             // incoming instruction1
-		input  [31:0] if_id_IR2,             // incoming instruction2
-		input         if_id_valid_inst1,
-		input         if_id_valid_inst2,
-		input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC+4
-		input  [63:0] if_id_NPC_inst2,           // incoming instruction2 PC+4
+             
+				input         clock,                // system clock
+				input         reset,                // system reset
+				input  [31:0] if_id_IR1,             // incoming instruction1
+				input  [31:0] if_id_IR2,             // incoming instruction2
+				//input         wb_reg_wr_en_out,     // Reg write enable from WB Stage
+				//input   [4:0] wb_reg_wr_idx_out,    // Reg write index from WB Stage
+				//input  [63:0] wb_reg_wr_data_out,   // Reg write data from WB Stage
+				input         if_id_valid_inst1,
+				input         if_id_valid_inst2,
+				input  [63:0] if_id_NPC_inst1,           // incoming instruction1 PC+4
+				input  [63:0] if_id_NPC_inst2,           // incoming instruction2 PC+4
 
-		 
-		output logic [63:0] opa_mux_out1,          //instr1 opa and opb value or tag
-	    output logic [63:0] opb_mux_out1,
-		output logic  opa_mux_tag1,                //signal to indicate whether it is value or tag,true means value,faulse means tag
-		output logic  opb_mux_tag1,
-		output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
-											       // (ZERO_REG if no writeback)
-		 
-		output logic [63:0] opa_mux_out2,          //instr2 opa and opb value or tag
-		output logic [63:0] opb_mux_out2,
-		output logic  opa_mux_tag2,                //signal to indicate whether it is value or tag
-		output logic  opb_mux_tag2,
-		output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
+				 
+				output logic [63:0] opa_mux_out1,          //instr1 opa and opb value or tag
+			    output logic [63:0] opb_mux_out1,
+				output logic  opa_mux_tag1,                //signal to indicate whether it is value or tag,true means value,faulse means tag
+				output logic  opb_mux_tag1,
+				output logic  [4:0] id_dest_reg_idx_out1,  // destination (writeback) register index
+													       // (ZERO_REG if no writeback)
+				 
+				output logic [63:0] opa_mux_out2,          //instr2 opa and opb value or tag
+				output logic [63:0] opb_mux_out2,
+				output logic  opa_mux_tag2,                //signal to indicate whether it is value or tag
+				output logic  opb_mux_tag2,
+				output logic  [4:0] id_dest_reg_idx_out2,  // destination (writeback) register index
 
 
-		output ALU_FUNC id_alu_func_out1,      // ALU function select (ALU_xxx *)
-		output ALU_FUNC id_alu_func_out2,      // ALU function select (ALU_xxx *)
-		output logic  [5:0] id_op_type_inst1,		// op type
-		output logic  [5:0] id_op_type_inst2,
-		output FU_SELECT id_op_select1,
-		output FU_SELECT id_op_select2,
+				output ALU_FUNC id_alu_func_out1,      // ALU function select (ALU_xxx *)
+				output ALU_FUNC id_alu_func_out2,      // ALU function select (ALU_xxx *)
+				output logic  [5:0] id_op_type_inst1,		// op type
+				output logic  [5:0] id_op_type_inst2,
+				output FU_SELECT id_op_select1,
+				output FU_SELECT id_op_select2,
 
-		output logic        id_rd_mem_out1,        // does inst read memory?
-		output logic        id_wr_mem_out1,        // does inst write memory?
-		output logic        id_cond_branch_out1,   // is inst a conditional branch?
-		output logic        id_uncond_branch_out1, // is inst an unconditional branch 
-											        // or jump?
-		output logic        id_halt_out1,
-		//output logic        id_cpuid_out1,         // get CPUID inst?
-		output logic        id_illegal_out1,
-		output logic        id_valid_inst_out1,     // is inst a valid instruction to be 
-											        // counted for CPI calculations?
-		output logic        id_rd_mem_out2,        // does inst read memory?
-		output logic        id_wr_mem_out2,        // does inst write memory?
-		output logic        id_cond_branch_out2,   // is inst a conditional branch?
-		output logic        id_uncond_branch_out2, // is inst an unconditional branch 
-									        		// or jump?
-		output logic        id_halt_out2,
-		//output logic        id_cpuid_out2,         // get CPUID inst?
-		output logic        id_illegal_out2,
-		output logic        id_valid_inst_out2,     // is inst a valid instruction to be
-		output logic [4:0]  id_rega_inst1, 
-		output logic [4:0]  id_rega_inst2
+				output logic        id_rd_mem_out1,        // does inst read memory?
+				output logic        id_wr_mem_out1,        // does inst write memory?
+				//output logic        id_ldl_mem_out1,       // load-lock inst?
+				//output logic        id_stc_mem_out1,       // store-conditional inst?
+				output logic        id_cond_branch_out1,   // is inst a conditional branch?
+				output logic        id_uncond_branch_out1, // is inst an unconditional branch 
+													        // or jump?
+				output logic        id_halt_out1,
+				//output logic        id_cpuid_out1,         // get CPUID inst?
+				output logic        id_illegal_out1,
+				output logic        id_valid_inst_out1,     // is inst a valid instruction to be 
+									        // counted for CPI calculations?
+				output logic        id_rd_mem_out2,        // does inst read memory?
+				output logic        id_wr_mem_out2,        // does inst write memory?
+				//output logic        id_ldl_mem_out2,       // load-lock inst?
+				//output logic        id_stc_mem_out2,       // store-conditional inst?
+				output logic        id_cond_branch_out2,   // is inst a conditional branch?
+				output logic        id_uncond_branch_out2, // is inst an unconditional branch 
+											        		// or jump?
+				output logic        id_halt_out2,
+				//output logic        id_cpuid_out2,         // get CPUID inst?
+				output logic        id_illegal_out2,
+				output logic        id_valid_inst_out2,     // is inst a valid instruction to be
+				output logic [4:0]  id_rega_inst1, 
+				output logic [4:0]  id_rega_inst2,
+				output logic        if_FBEQ1,
+				output logic        if_FBEQ2
 );
    
 	DEST_REG_SEL dest_reg_select1;
@@ -382,12 +390,15 @@ module id_stage(
 					 .dest_reg(dest_reg_select1),
 					 .rd_mem(id_rd_mem_out1),
 					 .wr_mem(id_wr_mem_out1),
+					 //.ldl_mem(id_ldl_mem_out1),
+					 //.stc_mem(id_stc_mem_out1),
 					 .cond_branch(id_cond_branch_out1),
 					 .uncond_branch(id_uncond_branch_out1),
 					 .halt(id_halt_out1),
 					 //.cpuid(id_cpuid_out1),
 					 .illegal(id_illegal_out1),
-					 .valid_inst(id_valid_inst_out1)
+					 .valid_inst(id_valid_inst_out1),
+					 .if_FBEQ(if_FBEQ1)
 					);
 
 	decoder decode_2 (// Input
@@ -401,12 +412,15 @@ module id_stage(
 					 .dest_reg(dest_reg_select2),
 					 .rd_mem(id_rd_mem_out2),
 					 .wr_mem(id_wr_mem_out2),
+					 //.ldl_mem(id_ldl_mem_out2),
+					 //.stc_mem(id_stc_mem_out2),
 					 .cond_branch(id_cond_branch_out2),
 					 .uncond_branch(id_uncond_branch_out2),
 					 .halt(id_halt_out2),
 					 //.cpuid(id_cpuid_out2),
 					 .illegal(id_illegal_out2),
-					 .valid_inst(id_valid_inst_out2)
+					 .valid_inst(id_valid_inst_out2),
+					 .if_FBEQ(if_FBEQ2)
 					);
 	// mux to generate dest_reg_idx based on
 	// the dest_reg_select output from decoder
@@ -416,13 +430,13 @@ module id_stage(
 			DEST_IS_REGC: id_dest_reg_idx_out1 = id_regc_inst1;
 			DEST_IS_REGA: id_dest_reg_idx_out1 = id_rega_inst1;
 			DEST_NONE:    id_dest_reg_idx_out1 = `ZERO_REG;
-			default:      id_dest_reg_idx_out1 = `ZERO_REG; 
+			default:       id_dest_reg_idx_out1 = `ZERO_REG; 
 		endcase
 		case (dest_reg_select2)
 			DEST_IS_REGC: id_dest_reg_idx_out2 = id_regc_inst2;
 			DEST_IS_REGA: id_dest_reg_idx_out2 = id_rega_inst2;
 			DEST_NONE:    id_dest_reg_idx_out2 = `ZERO_REG;
-			default:      id_dest_reg_idx_out2 = `ZERO_REG; 
+			default:       id_dest_reg_idx_out2 = `ZERO_REG; 
 		endcase
 	end
 
@@ -430,6 +444,7 @@ module id_stage(
 	begin
 		case({id_op_type_inst1[5:3],3'b0})
 			6'h08, 6'h20, 6'h28: id_op_select1 = USE_MEMORY;
+			//6'h18, 6'h30, 6'h38: id_op_select1 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out1 == ALU_MULQ)
 					id_op_select1 = USE_MULTIPLIER;
@@ -439,6 +454,7 @@ module id_stage(
 		endcase
 		case({id_op_type_inst2[5:3],3'b0})
 			6'h08, 6'h20, 6'h28: id_op_select2 = USE_MEMORY;
+			//6'h18, 6'h30, 6'h38: id_op_select2 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out2 == ALU_MULQ)
 					id_op_select2 = USE_MULTIPLIER;
@@ -446,6 +462,8 @@ module id_stage(
 					id_op_select2 = USE_ADDER;
 				end
 		endcase	
+		//$display("id_dest_reg_idx_out1:%h", id_dest_reg_idx_out1);
+		//$display("id_dest_reg_idx_out2:%h", id_dest_reg_idx_out2);
 	end
 			
    
