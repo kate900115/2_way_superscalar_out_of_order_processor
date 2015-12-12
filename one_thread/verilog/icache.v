@@ -59,7 +59,7 @@ module icache(
 		if(!pre_enable || (read_enable && cachemem_is_miss)) begin //this clock cycle not prefetch, this cc release no use
 			n_pc_address = pc_address;
 		end
-		else if(pre_enable) begin //this cc prefetch, this cc release and use
+		else begin //this cc prefetch, this cc release and use
 			n_pc_address = pc_address +8;
 		end
 	end
