@@ -224,30 +224,30 @@ void setup_gui(FILE *fp){
   int pipe_width=0;
 
   //instantiate the title window at top of screen
-  title_win = create_newwin(3,COLS,0,0,4);
+  title_win = create_newwin(3,COLS,0,0,3);
   mvwprintw(title_win,1,1,"SIMULATION INTERFACE V1");
   mvwprintw(title_win,1,COLS-22,"BEN KEMPKE/JOSH SMITH");
   wrefresh(title_win);
 
   //instantiate time window at right hand side of screen
-  time_win = create_newwin(3,10,8,COLS-10,5);
+  time_win = create_newwin(3,10,8,COLS-10,1);
   mvwprintw(time_win,0,3,"TIME");
   wrefresh(time_win);
 
   //instantiate a sim time window which states the actual simlator time
-  sim_time_win = create_newwin(3,10,11,COLS-10,5);
+  sim_time_win = create_newwin(3,10,11,COLS-10,1);
   mvwprintw(sim_time_win,0,1,"SIM TIME");
   wrefresh(sim_time_win);
 
   //instantiate a window to show which clock edge this is
-  clock_win = create_newwin(6,15,8,COLS-25,5);
+  clock_win = create_newwin(6,15,8,COLS-25,1);
   mvwprintw(clock_win,0,5,"CLOCK");
   mvwprintw(clock_win,1,1,"cycle:");
   update_clock(0);
   wrefresh(clock_win);
 
   // instantiate a window for the PRF on the right side
-  prf_win = create_newwin(50,25,14,COLS-25,5);
+  prf_win = create_newwin(50,25,14,COLS-25,1);
   mvwprintw(prf_win,0,13,"PRF");
   int i=0;
   char tmp_buf[48];
@@ -258,7 +258,7 @@ void setup_gui(FILE *fp){
   wrefresh(prf_win);
 
   //instantiate window to visualize instructions in pipeline below title
-  pipe_win = create_newwin(4,COLS,3,0,7);
+ /* pipe_win = create_newwin(4,COLS,3,0,7);
   pipe_width = COLS/6;
   mvwprintw(pipe_win,0,(COLS-8)/2,"Out of order machine");
   wattron(pipe_win,A_UNDERLINE);
@@ -268,57 +268,57 @@ void setup_gui(FILE *fp){
   mvwprintw(pipe_win,1,4*pipe_width-3,"ROB");
   wattroff(pipe_win,A_UNDERLINE);
   wrefresh(pipe_win);
-
+*/
   //instantiate window to visualize IF stage (including IF/ID)
-  if_win = create_newwin((num_if_regs+2),40,8,0,5);
+  if_win = create_newwin((num_if_regs+2),40,2,0,1);
   mvwprintw(if_win,0,10,"IF STAGE");
   wrefresh(if_win);
 
   //instantiate window to visualize IF/ID signals
-  rs_win = create_newwin((num_rs_regs+2),30,8,75,5);
+  rs_win = create_newwin((num_rs_regs+2),20,LINES-7-(num_rat1_regs+2),40,1);
   mvwprintw(rs_win,0,12,"RRAT2");
   wrefresh(rs_win);
 
   //instantiate a window to visualize ID stage
-  id_win = create_newwin((num_id_regs+2),35,8,40,5);
+  id_win = create_newwin((num_id_regs+2),40,2,40,1);
   mvwprintw(id_win,0,10,"ID STAGE");
   wrefresh(id_win);
 
   //instantiate a window to visualize ID/EX signals
-  rob_win = create_newwin((num_rob_regs+2),43,8,105,5);
-  mvwprintw(rob_win,0,12,"ROB");
+  rob_win = create_newwin((num_rob_regs+2),43,2,80,1);
+  mvwprintw(rob_win,0,12,"ROB & RS");
   wrefresh(rob_win);
 
   //instantiate a window to visualize EX stage
-  ex_win = create_newwin((num_ex_regs+2),40,LINES-7-(num_ex_regs+2),40,5);
-  mvwprintw(ex_win,0,10,"EX STAGE");
+  ex_win = create_newwin((num_ex_regs+2),40,10,0,1);
+  mvwprintw(ex_win,0,10,"EX STAGE & CDB");
   wrefresh(ex_win);
 
   //instantiate a window to visualize EX/MEM
-  rat1_win = create_newwin((num_rat1_regs+4),35,LINES-7-(num_rat1_regs+2),0,5);
-  mvwprintw(rat1_win,0,12,"RAT");
+  rat1_win = create_newwin((num_rat1_regs+4),20,LINES-7-(num_rat1_regs+2),0,1);
+  mvwprintw(rat1_win,0,12,"RAT1");
   wrefresh(rat1_win);
 
   //instantiate a window to visualize MEM stage
-  mem_win = create_newwin((num_mem_regs+4),35,LINES-7-(num_mem_regs+2),90,5);
-  mvwprintw(mem_win,0,10,"MEM");
+  mem_win = create_newwin((num_mem_regs+4),35,LINES-7-(num_mem_regs+2),123,1);
+  mvwprintw(mem_win,0,10,"PRF 48-87");
   wrefresh(mem_win);
 
   //instantiate a window to visualize MEM/WB
-  rrat_win = create_newwin((num_rrat_regs+4),45,LINES-7-(num_rrat_regs+2),150,5);
-  mvwprintw(rrat_win,0,12,"RRAT");
+  rrat_win = create_newwin((num_rrat_regs+4),20,LINES-7-(num_rrat_regs+2),20,1);
+  mvwprintw(rrat_win,0,12,"RRAT1");
   wrefresh(rrat_win);
 
 
   //instantiate a window to visualize WB stage
-  cdb_win = create_newwin((num_cdb_regs+4),40,20,210,5);
+  cdb_win = create_newwin((num_cdb_regs+4),20,LINES-7-(num_rat1_regs+2),60,1);
   mvwprintw(cdb_win,0,10,"RAT2");
   wrefresh(cdb_win);
 
   //instantiate an instructional window to help out the user some
-  instr_win = create_newwin(7,30,LINES-7,0,5);
+  instr_win = create_newwin(7,30,LINES-7,0,1);
   mvwprintw(instr_win,0,9,"INSTRUCTIONS");
-  wattron(instr_win,COLOR_PAIR(5));
+  wattron(instr_win,COLOR_PAIR(1));
   mvwaddstr(instr_win,1,1,"'n'   -> Next clock edge");
   mvwaddstr(instr_win,2,1,"'b'   -> Previous clock edge");
   mvwaddstr(instr_win,3,1,"'c/g' -> Goto specified time");
@@ -327,7 +327,7 @@ void setup_gui(FILE *fp){
   wrefresh(instr_win);
   
   // instantiate window to visualize misc regs/wires
-  misc_win = create_newwin(7,COLS-25-30,LINES-7,30,5);
+  misc_win = create_newwin(7,COLS-25-30,LINES-7,30,1);
   mvwprintw(misc_win,0,(COLS-30-30)/2-6,"MISC SIGNALS");
   wrefresh(misc_win);
 

@@ -338,9 +338,9 @@ module testbench;
     // Call to initialize visual debugger
     // *Note that after this, all stdout output goes to visual debugger*
     // each argument is number of registers/signals for the group
-    // (IF, RS, ID, ROB, EX, EX/MEM, MEM, RAT, WB, Misc)
+    // (IF, RS, ID, ROB&RS, EX, RAT1, MEM, RRAT1, WB, Misc)
     // p: PC 6  g: ID 13  
-    initcurses(6,32,26,24,19,48,10,42,32,2);
+    initcurses(6,32,26,64,19,32,40,32,32,2);
 
     // Pulse the reset signal
     reset = 1'b1;
@@ -474,58 +474,39 @@ module testbench;
     
 
 
-    // RAT signals (16) - prefix 'i'
-    $display("iRAT1_PRF_opa_idx1 6:%h",         processor_0.RAT1_PRF_opa_idx1);
-    $display("iRAT1_PRF_opb_idx1 6:%h",         processor_0.RAT1_PRF_opb_idx1);
-    $display("iRAT1_PRF_opa_idx2 6:%h",         processor_0.RAT1_PRF_opa_idx2);
-    $display("iRAT1_PRF_opb_idx2 6:%h",         processor_0.RAT1_PRF_opb_idx2);
-    $display("iRAT1_PRF_free_list 6:%h",        processor_0.RAT1_PRF_free_list);
-    
-    $display("iRAT2_PRF_opa_idx1 6:%h",         processor_0.RAT2_PRF_opa_idx1);
-    $display("iRAT2_PRF_opb_idx1 6:%h",         processor_0.RAT2_PRF_opb_idx1);
-    $display("iRAT2_PRF_opa_idx2 6:%h",         processor_0.RAT2_PRF_opa_idx2);
-    $display("iRAT2_PRF_opb_idx2 6:%h",         processor_0.RAT2_PRF_opb_idx2);
-    $display("iRAT2_PRF_free_list 6:%h",        processor_0.RAT2_PRF_free_list);  //10
-    
-    $display("iRAT1_PRF_allocate_req1 1:%h",    processor_0.RAT1_PRF_allocate_req1);
-    $display("iRAT1_PRF_allocate_req2 1:%h",    processor_0.RAT1_PRF_allocate_req2);
-    $display("irat1_prf_free_valid 1:%h",       processor_0.rat1_prf_free_valid);
-    $display("iRAT2_PRF_allocate_req1 1:%h",    processor_0.RAT2_PRF_allocate_req1);
-    $display("iRAT2_PRF_allocate_req2 1:%h",    processor_0.RAT2_PRF_allocate_req2);
-    $display("irat2_prf_free_valid 1:%h",       processor_0.rat2_prf_free_valid);  //6
-    
-    $display("ir0 6:%d",processor_0.rat1.rat_reg[0]);
-    $display("ir1 6:%d",processor_0.rat1.rat_reg[1]);
-    $display("ir2 6:%d",processor_0.rat1.rat_reg[2]);
-    $display("ir3 6:%d",processor_0.rat1.rat_reg[3]);
-    $display("ir4 6:%d",processor_0.rat1.rat_reg[4]);
-    $display("ir5 6:%d",processor_0.rat1.rat_reg[5]);
-    $display("ir6 6:%d",processor_0.rat1.rat_reg[6]);
- 	$display("ir7 6:%d",processor_0.rat1.rat_reg[7]);
-  	$display("ir8 6:%d",processor_0.rat1.rat_reg[8]);
-  	$display("ir9 6:%d",processor_0.rat1.rat_reg[9]);
-  	$display("ir10 6:%d",processor_0.rat1.rat_reg[10]);
-	$display("ir11 6:%d",processor_0.rat1.rat_reg[11]);
-    $display("ir12 6:%d",processor_0.rat1.rat_reg[12]);
-    $display("ir13 6:%d",processor_0.rat1.rat_reg[13]);
-    $display("ir14 6:%d",processor_0.rat1.rat_reg[14]);
-    $display("ir15 6:%d",processor_0.rat1.rat_reg[15]);
-    $display("ir16 6:%d",processor_0.rat1.rat_reg[16]);
- 	$display("ir17 6:%d",processor_0.rat1.rat_reg[17]);
-  	$display("ir18 6:%d",processor_0.rat1.rat_reg[18]);
-  	$display("ir19 6:%d",processor_0.rat1.rat_reg[19]);
-  	$display("ir20 6:%d",processor_0.rat1.rat_reg[20]);
-  	$display("ir21 6:%d",processor_0.rat1.rat_reg[21]);
-    $display("ir22 6:%d",processor_0.rat1.rat_reg[22]);
-    $display("ir23 6:%d",processor_0.rat1.rat_reg[23]);
-    $display("ir24 6:%d",processor_0.rat1.rat_reg[24]);
-    $display("ir25 6:%d",processor_0.rat1.rat_reg[25]);
-    $display("ir26 6:%d",processor_0.rat1.rat_reg[26]);
- 	$display("ir27 6:%d",processor_0.rat1.rat_reg[27]);
-  	$display("ir28 6:%d",processor_0.rat1.rat_reg[28]);
-  	$display("ir29 6:%d",processor_0.rat1.rat_reg[29]);
-  	$display("ir30 6:%d",processor_0.rat1.rat_reg[30]);
-  	$display("ir31 6:%d",processor_0.rat1.rat_reg[31]);
+    // RAT signals (16) - prefix 'i'  
+    $display("ir0 7:%d",processor_0.rat1.rat_reg[0]);
+    $display("ir1 7:%d",processor_0.rat1.rat_reg[1]);
+    $display("ir2 7:%d",processor_0.rat1.rat_reg[2]);
+    $display("ir3 7:%d",processor_0.rat1.rat_reg[3]);
+    $display("ir4 7:%d",processor_0.rat1.rat_reg[4]);
+    $display("ir5 7:%d",processor_0.rat1.rat_reg[5]);
+    $display("ir6 7:%d",processor_0.rat1.rat_reg[6]);
+ 	$display("ir7 7:%d",processor_0.rat1.rat_reg[7]);
+  	$display("ir8 7:%d",processor_0.rat1.rat_reg[8]);
+  	$display("ir9 7:%d",processor_0.rat1.rat_reg[9]);
+  	$display("ir10 7:%d",processor_0.rat1.rat_reg[10]);
+	$display("ir11 7:%d",processor_0.rat1.rat_reg[11]);
+    $display("ir12 7:%d",processor_0.rat1.rat_reg[12]);
+    $display("ir13 7:%d",processor_0.rat1.rat_reg[13]);
+    $display("ir14 7:%d",processor_0.rat1.rat_reg[14]);
+    $display("ir15 7:%d",processor_0.rat1.rat_reg[15]);
+    $display("ir16 7:%d",processor_0.rat1.rat_reg[16]);
+ 	$display("ir17 7:%d",processor_0.rat1.rat_reg[17]);
+  	$display("ir18 7:%d",processor_0.rat1.rat_reg[18]);
+  	$display("ir19 7:%d",processor_0.rat1.rat_reg[19]);
+  	$display("ir20 7:%d",processor_0.rat1.rat_reg[20]);
+  	$display("ir21 7:%d",processor_0.rat1.rat_reg[21]);
+    $display("ir22 7:%d",processor_0.rat1.rat_reg[22]);
+    $display("ir23 7:%d",processor_0.rat1.rat_reg[23]);
+    $display("ir24 7:%d",processor_0.rat1.rat_reg[24]);
+    $display("ir25 7:%d",processor_0.rat1.rat_reg[25]);
+    $display("ir26 7:%d",processor_0.rat1.rat_reg[26]);
+ 	$display("ir27 7:%d",processor_0.rat1.rat_reg[27]);
+  	$display("ir28 7:%d",processor_0.rat1.rat_reg[28]);
+  	$display("ir29 7:%d",processor_0.rat1.rat_reg[29]);
+  	$display("ir30 7:%d",processor_0.rat1.rat_reg[30]);
+  	$display("ir31 7:%d",processor_0.rat1.rat_reg[31]);
     // PRF signals (17) - prefix 'f'
    /* $display("fPRF_RAT1_rename_valid1 1:%h",    processor_0.PRF_RAT1_rename_valid1);
     $display("fPRF_RAT1_rename_valid2 1:%h",    processor_0.PRF_RAT1_rename_valid2);
@@ -549,115 +530,150 @@ module testbench;
 
 */
 
-    // RRAT signals (10) - prefix 'j'
-    $display("jRRAT1_PRF_free_valid1 1:%h",     	processor_0.RRAT1_PRF_free_valid1);
-    $display("jRRAT1_PRF_free_valid2 1:%h",     	processor_0.RRAT1_PRF_free_valid2);
-    $display("jRRAT2_PRF_free_valid1 1:%h",     	processor_0.RRAT2_PRF_free_valid1);
-    $display("jRRAT2_PRF_free_valid2 1:%h",     	processor_0.RRAT2_PRF_free_valid2);//4
-    
-    $display("jRRAT1_PRF_free_idx1 16:%h",      	processor_0.RRAT1_PRF_free_idx1); 
-    $display("jRRAT1_PRF_free_idx2 16:%h",      	processor_0.RRAT1_PRF_free_idx2); 
-    $display("jRRAT2_PRF_free_idx1 16:%h",      	processor_0.RRAT2_PRF_free_idx1); 
-    $display("jRRAT2_PRF_free_idx2 16:%h",      	processor_0.RRAT2_PRF_free_idx2);  
-    $display("jRRAT1_PRF_free_enable_list 16:%h",   processor_0.RRAT1_PRF_free_enable_list); 
-    $display("jRRAT2_PRF_free_enable_list 16:%h",   processor_0.RRAT2_PRF_free_enable_list);     //10
+    // RRAT signals (10) - prefix 'j' 
+    //$display("jRRAT1_PRF_free_enable_list 16:%h",   processor_0.RRAT1_PRF_free_enable_list); 
+    //$display("jRRAT2_PRF_free_enable_list 16:%h",   processor_0.RRAT2_PRF_free_enable_list);     //10
 //logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx1;
 //logic [`ARF_SIZE-1:0][$clog2(`PRF_SIZE)-1:0]		RRAT_RAT_mispredict_up_idx2;
-    $display("jr0 6:%d",   processor_0.rrat1.rrat_reg[0]);
-    $display("jr1 6:%d",   processor_0.rrat1.rrat_reg[1]);
-    $display("jr2 6:%d",   processor_0.rrat1.rrat_reg[2]);
-    $display("jr3 6:%d",   processor_0.rrat1.rrat_reg[3]);
-    $display("jr4 6:%d",   processor_0.rrat1.rrat_reg[4]);
-    $display("jr5 6:%d",   processor_0.rrat1.rrat_reg[5]);
-    $display("jr6 6:%d",   processor_0.rrat1.rrat_reg[6]);
-    $display("jr7 6:%d",   processor_0.rrat1.rrat_reg[7]);
-    $display("jr8 6:%d",   processor_0.rrat1.rrat_reg[8]);
-    $display("jr9 6:%d",   processor_0.rrat1.rrat_reg[9]);
-    $display("jr10 6:%d",   processor_0.rrat1.rrat_reg[10]);
-    $display("jr11 6:%d",   processor_0.rrat1.rrat_reg[11]);
-    $display("jr12 6:%d",   processor_0.rrat1.rrat_reg[12]);
-    $display("jr13 6:%d",   processor_0.rrat1.rrat_reg[13]);
-    $display("jr14 6:%d",   processor_0.rrat1.rrat_reg[14]);
-    $display("jr15 6:%d",   processor_0.rrat1.rrat_reg[15]);
-    $display("jr16 6:%d",   processor_0.rrat1.rrat_reg[16]);
-    $display("jr17 6:%d",   processor_0.rrat1.rrat_reg[17]);
-    $display("jr18 6:%d",   processor_0.rrat1.rrat_reg[18]);
-    $display("jr19 6:%d",   processor_0.rrat1.rrat_reg[19]);
-    $display("jr20 6:%d",   processor_0.rrat1.rrat_reg[20]);
-    $display("jr21 6:%d",   processor_0.rrat1.rrat_reg[21]);
-    $display("jr22 6:%d",   processor_0.rrat1.rrat_reg[22]);
-    $display("jr23 6:%d",   processor_0.rrat1.rrat_reg[23]);
-    $display("jr24 6:%d",   processor_0.rrat1.rrat_reg[24]);
-    $display("jr25 6:%d",   processor_0.rrat1.rrat_reg[25]);
-    $display("jr26 6:%d",   processor_0.rrat1.rrat_reg[26]);
-    $display("jr27 6:%d",   processor_0.rrat1.rrat_reg[27]);
-    $display("jr28 6:%d",   processor_0.rrat1.rrat_reg[28]);
-    $display("jr29 6:%d",   processor_0.rrat1.rrat_reg[29]);
-    $display("jr30 6:%d",   processor_0.rrat1.rrat_reg[30]);
-    $display("jr31 6:%d",   processor_0.rrat1.rrat_reg[31]);
+    $display("jr0 7:%d",   processor_0.rrat1.rrat_reg[0]);
+    $display("jr1 7:%d",   processor_0.rrat1.rrat_reg[1]);
+    $display("jr2 7:%d",   processor_0.rrat1.rrat_reg[2]);
+    $display("jr3 7:%d",   processor_0.rrat1.rrat_reg[3]);
+    $display("jr4 7:%d",   processor_0.rrat1.rrat_reg[4]);
+    $display("jr5 7:%d",   processor_0.rrat1.rrat_reg[5]);
+    $display("jr6 7:%d",   processor_0.rrat1.rrat_reg[6]);
+    $display("jr7 7:%d",   processor_0.rrat1.rrat_reg[7]);
+    $display("jr8 7:%d",   processor_0.rrat1.rrat_reg[8]);
+    $display("jr9 7:%d",   processor_0.rrat1.rrat_reg[9]);
+    $display("jr10 7:%d",   processor_0.rrat1.rrat_reg[10]);
+    $display("jr11 7:%d",   processor_0.rrat1.rrat_reg[11]);
+    $display("jr12 7:%d",   processor_0.rrat1.rrat_reg[12]);
+    $display("jr13 7:%d",   processor_0.rrat1.rrat_reg[13]);
+    $display("jr14 7:%d",   processor_0.rrat1.rrat_reg[14]);
+    $display("jr15 7:%d",   processor_0.rrat1.rrat_reg[15]);
+    $display("jr16 7:%d",   processor_0.rrat1.rrat_reg[16]);
+    $display("jr17 7:%d",   processor_0.rrat1.rrat_reg[17]);
+    $display("jr18 7:%d",   processor_0.rrat1.rrat_reg[18]);
+    $display("jr19 7:%d",   processor_0.rrat1.rrat_reg[19]);
+    $display("jr20 7:%d",   processor_0.rrat1.rrat_reg[20]);
+    $display("jr21 7:%d",   processor_0.rrat1.rrat_reg[21]);
+    $display("jr22 7:%d",   processor_0.rrat1.rrat_reg[22]);
+    $display("jr23 7:%d",   processor_0.rrat1.rrat_reg[23]);
+    $display("jr24 7:%d",   processor_0.rrat1.rrat_reg[24]);
+    $display("jr25 7:%d",   processor_0.rrat1.rrat_reg[25]);
+    $display("jr26 7:%d",   processor_0.rrat1.rrat_reg[26]);
+    $display("jr27 7:%d",   processor_0.rrat1.rrat_reg[27]);
+    $display("jr28 7:%d",   processor_0.rrat1.rrat_reg[28]);
+    $display("jr29 7:%d",   processor_0.rrat1.rrat_reg[29]);
+    $display("jr30 7:%d",   processor_0.rrat1.rrat_reg[30]);
+    $display("jr31 7:%d",   processor_0.rrat1.rrat_reg[31]);
     // rob signals (22) - prefix 'i'
     $display("hROB_commit1_mispredict 1:%h",        processor_0.ROB_commit1_mispredict);
     $display("hROB_t1_is_full 1:%h",       			processor_0.ROB_t1_is_full);
-    $display("hROB_t2_is_full 1:%h",       			processor_0.ROB_t2_is_full);//4
+    $display("hROB_t2_is_full 1:%h",       			processor_0.ROB_t2_is_full);
     $display("hROB_commit2_mispredict 1:%h",        processor_0.ROB_commit2_mispredict);
     $display("hcdb1_branch_taken 1:%h",       		processor_0.cdb1_branch_taken);
-    $display("hcdb2_branch_taken 1:%h",       		processor_0.cdb2_branch_taken);//4
+    $display("hcdb2_branch_taken 1:%h",       		processor_0.cdb2_branch_taken);
     $display("hROB_commit1_is_thread1 1:%h",        processor_0.ROB_commit1_is_thread1);
     $display("hROB_commit1_is_branch 1:%h",         processor_0.ROB_commit1_is_branch);
     $display("hROB_commit2_is_thread1 1:%h",        processor_0.ROB_commit2_is_thread1);
-    $display("hROB_commit2_is_branch 1:%h",         processor_0.ROB_commit2_is_branch);//4
+    $display("hROB_commit2_is_branch 1:%h",         processor_0.ROB_commit2_is_branch);
     $display("hROB_commit1_is_halt 1:%h",           processor_0.ROB_commit1_is_halt);
     $display("hROB_commit1_is_illegal 1:%h",        processor_0.ROB_commit1_is_illegal);
     $display("hROB_commit2_is_halt 1:%h",           processor_0.ROB_commit2_is_halt);
-    $display("hROB_commit2_is_illegal 1:%h",        processor_0.ROB_commit2_is_illegal);//16
+    $display("hROB_commit2_is_illegal 1:%h",        processor_0.ROB_commit2_is_illegal);
     
     $display("hROB_inst1_rob_idx 16:%h",            processor_0.ROB_inst1_rob_idx); 
     $display("hROB_inst2_rob_idx 16:%h",            processor_0.ROB_inst2_rob_idx); 
     $display("hROB_commit1_target_pc 16:%h",        processor_0.ROB_commit1_target_pc); 
     $display("hROB_commit2_target_pc 16:%h",        processor_0.ROB_commit2_target_pc);  
     $display("hROB_commit1_prn_dest 16:%h",         processor_0.ROB_commit1_prn_dest); 
-    $display("hROB_commit2_prn_dest 16:%h",         processor_0.ROB_commit2_prn_dest);     //22
+    $display("hROB_commit2_prn_dest 16:%h",         processor_0.ROB_commit2_prn_dest);     
     
     $display("hRob_t1_head 1:%h",         processor_0.rob1.t1_head);  
     $display("hRob_t1_tail 1:%h",         processor_0.rob1.t1_tail);  
     $display("hRob_t2_head 1:%h",         processor_0.rob1.t2_head);  
     $display("hRob_t2_tail 1:%h",         processor_0.rob1.t2_tail);  
-   
-
+    
+    $display("hwr_data1 16:%h",     				processor_0.PRF_writeback_value1);
+    $display("hROB_commit1_pc 16:%h",     			processor_0.ROB_commit1_pc);
+    $display("hROB_commit1_arn_dest 16:%h",     	processor_0.ROB_commit1_arn_dest);
+    $display("hROB_commit1_wr_en 1:%h",     		processor_0.ROB_commit1_wr_en);
+    $display("hROB_commit1_valid 1:%h",     		processor_0.ROB_commit1_valid);
+    $display("hwr_data1 16:%h",     				processor_0.PRF_writeback_value2);
+    $display("hROB_commit2_pc 16:%h",     			processor_0.ROB_commit2_pc);
+    $display("hROB_commit2_arn_dest 16:%h",     	processor_0.ROB_commit2_arn_dest);
+    $display("hROB_commit2_wr_en 1:%h",     		processor_0.ROB_commit2_wr_en);
+    $display("hROB_commit2_valid 1:%h",     		processor_0.ROB_commit2_valid);//10
+    
+    $display("hRS_EX_opa[5] 16:%h",						processor_0.RS_EX_opa[5]);
+    $display("hRS_EX_opa[4] 16:%h",						processor_0.RS_EX_opa[4]);
+    $display("hRS_EX_opa[3] 16:%h",						processor_0.RS_EX_opa[3]);
+    $display("hRS_EX_opa[2] 16:%h",						processor_0.RS_EX_opa[2]);
+    $display("hRS_EX_opa[1] 16:%h",						processor_0.RS_EX_opa[1]);
+    $display("hRS_EX_opa[0] 16:%h",						processor_0.RS_EX_opa[0]);
+	$display("hRS_EX_opb[5] 16:%h",						processor_0.RS_EX_opb[5]);
+	$display("hRS_EX_opb[4] 16:%h",						processor_0.RS_EX_opb[4]);
+	$display("hRS_EX_opb[3] 16:%h",						processor_0.RS_EX_opb[3]);
+	$display("hRS_EX_opb[2] 16:%h",						processor_0.RS_EX_opb[2]);
+	$display("hRS_EX_opb[1] 16:%h",						processor_0.RS_EX_opb[1]);
+	$display("hRS_EX_opb[0] 16:%h",						processor_0.RS_EX_opb[0]);
+	$display("hRS_EX_opc[5] 16:%h",						processor_0.RS_EX_opc[5]);
+	$display("hRS_EX_opc[4] 16:%h",						processor_0.RS_EX_opc[4]);
+	$display("hRS_EX_opc[3] 16:%h",						processor_0.RS_EX_opc[3]);
+	$display("hRS_EX_opc[2] 16:%h",						processor_0.RS_EX_opc[2]);
+	$display("hRS_EX_opc[1] 16:%h",						processor_0.RS_EX_opc[1]);
+	$display("hRS_EX_opc[0] 16:%h",						processor_0.RS_EX_opc[0]);
+	$display("hRS_EX_dest_tag[5] 6:%b",					RS_EX_dest_tag[5]);
+	$display("hRS_EX_dest_tag[4] 6:%b",					RS_EX_dest_tag[4]);	
+	$display("hRS_EX_dest_tag[3] 6:%b",					RS_EX_dest_tag[3]);
+	$display("hRS_EX_dest_tag[2] 6:%b",					RS_EX_dest_tag[2]);
+	$display("hRS_EX_dest_tag[1] 6:%b",					RS_EX_dest_tag[1]);
+	$display("hRS_EX_dest_tag[0] 6:%b",					RS_EX_dest_tag[0]);
+	$display("hRS_EX_rob_idx[5] 4:%b",					RS_EX_rob_idx[5]);
+	$display("hRS_EX_rob_idx[4] 4:%b",					RS_EX_rob_idx[4]);
+	$display("hRS_EX_rob_idx[3] 4:%b",					RS_EX_rob_idx[3]);
+	$display("hRS_EX_rob_idx[2] 4:%b",					RS_EX_rob_idx[2]);
+	$display("hRS_EX_rob_idx[1] 4:%b",					RS_EX_rob_idx[1]);
+	$display("hRS_EX_rob_idx[0] 4:%b",					RS_EX_rob_idx[0]);
+/*logic [5:0]					RS_EX_out_valid;
+logic [5:0] [1:0]			RS_EX_branch_out;
+logic						RS_full;
+*/
 
     // RS signals (13) - prefix 'g'
-    $display("gr0 6:%d",   processor_0.rrat2.rrat_reg[0]);
-    $display("gr1 6:%d",   processor_0.rrat2.rrat_reg[1]);
-    $display("gr2 6:%d",   processor_0.rrat2.rrat_reg[2]);
-    $display("gr3 6:%d",   processor_0.rrat2.rrat_reg[3]);
-    $display("gr4 6:%d",   processor_0.rrat2.rrat_reg[4]);
-    $display("gr5 6:%d",   processor_0.rrat2.rrat_reg[5]);
-    $display("gr6 6:%d",   processor_0.rrat2.rrat_reg[6]);
-    $display("gr7 6:%d",   processor_0.rrat2.rrat_reg[7]);
-    $display("gr8 6:%d",   processor_0.rrat2.rrat_reg[8]);
-    $display("gr9 6:%d",   processor_0.rrat2.rrat_reg[9]);
-    $display("gr10 6:%d",   processor_0.rrat2.rrat_reg[10]);
-    $display("gr11 6:%d",   processor_0.rrat2.rrat_reg[11]);
-    $display("gr12 6:%d",   processor_0.rrat2.rrat_reg[12]);
-    $display("gr13 6:%d",   processor_0.rrat2.rrat_reg[13]);
-    $display("gr14 6:%d",   processor_0.rrat2.rrat_reg[14]);
-    $display("gr15 6:%d",   processor_0.rrat2.rrat_reg[15]);
-    $display("gr16 6:%d",   processor_0.rrat2.rrat_reg[16]);
-    $display("gr17 6:%d",   processor_0.rrat2.rrat_reg[17]);
-    $display("gr18 6:%d",   processor_0.rrat2.rrat_reg[18]);
-    $display("gr19 6:%d",   processor_0.rrat2.rrat_reg[19]);
-    $display("gr20 6:%d",   processor_0.rrat2.rrat_reg[20]);
-    $display("gr21 6:%d",   processor_0.rrat2.rrat_reg[21]);
-    $display("gr22 6:%d",   processor_0.rrat2.rrat_reg[22]);
-    $display("gr23 6:%d",   processor_0.rrat2.rrat_reg[23]);
-    $display("gr24 6:%d",   processor_0.rrat2.rrat_reg[24]);
-    $display("gr25 6:%d",   processor_0.rrat2.rrat_reg[25]);
-    $display("gr26 6:%d",   processor_0.rrat2.rrat_reg[26]);
-    $display("gr27 6:%d",   processor_0.rrat2.rrat_reg[27]);
-    $display("gr28 6:%d",   processor_0.rrat2.rrat_reg[28]);
-    $display("gr29 6:%d",   processor_0.rrat2.rrat_reg[29]);
-    $display("gr30 6:%d",   processor_0.rrat2.rrat_reg[30]);
-    $display("gr31 6:%d",   processor_0.rrat2.rrat_reg[31]);
+    $display("gr0 7:%d",   processor_0.rrat2.rrat_reg[0]);
+    $display("gr1 7:%d",   processor_0.rrat2.rrat_reg[1]);
+    $display("gr2 7:%d",   processor_0.rrat2.rrat_reg[2]);
+    $display("gr3 7:%d",   processor_0.rrat2.rrat_reg[3]);
+    $display("gr4 7:%d",   processor_0.rrat2.rrat_reg[4]);
+    $display("gr5 7:%d",   processor_0.rrat2.rrat_reg[5]);
+    $display("gr6 7:%d",   processor_0.rrat2.rrat_reg[6]);
+    $display("gr7 7:%d",   processor_0.rrat2.rrat_reg[7]);
+    $display("gr8 7:%d",   processor_0.rrat2.rrat_reg[8]);
+    $display("gr9 7:%d",   processor_0.rrat2.rrat_reg[9]);
+    $display("gr10 7:%d",   processor_0.rrat2.rrat_reg[10]);
+    $display("gr11 7:%d",   processor_0.rrat2.rrat_reg[11]);
+    $display("gr12 7:%d",   processor_0.rrat2.rrat_reg[12]);
+    $display("gr13 7:%d",   processor_0.rrat2.rrat_reg[13]);
+    $display("gr14 7:%d",   processor_0.rrat2.rrat_reg[14]);
+    $display("gr15 7:%d",   processor_0.rrat2.rrat_reg[15]);
+    $display("gr16 7:%d",   processor_0.rrat2.rrat_reg[16]);
+    $display("gr17 7:%d",   processor_0.rrat2.rrat_reg[17]);
+    $display("gr18 7:%d",   processor_0.rrat2.rrat_reg[18]);
+    $display("gr19 7:%d",   processor_0.rrat2.rrat_reg[19]);
+    $display("gr20 7:%d",   processor_0.rrat2.rrat_reg[20]);
+    $display("gr21 7:%d",   processor_0.rrat2.rrat_reg[21]);
+    $display("gr22 7:%d",   processor_0.rrat2.rrat_reg[22]);
+    $display("gr23 7:%d",   processor_0.rrat2.rrat_reg[23]);
+    $display("gr24 7:%d",   processor_0.rrat2.rrat_reg[24]);
+    $display("gr25 7:%d",   processor_0.rrat2.rrat_reg[25]);
+    $display("gr26 7:%d",   processor_0.rrat2.rrat_reg[26]);
+    $display("gr27 7:%d",   processor_0.rrat2.rrat_reg[27]);
+    $display("gr28 7:%d",   processor_0.rrat2.rrat_reg[28]);
+    $display("gr29 7:%d",   processor_0.rrat2.rrat_reg[29]);
+    $display("gr30 7:%d",   processor_0.rrat2.rrat_reg[30]);
+    $display("gr31 7:%d",   processor_0.rrat2.rrat_reg[31]);
     
     //rs output
 //logic [5:0][63:0]		RS_EX_opa;
@@ -688,42 +704,84 @@ module testbench;
     $display("ethread2_target_pc 16:%h",         	processor_0.thread2_target_pc);
     
     //CDB signals(10) --prefix 'd'
-    $display("wr0 6:%d",processor_0.rat2.rat_reg[0]);
-    $display("wr1 6:%d",processor_0.rat2.rat_reg[1]);
-    $display("wr2 6:%d",processor_0.rat2.rat_reg[2]);
-    $display("wr3 6:%d",processor_0.rat2.rat_reg[3]);
-    $display("wr4 6:%d",processor_0.rat2.rat_reg[4]);
-    $display("wr5 6:%d",processor_0.rat2.rat_reg[5]);
-    $display("wr6 6:%d",processor_0.rat2.rat_reg[6]);
- 	$display("wr7 6:%d",processor_0.rat2.rat_reg[7]);
-  	$display("wr8 6:%d",processor_0.rat2.rat_reg[8]);
-  	$display("wr9 6:%d",processor_0.rat2.rat_reg[9]);
-  	$display("wr10 6:%d",processor_0.rat2.rat_reg[10]);
-	$display("wr11 6:%d",processor_0.rat2.rat_reg[11]);
-    $display("wr12 6:%d",processor_0.rat2.rat_reg[12]);
-    $display("wr13 6:%d",processor_0.rat2.rat_reg[13]);
-    $display("wr14 6:%d",processor_0.rat2.rat_reg[14]);
-    $display("wr15 6:%d",processor_0.rat2.rat_reg[15]);
-    $display("wr16 6:%d",processor_0.rat2.rat_reg[16]);
- 	$display("wr17 6:%d",processor_0.rat2.rat_reg[17]);
-  	$display("wr18 6:%d",processor_0.rat2.rat_reg[18]);
-  	$display("wr19 6:%d",processor_0.rat2.rat_reg[19]);
-  	$display("wr20 6:%d",processor_0.rat2.rat_reg[20]);
-  	$display("wr21 6:%d",processor_0.rat2.rat_reg[21]);
-    $display("wr22 6:%d",processor_0.rat2.rat_reg[22]);
-    $display("wr23 6:%d",processor_0.rat2.rat_reg[23]);
-    $display("wr24 6:%d",processor_0.rat2.rat_reg[24]);
-    $display("wr25 6:%d",processor_0.rat2.rat_reg[25]);
-    $display("wr26 6:%d",processor_0.rat2.rat_reg[26]);
- 	$display("wr27 6:%d",processor_0.rat2.rat_reg[27]);
-  	$display("wr28 6:%d",processor_0.rat2.rat_reg[28]);
-  	$display("wr29 6:%d",processor_0.rat2.rat_reg[29]);
-  	$display("wr30 6:%d",processor_0.rat2.rat_reg[30]);
-  	$display("wr31 6:%d",processor_0.rat2.rat_reg[31]); //10
+    $display("wr0 7:%h",processor_0.rat2.rat_reg[0]);
+    $display("wr1 7:%h",processor_0.rat2.rat_reg[1]);
+    $display("wr2 7:%h",processor_0.rat2.rat_reg[2]);
+    $display("wr3 7:%h",processor_0.rat2.rat_reg[3]);
+    $display("wr4 7:%h",processor_0.rat2.rat_reg[4]);
+    $display("wr5 7:%h",processor_0.rat2.rat_reg[5]);
+    $display("wr6 7:%h",processor_0.rat2.rat_reg[6]);
+ 	$display("wr7 7:%h",processor_0.rat2.rat_reg[7]);
+  	$display("wr8 7:%h",processor_0.rat2.rat_reg[8]);
+  	$display("wr9 7:%h",processor_0.rat2.rat_reg[9]);
+  	$display("wr10 7:%h",processor_0.rat2.rat_reg[10]);
+	$display("wr11 7:%h",processor_0.rat2.rat_reg[11]);
+    $display("wr12 7:%h",processor_0.rat2.rat_reg[12]);
+    $display("wr13 7:%h",processor_0.rat2.rat_reg[13]);
+    $display("wr14 7:%h",processor_0.rat2.rat_reg[14]);
+    $display("wr15 7:%h",processor_0.rat2.rat_reg[15]);
+    $display("wr16 7:%h",processor_0.rat2.rat_reg[16]);
+ 	$display("wr17 7:%h",processor_0.rat2.rat_reg[17]);
+  	$display("wr18 7:%h",processor_0.rat2.rat_reg[18]);
+  	$display("wr19 7:%h",processor_0.rat2.rat_reg[19]);
+  	$display("wr20 7:%h",processor_0.rat2.rat_reg[20]);
+  	$display("wr21 7:%h",processor_0.rat2.rat_reg[21]);
+    $display("wr22 7:%h",processor_0.rat2.rat_reg[22]);
+    $display("wr23 7:%h",processor_0.rat2.rat_reg[23]);
+    $display("wr24 7:%h",processor_0.rat2.rat_reg[24]);
+    $display("wr25 7:%h",processor_0.rat2.rat_reg[25]);
+    $display("wr26 7:%h",processor_0.rat2.rat_reg[26]);
+ 	$display("wr27 7:%h",processor_0.rat2.rat_reg[27]);
+  	$display("wr28 7:%h",processor_0.rat2.rat_reg[28]);
+  	$display("wr29 7:%h",processor_0.rat2.rat_reg[29]);
+  	$display("wr30 7:%h",processor_0.rat2.rat_reg[30]);
+  	$display("wr31 7:%h",processor_0.rat2.rat_reg[31]); //10
     
     // MEM signals (10) - prefix 'm'*****Writeback
+    
+    $display("mr48 16:%h", processor_0.prf1.prf2[48].value);
+    $display("mr49 16:%h", processor_0.prf1.prf2[49].value);
+    $display("mr50 16:%h", processor_0.prf1.prf2[50].value);
+    $display("mr51 16:%h", processor_0.prf1.prf2[51].value);
+    $display("mr52 16:%h", processor_0.prf1.prf2[52].value);
+    $display("mr53 16:%h", processor_0.prf1.prf2[53].value);
+    $display("mr54 16:%h", processor_0.prf1.prf2[54].value);
+    $display("mr55 16:%h", processor_0.prf1.prf2[55].value);
+    $display("mr56 16:%h", processor_0.prf1.prf2[56].value);
+    $display("mr57 16:%h", processor_0.prf1.prf2[57].value);
+    $display("mr58 16:%h", processor_0.prf1.prf2[58].value);
+    $display("mr59 16:%h", processor_0.prf1.prf2[59].value);
+    $display("mr60 16:%h", processor_0.prf1.prf2[60].value);
+    $display("mr61 16:%h", processor_0.prf1.prf2[61].value);
+    $display("mr62 16:%h", processor_0.prf1.prf2[62].value);
+    $display("mr63 16:%h", processor_0.prf1.prf2[63].value);
+    $display("mr64 16:%h", processor_0.prf1.prf2[64].value);
+    $display("mr65 16:%h", processor_0.prf1.prf2[65].value);
+    $display("mr66 16:%h", processor_0.prf1.prf2[66].value);
+    $display("mr67 16:%h", processor_0.prf1.prf2[67].value);
+    $display("mr68 16:%h", processor_0.prf1.prf2[68].value);
+    $display("mr69 16:%h", processor_0.prf1.prf2[69].value);
+    $display("mr70 16:%h", processor_0.prf1.prf2[70].value);
+    $display("mr71 16:%h", processor_0.prf1.prf2[71].value);
+    $display("mr72 16:%h", processor_0.prf1.prf2[72].value);
+    $display("mr73 16:%h", processor_0.prf1.prf2[73].value);
+    $display("mr74 16:%h", processor_0.prf1.prf2[74].value);
+    $display("mr75 16:%h", processor_0.prf1.prf2[75].value);
+    $display("mr76 16:%h", processor_0.prf1.prf2[76].value);
+    $display("mr77 16:%h", processor_0.prf1.prf2[77].value);
+    $display("mr78 16:%h", processor_0.prf1.prf2[78].value);
+    $display("mr79 16:%h", processor_0.prf1.prf2[79].value);
+    $display("mr80 16:%h", processor_0.prf1.prf2[80].value);
+    $display("mr81 16:%h", processor_0.prf1.prf2[81].value);
+    $display("mr82 16:%h", processor_0.prf1.prf2[82].value);
+    $display("mr83 16:%h", processor_0.prf1.prf2[83].value);
+    $display("mr84 16:%h", processor_0.prf1.prf2[84].value);
+    $display("mr85 16:%h", processor_0.prf1.prf2[85].value);
+    $display("mr86 16:%h", processor_0.prf1.prf2[86].value);
+    $display("mr87 16:%h", processor_0.prf1.prf2[87].value);
+
       
-    $display("mwr_data1 16:%h",     				processor_0.PRF_writeback_value1);
+   /* $display("mwr_data1 16:%h",     				processor_0.PRF_writeback_value1);
     $display("mROB_commit1_pc 16:%h",     			processor_0.ROB_commit1_pc);
     $display("mROB_commit1_arn_dest 16:%h",     	processor_0.ROB_commit1_arn_dest);
     $display("mROB_commit1_wr_en 1:%h",     		processor_0.ROB_commit1_wr_en);
@@ -732,7 +790,7 @@ module testbench;
     $display("mROB_commit2_pc 16:%h",     			processor_0.ROB_commit2_pc);
     $display("mROB_commit2_arn_dest 16:%h",     	processor_0.ROB_commit2_arn_dest);
     $display("mROB_commit2_wr_en 1:%h",     		processor_0.ROB_commit2_wr_en);
-    $display("mROB_commit2_valid 1:%h",     		processor_0.ROB_commit2_valid);//10
+    $display("mROB_commit2_valid 1:%h",     		processor_0.ROB_commit2_valid);//10*/
     
     // Misc signals(2) - prefix 'v'
     $display("vcompleted 1:%h",     				processor_0.pipeline_completed_insts);
