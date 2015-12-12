@@ -1,0 +1,6 @@
+DirectC initcurses 
+DirectC flushpipe 
+DirectC waitforresponse 
+DirectC initmem 
+DirectC get_instr_at_pc 
+DirectC not_valid_pc 

@@ -1,0 +1,160 @@
+0 
+58
++define+
++define+SYNTH_TEST
++vc
+-Mamsrun=
+-Masflags=
+-Mcc=gcc
+-Mcfl= -pipe -fPIC -O -I/usr/caen/vcs-2015.09/include
+-Mcplusplus=g++
+-Mcrt0=
+-Mcrtn=
+-Mcsrc=test_bench/pipe_print.c test_bench/visual_c_hooks.c
+-Mexternalobj=
+-Mldflags= -rdynamic
+-Mobjects= /usr/caen/vcs-2015.09/linux64/lib/libvirsim.so /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so /usr/caen/vcs-2015.09/linux64/lib/libsnpsmalloc.so -lncurses
+-Mout=vis_simv
+-Msaverestoreobj=/usr/caen/vcs-2015.09/linux64/lib/vcs_save_restore_new.o
+-Msyslibs=-ldl
+-Mupdate
+-Mvcsaceobjs=
+-Mxcflags= -pipe -fPIC -I/usr/caen/vcs-2015.09/include
+-full64
+-gen_obj
+-line
+-o vis_simv
+-picarchive
+-sverilog
+/usr/caen/vcs-2015.09/linux64/bin/vcs1
+sys_defs.vh
+test_bench/mem.v
+test_bench/visual_testbench_pr.v
+verilog/BTB.v
+verilog/cdb.v
+verilog/cdb_one_entry.v
+verilog/dcache.v
+verilog/dcache_controller.v
+verilog/dcache_mem.v
+verilog/ex_stage.v
+verilog/icache.v
+verilog/icache_controller.v
+verilog/icachemem.v
+verilog/id_stage.v
+verilog/if_stage.v
+verilog/lq_one_entry.v
+verilog/lsq.v
+verilog/mult_stage.v
+verilog/pipe_mult.v
+verilog/predictor.v
+verilog/prf.v
+verilog/prf_one_entry.v
+verilog/priority_selector.v
+verilog/processor.v
+verilog/rat.v
+verilog/rob.v
+verilog/rob_one_entry.v
+verilog/rrat.v
+verilog/rs.v
+verilog/rs_one_entry.v
+verilog/sq_one_entry.v
+57
+sysc_uni_pwd=/home/zyuxuan/classes/eecs470/projects/project4/group7f15/two_threads
+_LMFILES_=/usr/caen/misc/modules/vcs/2015.09
+XMODIFIERS=@im=none
+XDG_VTNR=1
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session1
+XDG_SESSION_ID=888
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SEAT=seat0
+XDG_RUNTIME_DIR=/run/user/99482348
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/zyuxuan
+XDG_CURRENT_DESKTOP=X-Cinnamon;
+XAUTHORITY=/var/run/lightdm/zyuxuan/xauthority
+VTE_VERSION=3406
+VMR_MODE_FLAG=64
+VCS_MODE_FLAG=64
+VCS_HOME=/usr/caen/vcs-2015.09
+VCS_DEPTH=0
+VCS_ARG_ADDED_FOR_TMP=1
+VCS_ARCH=linux64
+UNAME=/bin/uname
+TOOL_HOME=/usr/caen/vcs-2015.09/linux64
+SW_VCS=2015.09
+SSH_AUTH_SOCK=/run/user/99482348/keyring-QKDUyA/ssh
+SSH_AGENT_PID=15325
+SNPSLMD_LICENSE_FILE=/usr/caen/vcs-2015.09/license.dat
+SESSION_MANAGER=local/unix:@/tmp/.ICE-unix/15189,unix/unix:/tmp/.ICE-unix/15189
+SCRNAME=vcs
+SCRIPT_NAME=vcs
+QT_PLUGIN_PATH=/usr/lib64/kde4/plugins:/usr/lib/kde4/plugins
+QT_IM_MODULE=xim
+QT_GRAPHICSSYSTEM_CHECKED=1
+QTLIB=/usr/lib64/qt-3.3/lib
+QTINC=/usr/lib64/qt-3.3/include
+QTDIR=/usr/lib64/qt-3.3
+OVA_UUM=0
+MODULESHOME=/usr/share/Modules
+MODULEPATH=/usr/share/Modules/modulefiles:/etc/modulefiles:/usr/caen/misc/modules:/afs/umich.edu/class/coe/modules
+MFLAGS=
+MAKELEVEL=1
+MAKEFLAGS=
+LOADEDMODULES=vcs/2015.09
+LESSOPEN=||/usr/bin/lesspipe.sh %s
+LC_ALL=C
+KRB5CCNAME=FILE:/tmp/krb5cc_99482348_0Yvf8X
+KDEDIRS=/usr
+IMSETTINGS_MODULE=none
+IMSETTINGS_INTEGRATE_DESKTOP=yes
+ICEAUTHORITY=/run/user/99482348/iceauthority
+HISTCONTROL=ignoredups
+GPG_AGENT_INFO=/run/user/99482348/keyring-QKDUyA/gpg:0:1
+GNOME_KEYRING_CONTROL=/run/user/99482348/keyring-QKDUyA
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GDMSESSION=cinnamon
+DESKTOP_SESSION=cinnamon
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-OjA5Wk0hd7,guid=4e4ecdc0f21e6332ff2e5668566c772d
+COLORTERM=gnome-terminal
+BASH_FUNC_module()=() {  eval `/usr/bin/modulecmd bash $*`_}
+0
+31
+1449949188 verilog/dcache_controller.v
+1449949188 verilog/dcache_mem.v
+1449949188 verilog/dcache.v
+1449949188 verilog/BTB.v
+1449949189 verilog/predictor.v
+1449949188 verilog/icache.v
+1449949189 verilog/icachemem.v
+1449764837 verilog/icache_controller.v
+1449949189 verilog/lsq.v
+1449949189 verilog/sq_one_entry.v
+1449764838 verilog/lq_one_entry.v
+1449764838 verilog/rs_one_entry.v
+1449949189 verilog/rs.v
+1449764838 verilog/rrat.v
+1449764838 verilog/rob_one_entry.v
+1449949189 verilog/rob.v
+1449949189 verilog/rat.v
+1449949189 verilog/processor.v
+1449764838 verilog/priority_selector.v
+1449764838 verilog/prf_one_entry.v
+1449764838 verilog/prf.v
+1449764838 verilog/pipe_mult.v
+1449764838 verilog/mult_stage.v
+1449949189 verilog/if_stage.v
+1449949189 verilog/id_stage.v
+1449764837 verilog/ex_stage.v
+1449764837 verilog/cdb_one_entry.v
+1449764837 verilog/cdb.v
+1449764836 test_bench/mem.v
+1449949187 test_bench/visual_testbench_pr.v
+1449949187 sys_defs.vh
+7
+1449764836 test_bench/pipe_print.c
+1449764837 test_bench/visual_c_hooks.c
+0 
+1440563255 /usr/caen/vcs-2015.09/linux64/lib/libvirsim.so
+1440562843 /usr/caen/vcs-2015.09/linux64/lib/liberrorinf.so
+1440562824 /usr/caen/vcs-2015.09/linux64/lib/libsnpsmalloc.so
+0 -lncurses
+1449949524 vis_simv.daidir
