@@ -205,6 +205,8 @@ logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
 
 logic 							ROB_commit1_is_branch;
 logic							ROB_commit2_is_branch;
+logic							ROB_commit1_is_uncond_branch;
+logic							ROB_commit2_is_uncond_branch;
 logic							ROB_commit1_is_illegal;
 logic							ROB_commit2_is_illegal;
 
@@ -225,14 +227,14 @@ logic			BTB_target_inst1_valid;
 logic			BTB_target_inst2_valid;*/
 
 //rs output
-logic [5:0][63:0]		RS_EX_opa;
-logic [5:0][63:0]		RS_EX_opb;
+logic [3:0][63:0]		RS_EX_opa;
+logic [3:0][63:0]		RS_EX_opb;
 
-logic [5:0][63:0]		RS_EX_opc;
-logic [5:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
-logic [5:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
-logic [5:0]					RS_EX_out_valid;
-logic [5:0] [1:0]			RS_EX_branch_out;
+logic [3:0][63:0]		RS_EX_opc;
+logic [3:0][$clog2(`PRF_SIZE)-1:0]	RS_EX_dest_tag;
+logic [3:0][$clog2(`ROB_SIZE):0]	RS_EX_rob_idx;
+logic [3:0]					RS_EX_out_valid;
+logic [3:0] [1:0]			RS_EX_branch_out;
 logic						RS_full;
 
 //lsq output
@@ -249,10 +251,10 @@ logic [63:0]					LSQ2Dcache_data;
 
 //ex output
 //logic [5:0]							EX_RS_fu_is_available;
-logic [5:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
-logic [5:0][63:0]					EX_CDB_fu_result_out;
+logic [3:0][$clog2(`PRF_SIZE)-1:0]	EX_CDB_dest_tag;
+logic [3:0][63:0]					EX_CDB_fu_result_out;
 //logic [5:0]							EX_CDB_fu_result_is_valid;
-logic [5:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
+logic [3:0][$clog2(`ROB_SIZE):0]	EX_CDB_rob_idx;
 logic [1:0]							EX_CDB_mispredict_sig;
 //ex success send to cdb
 logic					adder1_send_in_success;
@@ -550,10 +552,6 @@ id_stage id(
 	.id_op_select2(ID_fu_select2),
 
 
-	//.id_rd_mem_out1,        // does inst read memory?
-	//.id_wr_mem_out1,        // does inst write memory?
-	//.id_ldl_mem_out1,       // load-lock inst?
-	//.id_stc_mem_out1,       // store-conditional inst?
 	.id_cond_branch_out1(ID_inst1_is_cond_branch),   // is inst a conditional branch?
 	.id_uncond_branch_out1(ID_inst1_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
@@ -562,10 +560,6 @@ id_stage id(
 	.id_illegal_out1(ID_inst1_is_illegal),
 	.id_valid_inst_out1(ID_inst1_is_valid),     // is inst a valid instruction to be 
 													        // counted for CPI calculations?
-	//.id_rd_mem_out2,        // does inst read memory?
-	//.id_wr_mem_out2,        // does inst write memory?
-	//.id_ldl_mem_out2,       // load-lock inst?
-	//.id_stc_mem_out2,       // store-conditional inst?
 	.id_cond_branch_out2(ID_inst2_is_cond_branch),   // is inst a conditional branch?
 	.id_uncond_branch_out2(ID_inst2_is_uncond_branch), // is inst an unconditional branch 
 													        // or jump?
@@ -620,13 +614,11 @@ rat rat1(
 	.opa_PRF_idx1(RAT1_PRF_opa_idx1),
 	.opb_PRF_idx1(RAT1_PRF_opb_idx1),
 	.request1(RAT1_PRF_allocate_req1),  //send to PRF indicate whether it need data
-	//.RAT_allo_halt1(),
 
 	//output 2
 	.opa_PRF_idx2(RAT1_PRF_opa_idx2),
 	.opb_PRF_idx2(RAT1_PRF_opb_idx2),
 	.request2(RAT1_PRF_allocate_req2),  //send to PRF indicate whether it need data
-	//.RAT_allo_halt2(),
 
 	.rega_prf_inst1(RAT1_PRF_rega_idx1),
 	.rega_prf_inst2(RAT1_PRF_rega_idx2),
@@ -856,7 +848,8 @@ rob rob1(
 	.inst1_pc_in(current_pc),				//the pc of the instruction
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
-	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
+	.inst1_is_branch_in(ID_inst1_is_cond_branch),			//if this instruction is a branch
+	.inst1_is_uncond_branch_in(ID_inst1_is_uncond_branch),
 	.inst1_is_halt_in(ID_inst1_is_halt),
 	.inst1_is_illegal_in(ID_inst1_is_illegal),
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
@@ -865,7 +858,8 @@ rob rob1(
 	.inst2_pc_in(current_pc+4),				//the pc of the instruction
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
-	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
+	.inst2_is_branch_in(ID_inst2_is_cond_branch),			//if this instruction is a branch
+	.inst2_is_uncond_branch_in(ID_inst2_is_uncond_branch),
 	.inst2_is_halt_in(ID_inst2_is_halt),
 	.inst2_is_illegal_in(ID_inst2_is_illegal),
 	.inst2_load_in(ID_inst2_is_valid),		       	//tell rob if instruction2 is valid
@@ -890,6 +884,7 @@ rob rob1(
 	.commit1_pc_out(ROB_commit1_pc),
 	.commit1_target_pc_out(ROB_commit1_target_pc),
 	.commit1_is_branch_out(ROB_commit1_is_branch),				       	//if this instruction is a branch
+	.commit1_is_uncond_branch_out(ROB_commit1_is_uncond_branch),
 	.commit1_mispredict_out(ROB_commit1_mispredict),				       	//if this instrucion is mispredicted
 	.commit1_arn_dest_out(ROB_commit1_arn_dest),                       //the architected register number of the destination of this instruction
 	.commit1_prn_dest_out(ROB_commit1_prn_dest),						//the prf number of the destination of this instruction
@@ -902,6 +897,7 @@ rob rob1(
 	.commit2_pc_out(ROB_commit2_pc),
 	.commit2_target_pc_out(ROB_commit2_target_pc),
 	.commit2_is_branch_out(ROB_commit2_is_branch),						//if this instruction is a branch
+	.commit2_is_uncond_branch_out(ROB_commit2_is_uncond_branch),
 	.commit2_mispredict_out(ROB_commit2_mispredict),				       	//if this instrucion is mispredicted
 	.commit2_arn_dest_out(ROB_commit2_arn_dest),						//the architected register number of the destination of this instruction
 	.commit2_prn_dest_out(ROB_commit2_prn_dest),						//the prf number of the destination of this instruction

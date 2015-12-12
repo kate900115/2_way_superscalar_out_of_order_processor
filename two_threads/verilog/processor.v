@@ -14,13 +14,14 @@ module processor(
     input [3:0]   mem2proc_response,        // Tag from memory about current request
     input [63:0]  mem2proc_data,            // Data coming back from memory
     input [3:0]   mem2proc_tag,              // Tag from memory about current reply
+    input 	  is_two_threads,
 
     output BUS_COMMAND  proc2mem_command,    // command sent to memory
     output logic [63:0] proc2mem_addr,      // Address sent to memory
     output logic [63:0] proc2mem_data,      // Data sent to memory
 
     output logic [3:0]  pipeline_completed_insts,
-    //output ERROR_CODE   pipeline_error_status,
+    output ERROR_CODE   pipeline_error_status,
 
     // testing hooks (these must be exported so we can test
     // the synthesized version) data is tested by looking at
@@ -36,11 +37,11 @@ module processor(
     output logic [$clog2(`ARF_SIZE)-1:0]	ROB_commit2_arn_dest,
 	output logic 							ROB_commit2_wr_en,
     output logic [63:0]						PRF_writeback_value2,
-    output ERROR_CODE   pipeline_error_status,
+    //output ERROR_CODE   pipeline_error_status,
     
     // Outputs from IF-Stage 
     output logic [63:0]						PC_proc2Imem_addr,
-    output logic [63:0]						PC_proc2Imem_addr_previous,
+    output logic [63:0]						current_pc,
     output logic [31:0]						PC_inst1,
     output logic [31:0]						PC_inst2,
     output logic							PC_inst1_valid,
@@ -63,7 +64,6 @@ module processor(
 	output logic [63:0]						ROB_commit2_pc,
 	output logic [31:0]						ROB_commit1_inst_out,
 	output logic [31:0]						ROB_commit2_inst_out,
-	output logic 							is_next_thread1,
 	output logic							ROB_commit1_is_thread1,
 	output logic							ROB_commit2_is_thread1,
 	
@@ -73,12 +73,16 @@ module processor(
 );
 
 
+logic	thread1_branch_is_taken_pc;  //for pc to change addr
+logic	thread2_branch_is_taken_pc;
 
-logic	thread1_branch_is_taken;
+logic	thread1_branch_is_taken;  //for flush
 logic	thread2_branch_is_taken;
+logic 	[3:0]	ROB_t1_head;
+
 //pc output
 logic			PC_thread1_is_available;
-BUS_COMMAND		proc2Icache_command;
+//BUS_COMMAND		proc2Icache_command;
 //decoder
 logic [63:0]	ID_inst1_opa;
 logic [63:0]	ID_inst1_opb;
@@ -108,6 +112,9 @@ logic			ID_inst1_is_illegal;
 logic			ID_inst2_is_illegal;
 logic [4:0]			ID_rega_inst1;
 logic [4:0]			ID_rega_inst2;
+
+logic			thread1_halt;
+logic			thread2_halt;
 
 //rat output
 logic [$clog2(`PRF_SIZE)-1:0]	RAT1_PRF_opa_idx1;
@@ -181,13 +188,13 @@ logic [`PRF_SIZE-1:0]			RRAT2_PRF_free_enable_list;
 logic ROB_t1_is_full;
 logic ROB_t2_is_full;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst1_rob_idx;
-//logic							ROB_commit1_if_rename_out;
+
 logic 					ROB_commit1_is_valid;	
 logic							ROB_commit1_mispredict;
 logic [$clog2(`ROB_SIZE):0]		ROB_inst2_rob_idx;
-//logic							ROB_commit2_if_rename_out;
-logic 					ROB_commit2_is_valid;
 logic							ROB_commit2_mispredict;
+logic 					ROB_commit2_is_valid;
+
 logic							cdb1_branch_taken;
 logic							cdb2_branch_taken;
 logic [63:0]					ROB_commit1_target_pc;
@@ -195,12 +202,29 @@ logic [63:0]					ROB_commit2_target_pc;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
 
+//logic							ROB_commit1_branch_taken;
+//logic 							ROB_commit2_branch_taken;
+
 logic 							ROB_commit1_is_branch;
 logic							ROB_commit2_is_branch;
 logic							ROB_commit1_is_illegal;
 logic							ROB_commit2_is_illegal;
-logic [$clog2(`ROB_SIZE)-1:0]	ROB_t1_head;
-logic [$clog2(`ROB_SIZE)-1:0]	ROB_t2_head;
+
+/*//predictor output
+logic 	inst1_mispredict;
+logic 	inst2_mispredict;
+logic 	inst1_mispredict_valid;
+logic 	inst2_mispredict_valid;
+logic inst1_predict;             //inst predict signal
+logic inst1_predict_valid;
+logic inst2_predict;
+logic inst2_predict_valid;
+
+//BTB output
+logic [63:0]	BTB_target_inst1_pc;
+logic [63:0]	BTB_target_inst2_pc;
+logic			BTB_target_inst1_valid;
+logic			BTB_target_inst2_valid;*/
 
 //rs output
 logic [5:0][63:0]		RS_EX_opa;
@@ -256,29 +280,187 @@ logic [63:0]	thread2_target_pc;
 BUS_COMMAND				LSQ2Dcache_command;
 logic [63:0]			LSQ_address_out;
 
+// Icache output
+logic 									Icache_valid_out;
+logic [`ICACHE_BLOCK_SIZE-1:0]			Icache_data_out;
+logic [3:0]								Icache2proc_response;
+//logic [3:0]								Icache2proc_tag;//, mem2proc_tag_in;
+//logic [63:0]							Icache2proc_addr;
+BUS_COMMAND  							Icache2mem_command;
+BUS_COMMAND	 proc2Icache_command;
+logic						structure_hazard_stall;
+
+//dcache
+logic [`DCACHE_BLOCK_SIZE-1:0]	Dcache2proc_data;	 
+logic [3:0]						Dcache2proc_tag;	 	// to tell processor the tag of the previous load which is finished
+logic [3:0]						Dcache2proc_response;
+logic [63:0]					proc2Dmem_addr;
+logic [3:0]						proc2Dmem_command;
+logic [`DCACHE_BLOCK_SIZE-1:0]	proc2Dmem_data;
+logic [63:0]					Dcache2mem_addr;
+BUS_COMMAND						Dcache2mem_command;
+logic [`DCACHE_BLOCK_SIZE-1:0]  Dcache2mem_data;
+
+
 logic Imem2proc_valid;
-assign proc2mem_command = (LSQ2Dcache_command == BUS_NONE) ? proc2Icache_command : LSQ2Dcache_command;
-assign proc2mem_addr 	= (LSQ_address_out == BUS_NONE) ? PC_proc2Imem_addr : LSQ_address_out;
-assign proc2mem_data	= LSQ2Dcache_data;
+logic [63:0]							Icache2mem_addr;
+logic							terminate;
+logic							thread1_is_halt;
+logic							thread2_is_halt;
+logic							thread1_is_halt_reg;
+logic							thread2_is_halt_reg;
+logic							if_FBEQ1;
+logic							if_FBEQ2;
+
+assign thread1_halt	= (ID_inst1_is_halt||ID_inst2_is_halt) && PC_thread1_is_available;
+assign thread2_halt	= (ID_inst1_is_halt||ID_inst2_is_halt) && ~PC_thread1_is_available;
+
+
+assign proc2mem_command = (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_command : Dcache2mem_command;
+assign proc2mem_addr 	= (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_addr : Dcache2mem_addr;
+assign proc2mem_data	= Dcache2mem_data;
+assign structure_hazard_stall = (Icache2mem_command!= BUS_NONE && LSQ2Dcache_command!= BUS_NONE) ? 1 : 0;
+
+assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
+assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
+assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
+                                ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
+                                terminate               	  ? TERMINATE_NORMALLY :
+                                NO_ERROR;
+                                //(mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
+
+//assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
+//assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
+assign Imem2proc_valid = (mem2proc_tag != 0);
+
+assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
-assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
-assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
-assign pipeline_error_status =  ROB_commit1_is_illegal            ? HALTED_ON_ILLEGAL_I1 :
-                                ROB_commit1_is_halt               ? HALTED_ON_HALT_I1 :
-                                ROB_commit2_is_illegal            ? HALTED_ON_ILLEGAL_I2 :
-                                ROB_commit2_is_halt               ? HALTED_ON_HALT_I2 :
-                                NO_ERROR;
-                                //(mem2proc_response==4'h0)  ? HALTED_ON_MEMORY_ERROR :
 
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ROB_commit2_is_thread1);
 assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
-assign Imem2proc_valid = (mem2proc_tag != 0);
+assign thread1_is_halt = (ROB_commit1_is_thread1 &&  ROB_commit1_is_halt) || (ROB_commit2_is_thread1 && ROB_commit2_is_halt);
+assign thread2_is_halt = (~ROB_commit1_is_thread1 &&  ROB_commit1_is_halt) || (~ROB_commit2_is_thread1 && ROB_commit2_is_halt);
+assign terminate = thread1_is_halt_reg & thread2_is_halt_reg;
 
-assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
+always_ff @(posedge clock)
+begin
+	if(reset)
+	begin
+		thread1_is_halt_reg <= `SD 0;
+		thread2_is_halt_reg <= `SD 0;
+	end
+	else
+	begin
+		if(thread1_is_halt)
+		begin
+			thread1_is_halt_reg <= `SD 1;
+		end
+		else
+		begin
+			thread1_is_halt_reg <= `SD thread1_is_halt_reg; 
+		end
+
+		if(thread2_is_halt)
+		begin
+			thread2_is_halt_reg <= `SD 1;
+		end
+		else
+		begin
+			thread2_is_halt_reg <= `SD thread2_is_halt_reg; 
+		end
+	end
+end
+
+
+/*always_comb begin
+   	if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+		if(ROB_commit1_branch_taken)
+			thread1_target_pc = ROB_commit1_target_pc;
+		else
+   			thread1_target_pc = ROB_commit1_pc;
+	end
+   	else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+		if(ROB_commit2_branch_taken)
+			thread1_target_pc = ROB_commit2_target_pc;
+		else
+   			thread1_target_pc = ROB_commit2_pc;
+	end
+   	else if(BTB_target_inst1_valid)
+   		thread1_target_pc = BTB_target_inst1_pc;
+  	else if (BTB_target_inst2_valid)
+ 		thread1_target_pc = BTB_target_inst2_pc;
+ 	else 
+		thread1_target_pc = 0;
+end
+
+always_comb begin
+   	if((~ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+		if(ROB_commit1_branch_taken)
+			thread2_target_pc = ROB_commit1_target_pc;
+		else
+   			thread2_target_pc = ROB_commit1_pc;
+	end
+   	else if(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+		if(ROB_commit2_branch_taken)
+			thread2_target_pc = ROB_commit2_target_pc;
+		else
+   			thread2_target_pc = ROB_commit2_pc;
+	end
+   	else if (BTB_target_inst1_valid)
+   		thread2_target_pc = BTB_target_inst1_pc;
+  	else if (BTB_target_inst2_valid)
+ 		thread2_target_pc = BTB_target_inst2_pc;
+ 	else 
+		thread2_target_pc =0;
+end*/
+
+//icache
+//assign proc2mem_command	=  Icache2proc_command;
+//assign proc2mem_addr 	= Icache2proc_addr ;
+
+/*//HERE THE BRANCH TAKEN SIGNAL IS THE MISPREDICT SIGNAL                              
+assign thread1_branch_is_taken_pc = (inst1_mispredict&&inst1_mispredict_valid && ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ROB_commit2_is_thread1) ||(BTB_target_inst2_valid || BTB_target_inst1_valid); //predict taken 
+assign thread2_branch_is_taken_pc = (inst1_mispredict&&inst1_mispredict_valid && ~ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ~ROB_commit2_is_thread1) ||(BTB_target_inst2_valid || BTB_target_inst1_valid);
+assign thread1_branch_is_taken = (inst1_mispredict&&inst1_mispredict_valid && ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ROB_commit2_is_thread1);
+assign thread2_branch_is_taken = (inst1_mispredict&&inst1_mispredict_valid && ~ROB_commit1_is_thread1) || (inst2_mispredict&&inst2_mispredict_valid && ~ROB_commit2_is_thread1);*/
+
+//////////////////////////////////
+//								//
+//			 ICACHE				//
+//								//
+//////////////////////////////////
+icache ica(
+	.clock(clock),
+	.reset(reset),
+	
+	// input from processor.v
+	.proc2Icache_addr(PC_proc2Imem_addr),	
+	.proc2Icache_command(proc2Icache_command),
+	
+	// input from memory
+	.Imem2proc_response(mem2proc_response),
+	.Imem2proc_tag(mem2proc_tag),
+	.Imem2proc_data(mem2proc_data),
+	
+	.branch_mispredict(thread1_branch_is_taken),
+	.pc_target(thread1_target_pc),
+	
+	// output to mem.v
+	.proc2Imem_command(Icache2mem_command),
+	.proc2Imem_addr(Icache2mem_addr),
+	
+	// output to processor.v
+	.Icache2proc_data(Icache_data_out),
+	.Icache2proc_valid(Icache_valid_out)
+	//.Icache2proc_tag(Icache2proc_tag),	 	
+	//.Icache2proc_response(Icache2proc_response)
+	);
+	
+
 //////////////////////////////////
 //								//
 //			  PC				//
@@ -288,21 +470,23 @@ if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
-	.thread1_branch_is_taken(thread1_branch_is_taken),
-	.thread2_branch_is_taken(thread2_branch_is_taken),
+	.thread1_mispredict(thread1_branch_is_taken),
+	.thread2_mispredict(thread2_branch_is_taken),
 	.thread1_target_pc(thread1_target_pc),
 	.thread2_target_pc(thread2_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC
-	.rob1_stall(ROB_t1_is_full),		 	// when RoB1 is full, we need to stop PC1
-	.rob2_stall(ROB_t2_is_full),			// when RoB2 is full, we need to stop PC2
+	.rob1_stall(ROB_t1_is_full),			// when RoB2 is full, we need to stop PC2
+	.rob2_stall(ROB_t2_is_full),
 	.rat_stall(PRF_is_full),				// when the freelist of PRF is empty, RAT generate a stall signal
-	.thread1_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	.thread2_structure_hazard_stall(1'b0),	// If data and instruction want to use memory at the same time
-	.Icache2proc_data(mem2proc_data),			// Data coming back from instruction-memory
-	.Icache_hit(Imem2proc_valid),			//
-	.Icache2proc_tag(mem2proc_tag),
-	.Icache2proc_response(mem2proc_response),
-	.is_two_threads(1'b1),
+	.structure_hazard_stall(structure_hazard_stall),	// If data and instruction want to use memory at the same time
+
+	.thread1_halt(thread1_halt),					//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	.thread2_halt(thread2_halt),
+
+	.Icache2proc_data(Icache_data_out),			// Data coming back from instruction-memory
+	.Icache_hit(Icache_valid_out),	
+
+	.is_two_threads(is_two_threads),
 //output
 	.proc2Icache_addr(PC_proc2Imem_addr),
 	.proc2Icache_command(proc2Icache_command),
@@ -313,9 +497,66 @@ if_stage pc(
 	.inst2_is_valid(PC_inst2_valid),
 	.thread1_is_available(PC_thread1_is_available),
 	//for debug
-	.proc2Imem_addr_previous(PC_proc2Imem_addr_previous),
-	.is_next_thread1(is_next_thread1)
+	.PC_out(current_pc)
 	);
+
+/*////////////////////////////////////////////////////////////////////////////
+//										//
+//		Predictor & BTB         		//     
+//										//
+//////////////////////////////////////////
+
+
+	predictor predictor1(
+	.two_threads_enable(1'b1),
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(current_pc),
+	.inst1_valid(PC_inst1_valid && (ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch)),
+	.if_inst2_pc(current_pc+4),
+	.inst2_valid(PC_inst2_valid && (ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch)),
+
+	.branch_result1(ROB_commit1_branch_taken),              //branch taken or not taken
+	.branch_pc1(ROB_commit1_pc),             //branch local pc
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.branch_result2(ROB_commit2_branch_taken),
+	.branch_pc2(ROB_commit2_pc),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+
+	.inst1_predict(inst1_predict),              //inst predict signal
+	.inst1_predict_valid(inst1_predict_valid),
+	.inst2_predict(inst2_predict),
+	.inst2_predict_valid(inst2_predict_valid),
+	.branch1_mispredict(inst1_mispredict),
+	.branch1_mispredict_valid(inst1_mispredict_valid),
+	.branch2_mispredict(inst2_mispredict),
+	.branch2_mispredict_valid(inst2_mispredict_valid)
+	);
+
+
+	BTB BTB_1(
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(current_pc),
+	.if_inst2_pc(current_pc+4),
+	.inst1_valid(inst1_predict_valid && inst1_predict),
+	.inst2_valid(inst2_predict_valid && inst2_predict),
+		
+	.pc_idx1(ROB_commit1_pc),
+	.pc_idx2(ROB_commit2_pc),		
+	.target_pc1(ROB_commit1_target_pc),
+	.target_pc2(ROB_commit2_target_pc),
+	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+		
+	.target_inst1_pc(BTB_target_inst1_pc),
+	.target_inst2_pc(BTB_target_inst2_pc),
+	.target_inst1_valid(BTB_target_inst1_valid),
+	.target_inst2_valid(BTB_target_inst2_valid)
+
+	);*/		
+	
+
 
 //////////////////////////////////
 //								//
@@ -331,8 +572,8 @@ id_stage id(
 
 	.if_id_valid_inst1(PC_inst1_valid),
 	.if_id_valid_inst2(PC_inst2_valid),
-	.if_id_NPC_inst1(PC_proc2Imem_addr_previous),           // incoming instruction1 PC
-	.if_id_NPC_inst2(PC_proc2Imem_addr_previous+4),           // incoming instruction PC+4
+	.if_id_NPC_inst1(current_pc),           // incoming instruction1 PC
+	.if_id_NPC_inst2(current_pc+4),           // incoming instruction PC+4
 //output
 
 	.id_rega_inst1(ID_rega_inst1),
@@ -383,7 +624,9 @@ id_stage id(
 	.id_halt_out2(ID_inst2_is_halt),
 	//.id_cpuid_out2,         // get CPUID inst?
 	.id_illegal_out2(ID_inst2_is_illegal),
-	.id_valid_inst_out2(ID_inst2_is_valid)     // is inst a valid instruction to be 
+	.id_valid_inst_out2(ID_inst2_is_valid),     // is inst a valid instruction to be 
+	.if_FBEQ1(if_FBEQ1),
+	.if_FBEQ2(if_FBEQ2)
 );
 //////////////////////////////////
 //								//
@@ -600,8 +843,8 @@ prf prf1(
 
 	.rrat1_prf_free_list(RRAT1_PRF_free_enable_list),				// when a branch is mispredict, RRAT1 gives a freelist to PRF
 	.rrat2_prf_free_list(RRAT2_PRF_free_enable_list),				// when a branch is mispredict, RRAT2 gives a freelist to PRF
-	.rrat1_branch_mistaken_free_valid(ROB_commit1_mispredict),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
-	.rrat2_branch_mistaken_free_valid(ROB_commit2_mispredict),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
+	.rrat1_branch_mistaken_free_valid( (ROB_commit1_mispredict && ROB_commit1_is_thread1) || (ROB_commit2_mispredict&&ROB_commit2_is_thread1)  ),			// when a branch is mispredict, RRAT1 gives a freelist to PRF
+	.rrat2_branch_mistaken_free_valid( (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict&&~ROB_commit2_is_thread1)  ),			// when a branch is mispredict, RRAT2 gives a freelist to PRF
 	.rat1_prf_free_list(RAT1_PRF_free_list),			// when a branch is mispredict, RAT1 gives a freelist to PRF
 	.rat2_prf_free_list(RAT2_PRF_free_list),			// when a branch is mispredict, RAT2 gives a freelist to PRF
 
@@ -617,7 +860,7 @@ prf prf1(
 	.rob1_retire_idx(ROB_commit1_prn_dest),					// when rob1 retires an instruction, prf gives out the corresponding value.
 	.rob2_retire_idx(ROB_commit2_prn_dest),					// when rob2 retires an instruction, prf gives out the corresponding value.
 	.rat1_read_enable(PC_thread1_is_available),
-	.is_one_thread(1'b0),
+	.is_one_thread(~is_two_threads),
 
 
 	//output
@@ -664,7 +907,7 @@ rob rob1(
 	
 	.is_thread1(PC_thread1_is_available),					//if it ==1, it is for thread1, else it is for thread 2
 //instruction1 input
-	.inst1_pc_in(PC_proc2Imem_addr_previous),				//the pc of the instruction
+	.inst1_pc_in(current_pc),				//the pc of the instruction
 	.inst1_arn_dest_in(ID_dest_ARF_idx1),			//the arf number of the destinaion of the instruction
 	.inst1_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx1 : PRF_RAT2_rename_idx1),			//the prf number of the destination of this instruction
 	.inst1_is_branch_in(ID_inst1_is_cond_branch || ID_inst1_is_uncond_branch),			//if this instruction is a branch
@@ -673,7 +916,7 @@ rob rob1(
 	.inst1_load_in(ID_inst1_is_valid),				//tell rob if instruction1 is valid
 
 //instruction2 input
-	.inst2_pc_in(PC_proc2Imem_addr_previous+4),				//the pc of the instruction
+	.inst2_pc_in(current_pc+4),				//the pc of the instruction
 	.inst2_arn_dest_in(ID_dest_ARF_idx2),			//the arf number of the destinaion of the instruction
 	.inst2_prn_dest_in(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),          //the prf number of the destination of this instruction
 	.inst2_is_branch_in(ID_inst2_is_cond_branch || ID_inst2_is_uncond_branch),			//if this instruction is a branch
@@ -689,14 +932,14 @@ rob rob1(
 	.fu_rob_idx2(cdb2_rob_idx),			//the rob number of the instruction in the first multiplyer************************************
 	.mispredict_in2(cdb2_branch_taken),
 	.target_pc_in2(cdb2_value),
-	
-	.t1_head(ROB_t1_head),
-	.t2_head(ROB_t2_head),
 //output
 //after dispatching, we need to send rs the rob number we assigned to instruction1 and instruction2
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),					//it is combinational logic so that the output is dealt with right after a
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),					//instruction comes in, and then this signal is immediately sent to rs to
-																						//store in rs
+	
+	.t1_head(ROB_t1_head),
+	.t2_head(ROB_t2_head),
+																					//store in rs
 //when committed, the output of the first instrucion committed
 	.commit1_pc_out(ROB_commit1_pc),
 	.commit1_target_pc_out(ROB_commit1_target_pc),
@@ -756,8 +999,8 @@ rs rs1(
 	.inst1_rs_opa_valid(PRF_RS_inst1_opa_valid || ID_inst1_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst1_rs_opb_valid(PRF_RS_inst1_opb_valid || ID_inst1_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT) 
 
-	.inst1_rs_opc_in(PRF_RS_inst1_opc),
-	.inst1_rs_opc_valid(PRF_RS_inst1_opc_valid),
+	.inst1_rs_opc_in(if_FBEQ1? PC_thread1_is_available : PRF_RS_inst1_opc),
+	.inst1_rs_opc_valid(if_FBEQ1? 1 : PRF_RS_inst1_opc_valid),
 
 	.inst1_rs_rob_idx_in(ROB_inst1_rob_idx),  	// The rob index of instruction 1
 	.inst1_rs_alu_func(ID_alu_func1),
@@ -771,8 +1014,8 @@ rs rs1(
 	.inst2_rs_opa_valid(PRF_RS_inst2_opa_valid || ID_inst2_opa_valid),   	// Is Opa a Tag or immediate data (READ THIS COMMENT) 
 	.inst2_rs_opb_valid(PRF_RS_inst2_opb_valid || ID_inst2_opb_valid),   	// Is Opb a tag or immediate data (READ THIS COMMENT)
 
-	.inst2_rs_opc_in(PRF_RS_inst2_opc),
-	.inst2_rs_opc_valid(PRF_RS_inst2_opc_valid),
+	.inst2_rs_opc_in(if_FBEQ2? PC_thread1_is_available : PRF_RS_inst2_opc),
+	.inst2_rs_opc_valid(if_FBEQ2? 1 : PRF_RS_inst2_opc_valid),
  
 	.inst2_rs_rob_idx_in(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 	.inst2_rs_alu_func(ID_alu_func2),
@@ -802,8 +1045,8 @@ rs rs1(
 	.rs_full(RS_full),			// RS is full now
 	
 	//for debug
-	.inst1_rs_pc_in(PC_proc2Imem_addr_previous),
-	.inst2_rs_pc_in(PC_proc2Imem_addr_previous+4),
+	.inst1_rs_pc_in(current_pc),
+	.inst2_rs_pc_in(current_pc+4),
 	.fu_inst_pc_out(fu_next_inst_pc_out)	
 );
 
@@ -919,7 +1162,7 @@ cdb cdb1(
     //for instruction1
    		.inst1_valid(ID_inst1_is_valid),
 		.inst1_op_type(ID_op_type1),
-		.inst1_pc(PC_proc2Imem_addr_previous),
+		.inst1_pc(current_pc),
 		//.inst1_in,
 		.lsq_rega_in1(PRF_RS_inst1_opc),
 		.lsq_rega_valid1(PRF_RS_inst1_opc_valid),
@@ -933,7 +1176,7 @@ cdb cdb1(
     //for instruction2
    		.inst2_valid(ID_inst2_is_valid),
    		.inst2_op_type(ID_op_type2),
-		.inst2_pc(PC_proc2Imem_addr_previous+4),
+		.inst2_pc(current_pc+4),
 		//.inst2_in,
 		.lsq_rega_in2(PRF_RS_inst2_opc),
 		.lsq_rega_valid2(PRF_RS_inst2_opc_valid),
@@ -943,9 +1186,9 @@ cdb cdb1(
 		.lsq_rob_idx_in2(ROB_inst2_rob_idx),  	// The rob index of instruction 2
 		.dest_reg_idx2(PC_thread1_is_available ? PRF_RAT1_rename_idx2 : PRF_RAT2_rename_idx2),
 	//from mem
-		.mem_data_in(mem2proc_data),		//when no forwarding possible, load from memory
-		.mem_response_in(mem2proc_response),
-		.mem_tag_in(mem2proc_tag),
+		.mem_data_in(Dcache2proc_data),		//when no forwarding possible, load from memory
+		.mem_response_in(Dcache2proc_response),
+		.mem_tag_in(Dcache2proc_tag),
 		.cache_hit(Dcache_data_hit),
 	
 	//retired store idx
@@ -973,8 +1216,32 @@ cdb cdb1(
 	);
 //////////////////////////////////
 //								//
-//			  MEM				//
+//			 DCACHE				//
 //								//
 //////////////////////////////////
+dcache dca(
+	.clock(clock),
+	.reset(reset),
+	// input from Mem.v
+	.Dmem2proc_response(mem2proc_response),
+	.Dmem2proc_tag(mem2proc_tag),
+	.Dmem2proc_data(mem2proc_data),
+	
+	// input from processor.v
+	.proc2Dcache_addr(LSQ_address_out),
+	.proc2Dcache_command(LSQ2Dcache_command),
+	.proc2Dcache_data(LSQ2Dcache_data),
+	
+	// output to mem.v
+	.proc2Dmem_command(Dcache2mem_command),
+	.proc2Dmem_addr(Dcache2mem_addr),
+	.proc2Dmem_data(Dcache2mem_data),
+	
+	// output to processor.v
+	.Dcache2proc_data(Dcache2proc_data),	 
+	.Dcache2proc_tag(Dcache2proc_tag),	 	
+	.Dcache2proc_response(Dcache2proc_response),
+	.Dcache_data_hit(Dcache_data_hit)
+);
 
 endmodule

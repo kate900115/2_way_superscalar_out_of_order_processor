@@ -46,6 +46,39 @@ module icachemem(
 	logic [`ICACHE_TAG_SIZE-1:0]     				tag_in_load;
 	logic											read_enable_load;
 	logic load_is_miss;
+	logic	last_load_miss, n_last_load_miss;
+	logic	[3:0] last_load_response, n_last_load_response;
+	always_comb
+	begin
+		if(data_is_miss) begin     //a new miss //posedge sig
+			n_last_load_response = mem_response;
+			n_last_load_miss = 1;
+		end
+		else if(!data_is_miss && last_load_miss && mem_tag == last_load_response && mem_tag !=0) begin  //grap data
+			n_last_load_response = 0;
+			n_last_load_miss = 0;
+		end
+		else if(!data_is_miss && last_load_miss && (mem_tag!= last_load_response || mem_tag==0)) begin
+			n_last_load_response = last_load_response;
+			n_last_load_miss = last_load_miss;
+		end
+		else if(!data_is_miss && !last_load_miss) begin
+			n_last_load_response = last_load_response;
+			n_last_load_miss = last_load_miss;
+		end
+	end
+	
+	always_ff @(posedge clock) begin
+		if(reset)
+		begin
+			last_load_miss = 0;
+			last_load_response = 0;
+			end
+		else begin
+			last_load_miss = n_last_load_miss;
+			last_load_response = n_last_load_response;
+		end
+	end
 	assign read_enable_load = read_enable_pref || read_enable;
 	assign index_in_load = (data_is_miss)?index_in:index_in_pref;
 	assign tag_in_load = (data_is_miss)?tag_in: tag_in_pref;
@@ -114,14 +147,14 @@ module icachemem(
 					cache_is_full						= 1'b1;
 				end
 
-				if (internal_way[index_in_load]==0)
+				if (internal_way[index_in_load]==0 && mem_response!=0)
 				begin
 					internal_way_next[index_in_load]			= 1'b1;
 					internal_response_in[index_in_load][0]	= mem_response;
 					internal_tag_in[index_in_load][0]		= tag_in_load;
 					internal_valid_in[index_in_load][0] 		= 1'b0;
 				end
-				else  if (internal_way[index_in_load]==1)
+				else  if (internal_way[index_in_load]==1 && mem_response!=0)
 				begin
 					internal_way_next[index_in_load]			= 1'b0;
 					internal_response_in[index_in_load][1]	= mem_response;
@@ -135,7 +168,7 @@ module icachemem(
 		begin
 			for (int j=0; j<`ICACHE_WAY; j++)
 			begin
-				if ((mem_tag == internal_response[i][j]) && (mem_tag!=0))
+				if ( (mem_tag == internal_response[i][j]) && (mem_tag!=0) )
 				begin
 					internal_data_in[i][j] 			= load_data_in;
 					internal_valid_in[i][j]			= 1'b1;
@@ -147,10 +180,15 @@ module icachemem(
 	end
 	
 	always_comb begin
-			if(!read_enable) begin
+			if(!read_enable && !(mem_tag == last_load_response && mem_tag!=0)) begin
 					read_data	 		  		= 0;
 					data_is_valid 		  		= 0;
 					data_is_miss  		  		= 0;			
+			end
+			else if(mem_tag == last_load_response && mem_tag!=0) begin
+					read_data 					= load_data_in;
+					data_is_valid				= 1;
+					data_is_miss				= 0;
 			end
 			else if(read_enable) begin
 			for (int j=0; j<`ICACHE_WAY; j++)

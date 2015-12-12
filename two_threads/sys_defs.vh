@@ -50,10 +50,11 @@
 typedef enum logic [3:0] {
   NO_ERROR               = 4'h0,
   HALTED_ON_MEMORY_ERROR = 4'h1,
-  HALTED_ON_HALT_I1         = 4'h2,
-  HALTED_ON_ILLEGAL_I1      = 4'h3,
-  HALTED_ON_HALT_I2         = 4'h4,
-  HALTED_ON_ILLEGAL_I2      = 4'h5
+//  HALTED_ON_HALT_I1         = 4'h2,
+  HALTED_ON_ILLEGAL_I1      = 4'h2,
+ // HALTED_ON_HALT_I2         = 4'h4,
+  HALTED_ON_ILLEGAL_I2      = 4'h3,
+  TERMINATE_NORMALLY	    = 4'h4
 } ERROR_CODE;
 
 //
@@ -311,7 +312,7 @@ typedef enum logic [4:0] {
 // new system define
 
 `define RS_SIZE 	10
-`define PRF_SIZE 	88
+`define PRF_SIZE 	192
 `define ROB_SIZE	16
 `define ARF_SIZE    32
 `define MEM_SIZE	64

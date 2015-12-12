@@ -46,7 +46,7 @@ module icache(
 			pc_address						<= `SD 0;
 			end
 		else if(branch_mispredict) begin
-			pc_address						<= `SD pc_target;
+			pc_address						<= `SD {pc_target[63:3],3'b0};
 			end
 		else begin
 			pc_address  					<= `SD n_pc_address;//prefetch

@@ -194,10 +194,10 @@ module ex_stage(
 		.result(alu_result2)
 	);
 	brcond b4(// Inputs
-			.opa(fu_rs_opc_in[3]),       // always check regA value
-			.func(fu_rs_op_type_in[3][2:0]), // inst bits to determine check
-				// Output
-			.cond(brcond_result[1])
+		.opa(fu_rs_opc_in[3]),       // always check regA value
+		.func(fu_rs_op_type_in[3][2:0]), // inst bits to determine check
+			// Output
+		.cond(brcond_result[1])
 	);
 	
 	/*assign fu_take_branch_out[0] =	brcond_result[0];  //calculate branch correct take or not take
@@ -285,7 +285,7 @@ module ex_stage(
 				fu_rs_rob_idx_out[1]	<= `SD fu_rs_rob_idx_in[1];
 				fu_rs_op_type_out[1]	<= `SD fu_rs_op_type_in[1];
 				fu_alu_func_out[1]		<= `SD fu_alu_func_in[1];
-				fu_result_out[1]		<= `SD alu_result1;
+				fu_result_out[1]		<= `SD fu_rs_branch_out[1][0]?rs_pc_in[1]+4:alu_result1;
 				fu_result_is_valid[1]	<= `SD 1'b1;
 				fu_mispredict_sig[0]	<= `SD fu_take_branch_out[0];
 				fu_inst_pc_out[1]		<= `SD rs_pc_in[1];
@@ -294,7 +294,6 @@ module ex_stage(
 			else if (adder1_send_in_success)
 			begin
 				fu_result_is_valid[1]	<= `SD 1'b0;
-			
 			end
 
 			if (fu_rs_valid_in[2])
@@ -322,7 +321,7 @@ module ex_stage(
 				fu_rs_rob_idx_out[3]	<= `SD fu_rs_rob_idx_in[3];
 				fu_rs_op_type_out[3]	<= `SD fu_rs_op_type_in[3];
 				fu_alu_func_out[3]		<= `SD fu_alu_func_in[3];
-				fu_result_out[3]		<= `SD alu_result2;
+				fu_result_out[3]		<= `SD fu_rs_branch_out[3][0]?rs_pc_in[3]+4:alu_result2;
 				fu_result_is_valid[3]	<= `SD 1'b1;
 				fu_mispredict_sig[1]	<= `SD fu_take_branch_out[1];
 				fu_inst_pc_out[3]		<= `SD rs_pc_in[3];

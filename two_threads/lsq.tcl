@@ -1,23 +1,22 @@
 # Begin_DVE_Session_Save_Info
 # DVE full session
-# Saved on Wed Dec 9 00:15:37 2015
+# Saved on Thu Dec 10 09:52:06 2015
 # Designs open: 1
 #   Sim: dve
 # Toplevel windows open: 2
 # 	TopLevel.1
 # 	TopLevel.2
-#   Source.1: _vcs_unit__497791245
-#   Wave.1: 157 signals
-#   Group count = 2
-#   Group Group1 signal count = 44
-#   Group Group2 signal count = 157
+#   Source.1: _vcs_unit__533683499
+#   Wave.1: 34 signals
+#   Group count = 1
+#   Group Group1 signal count = 34
 # End_DVE_Session_Save_Info
 
 # DVE version: K-2015.09_Full64
 # DVE build date: Aug 25 2015 21:36:02
 
 
-#<Session mode="Full" path="/home/golifan/Downloads/EECS470/project4/group7f15/two_threads/lsq.tcl" type="Debug">
+#<Session mode="Full" path="/home/tianmili/classes/eecs470/projects/project4/one_thread/lsq.tcl" type="Debug">
 
 gui_set_loading_session_type Post
 gui_continuetime_set
@@ -69,7 +68,7 @@ if {![gui_exist_window -window TopLevel.1]} {
 } else { 
     set TopLevel.1 TopLevel.1
 }
-gui_show_window -window ${TopLevel.1} -show_state normal -rect {{29 65} {2528 1418}}
+gui_show_window -window ${TopLevel.1} -show_state normal -rect {{2 33} {2558 1413}}
 
 # ToolBar settings
 gui_set_toolbar_attributes -toolbar {TimeOperations} -dock_state top
@@ -116,23 +115,28 @@ gui_show_toolbar -toolbar {Testbench}
 # End ToolBar settings
 
 # Docked window settings
-set HSPane.1 [gui_create_window -type HSPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 150]
+set HSPane.1 [gui_create_window -type HSPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 267]
 catch { set Hier.1 [gui_share_window -id ${HSPane.1} -type Hier] }
-gui_set_window_pref_key -window ${HSPane.1} -key dock_width -value_type integer -value 150
+gui_set_window_pref_key -window ${HSPane.1} -key dock_width -value_type integer -value 267
 gui_set_window_pref_key -window ${HSPane.1} -key dock_height -value_type integer -value -1
 gui_set_window_pref_key -window ${HSPane.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${HSPane.1} {{left 0} {top 0} {width 149} {height 1090} {dock_state left} {dock_on_new_line true} {child_hier_colhier 192} {child_hier_coltype 100} {child_hier_colpd 0} {child_hier_col1 0} {child_hier_col2 1} {child_hier_col3 -1}}
-set DLPane.1 [gui_create_window -type DLPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 387]
+gui_update_layout -id ${HSPane.1} {{left 0} {top 0} {width 266} {height 1112} {dock_state left} {dock_on_new_line true} {child_hier_colhier 216} {child_hier_coltype 111} {child_hier_colpd 0} {child_hier_col1 0} {child_hier_col2 1} {child_hier_col3 -1}}
+set DLPane.1 [gui_create_window -type DLPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 669]
 catch { set Data.1 [gui_share_window -id ${DLPane.1} -type Data] }
-gui_set_window_pref_key -window ${DLPane.1} -key dock_width -value_type integer -value 387
-gui_set_window_pref_key -window ${DLPane.1} -key dock_height -value_type integer -value 1090
+gui_set_window_pref_key -window ${DLPane.1} -key dock_width -value_type integer -value 669
+gui_set_window_pref_key -window ${DLPane.1} -key dock_height -value_type integer -value 1292
 gui_set_window_pref_key -window ${DLPane.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${DLPane.1} {{left 0} {top 0} {width 386} {height 1090} {dock_state left} {dock_on_new_line true} {child_data_colvariable 264} {child_data_colvalue 64} {child_data_coltype 111} {child_data_col1 0} {child_data_col2 1} {child_data_col3 2}}
-set Console.1 [gui_create_window -type Console -parent ${TopLevel.1} -dock_state bottom -dock_on_new_line true -dock_extent 175]
-gui_set_window_pref_key -window ${Console.1} -key dock_width -value_type integer -value 2500
-gui_set_window_pref_key -window ${Console.1} -key dock_height -value_type integer -value 175
+gui_update_layout -id ${DLPane.1} {{left 0} {top 0} {width 668} {height 1112} {dock_state left} {dock_on_new_line true} {child_data_colvariable 358} {child_data_colvalue 182} {child_data_coltype 206} {child_data_col1 0} {child_data_col2 1} {child_data_col3 2}}
+set Console.1 [gui_create_window -type Console -parent ${TopLevel.1} -dock_state bottom -dock_on_new_line true -dock_extent 171]
+gui_set_window_pref_key -window ${Console.1} -key dock_width -value_type integer -value -1
+gui_set_window_pref_key -window ${Console.1} -key dock_height -value_type integer -value 171
 gui_set_window_pref_key -window ${Console.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${Console.1} {{left 0} {top 0} {width 2499} {height 174} {dock_state bottom} {dock_on_new_line true}}
+gui_update_layout -id ${Console.1} {{left 0} {top 0} {width 319} {height 179} {dock_state bottom} {dock_on_new_line true}}
+set DriverLoad.1 [gui_create_window -type DriverLoad -parent ${TopLevel.1} -dock_state bottom -dock_on_new_line false -dock_extent 180]
+gui_set_window_pref_key -window ${DriverLoad.1} -key dock_width -value_type integer -value 150
+gui_set_window_pref_key -window ${DriverLoad.1} -key dock_height -value_type integer -value 180
+gui_set_window_pref_key -window ${DriverLoad.1} -key dock_offset -value_type integer -value 0
+gui_update_layout -id ${DriverLoad.1} {{left 0} {top 0} {width 2236} {height 179} {dock_state bottom} {dock_on_new_line false}}
 #### Start - Readjusting docked view's offset / size
 set dockAreaList { top left right bottom }
 foreach dockArea $dockAreaList {
@@ -169,7 +173,7 @@ if {![gui_exist_window -window TopLevel.2]} {
 } else { 
     set TopLevel.2 TopLevel.2
 }
-gui_show_window -window ${TopLevel.2} -show_state normal -rect {{73 68} {2558 1413}}
+gui_show_window -window ${TopLevel.2} -show_state minimized -rect {{74 69} {2558 1413}}
 
 # ToolBar settings
 gui_set_toolbar_attributes -toolbar {TimeOperations} -dock_state top
@@ -221,7 +225,7 @@ gui_sync_global -id ${TopLevel.2} -option true
 # MDI window settings
 set Wave.1 [gui_create_window -type {Wave}  -parent ${TopLevel.2}]
 gui_show_window -window ${Wave.1} -show_state maximized
-gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 721} {child_wave_right 1759} {child_wave_colname 358} {child_wave_colvalue 359} {child_wave_col1 0} {child_wave_col2 1}}
+gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 721} {child_wave_right 1758} {child_wave_colname 358} {child_wave_colvalue 359} {child_wave_col1 0} {child_wave_col2 1}}
 
 # End MDI window settings
 
@@ -242,11 +246,11 @@ gui_update_statusbar_target_frame ${TopLevel.2}
 # DVE Open design session: 
 
 if { [llength [lindex [gui_get_db -design Sim] 0]] == 0 } {
-gui_set_env SIMSETUP::SIMARGS {{ +vc +define+ +memcbk -ucligui}}
+gui_set_env SIMSETUP::SIMARGS {{-ucligui +vc +define+ +memcbk}}
 gui_set_env SIMSETUP::SIMEXE {dve}
 gui_set_env SIMSETUP::ALLOW_POLL {0}
 if { ![gui_is_db_opened -db {dve}] } {
-gui_sim_run Ucli -exe dve -args { +vc +define+ +memcbk -ucligui} -dir ../two_threads -nosource
+gui_sim_run Ucli -exe dve -args {-ucligui +vc +define+ +memcbk} -dir ../one_thread -nosource
 }
 }
 if { ![gui_sim_state -check active] } {error "Simulator did not start correctly" error}
@@ -268,23 +272,16 @@ gui_set_time_units 100ps
 # Global: Signal Compare
 
 # Global: Signal Groups
-gui_load_child_values {testbench.processor_0.pc}
 
 
-set _session_group_3 Group1
-gui_sg_create "$_session_group_3"
-set Group1 "$_session_group_3"
-
-gui_sg_addsignal -group "$_session_group_3" { testbench.processor_0.pc.clock testbench.processor_0.pc.reset testbench.processor_0.pc.thread1_branch_is_taken testbench.processor_0.pc.thread2_branch_is_taken testbench.processor_0.pc.thread1_target_pc testbench.processor_0.pc.thread2_target_pc testbench.processor_0.pc.rs_stall testbench.processor_0.pc.rob1_stall testbench.processor_0.pc.rob2_stall testbench.processor_0.pc.rat_stall testbench.processor_0.pc.thread1_structure_hazard_stall testbench.processor_0.pc.thread2_structure_hazard_stall testbench.processor_0.pc.Icache2proc_data testbench.processor_0.pc.Icache2proc_tag testbench.processor_0.pc.Icache2proc_response testbench.processor_0.pc.Icache_hit testbench.processor_0.pc.is_two_threads testbench.processor_0.pc.proc2Icache_addr testbench.processor_0.pc.proc2Icache_command testbench.processor_0.pc.next_PC_out testbench.processor_0.pc.inst1_out testbench.processor_0.pc.inst2_out testbench.processor_0.pc.inst1_is_valid testbench.processor_0.pc.inst2_is_valid testbench.processor_0.pc.thread1_is_available testbench.processor_0.pc.proc2Imem_addr_previous testbench.processor_0.pc.is_next_thread1 testbench.processor_0.pc.PC_reg1 testbench.processor_0.pc.PC_reg2 testbench.processor_0.pc.next_PC1 testbench.processor_0.pc.next_PC2 testbench.processor_0.pc.current_inst1 testbench.processor_0.pc.next_current_inst1 testbench.processor_0.pc.current_inst2 testbench.processor_0.pc.next_current_inst2 testbench.processor_0.pc.pc1_stall testbench.processor_0.pc.pc2_stall testbench.processor_0.pc.next_t1 testbench.processor_0.pc.thread1_is_done testbench.processor_0.pc.next_t1_done testbench.processor_0.pc.thread2_is_done testbench.processor_0.pc.next_t2_done testbench.processor_0.pc.next_command testbench.processor_0.pc.start }
-
-set _session_group_4 Group2
+set _session_group_4 Group1
 gui_sg_create "$_session_group_4"
-set Group2 "$_session_group_4"
+set Group1 "$_session_group_4"
 
-gui_sg_addsignal -group "$_session_group_4" { testbench.processor_0.lsq1.clock testbench.processor_0.lsq1.reset testbench.processor_0.lsq1.lsq_cdb1_in testbench.processor_0.lsq1.lsq_cdb1_tag testbench.processor_0.lsq1.lsq_cdb1_valid testbench.processor_0.lsq1.lsq_cdb2_in testbench.processor_0.lsq1.lsq_cdb2_tag testbench.processor_0.lsq1.lsq_cdb2_valid testbench.processor_0.lsq1.inst1_valid testbench.processor_0.lsq1.inst1_op_type testbench.processor_0.lsq1.inst1_pc testbench.processor_0.lsq1.inst1_in testbench.processor_0.lsq1.lsq_rega_in1 testbench.processor_0.lsq1.lsq_rega_valid1 testbench.processor_0.lsq1.lsq_opa_in1 testbench.processor_0.lsq1.lsq_opb_in1 testbench.processor_0.lsq1.lsq_opb_valid1 testbench.processor_0.lsq1.lsq_rob_idx_in1 testbench.processor_0.lsq1.dest_reg_idx1 testbench.processor_0.lsq1.inst2_valid testbench.processor_0.lsq1.inst2_op_type testbench.processor_0.lsq1.inst2_pc testbench.processor_0.lsq1.inst2_in testbench.processor_0.lsq1.lsq_rega_in2 testbench.processor_0.lsq1.lsq_rega_valid2 testbench.processor_0.lsq1.lsq_opa_in2 testbench.processor_0.lsq1.lsq_opb_in2 testbench.processor_0.lsq1.lsq_opb_valid2 testbench.processor_0.lsq1.lsq_rob_idx_in2 testbench.processor_0.lsq1.dest_reg_idx2 testbench.processor_0.lsq1.mem_data_in testbench.processor_0.lsq1.mem_response_in testbench.processor_0.lsq1.mem_tag_in testbench.processor_0.lsq1.cache_hit testbench.processor_0.lsq1.t1_head testbench.processor_0.lsq1.t2_head testbench.processor_0.lsq1.thread1_mispredict testbench.processor_0.lsq1.thread2_mispredict testbench.processor_0.lsq1.cdb_dest_tag1 testbench.processor_0.lsq1.cdb_result_out1 testbench.processor_0.lsq1.cdb_result_is_valid1 testbench.processor_0.lsq1.cdb_rob_idx1 testbench.processor_0.lsq1.cdb_dest_tag2 testbench.processor_0.lsq1.cdb_result_out2 testbench.processor_0.lsq1.cdb_result_is_valid2 testbench.processor_0.lsq1.cdb_rob_idx2 testbench.processor_0.lsq1.mem_data_out testbench.processor_0.lsq1.mem_address_out testbench.processor_0.lsq1.lsq2Dcache_command testbench.processor_0.lsq1.lsq_is_full testbench.processor_0.lsq1.inst1_opb testbench.processor_0.lsq1.inst1_opb_valid testbench.processor_0.lsq1.inst2_opb testbench.processor_0.lsq1.inst2_opb_valid testbench.processor_0.lsq1.inst1_rega testbench.processor_0.lsq1.inst1_rega_valid testbench.processor_0.lsq1.inst2_rega testbench.processor_0.lsq1.inst2_rega_valid testbench.processor_0.lsq1.lq_mem_in1 testbench.processor_0.lsq1.lq_mem_in2 testbench.processor_0.lsq1.lq1_mem_in_temp1 testbench.processor_0.lsq1.lq1_mem_in_temp2 testbench.processor_0.lsq1.lq2_mem_in_temp1 testbench.processor_0.lsq1.lq2_mem_in_temp2 testbench.processor_0.lsq1.lq1_mem_in_temp1_1 testbench.processor_0.lsq1.lq1_mem_in_temp2_2 testbench.processor_0.lsq1.lq2_mem_in_temp1_1 testbench.processor_0.lsq1.lq2_mem_in_temp2_2 testbench.processor_0.lsq1.lq1_request2mem testbench.processor_0.lsq1.lq2_request2mem testbench.processor_0.lsq1.lq1_requested testbench.processor_0.lsq1.lq2_requested testbench.processor_0.lsq1.lq1_clean testbench.processor_0.lsq1.lq2_clean testbench.processor_0.lsq1.lq1_free_en testbench.processor_0.lsq1.lq2_free_en testbench.processor_0.lsq1.lq1_is_ready testbench.processor_0.lsq1.lq2_is_ready testbench.processor_0.lsq1.lq1_mem_data_in_valid testbench.processor_0.lsq1.lq2_mem_data_in_valid testbench.processor_0.lsq1.lq1_is_available testbench.processor_0.lsq1.lq2_is_available testbench.processor_0.lsq1.lq1_addr_valid testbench.processor_0.lsq1.lq2_addr_valid testbench.processor_0.lsq1.lq1_opa testbench.processor_0.lsq1.lq1_opb testbench.processor_0.lsq1.lq2_opa testbench.processor_0.lsq1.lq2_opb testbench.processor_0.lsq1.lq1_rob_idx testbench.processor_0.lsq1.lq2_rob_idx testbench.processor_0.lsq1.lq1_pc testbench.processor_0.lsq1.lq2_pc testbench.processor_0.lsq1.lq1_dest_tag testbench.processor_0.lsq1.lq2_dest_tag testbench.processor_0.lsq1.lq1_mem_value testbench.processor_0.lsq1.lq2_mem_value testbench.processor_0.lsq1.lq1_mem_value_valid testbench.processor_0.lsq1.lq2_mem_value_valid testbench.processor_0.lsq1.sq_mem_in1 }
-gui_sg_addsignal -group "$_session_group_4" { testbench.processor_0.lsq1.sq_mem_in2 testbench.processor_0.lsq1.sq1_clean testbench.processor_0.lsq1.sq2_clean testbench.processor_0.lsq1.sq1_free_en testbench.processor_0.lsq1.sq2_free_en testbench.processor_0.lsq1.sq1_is_ready testbench.processor_0.lsq1.sq2_is_ready testbench.processor_0.lsq1.sq_head1 testbench.processor_0.lsq1.n_sq_head1 testbench.processor_0.lsq1.sq_head2 testbench.processor_0.lsq1.n_sq_head2 testbench.processor_0.lsq1.sq_tail1 testbench.processor_0.lsq1.n_sq_tail1 testbench.processor_0.lsq1.sq_tail2 testbench.processor_0.lsq1.n_sq_tail2 testbench.processor_0.lsq1.sq1_is_available testbench.processor_0.lsq1.sq2_is_available testbench.processor_0.lsq1.sq1_opa testbench.processor_0.lsq1.sq1_opb testbench.processor_0.lsq1.sq2_opa testbench.processor_0.lsq1.sq2_opb testbench.processor_0.lsq1.sq1_rob_idx testbench.processor_0.lsq1.sq2_rob_idx testbench.processor_0.lsq1.sq1_pc testbench.processor_0.lsq1.sq2_pc testbench.processor_0.lsq1.sq1_store_data testbench.processor_0.lsq1.sq2_store_data testbench.processor_0.lsq1.sq1_dest_tag testbench.processor_0.lsq1.sq2_dest_tag testbench.processor_0.lsq1.inst1_type testbench.processor_0.lsq1.inst2_type testbench.processor_0.lsq1.inst1_is_lq1 testbench.processor_0.lsq1.inst1_is_lq2 testbench.processor_0.lsq1.inst1_is_sq1 testbench.processor_0.lsq1.inst1_is_sq2 testbench.processor_0.lsq1.inst2_is_lq1 testbench.processor_0.lsq1.inst2_is_lq2 testbench.processor_0.lsq1.inst2_is_sq1 testbench.processor_0.lsq1.inst2_is_sq2 testbench.processor_0.lsq1.out1_is_sq1 testbench.processor_0.lsq1.out1_is_sq2 testbench.processor_0.lsq1.out2_is_sq1 testbench.processor_0.lsq1.out2_is_sq2 testbench.processor_0.lsq1.current_mem_inst testbench.processor_0.lsq1.tag_table testbench.processor_0.lsq1.tag_valid testbench.processor_0.lsq1.lda1_dest_tag testbench.processor_0.lsq1.lda1_result testbench.processor_0.lsq1.lda1_valid testbench.processor_0.lsq1.lda1_rob_idx testbench.processor_0.lsq1.lda2_dest_tag testbench.processor_0.lsq1.lda2_result testbench.processor_0.lsq1.lda2_valid testbench.processor_0.lsq1.lda2_rob_idx testbench.processor_0.lsq1.next_mem_valid testbench.processor_0.lsq1.next_mem_inst testbench.processor_0.lsq1.next_next_mem_valid testbench.processor_0.lsq1.next_next_mem_inst }
+gui_sg_addsignal -group "$_session_group_4" { testbench.processor_0.pc.clock testbench.processor_0.pc.reset testbench.processor_0.pc.mispredict testbench.processor_0.pc.target_pc testbench.processor_0.pc.rs_stall testbench.processor_0.pc.rob1_stall testbench.processor_0.pc.rat_stall testbench.processor_0.pc.structure_hazard_stall testbench.processor_0.pc.Icache2proc_data testbench.processor_0.pc.Icache_hit testbench.processor_0.pc.is_two_threads testbench.processor_0.pc.proc2Icache_addr testbench.processor_0.pc.proc2Icache_command testbench.processor_0.pc.inst1_out testbench.processor_0.pc.inst2_out testbench.processor_0.pc.inst1_is_valid testbench.processor_0.pc.inst2_is_valid testbench.processor_0.pc.thread1_is_available testbench.processor_0.pc.PC_out testbench.processor_0.pc.PC_reg testbench.processor_0.pc.next_PC testbench.processor_0.pc.current_inst1 testbench.processor_0.pc.current_inst2 testbench.processor_0.pc.pc_stall testbench.processor_0.pc.next_command testbench.processor_0.rob1.commit1_pc_out testbench.processor_0.rob1.commit1_arn_dest_out testbench.processor_0.rob1.commit1_valid testbench.processor_0.rob1.commit2_pc_out testbench.processor_0.rob1.commit2_arn_dest_out testbench.processor_0.rob1.commit2_valid testbench.processor_0.rob1.t1_head testbench.processor_0.rob1.t1_tail testbench.processor_0.rob1.rob1_internal_available_out }
 
 # Global: Highlighting
+gui_highlight_signals -color #00ff00 {{testbench.processor_0.pc.Icache2proc_data[63:32]} {testbench.processor_0.pc.Icache2proc_data[63:0]}}
 
 # Global: Stack
 gui_change_stack_mode -mode list
@@ -292,7 +289,7 @@ gui_change_stack_mode -mode list
 # Post database loading setting...
 
 # Restore C1 time
-gui_set_time -C1_only 1501070
+gui_set_time -C1_only 9611
 
 
 
@@ -319,17 +316,17 @@ gui_hier_list_init -id ${Hier.1}
 gui_change_design -id ${Hier.1} -design Sim
 catch {gui_list_expand -id ${Hier.1} testbench}
 catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
-catch {gui_list_select -id ${Hier.1} {testbench.processor_0.lsq1}}
+catch {gui_list_select -id ${Hier.1} {testbench.processor_0.rob1}}
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Data 'Data.1'
 gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Data.1} -text {*}
-gui_list_show_data -id ${Data.1} {testbench.processor_0.lsq1}
+gui_list_show_data -id ${Data.1} {testbench.processor_0.rob1}
 gui_show_window -window ${Data.1}
-catch { gui_list_select -id ${Data.1} {testbench.processor_0.lsq1.lsq_rob_idx_in1 testbench.processor_0.lsq1.inst2_valid testbench.processor_0.lsq1.lq1_mem_in_temp1_1 testbench.processor_0.lsq1.lsq_rob_idx_in2 testbench.processor_0.lsq1.inst2_in testbench.processor_0.lsq1.inst2_opb testbench.processor_0.lsq1.sq2_dest_tag testbench.processor_0.lsq1.lq1_addr_valid testbench.processor_0.lsq1.t1_head testbench.processor_0.lsq1.inst1_rega_valid testbench.processor_0.lsq1.inst2_rega testbench.processor_0.lsq1.inst2_pc testbench.processor_0.lsq1.mem_data_in testbench.processor_0.lsq1.sq2_pc testbench.processor_0.lsq1.sq1_free_en testbench.processor_0.lsq1.sq2_clean testbench.processor_0.lsq1.lq2_pc testbench.processor_0.lsq1.sq2_rob_idx testbench.processor_0.lsq1.sq_mem_in1 testbench.processor_0.lsq1.sq_mem_in2 testbench.processor_0.lsq1.inst2_is_sq1 testbench.processor_0.lsq1.inst2_is_sq2 testbench.processor_0.lsq1.out1_is_sq1 testbench.processor_0.lsq1.lq1_clean testbench.processor_0.lsq1.next_next_mem_inst testbench.processor_0.lsq1.out1_is_sq2 testbench.processor_0.lsq1.lq2_requested testbench.processor_0.lsq1.dest_reg_idx1 testbench.processor_0.lsq1.dest_reg_idx2 testbench.processor_0.lsq1.lsq_cdb1_in testbench.processor_0.lsq1.sq_tail1 testbench.processor_0.lsq1.sq1_opa testbench.processor_0.lsq1.sq_tail2 testbench.processor_0.lsq1.sq1_opb testbench.processor_0.lsq1.sq1_is_ready testbench.processor_0.lsq1.tag_table testbench.processor_0.lsq1.lq1_mem_in_temp1 testbench.processor_0.lsq1.lq1_mem_in_temp2 testbench.processor_0.lsq1.clock testbench.processor_0.lsq1.cdb_dest_tag1 testbench.processor_0.lsq1.lq1_dest_tag testbench.processor_0.lsq1.cdb_dest_tag2 testbench.processor_0.lsq1.sq2_store_data testbench.processor_0.lsq1.lq1_free_en testbench.processor_0.lsq1.reset testbench.processor_0.lsq1.lq2_mem_in_temp1 testbench.processor_0.lsq1.sq2_is_available testbench.processor_0.lsq1.lq2_mem_in_temp2 testbench.processor_0.lsq1.lda1_rob_idx testbench.processor_0.lsq1.current_mem_inst testbench.processor_0.lsq1.inst1_type testbench.processor_0.lsq1.lsq_opb_valid1 testbench.processor_0.lsq1.lsq_opb_valid2 testbench.processor_0.lsq1.lq2_mem_value testbench.processor_0.lsq1.lq2_rob_idx testbench.processor_0.lsq1.sq2_opa testbench.processor_0.lsq1.sq2_opb testbench.processor_0.lsq1.inst2_is_lq1 testbench.processor_0.lsq1.inst2_is_lq2 testbench.processor_0.lsq1.lq_mem_in1 testbench.processor_0.lsq1.lsq_rega_in1 testbench.processor_0.lsq1.lq_mem_in2 testbench.processor_0.lsq1.lsq_rega_in2 testbench.processor_0.lsq1.inst1_valid testbench.processor_0.lsq1.sq2_is_ready testbench.processor_0.lsq1.lsq_is_full testbench.processor_0.lsq1.lq2_dest_tag testbench.processor_0.lsq1.lq1_request2mem testbench.processor_0.lsq1.lq1_mem_value_valid testbench.processor_0.lsq1.thread1_mispredict testbench.processor_0.lsq1.lq2_mem_value_valid testbench.processor_0.lsq1.mem_response_in testbench.processor_0.lsq1.inst1_is_sq1 testbench.processor_0.lsq1.sq2_free_en testbench.processor_0.lsq1.inst1_is_sq2 testbench.processor_0.lsq1.mem_tag_in testbench.processor_0.lsq1.sq1_clean testbench.processor_0.lsq1.lsq_cdb1_tag testbench.processor_0.lsq1.mem_data_out testbench.processor_0.lsq1.lq1_requested testbench.processor_0.lsq1.inst1_op_type testbench.processor_0.lsq1.lsq_rega_valid1 testbench.processor_0.lsq1.lda2_valid testbench.processor_0.lsq1.lsq_rega_valid2 testbench.processor_0.lsq1.inst1_rega testbench.processor_0.lsq1.n_sq_tail1 testbench.processor_0.lsq1.n_sq_tail2 testbench.processor_0.lsq1.sq_head1 testbench.processor_0.lsq1.sq_head2 testbench.processor_0.lsq1.lq1_opa testbench.processor_0.lsq1.lsq_opa_in1 testbench.processor_0.lsq1.lq1_opb testbench.processor_0.lsq1.lsq_opa_in2 testbench.processor_0.lsq1.lq2_addr_valid testbench.processor_0.lsq1.lq1_is_ready testbench.processor_0.lsq1.lsq_cdb2_tag testbench.processor_0.lsq1.lsq_cdb2_in testbench.processor_0.lsq1.cdb_rob_idx1 testbench.processor_0.lsq1.lda1_dest_tag testbench.processor_0.lsq1.cdb_rob_idx2 testbench.processor_0.lsq1.lq2_free_en testbench.processor_0.lsq1.inst1_is_lq1 testbench.processor_0.lsq1.inst2_rega_valid testbench.processor_0.lsq1.inst2_opb_valid testbench.processor_0.lsq1.inst1_is_lq2 testbench.processor_0.lsq1.lq1_mem_value testbench.processor_0.lsq1.lq2_request2mem testbench.processor_0.lsq1.lda2_rob_idx testbench.processor_0.lsq1.lda2_result testbench.processor_0.lsq1.lq2_opa testbench.processor_0.lsq1.t2_head testbench.processor_0.lsq1.lsq_opb_in1 testbench.processor_0.lsq1.lq2_opb testbench.processor_0.lsq1.lsq2Dcache_command testbench.processor_0.lsq1.lsq_opb_in2 testbench.processor_0.lsq1.lsq_cdb2_valid testbench.processor_0.lsq1.inst1_in testbench.processor_0.lsq1.lq2_is_ready testbench.processor_0.lsq1.cdb_result_out1 testbench.processor_0.lsq1.cdb_result_out2 testbench.processor_0.lsq1.lda2_dest_tag testbench.processor_0.lsq1.tag_valid testbench.processor_0.lsq1.inst1_pc testbench.processor_0.lsq1.lq1_mem_data_in_valid testbench.processor_0.lsq1.sq1_store_data testbench.processor_0.lsq1.lq2_mem_in_temp2_2 testbench.processor_0.lsq1.cdb_result_is_valid1 testbench.processor_0.lsq1.cdb_result_is_valid2 testbench.processor_0.lsq1.sq1_pc testbench.processor_0.lsq1.lq2_mem_in_temp1_1 testbench.processor_0.lsq1.mem_address_out testbench.processor_0.lsq1.lq1_pc testbench.processor_0.lsq1.sq1_is_available testbench.processor_0.lsq1.inst2_op_type testbench.processor_0.lsq1.sq1_rob_idx testbench.processor_0.lsq1.lda1_valid testbench.processor_0.lsq1.n_sq_head1 testbench.processor_0.lsq1.n_sq_head2 testbench.processor_0.lsq1.inst2_type testbench.processor_0.lsq1.lq2_mem_data_in_valid testbench.processor_0.lsq1.lq2_clean testbench.processor_0.lsq1.cache_hit testbench.processor_0.lsq1.next_mem_inst testbench.processor_0.lsq1.lda1_result testbench.processor_0.lsq1.out2_is_sq1 testbench.processor_0.lsq1.inst1_opb_valid testbench.processor_0.lsq1.out2_is_sq2 testbench.processor_0.lsq1.thread2_mispredict testbench.processor_0.lsq1.sq1_dest_tag testbench.processor_0.lsq1.inst1_opb testbench.processor_0.lsq1.next_next_mem_valid testbench.processor_0.lsq1.lq1_is_available testbench.processor_0.lsq1.next_mem_valid testbench.processor_0.lsq1.lq1_rob_idx testbench.processor_0.lsq1.lsq_cdb1_valid testbench.processor_0.lsq1.lq2_is_available testbench.processor_0.lsq1.lq1_mem_in_temp2_2 }}
-gui_view_scroll -id ${Data.1} -vertical -set 0
+catch { gui_list_select -id ${Data.1} {testbench.processor_0.rob1.rob1_internal_available_out }}
+gui_view_scroll -id ${Data.1} -vertical -set 960
 gui_view_scroll -id ${Data.1} -horizontal -set 0
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
@@ -337,9 +334,7 @@ gui_view_scroll -id ${Hier.1} -horizontal -set 0
 # Source 'Source.1'
 gui_src_value_annotate -id ${Source.1} -switch false
 gui_set_env TOGGLE::VALUEANNOTATE 0
-gui_open_source -id ${Source.1}  -replace -active _vcs_unit__497791245 sys_defs.vh
-gui_src_value_annotate -id ${Source.1} -switch true
-gui_set_env TOGGLE::VALUEANNOTATE 1
+gui_open_source -id ${Source.1}  -replace -active _vcs_unit__533683499 sys_defs.vh
 gui_view_scroll -id ${Source.1} -vertical -set 0
 gui_src_set_reusable -id ${Source.1}
 
@@ -352,8 +347,10 @@ gui_list_set_height -id Wave -height 25
 set origGroupCreationState [gui_list_create_group_when_add -wave]
 gui_list_create_group_when_add -wave -disable
 gui_marker_set_ref -id ${Wave.1}  C1
-gui_wv_zoom_timerange -id ${Wave.1} 1500780 1501360
-gui_list_add_group -id ${Wave.1} -after {New Group} {Group2}
+gui_wv_zoom_timerange -id ${Wave.1} 9286 10446
+gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
+gui_list_expand -id ${Wave.1} testbench.processor_0.rob1.rob1_internal_available_out
+gui_list_select -id ${Wave.1} {testbench.processor_0.pc.current_inst2 }
 gui_seek_criteria -id ${Wave.1} {Any Edge}
 
 
@@ -369,21 +366,26 @@ if { $groupExD } {
 }
 gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Wave.1} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.1} -group Group2  -position in
+gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -position in
 
-gui_marker_move -id ${Wave.1} {C1} 1501070
-gui_view_scroll -id ${Wave.1} -vertical -set 0
+gui_marker_move -id ${Wave.1} {C1} 9611
+gui_view_scroll -id ${Wave.1} -vertical -set 75
 gui_show_grid -id ${Wave.1} -enable false
+
+# DriverLoad 'DriverLoad.1'
+gui_get_drivers -session -id ${DriverLoad.1} -signal testbench.processor_0.pc.rs_stall -time 160 -starttime 20735
+gui_get_drivers -session -id ${DriverLoad.1} -signal testbench.processor_0.pc.pc_stall -time 4360 -starttime 4488
+gui_get_drivers -session -id ${DriverLoad.1} -signal {testbench.processor_0.pc.current_inst2[63:0]} -time 18160 -starttime 19134
 # Restore toplevel window zorder
 # The toplevel window could be closed if it has no view/pane
+if {[gui_exist_window -window ${TopLevel.2}]} {
+	gui_set_active_window -window ${TopLevel.2}
+	gui_set_active_window -window ${Wave.1}
+}
 if {[gui_exist_window -window ${TopLevel.1}]} {
 	gui_set_active_window -window ${TopLevel.1}
 	gui_set_active_window -window ${Source.1}
 	gui_set_active_window -window ${DLPane.1}
-}
-if {[gui_exist_window -window ${TopLevel.2}]} {
-	gui_set_active_window -window ${TopLevel.2}
-	gui_set_active_window -window ${Wave.1}
 }
 #</Session>
 

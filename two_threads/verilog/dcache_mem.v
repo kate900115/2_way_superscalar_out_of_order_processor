@@ -21,7 +21,8 @@ module dcache_mem(
 	output logic									data_is_dirty,  // data which need to be replaced is dirty
 	output logic									data_is_miss,
 	output logic									cache_is_full,
-	output logic [`DCACHE_BLOCK_SIZE-1:0]			data_out
+	output logic [`DCACHE_BLOCK_SIZE-1:0]			data_out,
+	output logic [63:0]								writeback_address
 	);
 	
 	// internal registers
@@ -50,7 +51,10 @@ module dcache_mem(
 	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way;
 	logic [`DCACHE_INDEX_ENTRY_SIZE-1:0]											internal_way_next;
 	
-					
+	logic 																			true_miss;
+	
+	
+	assign data_out			 = read_data;	
 	
 	always_ff@(posedge clock)
 	begin
@@ -64,7 +68,7 @@ module dcache_mem(
 			internal_way						<= `SD 0;
 			internal_load_inst					<= `SD 0;
 			internal_store_inst 				<= `SD 0;
-			data_out 							<= `SD 0;
+			//data_out 							<= `SD 0;
 		end
 		else
 		begin
@@ -76,7 +80,7 @@ module dcache_mem(
 			internal_way						<= `SD internal_way_next;
 			internal_load_inst					<= `SD internal_load_inst_in;
 			internal_store_inst 				<= `SD internal_store_inst_in;
-			data_out 							<= `SD read_data;
+			//data_out 							<= `SD read_data;
 		end
 	end
 	
@@ -97,6 +101,8 @@ module dcache_mem(
 		store_data_out							= 0;
 		read_data								= load_data_in;
 		cache_is_full							= 1'b0;
+		writeback_address 						= 0;
+		true_miss								= 1'b0;
 		
 		// for read
 		if (read_enable)
@@ -110,6 +116,7 @@ module dcache_mem(
 					internal_way_next[index_in]	= ~j;
 					data_is_valid 		  		= 1'b1;
 					data_is_miss  		  		= 1'b0;
+					true_miss					= 1'b0;
 					break;
 				end
 				else
@@ -118,6 +125,7 @@ module dcache_mem(
 					internal_way_next[index_in]	= internal_way[index_in];
 					data_is_valid 		  		= 1'b0;
 					data_is_miss  		  		= 1'b1;
+					true_miss					= 1'b1;
 				end
 			end 
 			
@@ -135,21 +143,24 @@ module dcache_mem(
 					internal_response_in[index_in][0]	= 0; 
 					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
 					internal_valid_in[index_in][0]      = internal_valid[index_in][0];
+					internal_dirty_in[index_in][0]		= 0; 
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][0]	= 1'b1;
 					internal_store_inst_in[index_in][0]	= 1'b0;
 					store_data_out						= internal_data[index_in][0];
+					writeback_address 					= {internal_tag[index_in][0],index_in,3'b0};
 				end
 				else if ((internal_way[index_in]==1)&&(internal_dirty[index_in][1]))
 				begin
 					internal_way_next[index_in]			= internal_way[index_in];
-					internal_response_in[index_in][1]	= 0; 
 					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
 					internal_valid_in[index_in][1] 		= internal_valid[index_in][1];
+					internal_dirty_in[index_in][1]		= 0; 
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][1]	= 1'b1;
 					internal_store_inst_in[index_in][1]	= 1'b0;
 					store_data_out						= internal_data[index_in][1];
+					writeback_address 					= {internal_tag[index_in][1],index_in,3'b0};
 				end
 				else if ((internal_way[index_in]==0)&&(!internal_dirty[index_in][0]))
 				begin
@@ -189,12 +200,14 @@ module dcache_mem(
 					internal_way_next[index_in]		= ~j;
 					data_is_valid 		    		= 1'b1;
 					data_is_miss  		  			= 1'b0;
+					true_miss						= 1'b0;
 					break;
 				end
 				else
 				begin
 					data_is_valid 		 			= 1'b0;
 					data_is_miss  		 			= 1'b1;
+					true_miss						= 1'b1;
 				end
 			end
 			
@@ -207,47 +220,61 @@ module dcache_mem(
 				end
 				else if ((internal_way[index_in]==0) && (internal_dirty[index_in][0])) 
 				begin
-					internal_way_next[index_in]			= internal_way[index_in];
+					internal_way_next[index_in]			= 1'b1;
 					internal_response_in[index_in][0]	= 0; 
-					internal_tag_in[index_in][0]		= internal_tag[index_in][0];
+					internal_tag_in[index_in][0]		= tag_in;
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][0]	= 1'b0;
 					internal_store_inst_in[index_in][0]	= 1'b1;
-					internal_valid_in[index_in][0]		= 1'b0;
+					internal_valid_in[index_in][0]		= 1'b1;
+					internal_dirty_in[index_in][0]		= 1'b1;
+					internal_data_in[index_in][0]	 	= write_data_in;
 					store_data_out						= internal_data[index_in][0];
+					data_is_valid 		    			= 1'b1;
+					data_is_miss  		  				= 1'b0;
+					writeback_address 					= {internal_tag[index_in][0],index_in,3'b0};
 				end
 				else if ((internal_way[index_in]==1) && (internal_dirty[index_in][1]))
 				begin
-					internal_way_next[index_in]			= internal_way[index_in];
+					internal_way_next[index_in]			= 1'b0;
 					internal_response_in[index_in][1]	= 0; 
-					internal_tag_in[index_in][1]		= internal_tag[index_in][1];
+					internal_tag_in[index_in][1]		= tag_in;
 					data_is_dirty			  			= 1'b1;
 					internal_load_inst_in[index_in][1]	= 1'b0;
 					internal_store_inst_in[index_in][1]	= 1'b1;
-					internal_valid_in[index_in][1]		= 1'b0;
+					internal_valid_in[index_in][1]		= 1'b1;
+					internal_dirty_in[index_in][1]		= 1'b1;
+					internal_data_in[index_in][1]	 	= write_data_in;
 					store_data_out						= internal_data[index_in][1];
+					data_is_valid 		    			= 1'b1;
+					data_is_miss  		  				= 1'b0;
+					writeback_address 					= {internal_tag[index_in][1],index_in,3'b0};
 				end
 				else if ((internal_way[index_in]==0) && (!internal_dirty[index_in][0]))
 				begin
 					internal_way_next[index_in]			= 1'b1;
-					internal_response_in[index_in][0]	= mem_response;
 					internal_tag_in[index_in][0]		= tag_in;
 					data_is_dirty			  			= 1'b0;
-					internal_load_inst_in[index_in][0]	= 1'b0;
 					internal_store_inst_in[index_in][0]	= 1'b1;
-					internal_valid_in[index_in][0]		= 1'b0;
-					store_data_out						= 0;
+					internal_valid_in[index_in][0]		= 1'b1;
+					internal_data_in[index_in][0]	 	= write_data_in;
+					internal_tag_in[index_in][0]		= tag_in;
+					internal_dirty_in[index_in][0] 		= 1'b1;
+					data_is_valid 		    			= 1'b1;
+					data_is_miss  		  				= 1'b0;
 				end
 				else if ((internal_way[index_in]==1) && (!internal_dirty[index_in][1]))
 				begin
 					internal_way_next[index_in]			= 1'b0;
-					internal_response_in[index_in][1]	= mem_response;
 					internal_tag_in[index_in][1]		= tag_in;
 					data_is_dirty			  			= 1'b0;
-					internal_load_inst_in[index_in][1]	= 1'b0;
-					internal_store_inst_in[index_in][1] = 1'b1;
-					internal_valid_in[index_in][1]		= 1'b0;
-					store_data_out						= 0;
+					internal_store_inst_in[index_in][1]	= 1'b1;
+					internal_valid_in[index_in][1]		= 1'b1;
+					internal_data_in[index_in][1]	 	= write_data_in;
+					internal_tag_in[index_in][1]		= tag_in;
+					internal_dirty_in[index_in][1] 		= 1'b1;
+					data_is_valid 		    			= 1'b1;
+					data_is_miss  		  				= 1'b0;
 				end
 			end
 		end
@@ -264,7 +291,7 @@ module dcache_mem(
 					internal_dirty_in[i][j]			= 1'b0;
 					internal_response_in[i][j]		= 0;
 					read_data						= load_data_in;
-					//internal_way_next[i]			= ~j;
+					internal_way_next[i]			= ~j;
 					break;
 				end
 				else if ((mem_tag == internal_response[i][j]) && (mem_tag!=0) && (internal_store_inst[i][j]))
