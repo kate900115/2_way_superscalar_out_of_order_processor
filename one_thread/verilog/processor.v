@@ -48,16 +48,16 @@ module processor(
     output logic							PC_inst2_valid,
     
     // Outputs from RS
-	output logic [5:0][63:0]				fu_next_inst_pc_out,
-	output logic [5:0][5:0]					RS_EX_op_type,
-	output ALU_FUNC [5:0]					RS_EX_alu_func,
+	output logic [3:0][63:0]				fu_next_inst_pc_out,
+	output logic [3:0][5:0]					RS_EX_op_type,
+	output ALU_FUNC [3:0]					RS_EX_alu_func,
 	
 	// Outputs from EX-stage
-	output logic [5:0][63:0]				fu_inst_pc_out,	
-	output ALU_FUNC [5:0]					EX_alu_func_out,
-    output logic [5:0][5:0]					EX_rs_op_type_out,
-    output logic [5:0]						EX_RS_fu_is_available,
-    output logic [5:0]						EX_CDB_fu_result_is_valid,
+	output logic [3:0][63:0]				fu_inst_pc_out,	
+	output ALU_FUNC [3:0]					EX_alu_func_out,
+    output logic [3:0][5:0]					EX_rs_op_type_out,
+    output logic [3:0]						EX_RS_fu_is_available,
+    output logic [3:0]						EX_CDB_fu_result_is_valid,
 	
 	// Outputs from ROB
 	output logic [63:0]						ROB_commit1_pc,
