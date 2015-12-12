@@ -441,8 +441,6 @@ module id_stage(
 	always_comb
 	begin
 		case({id_op_type_inst1[5:3],3'b0})
-			6'h08, 6'h20, 6'h28: id_op_select1 = USE_MEMORY;
-			//6'h18, 6'h30, 6'h38: id_op_select1 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out1 == ALU_MULQ)
 					id_op_select1 = USE_MULTIPLIER;
@@ -451,8 +449,6 @@ module id_stage(
 				end
 		endcase
 		case({id_op_type_inst2[5:3],3'b0})
-			6'h08, 6'h20, 6'h28: id_op_select2 = USE_MEMORY;
-			//6'h18, 6'h30, 6'h38: id_op_select2 = USE_BRANCH;
 			default: begin
 				if(id_alu_func_out2 == ALU_MULQ)
 					id_op_select2 = USE_MULTIPLIER;
