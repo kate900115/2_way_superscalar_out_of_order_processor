@@ -40,7 +40,7 @@ module rs(
 	input  [5:0]	      						inst1_rs_op_type_in,  	// Instruction type from decoder
 	input  FU_SELECT							inst1_rs_fu_select_in,
 	input  		        						inst1_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  [1:0]                                                            inst1_rs_branch_in,
+	input  [1:0]                                inst1_rs_branch_in,
         
         //for instruction2
 	input  [63:0] 								inst2_rs_opa_in,      	// Operand a from Rename  
@@ -56,7 +56,7 @@ module rs(
 	input  [5:0]	      						inst2_rs_op_type_in,  	// Instruction type from decoder
 	input  FU_SELECT        					inst2_rs_fu_select_in,
 	input  		        						inst2_rs_load_in,     	// Signal from rename to flop opa/b /or signal to tell RS to load instruction in
-	input  [1:0]                                                            inst2_rs_branch_in,
+	input  [1:0]                                inst2_rs_branch_in,
 
 	input  [3:0]								fu_is_available,		//0,3:mult1,2 1,4:ALU1,2 2,5:MEM1,2
 	
