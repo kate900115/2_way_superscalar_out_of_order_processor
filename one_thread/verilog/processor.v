@@ -455,8 +455,8 @@ if_stage pc(
 
 	.id_uncond_branch_out1(ID_inst1_is_uncond_branch && ID_inst1_is_valid),
 	.id_uncond_branch_out2(ID_inst2_is_uncond_branch && ID_inst2_is_valid),
-	.uncond_target_pc1(ID_inst1_opb+current_pc),
-	.uncond_target_pc2(ID_inst2_opb+current_pc+4),
+	.uncond_target_pc1(ID_inst1_opb+current_pc+4),
+	.uncond_target_pc2(ID_inst2_opb+current_pc+8),
 //output
 	.proc2Icache_addr(PC_proc2Imem_addr),
 	.proc2Icache_command(proc2Icache_command),

@@ -75,6 +75,7 @@ module icache(
 		.Imem2proc_data(Imem2proc_data),
 		.proc2Icache_addr(proc2Icache_addr),	
 		.proc2Icache_command(proc2Icache_command),
+
 		// input from processor.v
 		.pref2Icache_addr(pc_address),	
 		.pref2Icache_command(pre_command),
@@ -107,6 +108,8 @@ module icache(
 	icachemem im(
 		.clock(clock),
 		.reset(reset),
+
+		.branch_mispredict(branch_mispredict),
 		// input from icache_controller.v
 		.index_in(index),
 		.Icache_do_thing(Icache_do_thing),

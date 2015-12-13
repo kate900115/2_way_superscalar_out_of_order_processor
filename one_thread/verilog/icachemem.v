@@ -1,6 +1,8 @@
 module icachemem(
 	input 											clock,
 	input											reset,
+
+	input								branch_mispredict,
 	// input from icache_controller.v
 	input [`ICACHE_INDEX_SIZE-1:0]					index_in_pref,
 	input [`ICACHE_TAG_SIZE-1:0]     				tag_in_pref,
@@ -66,6 +68,13 @@ module icachemem(
 			n_last_load_response = last_load_response;
 			n_last_load_miss = last_load_miss;
 		end
+
+		if(branch_mispredict)
+		begin
+			n_last_load_response = 0;
+			n_last_load_miss = 0;
+		end
+
 	end
 	
 	always_ff @(posedge clock) begin
