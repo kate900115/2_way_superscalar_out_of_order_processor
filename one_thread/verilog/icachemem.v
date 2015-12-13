@@ -50,9 +50,13 @@ module icachemem(
 	logic	[3:0] last_load_response, n_last_load_response;
 	always_comb
 	begin
-		if(data_is_miss) begin     //a new miss //posedge sig
+		if(data_is_miss && Icache_do_thing) begin     //a new miss //posedge sig
 			n_last_load_response = mem_response;
 			n_last_load_miss = 1;
+		end
+		else if(data_is_miss && ~Icache_do_thing) begin     //a new miss //posedge sig
+			n_last_load_response = last_load_response;
+			n_last_load_miss = last_load_miss;
 		end
 		else if(!data_is_miss && last_load_miss && mem_tag == last_load_response && mem_tag !=0) begin  //grap data
 			n_last_load_response = 0;

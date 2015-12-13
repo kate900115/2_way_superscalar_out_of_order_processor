@@ -437,7 +437,10 @@ icache ica(
 if_stage pc(
 //input
 	.clock(clock),							// system clock
-	.reset(reset), 							// system reset
+	.reset(reset), 	
+
+	.Icache_do_thing(Icache_do_thing),
+						// system reset
 	.mispredict(thread1_branch_is_taken),
 	.target_pc(thread1_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC

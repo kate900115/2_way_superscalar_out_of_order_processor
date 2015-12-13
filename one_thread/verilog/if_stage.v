@@ -12,6 +12,8 @@
 module if_stage(
 	input 				clock,							// system clock
 	input 				reset, 							// system reset
+
+	input				Icache_do_thing,
 	input 				mispredict,
 	input [63:0]			target_pc,
 	input         			rs_stall,		 				// when RS is full, we need to stop PC
@@ -161,6 +163,7 @@ module if_stage(
 				inst2_is_valid 	= 0;
 				inst1_out	= 0;
 				inst2_out	= 0;
+
 			end
 			else if(~Icache_hit && ~pc_stall )
 			begin
@@ -171,5 +174,21 @@ module if_stage(
 				inst1_out	= 0;
 				inst2_out	= 0;
 			end
+				
+
+				if(~Icache_do_thing && proc2Icache_command == BUS_LOAD)
+				begin
+					next_command	= BUS_LOAD;
+					next_PC		= PC_reg;
+					inst1_is_valid 	= 0;
+					inst2_is_valid 	= 0;
+					inst1_out	= 0;
+					inst2_out	= 0;
+				end
+
+
+
+
+
 	end
 endmodule
