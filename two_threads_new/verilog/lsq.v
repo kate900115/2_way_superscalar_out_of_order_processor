@@ -717,7 +717,7 @@ module lsq(
 				if (~lq1_requested[i] && lq1_addr_valid[i] && ~lq1_is_available[i] && (lq1_rob_idx[i] - t1_head < sq1_rob_idx[sq_head1]- t1_head || sq1_is_available[sq_head1])) begin
 					lsq2Dcache_command	= BUS_LOAD;
 					mem_address_out		= lq1_opa[i] + lq1_opb[i];
-					inst_op_type		= lq1_inst_op_type[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
+					inst_op_type		= lq1_inst_op_type[i];
 					llsc_enable			= 1;
 					if ((mem_response_in != 0) || cache_hit) begin
 						lq1_request2mem[i]	= 1;
@@ -732,7 +732,7 @@ module lsq(
 				else if (~lq2_requested[i] && lq2_addr_valid[i] && ~lq2_is_available[i] && (lq2_rob_idx[i]- t2_head < sq2_rob_idx[sq_head2]- t2_head || sq2_is_available[sq_head2])) begin
 					lsq2Dcache_command	= BUS_LOAD;
 					mem_address_out		= lq2_opa[i] + lq2_opb[i];
-					inst_op_type		= lq2_inst_op_type[next_mem_inst[$clog2(`SQ_SIZE)-1:0]];
+					inst_op_type		= lq2_inst_op_type[i];
 					llsc_enable			= 1;
 					if ((mem_response_in != 0) || cache_hit) begin
 						lq2_request2mem[i]	= 1;
@@ -751,7 +751,7 @@ module lsq(
 				mem_address_out			= sq1_opa[sq_head1] + sq1_opb[sq_head1];
 				inst_op_type			= sq1_inst_op_type[sq_head1];
 				llsc_enable				= 1;
-				sq2_c_update[sq_head2]	= 2'b10;
+				sq1_c_update[sq_head1]	= 2'b10;
 				if (!inst_store_success) begin
 					lsq2Dcache_command		= BUS_NONE;
 					sq1_c_update[sq_head1]	= 2'b01;

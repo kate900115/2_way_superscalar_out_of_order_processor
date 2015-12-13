@@ -302,12 +302,14 @@ module rob(
 	always_comb
 	begin
 	commit1_is_branch_out	= 0;
+	commit1_is_uncond_branch_out	= 0;
 	commit1_mispredict_out	= 0;
 	commit1_arn_dest_out	= `ZERO_REG;
 	commit1_prn_dest_out	= 0;
 	commit1_if_rename_out	= 0;
 	commit1_is_thread1		= 0;
 	commit2_is_branch_out	= 0;
+	commit2_is_uncond_branch_out	= 0;
 	commit2_mispredict_out	= 0;
 	commit2_arn_dest_out	= `ZERO_REG;
 	commit2_prn_dest_out	= 0;
@@ -438,7 +440,7 @@ module rob(
 		next_t2_tail = t2_tail;
 		t1_is_full = 0;
 		t2_is_full = 0;
-		if(inst1_load_in && inst2_load_in)//*************************************
+		if(inst1_load_in && ~inst1_is_illegal_in && inst2_load_in && ~inst2_is_illegal_in)//*************************************
 		begin
 			if (is_thread1)
 			begin
@@ -457,7 +459,7 @@ module rob(
 				next_t2_tail = t2_tail + 4'h2;
 			end
 		end
-		else if(inst1_load_in && ~inst2_load_in)//*************************************
+		else if(inst1_load_in && ~inst1_is_illegal_in && ~inst2_load_in)//*************************************
 		begin
 			if (is_thread1)
 			begin
@@ -479,21 +481,21 @@ module rob(
 				rob1_internal_if_committed[i] = 1;
 			end
 		end
-		else if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
+		if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out)
 		begin
 			next_t2_tail = next_t2_head;
 			for (int j = 0; j < `ROB_SIZE; j++) begin
 				rob2_internal_if_committed[j] = 1;
 			end
 		end
-		else if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
 		begin
 			next_t1_tail = next_t1_head;
 			for (int k = 0; k < `ROB_SIZE; k++) begin
 				rob1_internal_if_committed[k] = 1;
 			end
 		end
-		else if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
+		if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out)
 		begin
 			next_t2_tail = next_t2_head;
 			for (int m = 0; m < `ROB_SIZE; m++) begin
