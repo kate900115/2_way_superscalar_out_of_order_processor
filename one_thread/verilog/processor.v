@@ -305,11 +305,11 @@ logic [`DCACHE_BLOCK_SIZE-1:0]  Dcache2mem_data;
 logic Imem2proc_valid;
 logic Icache_do_thing;
 logic [63:0]							Icache2mem_addr;
-assign proc2mem_command = (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_command : Dcache2mem_command;
-assign proc2mem_addr 	= (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_addr : Dcache2mem_addr;
-assign Icache_do_thing  = (LSQ2Dcache_command == BUS_NONE) ;
+assign proc2mem_command = (Dcache2mem_command == BUS_NONE) ? Icache2mem_command : Dcache2mem_command;
+assign proc2mem_addr 	= (Dcache2mem_command == BUS_NONE) ? Icache2mem_addr : Dcache2mem_addr;
+assign Icache_do_thing  = (Dcache2mem_command == BUS_NONE) ;
 assign proc2mem_data	= Dcache2mem_data;
-assign structure_hazard_stall = (Icache2mem_command!= BUS_NONE && LSQ2Dcache_command!= BUS_NONE) ? 1 : 0;
+assign structure_hazard_stall = (Icache2mem_command!= BUS_NONE && Dcache2mem_command!= BUS_NONE) ? 1 : 0;
 
 assign ROB_commit1_wr_en = ROB_commit1_arn_dest != `ZERO_REG;
 assign ROB_commit2_wr_en = ROB_commit2_arn_dest != `ZERO_REG;
