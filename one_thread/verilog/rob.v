@@ -349,7 +349,7 @@ module rob(
 			commit1_is_illegal_out	= rob1_internal_is_illegal_out[t1_head];
 			commit1_inst_out		= rob1_internal_inst_out[t1_head];
 			rob1_internal_if_committed[t1_head] = 1;
-			if (rob1_internal_is_ex_out[t1_head+4'b1] && t1_head+4'b1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out_temp  && ~commit1_is_halt_out))
+			if (rob1_internal_is_ex_out[t1_head+4'b1] && t1_head+4'b1 != t1_tail && ~(commit1_is_branch_out && commit1_mispredict_out_temp)  && ~commit1_is_halt_out)
 			begin
 				commit2_pc_out			= rob1_internal_pc_out[t1_head+4'b1];
 				commit2_target_pc_out	= rob1_internal_target_pc_out[t1_head+4'b1];
