@@ -68,7 +68,15 @@ module processor(
 	output logic							ROB_commit2_is_thread1,
 	
 	output logic							ROB_commit1_is_halt,
-	output logic							ROB_commit2_is_halt
+	output logic							ROB_commit2_is_halt,
+	
+	// Output from lsq
+	output logic [63:0]						lsq_inst1_pc_out,
+	output logic [63:0]						lsq_inst2_pc_out,
+	output logic [31:0]						lsq_inst1_out,
+	output logic [31:0]						lsq_inst2_out,
+	output logic							LSQ_CDB_result_is_valid1,
+	output logic							LSQ_CDB_result_is_valid2					
 
 );
 
@@ -1163,7 +1171,7 @@ cdb cdb1(
    		.inst1_valid(ID_inst1_is_valid),
 		.inst1_op_type(ID_op_type1),
 		.inst1_pc(current_pc),
-		//.inst1_in,
+		.inst1_in(PC_inst1),
 		.lsq_rega_in1(PRF_RS_inst1_opc),
 		.lsq_rega_valid1(PRF_RS_inst1_opc_valid),
 		.lsq_opa_in1(ID_inst1_opa),      	// Operand a from Rename  data
@@ -1177,7 +1185,7 @@ cdb cdb1(
    		.inst2_valid(ID_inst2_is_valid),
    		.inst2_op_type(ID_op_type2),
 		.inst2_pc(current_pc+4),
-		//.inst2_in,
+		.inst2_in(PC_inst2),
 		.lsq_rega_in2(PRF_RS_inst2_opc),
 		.lsq_rega_valid2(PRF_RS_inst2_opc_valid),
 		.lsq_opa_in2(ID_inst2_opa),      	// Operand a from Rename  data
@@ -1211,6 +1219,11 @@ cdb cdb1(
 		.mem_data_out(LSQ2Dcache_data),
 		.mem_address_out(LSQ_address_out),
 		.lsq2Dcache_command(LSQ2Dcache_command),
+	//for debug
+		.lsq_inst1_pc_out(lsq_inst1_pc_out),
+		.lsq_inst2_pc_out(lsq_inst2_pc_out),
+		.lsq_inst1_out(lsq_inst1_out),
+		.lsq_inst2_out(lsq_inst2_out),
 	//full
 		.lsq_is_full(LSQ_is_full)
 	);

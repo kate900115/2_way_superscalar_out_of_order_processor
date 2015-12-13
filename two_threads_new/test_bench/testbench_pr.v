@@ -92,6 +92,15 @@ module testbench;
 		logic							ROB_commit2_is_halt;
 		logic [1:0]						count;
 		
+		// output from lsq
+		logic [63:0]					lsq_inst1_pc_out;
+		logic [63:0]					lsq_inst2_pc_out;
+		logic [31:0]					lsq_inst1_out;
+		logic [31:0]					lsq_inst2_out;
+		logic							LSQ_CDB_result_is_valid1;
+		logic							LSQ_CDB_result_is_valid2;	
+		
+		// for debug
 		logic [31:0]					ROB_commit_0_inst;
 		logic [31:0]					ROB_commit_1_inst;
 		logic [31:0]					ROB_commit_2_inst;
@@ -167,7 +176,15 @@ module testbench;
 			.ROB_commit1_is_thread1(ROB_commit1_is_thread1),
 			.ROB_commit2_is_thread1(ROB_commit2_is_thread1),
 			.ROB_commit1_is_halt(ROB_commit1_is_halt),
-			.ROB_commit2_is_halt(ROB_commit2_is_halt)
+			.ROB_commit2_is_halt(ROB_commit2_is_halt),
+			
+			// Output from LSQ
+			.lsq_inst1_pc_out(lsq_inst1_pc_out),
+			.lsq_inst2_pc_out(lsq_inst2_pc_out),
+			.lsq_inst1_out(lsq_inst1_out),
+			.lsq_inst2_out(lsq_inst2_out),
+			.LSQ_CDB_result_is_valid1(LSQ_CDB_result_is_valid1),
+			.LSQ_CDB_result_is_valid2(LSQ_CDB_result_is_valid2)	
 	);
 
 	// Instantiate the Data Memory
@@ -298,7 +315,7 @@ module testbench;
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
     		print_header("                                                                            																													D-MEM Bus &\n");
-    		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   RS5   |    RS6    |    EX1    |   EX2   |   EX3   |    EX4    |    EX5    |   EX6   |   RoB1   |   RoB2   | ");
+    		print_header("Cycle: PC inst1 | PC inst2 |    RS1   |    RS2    |   RS3   |    RS4   |   LSQ1   |   LSQ2    |    EX1    |   EX2   |   EX3   |    EX4    |    RoB1   |   RoB2   | ");
     
   		end
 
@@ -416,15 +433,15 @@ module testbench;
        print_stage_fu(" ", fu_next_inst_pc_out[1][63:0],RS_EX_op_type[1],1);
        print_stage_fu(" ", fu_next_inst_pc_out[2][63:0],RS_EX_op_type[2],1);
        print_stage_fu(" ", fu_next_inst_pc_out[3][63:0],RS_EX_op_type[3],1);
-       print_stage_fu(" ", fu_next_inst_pc_out[4][63:0],RS_EX_op_type[4],1);
-       print_stage_fu(" ", fu_next_inst_pc_out[5][63:0],RS_EX_op_type[5],1);
+       
+       //lsq
+       print_stage(" ", lsq_inst1_out, lsq_inst1_pc_out, {31'b0,LSQ_CDB_result_is_valid1});
+       print_stage(" ", lsq_inst2_out, lsq_inst2_pc_out, {31'b0,LSQ_CDB_result_is_valid2});
        //EX
        print_stage_fu(" ", fu_inst_pc_out[0][63:0],EX_rs_op_type_out[0],~EX_RS_fu_is_available[0] || EX_CDB_fu_result_is_valid[0]);
        print_stage_fu(" ", fu_inst_pc_out[1][63:0],EX_rs_op_type_out[1],~EX_RS_fu_is_available[1] || EX_CDB_fu_result_is_valid[1]);
        print_stage_fu(" ", fu_inst_pc_out[2][63:0],EX_rs_op_type_out[2],~EX_RS_fu_is_available[2] || EX_CDB_fu_result_is_valid[2]);
        print_stage_fu(" ", fu_inst_pc_out[3][63:0],EX_rs_op_type_out[3],~EX_RS_fu_is_available[3] || EX_CDB_fu_result_is_valid[3]);
-       print_stage_fu(" ", fu_inst_pc_out[4][63:0],EX_rs_op_type_out[4],~EX_RS_fu_is_available[4] || EX_CDB_fu_result_is_valid[4]);
-       print_stage_fu(" ", fu_inst_pc_out[5][63:0],EX_rs_op_type_out[5],~EX_RS_fu_is_available[5] || EX_CDB_fu_result_is_valid[5]);
        
        //ROB
        print_stage(" ", ROB_commit1_inst_out, ROB_commit1_pc, ROB_commit1_valid);
