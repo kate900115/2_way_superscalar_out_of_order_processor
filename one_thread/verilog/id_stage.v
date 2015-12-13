@@ -145,12 +145,12 @@ module decoder(
 		opa_select = ALU_OPA_IS_MEM_DISP;
           	opb_select = ALU_OPB_IS_REGB;
 		end
-            `LDQ_INST, `LDQ_L_INST:
+            `LDQ_INST:
               begin
                 rd_mem = `TRUE;
                 dest_reg = DEST_IS_REGA;
               end // case: `LDQ_INST
-            `STQ_INST, `STQ_C_INST:
+            `STQ_INST:
               begin
                 wr_mem = `TRUE;
                 dest_reg = DEST_NONE;

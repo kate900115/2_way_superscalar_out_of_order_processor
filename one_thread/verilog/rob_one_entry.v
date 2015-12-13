@@ -104,7 +104,7 @@ module rob_one_entry(
 	assign is_thread1_out = if_committed ? thread : 0;
 	assign is_branch_out  = if_committed ? is_branch : 0;
 	assign is_uncond_branch_out	= if_committed ? is_uncond_branch : 0;
-	assign mispredict_out = if_committed ? mispredict && ~is_uncond_branch : 0;
+	assign mispredict_out = if_committed ? mispredict : 0;
 	assign arn_dest_out   = if_committed ? arn_dest : 0;
 	assign prn_dest_out   = if_committed ? prn_dest : 0;
 	assign target_pc_out  = if_committed ? target_pc : 0;

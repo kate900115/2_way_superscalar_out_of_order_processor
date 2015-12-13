@@ -12,10 +12,9 @@
 module if_stage(
 	input 				clock,							// system clock
 	input 				reset, 							// system reset
-	input				branch_taken,
 	input 				mispredict,
-	input [63:0]		target_pc,
-	input         		rs_stall,		 				// when RS is full, we need to stop PC
+	input [63:0]			target_pc,
+	input         			rs_stall,		 				// when RS is full, we need to stop PC
 	input	  			rob1_stall,		 				// when RoB1 is full, we need to stop PC1
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				structure_hazard_stall,// If data and instruction want to use memory at the same time
@@ -24,7 +23,11 @@ module if_stage(
 	input			    Icache_hit,
 
 
-	input				is_two_threads,		
+	input				is_two_threads,	
+	input				id_uncond_branch_out1,
+	input				id_uncond_branch_out2,
+	input	[63:0]			uncond_target_pc1,
+	input	[63:0]			uncond_target_pc2,
 
 //to i cache
 	output logic [63:0]	proc2Icache_addr,					// Address sent to Instruction memory
@@ -84,22 +87,15 @@ module if_stage(
 			inst2_is_valid 	= 0;
 			inst1_out	= 0;
 			inst2_out	= 0;
-			if (branch_taken)					// might not be right;
+			if (mispredict)					// might not be right;
 			begin
-				next_PC		= target_pc + 4;
+				next_PC		= target_pc;
 				next_command	= BUS_LOAD;
-				inst1_is_valid 	= ~mispredict;
-				inst2_is_valid 	= ~mispredict;
-				if(target_pc[3]==1)
-				begin
+				inst1_is_valid 	= 0;
+				inst1_is_valid 	= 0;
 				inst1_out	= 0;
-				inst2_out	= current_inst2;
-				end
-				else
-				begin
-				inst1_out	= current_inst1;
-				inst2_out	= current_inst2;
-				end
+				inst2_out	= 0;
+
 			end
 			else if(reset_reg)
 			begin
@@ -118,6 +114,26 @@ module if_stage(
 				inst2_is_valid 	= 1;
 				inst1_out	= current_inst1;
 				inst2_out	= current_inst2;
+				if(id_uncond_branch_out1)
+				begin
+					next_command	= BUS_LOAD;
+					next_PC		= uncond_target_pc1;
+					inst1_is_valid 	= 1;
+					inst2_is_valid 	= 0;
+					inst1_out	= current_inst1;
+					inst2_out	= 0;
+				end
+				else if(id_uncond_branch_out2)
+				begin
+					next_command	= BUS_LOAD;
+					next_PC		= uncond_target_pc2;
+					inst1_is_valid 	= 1;
+					inst2_is_valid 	= 1;
+					inst1_out	= current_inst1;
+					inst2_out	= current_inst2;
+				end
+
+
 				if(PC_reg[2]==1)			//if pc == 8 n +4, we need to only load in the second instruction ,and and pc with 4 next time
 				begin
 				next_command	= BUS_LOAD;
