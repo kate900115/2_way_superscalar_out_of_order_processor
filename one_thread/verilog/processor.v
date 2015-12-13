@@ -68,7 +68,15 @@ module processor(
 	output logic							ROB_commit2_is_thread1,
 	
 	output logic							ROB_commit1_is_halt,
-	output logic							ROB_commit2_is_halt
+	output logic							ROB_commit2_is_halt,
+	
+	// Output from lsq
+	output logic [63:0]						lsq_inst1_pc_out,
+	output logic [63:0]						lsq_inst2_pc_out,
+	output logic [31:0]						lsq_inst1_out,
+	output logic [31:0]						lsq_inst2_out,
+	output logic							LSQ_CDB_result_is_valid1,
+	output logic							LSQ_CDB_result_is_valid2
 
 );
 
@@ -1162,6 +1170,11 @@ cdb cdb1(
 		.mem_data_out(LSQ2Dcache_data),
 		.mem_address_out(LSQ_address_out),
 		.lsq2Dcache_command(LSQ2Dcache_command),
+	//for debug
+		.lsq_inst1_pc_out(lsq_inst1_pc_out),
+		.lsq_inst2_pc_out(lsq_inst2_pc_out),
+		.lsq_inst1_out(lsq_inst1_out),
+		.lsq_inst2_out(lsq_inst2_out),
 	//full
 		.lsq_is_full(LSQ_is_full)
 	);
