@@ -167,12 +167,8 @@ module lsq(
 	logic							inst_store_success;
 	
 	//for debug
-	logic	[63:0]					lq1_pc;
-	logic	[63:0]					lq2_pc;
 	logic	[31:0]					lq1_inst;
 	logic	[31:0]					lq2_inst;
-	logic	[63:0]					sq1_pc;
-	logic	[63:0]					sq2_pc;
 	logic	[31:0]					sq1_inst;
 	logic	[31:0]					sq2_inst;
 	
