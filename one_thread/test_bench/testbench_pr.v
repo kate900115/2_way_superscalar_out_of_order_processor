@@ -308,7 +308,7 @@ module testbench;
 
 		
     		//Open header AFTER throwing the reset otherwise the reset state is displayed
-    		print_header("                                                                            																													D-MEM Bus &\n");
+    		print_header("                                                                            																									D-MEM Bus &\n");
     		print_header("Cycle: PC inst1 | PC inst2 |   RS1   |    RS2    |   RS3   |    RS4   |   LSQ1   |   LSQ2   |   EX1    |   EX2   |   EX3   |    EX4    |     RoB1   |   RoB2   | ");
     
   		end
