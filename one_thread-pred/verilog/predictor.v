@@ -184,7 +184,7 @@ module predictor(
 				end
 			end
 
-			if(branch_valid2) begin
+			else if(branch_valid2) begin
 				for (int i=0; i<`LOCALTAB_SIZE; i++) begin
 					if(i==branch_pc2[$clog2(`LOCALTAB_SIZE)+1:2]) begin
 						local_nexthistory[i]=local_history[i]<<1 + branch_result2;

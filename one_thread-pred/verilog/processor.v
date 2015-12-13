@@ -208,8 +208,8 @@ logic [63:0]					ROB_commit2_target_pc;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit1_prn_dest;
 logic [$clog2(`PRF_SIZE)-1:0]	ROB_commit2_prn_dest;
 
-//logic							ROB_commit1_branch_taken;
-//logic 							ROB_commit2_branch_taken;
+logic							ROB_commit1_branch_taken;
+logic 							ROB_commit2_branch_taken;
 
 logic 							ROB_commit1_is_branch;
 logic							ROB_commit2_is_branch;
@@ -334,55 +334,55 @@ assign Imem2proc_valid = (mem2proc_tag != 0);
 
 assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
 
-assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
+/*assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
-							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;*/
 
 assign thread1_branch_is_taken = (ROB_commit1_mispredict && ROB_commit1_is_thread1 && ~ROB_commit1_is_uncond_branch) || (ROB_commit2_mispredict && ROB_commit2_is_thread1 && ~ROB_commit2_is_uncond_branch); //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1);
+assign thread2_branch_is_taken = (ROB_commit1_mispredict && ~ROB_commit1_is_thread1 && ~ROB_commit1_is_uncond_branch) || (ROB_commit2_mispredict && ~ROB_commit2_is_thread1 && ~ROB_commit2_is_uncond_branch);
 
-/*always_comb begin
-   	if((ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+always_comb begin
+   	if(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) begin
 		if(ROB_commit1_branch_taken)
 			thread1_target_pc = ROB_commit1_target_pc;
 		else
-   			thread1_target_pc = ROB_commit1_pc;
+   			thread1_target_pc = ROB_commit1_pc+4;
 	end
-   	else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+   	else if(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) begin
 		if(ROB_commit2_branch_taken)
 			thread1_target_pc = ROB_commit2_target_pc;
 		else
-   			thread1_target_pc = ROB_commit2_pc;
+   			thread1_target_pc = ROB_commit2_pc+4;
 	end
-   	else if(BTB_target_inst1_valid)
+   	/*else if(BTB_target_inst1_valid)
    		thread1_target_pc = BTB_target_inst1_pc;
   	else if (BTB_target_inst2_valid)
- 		thread1_target_pc = BTB_target_inst2_pc;
+ 		thread1_target_pc = BTB_target_inst2_pc;*/
  	else 
 		thread1_target_pc = 0;
 end
 
 always_comb begin
-   	if((~ROB_commit1_is_thread1 && ROB_commit1_is_branch && inst1_mispredict && inst1_mispredict_valid)) begin
+   	if(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) begin
 		if(ROB_commit1_branch_taken)
 			thread2_target_pc = ROB_commit1_target_pc;
 		else
-   			thread2_target_pc = ROB_commit1_pc;
+   			thread2_target_pc = ROB_commit1_pc+4;
 	end
-   	else if(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && inst2_mispredict && inst2_mispredict_valid) begin
+   	else if(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) begin
 		if(ROB_commit2_branch_taken)
 			thread2_target_pc = ROB_commit2_target_pc;
 		else
-   			thread2_target_pc = ROB_commit2_pc;
+   			thread2_target_pc = ROB_commit2_pc+4;
 	end
-   	else if (BTB_target_inst1_valid)
+   	/*else if (BTB_target_inst1_valid)
    		thread2_target_pc = BTB_target_inst1_pc;
   	else if (BTB_target_inst2_valid)
- 		thread2_target_pc = BTB_target_inst2_pc;
+ 		thread2_target_pc = BTB_target_inst2_pc;*/
  	else 
 		thread2_target_pc =0;
-end*/
+end
 
 //icache
 //assign proc2mem_command	=  Icache2proc_command;
@@ -414,7 +414,7 @@ icache ica(
 	.Imem2proc_tag(mem2proc_tag),
 	.Imem2proc_data(mem2proc_data),
 	
-	.branch_mispredict(thread1_branch_is_taken  ),
+	.branch_mispredict(thread1_branch_is_taken),
 	.pc_target(thread1_target_pc),
 	
 	// output to mem.v
@@ -488,10 +488,10 @@ if_stage pc(
 
 	.branch_result1(ROB_commit1_branch_taken && ~ROB_commit1_is_uncond_branch),              //branch taken or not taken
 	.branch_pc1(ROB_commit1_pc),             //branch local pc
-	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid  && ~ROB_commit1_is_uncond_branch),
 	.branch_result2(ROB_commit2_branch_taken && ~ROB_commit2_is_uncond_branch),
 	.branch_pc2(ROB_commit2_pc),
-	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid  && ~ROB_commit2_is_uncond_branch),
 
 	.inst1_predict(inst1_predict),              //inst predict signal
 	.inst1_predict_valid(inst1_predict_valid),
@@ -516,8 +516,8 @@ if_stage pc(
 	.pc_idx2(ROB_commit2_pc),		
 	.target_pc1(ROB_commit1_target_pc),
 	.target_pc2(ROB_commit2_target_pc),
-	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
-	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid && ~ROB_commit1_is_uncond_branch),
+	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid && ~ROB_commit2_is_uncond_branch),
 		
 	.target_inst1_pc(BTB_target_inst1_pc),
 	.target_inst2_pc(BTB_target_inst2_pc),

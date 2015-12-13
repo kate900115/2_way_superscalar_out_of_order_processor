@@ -107,6 +107,8 @@ module icache(
 	icachemem im(
 		.clock(clock),
 		.reset(reset),
+		
+		.branch_mispredict(branch_mispredict),
 		// input from icache_controller.v
 		.index_in(index),
 		.Icache_do_thing(Icache_do_thing),

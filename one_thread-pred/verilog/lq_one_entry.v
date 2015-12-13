@@ -139,6 +139,8 @@ module lq_one_entry(
 			next_lq_rob_idx		= lq_rob_idx_in1;
 			next_lq_dest_tag	= lq_dest_idx1;
 			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
+			next_lq_mem_value	= 0;
 		end
 		else if (lq_free_enable && lq_mem_in2) begin
 			next_inuse			= 1;
@@ -151,6 +153,8 @@ module lq_one_entry(
 			next_lq_rob_idx		= lq_rob_idx_in2;
 			next_lq_dest_tag	= lq_dest_idx2;
 			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
+			next_lq_mem_value	= 0;
 		end
 		else if (lq_free_enable) begin
 			next_inuse			= 0;
@@ -177,6 +181,8 @@ module lq_one_entry(
 			next_lq_rob_idx		= lq_rob_idx_in1;
 			next_lq_dest_tag	= lq_dest_idx1;
 			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
+			next_lq_mem_value	= 0;
 		end
 		else if (lq_mem_in2) begin
 			next_inuse			= 1;
@@ -189,6 +195,8 @@ module lq_one_entry(
 			next_lq_rob_idx		= lq_rob_idx_in2;
 			next_lq_dest_tag	= lq_dest_idx2;
 			next_lq_mem_value_valid = 0;
+			next_lq_requested	= 0;
+			next_lq_mem_value	= 0;
 		end
 		else begin
 			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb1_tag) && inuse && lq_cdb1_valid) begin
