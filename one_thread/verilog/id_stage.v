@@ -189,6 +189,8 @@ module decoder(
         end
       endcase // case(inst[31:29] << 3)
     end // if(~valid_inst_in)
+		//noop illegal
+
   end // always
      
 endmodule // decoder

@@ -112,7 +112,7 @@ module dcache_controller(
 						// to proc.v
 						// for current instruction
 						Dcache2proc_response 	 = Dmem2proc_response;
-						Dcache_data_hit			 = 0;
+						Dcache_data_hit			 = 1;
 						// for previous instruction
 						Dcache_data_out  		 = cachemem_data;
 						Dcache2proc_tag  		 = Dmem2proc_tag;
