@@ -80,6 +80,16 @@ module processor(
 
 );
 
+logic inst1_predict;             //inst predict signal
+logic inst1_predict_valid;
+logic inst2_predict;
+logic inst2_predict_valid;
+
+//BTB output
+logic [63:0]	BTB_target_inst1_pc;
+logic [63:0]	BTB_target_inst2_pc;
+logic			BTB_target_inst1_valid;
+logic			BTB_target_inst2_valid;
 
 logic	thread1_branch_is_taken_pc;  //for pc to change addr
 logic	thread2_branch_is_taken_pc;
@@ -1210,5 +1220,61 @@ dcache dca(
 	.Dcache2proc_response(Dcache2proc_response),
 	.Dcache_data_hit(Dcache_data_hit)
 );
+
+////////////////////////////////////////////////////////////////////////////
+//										//
+//		Predictor & BTB         		//     
+//										//
+//////////////////////////////////////////
+
+
+	predictor predictor1(
+	.two_threads_enable(1'b1),
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(current_pc),
+	.inst1_valid(PC_inst1_valid && ID_inst1_is_cond_branch),
+	.if_inst2_pc(current_pc+4),
+	.inst2_valid(PC_inst2_valid && ID_inst2_is_cond_branch),
+
+	.branch_result1(ROB_commit1_branch_taken && ~ROB_commit1_is_uncond_branch),              //branch taken or not taken
+	.branch_pc1(ROB_commit1_pc),             //branch local pc
+	.branch_valid1(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.branch_result2(ROB_commit2_branch_taken && ~ROB_commit2_is_uncond_branch),
+	.branch_pc2(ROB_commit2_pc),
+	.branch_valid2(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+
+	.inst1_predict(inst1_predict),              //inst predict signal
+	.inst1_predict_valid(inst1_predict_valid),
+	.inst2_predict(inst2_predict),
+	.inst2_predict_valid(inst2_predict_valid)
+	/*.branch1_mispredict(inst1_mispredict),
+	.branch1_mispredict_valid(inst1_mispredict_valid),
+	.branch2_mispredict(inst2_mispredict),
+	.branch2_mispredict_valid(inst2_mispredict_valid)*/
+	);
+
+
+	BTB BTB_1(
+	.reset(reset),
+	.clock(clock),
+	.if_inst1_pc(current_pc),
+	.if_inst2_pc(current_pc+4),
+	.inst1_valid(inst1_predict_valid && inst1_predict),
+	.inst2_valid(inst2_predict_valid && inst2_predict),
+		
+	.pc_idx1(ROB_commit1_pc),
+	.pc_idx2(ROB_commit2_pc),		
+	.target_pc1(ROB_commit1_target_pc),
+	.target_pc2(ROB_commit2_target_pc),
+	.target_pc1_valid(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_valid),
+	.target_pc2_valid(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_valid),
+		
+	.target_inst1_pc(BTB_target_inst1_pc),
+	.target_inst2_pc(BTB_target_inst2_pc),
+	.target_inst1_valid(BTB_target_inst1_valid),
+	.target_inst2_valid(BTB_target_inst2_valid)
+
+	);		
 
 endmodule

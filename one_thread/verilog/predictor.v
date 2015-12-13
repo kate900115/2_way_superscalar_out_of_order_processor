@@ -17,12 +17,12 @@ module predictor(
 		output logic inst1_predict,              //inst predict signal
 		output logic inst1_predict_valid,
 		output logic inst2_predict,
-		output logic inst2_predict_valid,
+		output logic inst2_predict_valid
 		
-		output logic branch1_mispredict,
+		/*output logic branch1_mispredict,
 		output logic branch1_mispredict_valid,
 		output logic branch2_mispredict,
-		output logic branch2_mispredict_valid
+		output logic branch2_mispredict_valid*/
 	);
 
 	logic [`LOCALTAB_SIZE-1:0] [$clog2(`LHISTORY_SIZE)-1:0] local_history;
@@ -34,10 +34,10 @@ module predictor(
 
 	always_comb begin
 
-		branch1_mispredict=0;
+		/*branch1_mispredict=0;
 		branch1_mispredict_valid=0;
 		branch2_mispredict=0;
-		branch2_mispredict_valid=0;
+		branch2_mispredict_valid=0;*/
 
 		/*for (int j=0; j<`LHISTORY_SIZE; j++) begin
 
@@ -159,7 +159,7 @@ module predictor(
 				
 						end	
 						
-						if(branch_result1) begin
+						/*if(branch_result1) begin
 							if(l_state[j][1])   begin     //predict branch taken
 								branch1_mispredict=1'b0;
 								branch1_mispredict_valid=1'b1;
@@ -178,7 +178,7 @@ module predictor(
 								branch1_mispredict=1'b0;
 								branch1_mispredict_valid=1'b1;
 							end
-						end
+						end*/
 						break;
 					end
 				end
@@ -206,7 +206,7 @@ module predictor(
 					
 						end
 
-						if(branch_result2) begin
+						/*if(branch_result2) begin
 							if(l_state[j][1])   begin     //predict branch taken
 								branch2_mispredict=1'b0;
 								branch2_mispredict_valid=1'b1;
@@ -225,7 +225,7 @@ module predictor(
 								branch2_mispredict=1'b0;
 								branch2_mispredict_valid=1'b1;
 							end
-						end
+						end*/
 					break;
 					end
 				end
