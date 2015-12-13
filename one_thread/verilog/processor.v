@@ -325,7 +325,9 @@ assign Imem2proc_valid = (mem2proc_tag != 0);
 assign pipeline_completed_insts = {3'b0,ROB_commit1_valid || ROB_commit2_valid};
 
 assign thread1_target_pc = 	(ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
-							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
+							(ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 
+							(ID_inst1_is_uncond_branch && PC_inst1_valid) ? ID_inst1_opb+current_pc : 
+							(ID_inst2_is_uncond_branch && PC_inst2_valid) ? ID_inst2_opb+current_pc+4 : 0;
 assign thread2_target_pc = 	(~ROB_commit1_is_thread1 && ROB_commit1_is_branch && ROB_commit1_mispredict) ? (ROB_commit1_target_pc) : 
 							(~ROB_commit2_is_thread1 && ROB_commit2_is_branch && ROB_commit2_mispredict) ? (ROB_commit2_target_pc) : 0;
 
@@ -426,6 +428,7 @@ if_stage pc(
 //input
 	.clock(clock),							// system clock
 	.reset(reset), 							// system reset
+	.branch_taken(thread1_branch_is_taken || (ID_inst1_is_uncond_branch && PC_inst1_valid) || (ID_inst2_is_uncond_branch && PC_inst2_valid)),
 	.mispredict(thread1_branch_is_taken),
 	.target_pc(thread1_target_pc),
 	.rs_stall(RS_full),		 				// when RS is full, we need to stop PC

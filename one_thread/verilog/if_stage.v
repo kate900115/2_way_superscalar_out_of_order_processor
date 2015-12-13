@@ -12,9 +12,10 @@
 module if_stage(
 	input 				clock,							// system clock
 	input 				reset, 							// system reset
+	input				branch_taken,
 	input 				mispredict,
-	input [63:0]			target_pc,
-	input         			rs_stall,		 				// when RS is full, we need to stop PC
+	input [63:0]		target_pc,
+	input         		rs_stall,		 				// when RS is full, we need to stop PC
 	input	  			rob1_stall,		 				// when RoB1 is full, we need to stop PC1
 	input				rat_stall,						// when the freelist of PRF is empty, RAT generate a stall signal
 	input				structure_hazard_stall,// If data and instruction want to use memory at the same time
@@ -83,12 +84,12 @@ module if_stage(
 			inst2_is_valid 	= 0;
 			inst1_out	= 0;
 			inst2_out	= 0;
-			if (mispredict)					// might not be right;
+			if (branch_taken)					// might not be right;
 			begin
 				next_PC		= target_pc + 4;
 				next_command	= BUS_LOAD;
-				inst1_is_valid 	= 0;
-				inst1_is_valid 	= 0;
+				inst1_is_valid 	= ~mispredict;
+				inst2_is_valid 	= ~mispredict;
 				if(target_pc[3]==1)
 				begin
 				inst1_out	= 0;
