@@ -1,22 +1,23 @@
 # Begin_DVE_Session_Save_Info
 # DVE full session
-# Saved on Thu Dec 10 05:02:00 2015
+# Saved on Sun Dec 13 01:02:58 2015
 # Designs open: 1
 #   Sim: dve
 # Toplevel windows open: 2
 # 	TopLevel.1
 # 	TopLevel.2
-#   Source.1: _vcs_unit__533683499
-#   Wave.1: 25 signals
-#   Group count = 1
-#   Group Group1 signal count = 25
+#   Source.1: _vcs_unit__3810285426
+#   Wave.1: 26 signals
+#   Group count = 2
+#   Group Group1 signal count = 20
+#   Group Group2 signal count = 26
 # End_DVE_Session_Save_Info
 
 # DVE version: K-2015.09_Full64
 # DVE build date: Aug 25 2015 21:36:02
 
 
-#<Session mode="Full" path="/home/tianmili/classes/eecs470/projects/project4/one_thread/test_icache.tcl" type="Debug">
+#<Session mode="Full" path="/home/tianmili/classes/eecs470/projects/project4/group7f15/one_thread/test_icache.tcl" type="Debug">
 
 gui_set_loading_session_type Post
 gui_continuetime_set
@@ -68,7 +69,7 @@ if {![gui_exist_window -window TopLevel.1]} {
 } else { 
     set TopLevel.1 TopLevel.1
 }
-gui_show_window -window ${TopLevel.1} -show_state normal -rect {{11 65} {2499 1413}}
+gui_show_window -window ${TopLevel.1} -show_state normal -rect {{17 68} {2502 1413}}
 
 # ToolBar settings
 gui_set_toolbar_attributes -toolbar {TimeOperations} -dock_state top
@@ -115,28 +116,23 @@ gui_show_toolbar -toolbar {Testbench}
 # End ToolBar settings
 
 # Docked window settings
-set HSPane.1 [gui_create_window -type HSPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 276]
+set HSPane.1 [gui_create_window -type HSPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 251]
 catch { set Hier.1 [gui_share_window -id ${HSPane.1} -type Hier] }
-gui_set_window_pref_key -window ${HSPane.1} -key dock_width -value_type integer -value 276
+gui_set_window_pref_key -window ${HSPane.1} -key dock_width -value_type integer -value 251
 gui_set_window_pref_key -window ${HSPane.1} -key dock_height -value_type integer -value -1
 gui_set_window_pref_key -window ${HSPane.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${HSPane.1} {{left 0} {top 0} {width 275} {height 1080} {dock_state left} {dock_on_new_line true} {child_hier_colhier 216} {child_hier_coltype 111} {child_hier_colpd 0} {child_hier_col1 0} {child_hier_col2 1} {child_hier_col3 -1}}
-set DLPane.1 [gui_create_window -type DLPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 678]
+gui_update_layout -id ${HSPane.1} {{left 0} {top 0} {width 250} {height 1086} {dock_state left} {dock_on_new_line true} {child_hier_colhier 216} {child_hier_coltype 111} {child_hier_colpd 0} {child_hier_col1 0} {child_hier_col2 1} {child_hier_col3 -1}}
+set DLPane.1 [gui_create_window -type DLPane -parent ${TopLevel.1} -dock_state left -dock_on_new_line true -dock_extent 672]
 catch { set Data.1 [gui_share_window -id ${DLPane.1} -type Data] }
-gui_set_window_pref_key -window ${DLPane.1} -key dock_width -value_type integer -value 678
-gui_set_window_pref_key -window ${DLPane.1} -key dock_height -value_type integer -value 1081
+gui_set_window_pref_key -window ${DLPane.1} -key dock_width -value_type integer -value 672
+gui_set_window_pref_key -window ${DLPane.1} -key dock_height -value_type integer -value 1086
 gui_set_window_pref_key -window ${DLPane.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${DLPane.1} {{left 0} {top 0} {width 677} {height 1080} {dock_state left} {dock_on_new_line true} {child_data_colvariable 358} {child_data_colvalue 182} {child_data_coltype 206} {child_data_col1 0} {child_data_col2 1} {child_data_col3 2}}
+gui_update_layout -id ${DLPane.1} {{left 0} {top 0} {width 671} {height 1086} {dock_state left} {dock_on_new_line true} {child_data_colvariable 358} {child_data_colvalue 182} {child_data_coltype 206} {child_data_col1 0} {child_data_col2 1} {child_data_col3 2}}
 set Console.1 [gui_create_window -type Console -parent ${TopLevel.1} -dock_state bottom -dock_on_new_line true -dock_extent 179]
-gui_set_window_pref_key -window ${Console.1} -key dock_width -value_type integer -value -1
+gui_set_window_pref_key -window ${Console.1} -key dock_width -value_type integer -value 295
 gui_set_window_pref_key -window ${Console.1} -key dock_height -value_type integer -value 179
 gui_set_window_pref_key -window ${Console.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${Console.1} {{left 0} {top 0} {width 319} {height 179} {dock_state bottom} {dock_on_new_line true}}
-set DriverLoad.1 [gui_create_window -type DriverLoad -parent ${TopLevel.1} -dock_state bottom -dock_on_new_line false -dock_extent 180]
-gui_set_window_pref_key -window ${DriverLoad.1} -key dock_width -value_type integer -value 150
-gui_set_window_pref_key -window ${DriverLoad.1} -key dock_height -value_type integer -value 180
-gui_set_window_pref_key -window ${DriverLoad.1} -key dock_offset -value_type integer -value 0
-gui_update_layout -id ${DriverLoad.1} {{left 0} {top 0} {width 2168} {height 179} {dock_state bottom} {dock_on_new_line false}}
+gui_update_layout -id ${Console.1} {{left 0} {top 0} {width 2485} {height 178} {dock_state bottom} {dock_on_new_line true}}
 #### Start - Readjusting docked view's offset / size
 set dockAreaList { top left right bottom }
 foreach dockArea $dockAreaList {
@@ -173,7 +169,7 @@ if {![gui_exist_window -window TopLevel.2]} {
 } else { 
     set TopLevel.2 TopLevel.2
 }
-gui_show_window -window ${TopLevel.2} -show_state normal -rect {{66 61} {2558 1413}}
+gui_show_window -window ${TopLevel.2} -show_state normal -rect {{92 87} {2558 1413}}
 
 # ToolBar settings
 gui_set_toolbar_attributes -toolbar {TimeOperations} -dock_state top
@@ -225,7 +221,7 @@ gui_sync_global -id ${TopLevel.2} -option true
 # MDI window settings
 set Wave.1 [gui_create_window -type {Wave}  -parent ${TopLevel.2}]
 gui_show_window -window ${Wave.1} -show_state maximized
-gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 723} {child_wave_right 1764} {child_wave_colname 359} {child_wave_colvalue 360} {child_wave_col1 0} {child_wave_col2 1}}
+gui_update_layout -id ${Wave.1} {{show_state maximized} {dock_state undocked} {dock_on_new_line false} {child_wave_left 716} {child_wave_right 1745} {child_wave_colname 356} {child_wave_colvalue 356} {child_wave_col1 0} {child_wave_col2 1}}
 
 # End MDI window settings
 
@@ -272,16 +268,20 @@ gui_set_time_units 100ps
 # Global: Signal Compare
 
 # Global: Signal Groups
-gui_load_child_values {testbench.processor_0.pc}
 gui_load_child_values {testbench.processor_0.ica.im}
-gui_load_child_values {testbench.memory}
 
 
-set _session_group_5 Group1
-gui_sg_create "$_session_group_5"
-set Group1 "$_session_group_5"
+set _session_group_9 Group1
+gui_sg_create "$_session_group_9"
+set Group1 "$_session_group_9"
 
-gui_sg_addsignal -group "$_session_group_5" { testbench.processor_0.ica.im.index_in_pref testbench.processor_0.ica.im.tag_in_pref testbench.processor_0.ica.im.index_in testbench.processor_0.ica.im.tag_in testbench.processor_0.ica.im.internal_data testbench.processor_0.ica.im.internal_tag testbench.processor_0.ica.im.internal_valid testbench.processor_0.ica.im.internal_response testbench.processor_0.ica.im.clock testbench.processor_0.ica.im.reset testbench.processor_0.pc.inst1_out testbench.processor_0.pc.inst2_out testbench.processor_0.pc.inst1_is_valid testbench.processor_0.pc.inst2_is_valid testbench.processor_0.pc.PC_reg testbench.memory.mem2proc_data testbench.memory.mem2proc_tag testbench.processor_0.ica.im.load_data_in testbench.processor_0.ica.im.internal_data_in testbench.processor_0.ica.im.internal_response_in testbench.memory.proc2mem_addr testbench.memory.proc2mem_command testbench.memory.mem2proc_response testbench.processor_0.ica.ic.proc2Icache_addr testbench.processor_0.ica.ic.pref2Icache_addr }
+gui_sg_addsignal -group "$_session_group_9" { testbench.memory.clock testbench.memory.proc2mem_addr testbench.memory.proc2mem_data testbench.memory.proc2mem_command testbench.memory.mem2proc_response testbench.memory.mem2proc_data testbench.memory.mem2proc_tag testbench.processor_0.ica.proc2Icache_addr testbench.processor_0.ica.proc2Icache_command testbench.processor_0.ica.Icache2proc_data testbench.processor_0.ica.Icache2proc_valid testbench.processor_0.ica.im.index_in testbench.processor_0.ica.im.tag_in testbench.processor_0.ica.im.internal_tag testbench.processor_0.ica.im.internal_valid testbench.processor_0.ica.im.internal_data testbench.processor_0.ica.im.internal_response testbench.processor_0.ica.im.index_in_load testbench.processor_0.ica.im.index_in testbench.processor_0.ica.im.index_in_pref }
+
+set _session_group_10 Group2
+gui_sg_create "$_session_group_10"
+set Group2 "$_session_group_10"
+
+gui_sg_addsignal -group "$_session_group_10" { testbench.processor_0.ica.im.index_in_load testbench.processor_0.ica.im.index_in_pref testbench.processor_0.ica.im.index_in testbench.processor_0.ica.im.tag_in_load testbench.processor_0.ica.im.read_enable_load testbench.memory.mem2proc_data testbench.memory.mem2proc_response testbench.memory.mem2proc_tag testbench.memory.clock testbench.memory.proc2mem_addr testbench.memory.proc2mem_data testbench.memory.proc2mem_command testbench.processor_0.ica.ic.index testbench.processor_0.ica.ic.index_pref testbench.processor_0.ica.ic.tag testbench.processor_0.ica.ic.tag_pref testbench.processor_0.ica.ic.pref2Icache_addr testbench.processor_0.ica.ic.proc2Icache_addr testbench.memory.proc2mem_command testbench.memory.mem2proc_data testbench.memory.mem2proc_response testbench.memory.mem2proc_tag testbench.memory.clock testbench.memory.proc2mem_addr testbench.memory.proc2mem_data testbench.processor_0.ica.Icache2proc_valid }
 
 # Global: Highlighting
 
@@ -291,7 +291,7 @@ gui_change_stack_mode -mode list
 # Post database loading setting...
 
 # Restore C1 time
-gui_set_time -C1_only 7748
+gui_set_time -C1_only 4910
 
 
 
@@ -318,17 +318,16 @@ gui_hier_list_init -id ${Hier.1}
 gui_change_design -id ${Hier.1} -design Sim
 catch {gui_list_expand -id ${Hier.1} testbench}
 catch {gui_list_expand -id ${Hier.1} testbench.processor_0}
-catch {gui_list_expand -id ${Hier.1} testbench.processor_0.ica}
-catch {gui_list_select -id ${Hier.1} {testbench.processor_0.ica.ic}}
+catch {gui_list_select -id ${Hier.1} {testbench.processor_0.ica}}
 gui_view_scroll -id ${Hier.1} -vertical -set 0
 gui_view_scroll -id ${Hier.1} -horizontal -set 0
 
 # Data 'Data.1'
 gui_list_set_filter -id ${Data.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {LowPower 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Data.1} -text {*}
-gui_list_show_data -id ${Data.1} {testbench.processor_0.ica.ic}
+gui_list_show_data -id ${Data.1} {testbench.processor_0.ica}
 gui_show_window -window ${Data.1}
-catch { gui_list_select -id ${Data.1} {testbench.processor_0.ica.ic.pref2Icache_addr testbench.processor_0.ica.ic.proc2Icache_addr }}
+catch { gui_list_select -id ${Data.1} {testbench.processor_0.ica.Icache2proc_valid }}
 gui_view_scroll -id ${Data.1} -vertical -set 0
 gui_view_scroll -id ${Data.1} -horizontal -set 0
 gui_view_scroll -id ${Hier.1} -vertical -set 0
@@ -337,7 +336,7 @@ gui_view_scroll -id ${Hier.1} -horizontal -set 0
 # Source 'Source.1'
 gui_src_value_annotate -id ${Source.1} -switch false
 gui_set_env TOGGLE::VALUEANNOTATE 0
-gui_open_source -id ${Source.1}  -replace -active _vcs_unit__533683499 sys_defs.vh
+gui_open_source -id ${Source.1}  -replace -active _vcs_unit__3810285426 sys_defs.vh
 gui_view_scroll -id ${Source.1} -vertical -set 0
 gui_src_set_reusable -id ${Source.1}
 
@@ -350,8 +349,8 @@ gui_list_set_height -id Wave -height 25
 set origGroupCreationState [gui_list_create_group_when_add -wave]
 gui_list_create_group_when_add -wave -disable
 gui_marker_set_ref -id ${Wave.1}  C1
-gui_wv_zoom_timerange -id ${Wave.1} 7229 8397
-gui_list_add_group -id ${Wave.1} -after {New Group} {Group1}
+gui_wv_zoom_timerange -id ${Wave.1} 4713 5288
+gui_list_add_group -id ${Wave.1} -after {New Group} {Group2}
 gui_list_select -id ${Wave.1} {testbench.processor_0.ica.ic.proc2Icache_addr }
 gui_seek_criteria -id ${Wave.1} {Any Edge}
 
@@ -368,14 +367,11 @@ if { $groupExD } {
 }
 gui_list_set_filter -id ${Wave.1} -list { {Buffer 1} {Input 1} {Others 1} {Linkage 1} {Output 1} {Parameter 1} {All 1} {Aggregate 1} {LibBaseMember 1} {Event 1} {Assertion 1} {Constant 1} {Interface 1} {BaseMembers 1} {Signal 1} {$unit 1} {Inout 1} {Variable 1} }
 gui_list_set_filter -id ${Wave.1} -text {*}
-gui_list_set_insertion_bar  -id ${Wave.1} -group Group1  -position in
+gui_list_set_insertion_bar  -id ${Wave.1} -group Group2  -position in
 
-gui_marker_move -id ${Wave.1} {C1} 7748
+gui_marker_move -id ${Wave.1} {C1} 4910
 gui_view_scroll -id ${Wave.1} -vertical -set 0
 gui_show_grid -id ${Wave.1} -enable false
-
-# DriverLoad 'DriverLoad.1'
-gui_get_drivers -session -id ${DriverLoad.1} -signal {testbench.processor_0.ica.im.internal_valid[15:0][1:0]} -time 7660 -starttime 7850
 # Restore toplevel window zorder
 # The toplevel window could be closed if it has no view/pane
 if {[gui_exist_window -window ${TopLevel.1}]} {

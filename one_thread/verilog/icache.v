@@ -1,6 +1,8 @@
 module icache(
 	input									clock,
 	input									reset,
+
+	input								Icache_do_thing,
 	// input from processor.v  thread 1
 	input	[63:0]							proc2Icache_addr,	
 	input  BUS_COMMAND						proc2Icache_command,
@@ -53,7 +55,7 @@ module icache(
 			end
 	end
 	
-	assign pre_enable = !reset;
+	assign pre_enable = !reset && Icache_do_thing;
 	assign pre_command = (pre_enable)?BUS_LOAD: BUS_NONE;
 	always_comb begin
 		if(!pre_enable || (read_enable && cachemem_is_miss)) begin //this clock cycle not prefetch, this cc release no use
@@ -71,11 +73,11 @@ module icache(
 		.Imem2proc_response(Imem2proc_response),
 		.Imem2proc_tag(Imem2proc_tag),
 		.Imem2proc_data(Imem2proc_data),
+		.proc2Icache_addr(proc2Icache_addr),	
+		.proc2Icache_command(proc2Icache_command),
 		// input from processor.v
 		.pref2Icache_addr(pc_address),	
 		.pref2Icache_command(pre_command),
-		.proc2Icache_addr(proc2Icache_addr),	
-		.proc2Icache_command(proc2Icache_command),
 		// input from Icache.v
 		.cachemem_data(cachemem_data),
 		.cachemem_valid(cachemem_valid),
@@ -107,6 +109,7 @@ module icache(
 		.reset(reset),
 		// input from icache_controller.v
 		.index_in(index),
+		.Icache_do_thing(Icache_do_thing),
 		.index_in_pref(index_pref),
 		.tag_in(tag),  
 		.tag_in_pref(tag_pref),

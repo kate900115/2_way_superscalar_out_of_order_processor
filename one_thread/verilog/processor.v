@@ -303,9 +303,11 @@ logic [`DCACHE_BLOCK_SIZE-1:0]  Dcache2mem_data;
 
 
 logic Imem2proc_valid;
+logic Icache_do_thing;
 logic [63:0]							Icache2mem_addr;
 assign proc2mem_command = (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_command : Dcache2mem_command;
 assign proc2mem_addr 	= (LSQ2Dcache_command == BUS_NONE) ? Icache2mem_addr : Dcache2mem_addr;
+assign Icache_do_thing  = (LSQ2Dcache_command == BUS_NONE) ;
 assign proc2mem_data	= Dcache2mem_data;
 assign structure_hazard_stall = (Icache2mem_command!= BUS_NONE && LSQ2Dcache_command!= BUS_NONE) ? 1 : 0;
 
@@ -392,6 +394,8 @@ assign thread2_branch_is_taken = (inst1_mispredict&&inst1_mispredict_valid && ~R
 icache ica(
 	.clock(clock),
 	.reset(reset),
+
+	.Icache_do_thing(Icache_do_thing),
 	
 	// input from processor.v
 	.proc2Icache_addr(PC_proc2Imem_addr),	
@@ -402,7 +406,7 @@ icache ica(
 	.Imem2proc_tag(mem2proc_tag),
 	.Imem2proc_data(mem2proc_data),
 	
-	.branch_mispredict(thread1_branch_is_taken),
+	.branch_mispredict(thread1_branch_is_taken  ),
 	.pc_target(thread1_target_pc),
 	
 	// output to mem.v
@@ -439,7 +443,7 @@ if_stage pc(
 	.is_two_threads(is_two_threads),
 
 	.id_uncond_branch_out1(ID_inst1_is_uncond_branch && ID_inst1_is_valid),
-	.id_uncond_branch_out2(ID_inst2_is_uncond_branch && ID_inst1_is_valid),
+	.id_uncond_branch_out2(ID_inst2_is_uncond_branch && ID_inst2_is_valid),
 	.uncond_target_pc1(ID_inst1_opb+current_pc),
 	.uncond_target_pc2(ID_inst2_opb+current_pc+4),
 //output

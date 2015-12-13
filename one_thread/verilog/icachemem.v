@@ -10,7 +10,7 @@ module icachemem(
 	input											read_enable,
 	input [3:0]										mem_response,
 	input [3:0]										mem_tag,						
-	
+	input 								Icache_do_thing,
 	// input from mem.v
 	input [`ICACHE_BLOCK_SIZE-1:0]  				load_data_in,
 	
@@ -105,14 +105,14 @@ module icachemem(
 	always_comb
 	begin	
 		internal_tag_in  						= internal_tag;
-		internal_response_in					= internal_response;
+		internal_response_in						= internal_response;
 		internal_way_next						= internal_way;
 		load_is_miss							= 1'b1;
 		internal_data_in 						= internal_data;
 		internal_valid_in						= internal_valid;
 		cache_is_full							= 1'b0;
 		// for read
-		if (read_enable_load)
+		if (read_enable_load && Icache_do_thing)
 		begin
 			// is data miss?
 			for (int j=0; j<`ICACHE_WAY; j++)
