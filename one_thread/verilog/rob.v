@@ -484,21 +484,21 @@ module rob(
 				rob1_internal_if_committed[i] = 1;
 			end
 		end
-		else if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out_temp)
+		if (~commit1_is_thread1 && commit1_is_branch_out && commit1_mispredict_out_temp)
 		begin
 			next_t2_tail = next_t2_head;
 			for (int j = 0; j < `ROB_SIZE; j++) begin
 				rob2_internal_if_committed[j] = 1;
 			end
 		end
-		else if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out_temp)
+		if (commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out_temp)
 		begin
 			next_t1_tail = next_t1_head;
 			for (int k = 0; k < `ROB_SIZE; k++) begin
 				rob1_internal_if_committed[k] = 1;
 			end
 		end
-		else if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out_temp)
+		if (~commit2_is_thread1 && commit2_is_branch_out && commit2_mispredict_out_temp)
 		begin
 			next_t2_tail = next_t2_head;
 			for (int m = 0; m < `ROB_SIZE; m++) begin

@@ -123,6 +123,7 @@ module sq_one_entry(
 			next_inuse = 0;
 		else if (sq_free_enable && sq_mem_in1) begin
 			next_inuse			= 1;
+			next_sq_requested	= 0;
 			next_sq_pc			= sq_pc_in1;
 			next_sq_inst		= sq_inst1_in;
 			next_sq_opa			= sq_opa_in1;
@@ -136,6 +137,7 @@ module sq_one_entry(
 		end
 		else if (sq_free_enable && sq_mem_in2) begin
 			next_inuse			= 1;
+			next_sq_requested	= 0;
 			next_sq_pc			= sq_pc_in2;
 			next_sq_inst		= sq_inst2_in;
 			next_sq_opa			= sq_opa_in2;
@@ -163,6 +165,7 @@ module sq_one_entry(
 		end
 		else if (sq_mem_in1) begin
 			next_inuse			= 1;
+			next_sq_requested	= 0;
 			next_sq_pc			= sq_pc_in1;
 			next_sq_inst		= sq_inst1_in;
 			next_sq_opa			= sq_opa_in1;
@@ -176,6 +179,7 @@ module sq_one_entry(
 		end
 		else if (sq_mem_in2) begin
 			next_inuse			= 1;
+			next_sq_requested	= 0;
 			next_sq_pc			= sq_pc_in2;
 			next_sq_inst		= sq_inst2_in;
 			next_sq_opa			= sq_opa_in2;

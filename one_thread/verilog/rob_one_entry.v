@@ -145,6 +145,7 @@ module rob_one_entry(
 			next_halt			= inst1_halt_in;
 			next_illegal		= inst1_illegal_in;
 			next_rob_inst		= rob_inst1_in;
+			next_target_pc		= 0;
 		end
 		else if (inst2_rob_load_in)
 		begin
@@ -160,6 +161,7 @@ module rob_one_entry(
 			next_halt			= inst2_halt_in;
 			next_illegal		= inst2_illegal_in;
 			next_rob_inst		= rob_inst2_in;
+			next_target_pc		= 0;
 		end
 		else if (inuse && is_ex_in) begin
 			next_is_executed 	= is_ex_in;
