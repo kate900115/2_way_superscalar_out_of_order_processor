@@ -138,9 +138,16 @@ module lq_one_entry(
 			next_lq_addr_valid	= lq_opb_valid1;
 			next_lq_rob_idx		= lq_rob_idx_in1;
 			next_lq_dest_tag	= lq_dest_idx1;
-			next_lq_mem_value_valid = 0;
-			next_lq_requested	= 0;
-			next_lq_mem_value	= 0;
+			if (lq_inst_op_type1 == `LDA_INST) begin
+				next_lq_mem_value_valid = lq_opb_valid1;
+				next_lq_requested	= 1;
+				next_lq_mem_value	= lq_opa_in1+lq_opb_in1;
+			end
+			else begin
+				next_lq_mem_value_valid = 0;
+				next_lq_requested	= 0;
+				next_lq_mem_value	= 0;
+			end
 		end
 		else if (lq_free_enable && lq_mem_in2) begin
 			next_inuse			= 1;
@@ -152,9 +159,16 @@ module lq_one_entry(
 			next_lq_addr_valid	= lq_opb_valid2;
 			next_lq_rob_idx		= lq_rob_idx_in2;
 			next_lq_dest_tag	= lq_dest_idx2;
-			next_lq_mem_value_valid = 0;
-			next_lq_requested	= 0;
-			next_lq_mem_value	= 0;
+			if (lq_inst_op_type2 == `LDA_INST) begin
+				next_lq_mem_value_valid = lq_opb_valid2;
+				next_lq_requested	= 1;
+				next_lq_mem_value	= lq_opa_in2+lq_opb_in2;
+			end
+			else begin
+				next_lq_mem_value_valid = 0;
+				next_lq_requested	= 0;
+				next_lq_mem_value	= 0;
+			end
 		end
 		else if (lq_free_enable) begin
 			next_inuse			= 0;
@@ -180,9 +194,16 @@ module lq_one_entry(
 			next_lq_addr_valid	= lq_opb_valid1;
 			next_lq_rob_idx		= lq_rob_idx_in1;
 			next_lq_dest_tag	= lq_dest_idx1;
-			next_lq_mem_value_valid = 0;
-			next_lq_requested	= 0;
-			next_lq_mem_value	= 0;
+			if (lq_inst_op_type1 == `LDA_INST) begin
+				next_lq_mem_value_valid = lq_opb_valid1;
+				next_lq_requested	= 1;
+				next_lq_mem_value	= lq_opa_in1+lq_opb_in1;
+			end
+			else begin
+				next_lq_mem_value_valid = 0;
+				next_lq_requested	= 0;
+				next_lq_mem_value	= 0;
+			end
 		end
 		else if (lq_mem_in2) begin
 			next_inuse			= 1;
@@ -194,18 +215,33 @@ module lq_one_entry(
 			next_lq_addr_valid	= lq_opb_valid2;
 			next_lq_rob_idx		= lq_rob_idx_in2;
 			next_lq_dest_tag	= lq_dest_idx2;
-			next_lq_mem_value_valid = 0;
-			next_lq_requested	= 0;
-			next_lq_mem_value	= 0;
+			if (lq_inst_op_type2 == `LDA_INST) begin
+				next_lq_mem_value_valid = lq_opb_valid2;
+				next_lq_requested	= 1;
+				next_lq_mem_value	= lq_opa_in2+lq_opb_in2;
+			end
+			else begin
+				next_lq_mem_value_valid = 0;
+				next_lq_requested	= 0;
+				next_lq_mem_value	= 0;
+			end
 		end
 		else begin
 			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb1_tag) && inuse && lq_cdb1_valid) begin
 				next_lq_opb			= lq_cdb1_in;
 				next_lq_addr_valid	= 1;
+				if (lq_inst_op_type == `LDA_INST) begin
+					next_lq_mem_value_valid = 1;
+					next_lq_mem_value	= lq_opa+next_lq_opb;
+				end
 			end
-			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb1_tag) && inuse && lq_cdb2_valid) begin
+			if (~lq_addr_valid && (lq_opb[$clog2(`PRF_SIZE)-1:0] == lq_cdb2_tag) && inuse && lq_cdb2_valid) begin
 				next_lq_opb			= lq_cdb2_in;
 				next_lq_addr_valid	= 1;
+				if (lq_inst_op_type == `LDA_INST) begin
+					next_lq_mem_value_valid = 1;
+					next_lq_mem_value	= lq_opa+next_lq_opb;
+				end
 			end
 			if (~lq_mem_value_valid && lq_mem_data_in_valid && inuse) begin
 				next_lq_mem_value = lq_mem_data_in;
