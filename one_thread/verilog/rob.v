@@ -334,6 +334,8 @@ module rob(
 	commit2_is_illegal_out 	= 0;
 	commit1_inst_out		= 0;
 	commit2_inst_out		= 0;
+	commit1_is_uncond_branch_out = 0;
+	commit2_is_uncond_branch_out = 0;
 		if (rob1_internal_is_ex_out[t1_head] && (t1_head != t1_tail || (t1_head == t1_tail && !rob1_internal_available_out[t1_tail])))
 		begin
 			commit1_pc_out			= rob1_internal_pc_out[t1_head];
