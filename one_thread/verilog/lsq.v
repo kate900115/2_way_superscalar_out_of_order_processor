@@ -525,6 +525,10 @@ module lsq(
 		cdb_dest_tag2	= 0;
 		n_sq_head1		= sq_head1;
 		n_sq_head2		= sq_head2;
+		lsq_inst1_out	= 0;
+		lsq_inst2_out	= 0;
+		lsq_inst1_pc_out	= 0;
+		lsq_inst2_pc_out	= 0;
 		if (lq1_is_ready != 0) begin
 			for (int i = 0; i < `LQ_SIZE; i++) begin
 				if (lq1_is_ready[i]) begin

@@ -1135,7 +1135,7 @@ cdb cdb1(
    		.inst1_valid(ID_inst1_is_valid),
 		.inst1_op_type(ID_op_type1),
 		.inst1_pc(current_pc),
-		//.inst1_in,
+		.inst1_in(PC_inst1),
 		.lsq_rega_in1(PRF_RS_inst1_opc),
 		.lsq_rega_valid1(PRF_RS_inst1_opc_valid),
 		.lsq_opa_in1(ID_inst1_opa),      	// Operand a from Rename  data
@@ -1149,7 +1149,7 @@ cdb cdb1(
    		.inst2_valid(ID_inst2_is_valid),
    		.inst2_op_type(ID_op_type2),
 		.inst2_pc(current_pc+4),
-		//.inst2_in,
+		.inst2_in(PC_inst2),
 		.lsq_rega_in2(PRF_RS_inst2_opc),
 		.lsq_rega_valid2(PRF_RS_inst2_opc_valid),
 		.lsq_opa_in2(ID_inst2_opa),      	// Operand a from Rename  data
